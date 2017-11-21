@@ -1,0 +1,3 @@
+#!/bin/bash
+
+rm -f *.a lib_csw_all.so *.o

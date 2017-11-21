@@ -1,0 +1,6 @@
+export classpath=$CSW_PARENT
+echo
+echo $classpath
+echo
+cd $CSW_PARENT
+java -Xmx500m -Djava.library.path=$CSW_PARENT/csw/lib csw.jtest.$1

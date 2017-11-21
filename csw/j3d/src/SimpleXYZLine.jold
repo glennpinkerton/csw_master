@@ -1,0 +1,189 @@
+
+package csw.j3d.src;
+
+/**
+ * This is a very simple storage class for the points used in an XYZ line.
+ * The x, y and z coordinates are assumed to be in the same units.  There are no
+ * provisions for editing a point at a time.  An editor can get the arrays,
+ * modify them, and then reset the arrays, numPoints and maxPoints as
+ * needed.
+ */
+public class SimpleXYZLine
+{
+
+    double[] xArray;
+    double[] yArray;
+    double[] zArray;
+    int      maxPoints;
+    int      numPoints;
+
+/**
+ * Constructor that creates empty x, y and z arrays of the specified
+ * size.  The arrays can be referenced via {@link #getXArray}, 
+ * {@link #getYArray} and {@link #getZArray}.  They can be filled
+ * in then if desired.
+ */
+    public SimpleXYZLine(int size) 
+    {
+      maxPoints = size;
+      xArray = new double[size];
+      yArray = new double[size];
+      zArray = new double[size];
+    }
+
+/**
+ * Constructor that takes the 3 double arrays.  This is
+ * the preferred constructor.  If the maxPoints parameter 
+ * is less than the numPoints parameter, maxPoints is set to numPoints.
+ *
+ * @param x array for x values.
+ * @param y array for y values.
+ * @param z array for z values.
+ * @param numPoints number of points in the line
+ * @param maxPoints size of the arrays (at least as large as numPoints)
+ */
+    public SimpleXYZLine(
+      double[] x,
+      double[] y,
+      double[] z,
+      int numPts,
+      int maxPts
+    ) 
+    {
+      if (maxPts < numPts) maxPts = numPts;
+      initData (x, y, z, numPts, maxPts);
+    }
+
+/**
+ * Copy constructor
+ *
+ * @param polyline SimpleXYZLine from which to copy.
+ */
+    public SimpleXYZLine(SimpleXYZLine polyline) {
+      copy (polyline);
+    }
+
+/**
+ * Method to get a copy of this line.
+ */
+    public SimpleXYZLine getCopy() {
+      SimpleXYZLine polyline = new SimpleXYZLine(this);
+      return(polyline);
+    }
+
+    private void copy (SimpleXYZLine line)
+    {
+      maxPoints = line.maxPoints;
+      numPoints = line.numPoints;
+      xArray = new double[maxPoints];
+      yArray = new double[maxPoints];
+      zArray = new double[maxPoints];
+
+      System.arraycopy (line.xArray, 0, xArray, 0, numPoints);
+      System.arraycopy (line.yArray, 0, yArray, 0, numPoints);
+      System.arraycopy (line.zArray, 0, zArray, 0, numPoints);
+    }
+
+    private void initData (double[] x,
+                           double[] y,
+                           double[] z,
+                           int maxp,
+                           int nump)
+    {
+      maxPoints = maxp;
+      numPoints = nump;
+      xArray = new double[maxPoints];
+      yArray = new double[maxPoints];
+      zArray = new double[maxPoints];
+
+      System.arraycopy (x, 0, xArray, 0, numPoints);
+      System.arraycopy (y, 0, yArray, 0, numPoints);
+      System.arraycopy (z, 0, zArray, 0, numPoints);
+    }
+
+    private void resizeArrays ()
+    {
+      int oldsize = xArray.length;
+
+      if (numPoints > maxPoints) maxPoints = numPoints;
+      if (maxPoints == oldsize) return;
+
+      double[] newx, newy, newz;
+
+      newx = new double[maxPoints];      
+      newy = new double[maxPoints];      
+      newz = new double[maxPoints];      
+
+      System.arraycopy (newx, 0, xArray, 0, numPoints);
+      System.arraycopy (newy, 0, yArray, 0, numPoints);
+      System.arraycopy (newz, 0, zArray, 0, numPoints);
+
+      xArray = newx;
+      yArray = newy;
+      zArray = newz;
+
+    }
+
+
+/**
+ * Set the x,y and z arrays.  The arrays must all be the same length
+ * or the object will get screwed up.
+ */
+    public void setXYZArrays (double[] x,
+                              double[] y,
+                              double[] z)
+    {
+      xArray = x;
+      yArray = y;
+      zArray = z;
+      maxPoints = x.length;
+      if (numPoints > x.length) {
+        numPoints = x.length;
+      }
+    }
+      
+
+/**
+ * Return the internal X Array object.
+ */
+    public double[] getXArray ()
+    {
+      return xArray;
+    }
+
+/**
+ * Return the internal Y Array object.
+ */
+    public double[] getYArray ()
+    {
+      return yArray;
+    }
+
+/**
+ * Return the internal Z Array object.
+ */
+    public double[] getZArray ()
+    {
+      return zArray;
+    }
+
+/**
+ * Set the number of points in the line.
+ */
+    public void setNumPoints (int npts)
+    {
+      numPoints = npts;
+      resizeArrays ();
+    }
+
+/**
+ * Set the maximum number of points (the internal array sizes)
+ */
+    public void setMaxPoints (int maxpts)
+    {
+      maxPoints = maxpts;
+      if (maxPoints < numPoints) maxPoints = numPoints;
+      resizeArrays ();
+    }
+
+}  // end of main class

@@ -1,0 +1,11 @@
+On the Nvidia Quadro fx500, you need to turn off the enhanced cpu
+instruction set option in the opengl properties to avoid flakey 
+behavior.
+
+On Tom's Nvidia Gforce 2, you need to be in true color mode, not 
+65k color mode, to get proper blending of transparent surfaces with
+the bounding box.
+
+Larry's ATI card is not a good choice for opengl.  The drivers are 
+not well debugged and intermitently, the 3d view does not show
+up initially on the mbuilder.

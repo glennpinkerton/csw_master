@@ -1,0 +1,14 @@
+#cd $CSW_PARENT/csw/utils/src;make clean;make;
+#cd $CSW_PARENT/csw/surfaceworks/src;make clean;make;
+#cd $CSW_PARENT/csw/jutils/src;make clean;make;
+####cd $CSW_PARENT/csw/jogl;make clean;make;
+#cd $CSW_PARENT/csw/jsurfaceworks/src;make clean;make;
+
+#cd $CSW_PARENT/csw/images;make clean;make;
+
+#cd $CSW_PARENT/csw/icons;make clean;make;
+
+#cd $CSW_PARENT/csw/jeasyx/src;make clean;make;
+
+cd $CSW_PARENT/csw/j3d/src;make clean;make;
+#cd $CSW_PARENT/csw/jtest;make clean;make;

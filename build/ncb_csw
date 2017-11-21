@@ -1,0 +1,67 @@
+echo
+echo   ==== building archive utils
+echo
+cd $CSW_PARENT/csw/utils/src;make;
+
+echo
+echo   ==== building archive hlevutils
+echo
+cd $CSW_PARENT/csw/hlevutils/src;make;
+
+echo
+echo   ==== building archive surfaceworks
+echo
+cd $CSW_PARENT/csw/surfaceworks/src;make;
+
+echo
+echo   ==== building archive jutils
+echo
+cd $CSW_PARENT/csw/jutils/src;make;
+
+echo
+echo   ==== not building archive jogl
+echo
+#cd $CSW_PARENT/csw/jogl;make;
+
+echo
+echo   ==== building archive images
+echo
+cd $CSW_PARENT/csw/images;make;
+
+echo
+echo   ==== building archive uistuff
+echo
+cd $CSW_PARENT/csw/uistuff;make;
+
+echo
+echo   ==== building archive j3d
+echo
+cd $CSW_PARENT/csw/j3d/src;make;
+
+echo
+echo   ==== building archive jsurfaceworks
+echo
+cd $CSW_PARENT/csw/jsurfaceworks/src;make archive;
+
+echo
+echo   ==== building archive jeasyx and shared lib
+echo
+cd $CSW_PARENT/csw/jeasyx/src;make shared_lib;
+
+cd $CSW_PARENT/csw/lib;./build_shared_lib;
+
+echo
+echo   ==== building executable jeasyx
+echo
+cd $CSW_PARENT/csw/jeasyx/src;make executable;
+
+echo
+echo   ==== building executable jsurf
+echo
+cd $CSW_PARENT/csw/jsurfaceworks/src;make executable;
+
+echo
+echo   ==== building jtest
+echo
+cd $CSW_PARENT/csw/jtest;make;
+

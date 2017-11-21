@@ -1,0 +1,14 @@
+echo "running tester line 1"
+echo
+export classpath=$CSW_PARENT:$CSW_PARENT/csw/jar/jogl-all.jar:$CSW_PARENT/csw/jar/gluegen-rt.jar:$CSW_PARENT/csw/jar/jogl-all-natives-linux-i586.jar:$CSW_PARENT/csw/jar/gluegen-rt-natives-linux-i586.jar
+#echo
+#echo classpath defined as:
+#echo $classpath
+#echo
+export glp_lib_path=$CSW_PARENT/csw/lib
+#echo
+#echo library path defined as:
+#echo $glp_lib_path
+#echo
+cd $CSW_PARENT
+java -Xmx500m -cp $classpath -Djava.library.path=$glp_lib_path -Djogamp.gluegen.UseTempJarCache=false csw.j3d.src.$1

@@ -1,0 +1,13 @@
+cd $CSW_PARENT/csw/hlevutils/src;make clean;
+cd $CSW_PARENT/csw/utils/src;make clean;
+cd $CSW_PARENT/csw/surfaceworks/src;make clean;
+cd $CSW_PARENT/csw/jutils/src;make clean;
+cd $CSW_PARENT/csw/jogl;make clean;
+cd $CSW_PARENT/csw/jsurfaceworks/src;make clean;
+cd $CSW_PARENT/csw/images;make clean;
+cd $CSW_PARENT/csw/uistuff;make clean;
+cd $CSW_PARENT/csw/jeasyx/src;make clean;
+cd $CSW_PARENT/csw/j3d/src;make clean;
+cd $CSW_PARENT/csw/jtest;make clean;
+
+cd $CSW_PARENT/csw/lib;./clean_shared_lib;

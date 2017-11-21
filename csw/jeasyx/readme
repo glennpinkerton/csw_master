@@ -1,0 +1,18 @@
+
+This file has some notes on development of the 2d graphics classes.
+It's mostly workarounds for any problems I encountered.
+
+
+
+
+I found a problem with drawing a Rectangle2D.Float to a Graphics2D.
+I had a rectangle defined with a negative height, which is ok 
+according to the documentation.  It would not draw.  After I shifted
+the rectangle to a positive height and width, it was drawn correctly.
+
+This was with sdk 1.4.0  I haven't tried it with 1.4.1
+
+
+
+
+
