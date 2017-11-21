@@ -1,3 +1,14 @@
+#!/bin/bash
+
+cd ..
+export CSW_PARENT=$(pwd);
+
+echo
+echo CSW_PARENT auto set to:  $CSW_PARENT
+echo
+echo
+
+
 echo
 echo   ==== building archive utils
 echo

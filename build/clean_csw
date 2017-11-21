@@ -1,3 +1,9 @@
+#!/bin/bash
+
+cd ..
+export CSW_PARENT=$(pwd);
+
+
 cd $CSW_PARENT/csw/hlevutils/src;make clean;
 cd $CSW_PARENT/csw/utils/src;make clean;
 cd $CSW_PARENT/csw/surfaceworks/src;make clean;
