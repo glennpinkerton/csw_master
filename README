@@ -11,7 +11,7 @@ a version control system
 I have made two branches:  glenns_branch and guest_branch.  If I understand
 git correctly, both branches are available to anyone.  I hope people will
 be courteous enough to explore the guest_branch and leave glenns_branch
-alone.
+alone.  Feel free to explore the guest_branch as you wish.
 
 I will update/replace this README with information about relatively big changes
 that I make in the code.
