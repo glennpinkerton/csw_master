@@ -1,0 +1,20 @@
+This is a collection of java and C++ code that does some graphics and
+contour mapping stuff.  The code was originally written by Glenn Pinkerton
+(glennpinkerton@comcast.net) between 1997 and 2007.  The current reincarnation
+is a refactor trying to use more modern software technology.
+
+My (Glenn's) reason for doing this is primarily to learn new technology.
+The code is currently (11/21/1917) not really "ready for use".  I have put
+it here on github to learn how to use github and to have everything under
+a version control system
+
+I have made two branches:  glenns_branch and guest_branch.  If I understand
+git correctly, both branches are available to anyone.  I hope people will
+be courteous enough to explore the guest_branch and leave glenns_branch
+alone.
+
+I will update/replace this README with information about relatively big changes
+that I make in the code.
+
+Any constructive comments are appreciated.
+
