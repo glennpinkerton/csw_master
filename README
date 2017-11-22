@@ -18,3 +18,13 @@ that I make in the code.
 
 Any constructive comments are appreciated.
 
+
+The two directories here are:
+
+    build     Scripts to build using make.  I do not have any other build
+              mechanism other than the makefiles.
+
+    csw       This has all the code, makefiles, some data, etc.
+
+There are README files in build and csw with more information.
+

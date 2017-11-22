@@ -1,0 +1,59 @@
+This directory has scripts used to build the software.
+
+There are three executable scripts and three .mk files:
+
+  build_csw     Clean all previous build output and do a full build from scratch.
+                On my system, this takes 5 minutes or so.
+
+  clean_csw     Clean all previous build output without a new build.
+
+  ncb_csw       "No Clean Build"  Build without a clean.  This works pretty
+                well if no header files have been changed.  I tend to use 
+                this most of the time, and use build_csw if I am going to be 
+                away for a few minutes while the build is going on.
+
+  linux.mk      This is the "master or global" make file for linux.  In this
+                version of the build scripts, linux.mk is identical to system.mk.
+
+  system.mk     This is the file that is included in each makefile used to
+                build the software.  The idea is to copy either linux.mk or
+                win32.mk into this file to build on either system.  Right now,
+                the win32.mk include has not been used for 10 years and it will
+                not work.
+
+  win32.mk      Old include file for win32 makes.  This does not work, but it is
+                kept with the possibility of getting it to work some time.
+
+
+
+So, only the linux build currently works.  Here are versions of various linux
+"system" programs used in the build process.
+
+  linux (fedora 20) output from uname -a
+
+    Linux bangor 3.11.10-301.fc20.x86_64 #1 SMP
+    Thu Dec 5 14:01:17 UTC 2013 x86_64 x86_64 x86_64 GNU/Linux
+
+  gcc output from gcc --version
+
+    gcc (GCC) 4.8.3 20140911 (Red Hat 4.8.3-7)
+
+  g++ putput from g++ --version
+
+    g++ (GCC) 4.8.3 20140911 (Red Hat 4.8.3-7)
+
+  javac   from javac -version
+
+    javac 1.8.0_121
+
+  javah   from javah -version
+
+    javac 1.8.0_121
+    
+  java    from java -version
+
+    javac 1.8.0_121
+
+ 
+This is not intended to be a tutorial on finding and installing and setting up
+these "system" programs.  I leave all this as an "exercise for the student". 

@@ -1,0 +1,17 @@
+The tester script can be used to run a java test program as follows.
+
+    ./tester javaclass
+
+Currently the only two classes in this directory that work are
+
+    JEasyXTest  and  JSWUnitTest
+
+After the software has been built, you can run:
+
+    ./tester JEasyXTest       to draw several pre programmed
+                              collections of graphical objects.
+
+or
+
+    ./tester JSWUnitTest      to draw a couple of examples of 
+                              calculated surface contour maps.  
