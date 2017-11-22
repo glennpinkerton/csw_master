@@ -28,3 +28,14 @@ The two directories here are:
 
 There are README files in build and csw with more information.
 
+
+You need to set the environment variable CSW_PARENT to the name of the
+directory where this README file is located.
+
+For example in bash:   
+
+export CSW_PARENT=/home/git_glenns_branch/csw_master
+
+I suggest you put this in your .bashrc file, in your home directory
+or in whatever other shell init file you have.
+
