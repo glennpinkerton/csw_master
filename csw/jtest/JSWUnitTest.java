@@ -143,6 +143,7 @@ catch (Exception e) {
         });
 
         JButton trimesh_file_button = new JButton ("debug trimesh file");
+        trimesh_file_button.setEnabled (false);
         trimesh_file_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
                 TFileFrame frame = new TFileFrame ();
@@ -151,6 +152,7 @@ catch (Exception e) {
         });
 
         JButton grid_file_button = new JButton ("debug grid file");
+        grid_file_button.setEnabled (false);
         grid_file_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
                 GridFileFrame frame = new GridFileFrame ();
@@ -159,6 +161,7 @@ catch (Exception e) {
         });
 
         JButton divide_file_button = new JButton ("debug subdivide file");
+        divide_file_button.setEnabled (false);
         divide_file_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
                 DivideFrame frame = new DivideFrame ();
@@ -167,6 +170,7 @@ catch (Exception e) {
         });
 
         JButton tmesh_fileio_button = new JButton ("trimesh fileio test");
+        tmesh_fileio_button.setEnabled (false);
         tmesh_fileio_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
                 FileioFrame frame = new FileioFrame ();
@@ -175,6 +179,7 @@ catch (Exception e) {
         });
 
         JButton pt_file_button = new JButton ("points and constraints");
+        pt_file_button.setEnabled (false);
         pt_file_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
                 PFileFrame frame = new PFileFrame ();
@@ -183,6 +188,7 @@ catch (Exception e) {
         });
 
         JButton tmesh_contour_button = new JButton ("trimesh contour");
+        tmesh_contour_button.setEnabled (false);
         tmesh_contour_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
                 ContourFrame frame = new ContourFrame ();
@@ -191,6 +197,7 @@ catch (Exception e) {
         });
 
         JButton bug_file_button = new JButton ("read bug files");
+        bug_file_button.setEnabled (false);
         bug_file_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
             JSurfaceWorks jsw = new JSurfaceWorks ();
@@ -199,6 +206,7 @@ catch (Exception e) {
         });
 
         JButton speed_button = new JButton ("trimesh performance test");
+        speed_button.setEnabled (false);
         speed_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
             JSurfaceWorks jsw = new JSurfaceWorks ();
@@ -207,6 +215,7 @@ catch (Exception e) {
         });
 
         JButton resample_button = new JButton ("line decimation test");
+        resample_button.setEnabled (false);
         resample_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
               ResampleFrame frame = new ResampleFrame ();

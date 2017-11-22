@@ -1,0 +1,91 @@
+This directory has the code, makefiles, some data, etc. for the software.
+
+In case you are wondering about the name "csw", it is the initials of a
+company that I tried to start about 20 years ago.  I have kept it for
+notalgic reasons if for nothing else.
+
+There are several directories with a bunch of stuff in each.  A brief
+description of each directory follows.  As I continue the effort to move
+this all to "more modern technology" I hope to put README files in each
+directory with more detail on each directory.
+
+
+hlevutils
+
+  This has a small amount of C++ code that seems to need separation 
+  for clean builds.  There probably is a better way, but here it is 
+  and it seems to work.
+
+images
+
+  This has some gif files used for some polygon pattern fills and
+  a java class to utilize them.
+
+j3d
+
+  This has (mostly) java files for 3d surface rendering.  The surfaces
+  are things that contour maps are generally made from.  These are not
+  surfaces in the gaming sense of the word.  The 3d surface rendering
+  has not been tested as of 11/21/2017.
+
+jar
+
+  This has some jar files installed from "system" packages.  I keep a
+  copy here for safety sake.  These copies are not directly used in
+  building the software.
+
+jeasyx
+
+  This has java, C++ and C files used for the graphics system.  The
+  system is driven from java with jni (java native interface) calls to
+  the C and C++.  There is a bunch of stuff here.
+
+jogl
+
+  Files for the jogl (java opengl) code.  This has jar files and native
+  shared libraries.  Jogl is freely available.  I will let you look into
+  it more if you are interested.
+
+jsurfaceworks
+
+  This has java, C++ and C files for calculating and manipulating
+  surfaces.  Rectangular grid surfaces and triangle meshes are available.
+  There is a bunch of stuff here.  The java code provides the api for
+  calculating the surfaces.  Java native interface (jni) is used to
+  do the actual surface calculation in c++ code.
+
+jtest
+
+  Simple test programs that exercise code from jeasyx and jsurfaceworks.
+  I have put a README in this directory explaining current limitations.
+
+jutils
+
+  A few java files with commonly used utilities.
+
+lib
+
+  Destination where the build process puts jar files (java archives) and
+  shared libraries (from C and C++),  The "system" shared libraries
+  installed from java, jogl, etc are also located here.
+
+little_stuff
+
+  Some odds and ends that may not be useful any more, but I will keep
+  them for now.
+
+surfaceworks
+
+  This has the C++ code for calculating and manipulating surfaces.  This
+  is pretty much home grown by Glenn.  There is a bunch of stuff here.
+
+uistuff
+
+  Some java classes and gif files used by the graphics panel in jeasyx.
+
+utils
+
+  Some common utilities used by the C and C++ code.  There is a bunch
+  of stuff here as well
+
+
