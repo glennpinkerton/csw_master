@@ -8,10 +8,8 @@ The code is currently (11/21/2017) not really "ready for use".  I have put
 it here on github to learn how to use github and to have everything under
 a version control system
 
-I have made two branches:  glenns_branch and guest_branch.  If I understand
-git correctly, both branches are available to anyone.  I hope people will
-be courteous enough to explore the guest_branch and leave glenns_branch
-alone.  Feel free to explore the guest_branch as you wish.
+I have made two branches:  glenns_branch and testing_branch.   You should make
+your own branch if you want to explore the code.
 
 I will update/replace this README with information about relatively big changes
 that I make in the code.
