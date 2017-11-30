@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -11,7 +11,7 @@
 /*
     ply_fpatP.h
 
-      This file has constants and structure definitions for the
+    This file has constants and structure definitions for the
     polygon pattern fill functions.
 */
 

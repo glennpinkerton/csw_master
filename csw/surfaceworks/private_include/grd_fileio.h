@@ -56,7 +56,6 @@
 
 #define MULTI_GRID_BASE     1000000
 #define FAULT_VERSION       2000
-#define BLENDED_FAULT_VERSION  3000
 #define EXPANDED_MASK_VERSION  4000
 
 #define FAULT_SCALE_CONSTANT_XY    10000000.0
@@ -132,16 +131,6 @@ class CSWGrdFileio
     int    grd_write_multiple_file (char*, GRidFileRec*, int);
     int    grd_read_multiple_file (char*, GRidFileRec*, int);
     int    grd_clean_file_rec_list (GRidFileRec *list, int nlist);
-    int    grd_write_blended_file (const char *, const char *,
-                                   CSW_Blended   *, char *,
-                                   int, int,
-                                   double, double, double, double,
-                                   FAultLineStruct *faults, int nfaults);
-    int    grd_read_blended_file (const char *, char *,
-                                  CSW_Blended   **, char **,
-                                  int*, int*,
-                                  double*, double*, double*, double*,
-                                  FAultLineStruct **faults, int *nfaults);
 
     int    grd_write_text_tri_mesh_file
                  (int vused,
@@ -184,11 +173,6 @@ class CSWGrdFileio
                   double *z,
                   int npts,
                   char *fname);
-
-    int grd_write_blended_grid
-                   (CSW_Blended *grid, int ncol, int nrow, int nskip,
-                   double xmin, double ymin, double xmax, double ymax,
-                   char *filename);
 
     int grd_write_float_points (CSW_F  *x,
                           CSW_F  *y,

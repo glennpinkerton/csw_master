@@ -61,6 +61,12 @@ cd $CSW_PARENT/csw/jeasyx/src;make shared_lib;
 
 cd $CSW_PARENT/csw/lib;./build_shared_lib;
 
+
+echo
+echo   ==== building jtest
+echo
+cd $CSW_PARENT/csw/jtest;make;
+
 echo
 echo   ==== building executable jeasyx
 echo
@@ -70,9 +76,3 @@ echo
 echo   ==== building executable jsurf
 echo
 cd $CSW_PARENT/csw/jsurfaceworks/src;make executable;
-
-echo
-echo   ==== building jtest
-echo
-cd $CSW_PARENT/csw/jtest;make;
-

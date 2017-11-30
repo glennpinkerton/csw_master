@@ -38,14 +38,14 @@ typedef struct {
 } COnstraintEdge;
 
 typedef struct {
-    int    *list;
+    int    *list = NULL;
     int    nlist,
            maxlist;
 } NOdeTriListStruct;
 
 typedef struct {
-    int    *nodes;
-    int    *edges;
+    int    *nodes = NULL;
+    int    *edges = NULL;
     int    num_nodes;
     int    num_edges;
     int    end_1_flag;
@@ -124,7 +124,7 @@ class CSWGrdConstraint
     int                 NumFlags = 0;
 
     NOdeTriListStruct   *NodeTriList = NULL;
-    NOdeEdgeListStruct  *NodeEdgeList;
+    NOdeEdgeListStruct  *NodeEdgeList = NULL;
     int                 NumNodeEdgeList = 0;
     int                 NumNodeTriList = 0;
 

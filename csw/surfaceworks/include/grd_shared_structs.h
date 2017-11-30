@@ -92,7 +92,6 @@
 #define GRD_NORMAL_GRID_FILE         1
 #define GRD_THICKNESS_GRID_FILE      2
 #define GRD_STEP_GRID_FILE           3
-#define GRD_BLENDED_GRID_FILE        4
 
 #define GRD_OUTSIDE_ONLY             0
 #define GRD_INSIDE_AND_OUTSIDE       1
@@ -184,13 +183,6 @@
     }  GRidArithData;
 
     typedef struct {
-        unsigned char      v1, p1,
-                           v2, p2,
-                           v3, p3,
-                           v4, p4;
-    }  CSW_BlendedNode;
-
-    typedef struct {
         int                value1,
                            value2,
                            value3,
@@ -202,8 +194,6 @@
         int                nvalues;
         CSW_Float          missing_percent;
     }  CSW_Mixture;
-
-    typedef CSW_BlendedNode CSW_Blended;
 
     typedef struct {
         CSW_F              x,
@@ -304,22 +294,6 @@
                         y2;
         int             image_type;
     }  GRdImage;
-
-    typedef struct {
-        unsigned char   *red;
-        unsigned char   *green;
-        unsigned char   *blue;
-        unsigned char   *alpha;
-        int             ncol,
-                        nrow;
-        double          x1,
-                        y1,
-                        x2,
-                        y2;
-        char            name[100];
-        int             id;
-    }  GRdNDPImage;
-
 
 
 #define   Z_ABSOLUTE_TINY  (1.e-30) 

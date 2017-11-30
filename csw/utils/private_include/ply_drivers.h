@@ -43,8 +43,8 @@ typedef struct {
 } CList;
 
 typedef struct {
-    double    *xpoly, *ypoly, *xpa[1], *ypa[1];
-    int       iflag, *ic, nc, npt, icomp;
+    double    *xpoly = NULL, *ypoly = NULL, *xpa[1], *ypa[1];
+    int       iflag, *ic = NULL, nc, npt, icomp;
     char      scflag, scf2;
 } POlyrec;
 

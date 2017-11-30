@@ -26,7 +26,6 @@
 #include "csw/jeasyx/private_include/EZXJavaArea.h"
 #include "csw/jeasyx/private_include/gtx_drawprim.h"
 #include "csw/jeasyx/private_include/gtx_msgP.h"
-#include "csw/jeasyx/private_include/NDPSurf.h"
 
 #include "csw/surfaceworks/include/contour_api.h"
 #include "csw/surfaceworks/include/grid_api.h"
@@ -573,29 +572,12 @@ CDisplayList::CDisplayList()
     tmp_contour_faults = NULL;
     num_tmp_contour_faults = 0;
 
-    BlendedXout = NULL;
-    BlendedYout = NULL;
-    BlendedZout = NULL;
-    BlendedNcout = NULL;
-    BlendedNvout = NULL;
-    BlendedNpout = 0;
-
-    NDPNvalues = 0;
-    NDPValue = NULL;
-    NDPRed = NULL;
-    NDPGreen = NULL;
-    NDPBlue = NULL;
-    NDPAlpha = NULL;
-
     ImageXFault = NULL;
     ImageYFault = NULL;
     ImageNFaultPoints = NULL;
     ImageNFaults = 0;
     ImageNFaultTotal = 0;
 
-    NDPSurfList = NULL;
-    numNDPSurfList = 0;
-    maxNDPSurfList = 0;
 
 }
 
@@ -711,19 +693,6 @@ CDisplayList::~CDisplayList()
         num_surf_list = 0;
     }
 
-    if (NDPSurfList != NULL) {
-        for (i=0; i<numNDPSurfList; i++) {
-            if (NDPSurfList[i] != NULL) {
-                delete (NDPSurfList[i]);
-            }
-            NDPSurfList[i] = NULL;
-        }
-        csw_Free (NDPSurfList);
-        NDPSurfList = NULL;
-        maxNDPSurfList = 0;
-        numNDPSurfList = 0;
-    }
-
     if (contour_list != NULL) {
         DLContour     *dlc;
         for (i=0; i<num_contour_list; i++) {
@@ -734,11 +703,6 @@ CDisplayList::~CDisplayList()
         }
         csw_Free (contour_list);
     }
-
-    csw_Free (BlendedXout);
-    csw_Free (BlendedNcout);
-
-    csw_Free (NDPValue);
 
     csw_Free (ImageXFault);
     csw_Free (ImageNFaultPoints);
@@ -1072,8 +1036,6 @@ void CDisplayList::Draw (void)
                 reclip_frame_contours (i);
                 delete_frame_grid_images (i);
                 reclip_frame_grid_images (i);
-                delete_frame_ndp_images (i);
-                reclip_frame_ndp_images (i);
 
                 current_frame_num = save_fnum;
                 update_frame_limits ();
@@ -9079,62 +9041,6 @@ void CDisplayList::delete_frame_grid_images (int fnum)
 }  /*  end of function delete_frame_grid_images */
 
 
-void CDisplayList::delete_frame_ndp_images (int fnum)
-{
-    int            i;
-    IMagePrim      *imptr, *imp2;
-
-    if (image_prim_list == NULL) {
-        return;
-    }
-    if (NDPSurfList == NULL) {
-        return;
-    }
-
-    for (i=0; i<num_image_prim_list; i++) {
-
-        imptr = image_prim_list + i;
-
-        if (imptr->deleted_flag == 1) {
-            continue;
-        }
-
-        if (imptr->frame_num != fnum) {
-            continue;
-        }
-
-        if (imptr->grid_num < 10000) {
-            continue;
-        }
-
-        if (imptr->grid_num >= 0) {
-            if (NDPSurfList[imptr->grid_num-10000]->needs_reclip == 0) {
-                continue;
-            }
-        }
-
-        imp2 = imptr;
-        imp2->deleted_flag = 1;
-        csw_Free (imp2->red_data);
-        csw_Free (imp2->green_data);
-        csw_Free (imp2->blue_data);
-        csw_Free (imp2->transparency_data);
-        imp2->red_data = NULL;
-        imp2->green_data = NULL;
-        imp2->blue_data = NULL;
-        imp2->transparency_data = NULL;
-        add_available_image (i);
-
-        imptr->numsub = 0;
-
-    }
-
-    return;
-
-}  /*  end of function delete_frame_ndp_images */
-
-
-
 void CDisplayList::rescale_frame (int fnum)
 {
     FRameStruct     *frptr;
@@ -9184,7 +9090,6 @@ void CDisplayList::rescale_frame (FRameStruct *frptr)
 
     delete_frame_images (fnum);
     delete_frame_grid_images (fnum);
-    delete_frame_ndp_images (fnum);
     delete_frame_cell_edges (fnum);
 
 /*
@@ -9239,7 +9144,6 @@ void CDisplayList::rescale_frame (FRameStruct *frptr)
 
     reclip_frame_images (fnum);
     reclip_frame_grid_images (fnum);
-    reclip_frame_ndp_images (fnum);
 
     current_frame_num = save_fnum;
     update_frame_limits ();
@@ -13273,51 +13177,6 @@ void CDisplayList::reclip_frame_grid_images (int fnum)
     return;
 
 }  /*  end of function reclip_frame_grid_images */
-
-
-
-void CDisplayList::reclip_frame_ndp_images (int fnum)
-
-{
-    int             i;
-    NDPSurf         *grid;
-
-    if (NDPSurfList == NULL) {
-        return;
-    }
-
-    save_current_graphic_attributes ();
-
-    for (i=0; i<numNDPSurfList; i++) {
-
-        grid = NDPSurfList[i];
-        if (grid == NULL) {
-            continue;
-        }
-
-        if (grid->deleted_flag == 1) {
-            continue;
-        }
-
-        if (grid->frame_num != fnum) {
-            continue;
-        }
-
-        if (grid->needs_reclip == 0) {
-            grid->needs_reclip = 1;
-            continue;
-        }
-
-        grid->CalcImage ((void *)this);
-
-    }
-
-    unsave_current_graphic_attributes ();
-
-    return;
-
-}  /*  end of function reclip_frame_ndp_images */
-
 
 
 
@@ -21156,190 +21015,9 @@ void CDisplayList::backscalef (
 
 }
 
-int CDisplayList::SetBlendedTriMesh (
-    double *xnode,
-    double *ynode,
-    double *znode,
-    int *nodeflag,
-    int numnode,
-    int *n1edge,
-    int *n2edge,
-    int *t1edge,
-    int *t2edge,
-    int *edgeflag,
-    int numedge,
-    int *e1tri,
-    int *e2tri,
-    int *e3tri,
-    int *triflag,
-    int numtri)
-{
-
-    nodeflag = nodeflag;
-    edgeflag = edgeflag;
-    triflag = triflag;
-
-    csw_Free (BlendedXout);
-    csw_Free (BlendedNcout);
-    BlendedXout = BlendedYout = BlendedZout = NULL;
-    BlendedNvout = BlendedNcout = NULL;
-    BlendedNpout = 0;
-
-/*
- * Check obvious errors.  Note that the flag arrays can be
- * NULL.  They are optional.
- */
-    if (xnode == NULL  ||
-        ynode == NULL  ||
-        znode == NULL  ||
-        numnode < 3  ||
-        n1edge == NULL  ||
-        n2edge == NULL  ||
-        t1edge == NULL  ||
-        t2edge == NULL  ||
-        numedge < 3  ||
-        e1tri == NULL  ||
-        e2tri == NULL  ||
-        e3tri == NULL  ||
-        numtri < 1)
-    {
-        return 0;
-    }
-
-    double         *xout, *yout, *zout;
-    int            npout, *ncout, *nvout, *nodeout;
-    int            maxpts, maxcomp, i;
-    NOdeStruct     *nodes;
-    EDgeStruct     *edges;
-    TRiangleStruct *tris;
-
-    maxpts = numedge / 3;
-    if (maxpts < 1000) maxpts = 1000;
-    maxcomp = maxpts;
-
-    xout = (double *)csw_Malloc (maxpts * 4 * sizeof(double));
-    if (xout == NULL) {
-        return -1;
-    }
-    yout = xout + maxpts;
-    zout = yout + maxpts;
-    nodeout = (int *)(zout + maxpts);
-
-    ncout = (int *)csw_Malloc (maxcomp * 2 * sizeof(int));
-    if (ncout == NULL) {
-        csw_Free (xout);
-        return -1;
-    }
-    nvout = ncout + maxcomp;
-
-    nodes = (NOdeStruct *)csw_Calloc (numnode * sizeof(NOdeStruct));
-    edges = (EDgeStruct *)csw_Calloc (numedge * sizeof(EDgeStruct));
-    tris = (TRiangleStruct *)csw_Calloc (numtri * sizeof(TRiangleStruct));
-    if (nodes == NULL  ||  edges == NULL  ||  tris == NULL) {
-        csw_Free (nodes);
-        csw_Free (edges);
-        csw_Free (tris);
-        csw_Free (xout);
-        csw_Free (ncout);
-        return -1;
-    }
-
-    for (i=0; i<numnode; i++) {
-        nodes[i].x = xnode[i];
-        nodes[i].y = ynode[i];
-        nodes[i].z = znode[i];
-    }
-
-    for (i=0; i<numedge; i++) {
-        edges[i].node1 = n1edge[i];
-        edges[i].node2 = n2edge[i];
-        edges[i].tri1 = t1edge[i];
-        edges[i].tri2 = t2edge[i];
-    }
-
-    for (i=0; i<numtri; i++) {
-        tris[i].edge1 = e1tri[i];
-        tris[i].edge2 = e2tri[i];
-        tris[i].edge3 = e3tri[i];
-    }
-
-    int istat =
-      grdapi_ptr->grd_OutlineTriMeshBoundary (
-        nodes, numnode,
-        edges, numedge,
-        tris, numtri,
-        xout, yout, zout,
-        nodeout,
-        &npout, ncout, nvout,
-        maxpts, maxcomp);
-    csw_Free (nodes);
-    csw_Free (edges);
-    csw_Free (tris);
-
-    if (istat == -1) {
-        csw_Free (xout);
-        csw_Free (ncout);
-        return -1;
-    }
-
-    BlendedXout = xout;
-    BlendedYout = yout;
-    BlendedZout = zout;
-    BlendedNcout = ncout;
-    BlendedNvout = nvout;
-    BlendedNpout = npout;
-
-    return 1;
-}
 
 /*----------------------------------------------------------------------------*/
 
-int CDisplayList::SetNDPGraphicProperties (
-    int     nvalues,
-    int     *value,
-    int     *red,
-    int     *green,
-    int     *blue,
-    int     *alpha)
-{
-
-    csw_Free (NDPValue);
-    NDPValue = NULL;
-    NDPRed = NULL;
-    NDPGreen = NULL;
-    NDPBlue = NULL;
-    NDPAlpha = NULL;
-    NDPNvalues = 0;
-
-    if (nvalues < 1) {
-        return 1;
-    }
-
-    csw_Free (NDPValue);
-    NDPValue = (int *)csw_Malloc (5 * nvalues * sizeof(int));
-    if (NDPValue == NULL) {
-        return -1;
-    }
-
-    NDPRed = NDPValue + nvalues;
-    NDPGreen = NDPRed + nvalues;
-    NDPBlue = NDPGreen + nvalues;
-    NDPAlpha = NDPBlue + nvalues;
-
-    int isize = nvalues * sizeof(int);
-    memcpy (NDPValue, value, isize);
-    memcpy (NDPRed, red, isize);
-    memcpy (NDPGreen, green, isize);
-    memcpy (NDPBlue, blue, isize);
-    memcpy (NDPAlpha, alpha, isize);
-
-    NDPNvalues = nvalues;
-
-    return 1;
-
-}
-
-/*----------------------------------------------------------------------------*/
 
 int CDisplayList::SetImageFaultData (
     double    *xf,
@@ -21399,143 +21077,6 @@ int CDisplayList::SetImageFaultData (
 
 /*----------------------------------------------------------------------------*/
 
-int CDisplayList::AddBlendedGridImage (
-    char   *name,
-    int    id,
-    int    ncol,
-    int    nrow,
-    double xmin,
-    double ymin,
-    double xmax,
-    double ymax,
-    int    *value1,
-    int    *value2,
-    int    *value3,
-    int    *value4,
-    double *fraction1,
-    double *fraction2,
-    double *fraction3,
-    double *fraction4
-    )
-
-{
-    int         istat, origmax;
-
-    if (NDPNvalues < 1) {
-        return -1;
-    }
-
-    NDPSurf      *ndpSurf;
-
-    try {
-        ndpSurf = new NDPSurf ();
-    }
-    catch (...) {
-        return -1;
-    }
-
-    if (numNDPSurfList >= maxNDPSurfList) {
-        origmax = maxNDPSurfList;
-        maxNDPSurfList += 10;
-        NDPSurfList = (NDPSurf **)csw_Realloc (NDPSurfList,
-                                           maxNDPSurfList * sizeof(NDPSurf *));
-        if (NDPSurfList) {
-            memset (NDPSurfList + origmax, 0, 10 * sizeof(NDPSurf *));
-        }
-    }
-
-    int do_write = csw_GetDoWrite ();
-    if (do_write) {
-        printf ("in dlist %f %f %f %f\n", xmin, ymin, xmax, ymax);
-        int nNodes = ncol * nrow;
-        CSW_BlendedNode
-        *blendedNodes = (CSW_BlendedNode *) csw_Malloc(
-            nNodes *
-            sizeof(CSW_BlendedNode));
-        if (blendedNodes) {
-            CSW_BlendedNode *bp;
-            for (int i=0; i<nNodes; i++) {
-                bp = blendedNodes + i;
-                bp->v1 = (unsigned char)value1[i];
-                bp->v2 = (unsigned char)value2[i];
-                bp->v3 = (unsigned char)value3[i];
-                bp->v4 = (unsigned char)value4[i];
-            }
-            grdapi_ptr->grd_WriteBlendedGrid (
-                blendedNodes, ncol, nrow, 1,
-                xmin, ymin, xmax, ymax,
-                (char *)"blend4.xyz");
-            csw_Free (blendedNodes);
-        }
-    }
-
-    if (NDPSurfList == NULL) {
-        delete ndpSurf;
-        return -1;
-    }
-
-    istat =
-      ndpSurf->SetGridData (
-        value1, value2, value3, value4,
-        fraction1, fraction2, fraction3, fraction4,
-        ncol, nrow,
-        xmin, ymin, xmax-xmin, ymax-ymin);
-    if (istat == -1) {
-        delete ndpSurf;
-        return -1;
-    }
-
-    istat =
-      ndpSurf->SetFaultData (
-        ImageXFault, ImageYFault,
-        ImageNFaultPoints, ImageNFaults);
-    if (istat == -1) {
-        delete ndpSurf;
-        return -1;
-    }
-
-    istat =
-      ndpSurf->SetColorData (
-        NDPNvalues,
-        NDPValue,
-        NDPRed,
-        NDPGreen,
-        NDPBlue,
-        NDPAlpha);
-    if (istat == -1) {
-        delete ndpSurf;
-        return -1;
-    }
-
-    if (BlendedNcout != NULL) {
-        int ntot = 0;
-        for (int i=0; i<BlendedNpout; i++) {
-            ntot += BlendedNcout[i];
-        }
-
-        istat =
-          ndpSurf->SetBoundaryData (
-            BlendedXout, BlendedYout,
-            BlendedNvout,
-            ntot);
-        if (istat == -1) {
-            delete ndpSurf;
-            return -1;
-        }
-    }
-
-    ndpSurf->SetName (name);
-    ndpSurf->SetSurfaceID (id);
-    ndpSurf->frame_num = current_frame_num;
-    ndpSurf->layer_num = current_layer_num;
-    ndpSurf->index_num = 10000 + numNDPSurfList;
-
-    NDPSurfList[numNDPSurfList] = ndpSurf;
-    numNDPSurfList++;
-
-    return 1;
-
-}
 
 /*
  * This version is needed to tie together images and vector

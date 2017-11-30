@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -43,7 +43,7 @@
 /*  define some data structures for polyline plotting  */
 
 typedef struct {
-    CSW_F          *xypts;
+    CSW_F          *xypts = NULL;
     int            npts, maxpts;
     CSW_F          xmin, ymin, xmax, ymax;
     CSW_F          thick, dashscale;

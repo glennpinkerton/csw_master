@@ -12,7 +12,8 @@
 #include <stddef.h>
 
 /* local includes */
-#include "JSurfaceWorksBase.h"
+//#include "JSurfaceWorksBase.h"
+#include "csw_jsurfaceworks_src_JSurfaceWorksBase.h"
 
 /*-------------------------------------------------------------------------*/
 

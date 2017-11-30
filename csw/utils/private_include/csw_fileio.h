@@ -59,8 +59,8 @@ class CSWFileioUtil
     int             LogFileId = -1;
     int             BadPipeNum = -1;
 
-    FILE            *FileIn,
-                    *Ftmp,
+    FILE            *FileIn = NULL,
+                    *Ftmp = NULL,
                     *OpenFileList[MAX_OPEN_FILES];
     int             FirstOpen = 1;
 

@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -11,7 +11,7 @@
 /*
     gtx_protoP.h
 
-      This is a private header file that has function prototypes for the 
+    This is a private header file that has function prototypes for the 
     functions found in the ply_*.c files.  These functions do not need any
     structure or type definitions other than CSW_F, so I group all of the
     prototypes into this single file.
@@ -33,8 +33,6 @@
 
 #ifndef GTX_PROTO_P_H
 #define GTX_PROTO_P_H
-
-//#include "csw/utils/private_include/csw_P.h"
 
 /*
     typedefs for structures and functions

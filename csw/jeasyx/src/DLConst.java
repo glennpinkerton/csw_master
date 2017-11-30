@@ -505,9 +505,6 @@ public class DLConst {
     final static int GTX_CONTOUR_LINE      = 111;
     final static int GTX_GRID_DATA         = 121;
     final static int GTX_FAULT_LINE_DATA   = 131;
-    final static int GTX_BLENDED_GRID_DATA = 132;
-    final static int GTX_BLEND_TRIMESH_DATA = 133;
-    final static int GTX_NDP_GRAPHIC_PROPS = 134;
     final static int GTX_IMAGE_FAULT_DATA  = 135;
 
   /*

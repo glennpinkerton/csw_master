@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -11,7 +11,7 @@
 /*
     csw_window_system.h
 
-      This file defines some constants usually associated with the
+    This file defines some constants usually associated with the
     window system but possible referenced elsewhere as well.  Since
     the constants can be referenced elsewhere, I separate this header
     from csw/easyx/private_include/gtx_window_system.h so that the

@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -41,7 +41,6 @@
 #include "csw/jeasyx/private_include/gpf_symbPP.h"
 #include "csw/jeasyx/private_include/gpf_textP.h"
 #include "csw/jeasyx/private_include/gtx_frinfoP.h"
-//#include "csw/jeasyx/private_include/DLContour.h"
 
 
 

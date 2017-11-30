@@ -40,8 +40,6 @@
 #  include "csw/surfaceworks/include/grd_shared_structs.h"
 
 
-#define DEBUG_BLENDED_GRID       0
-
 /*
     define some constants for the class
 */
@@ -54,7 +52,6 @@
 #define AVG_ERROR_DIVISOR        5000.0f
 #define PROFILE_EXTENSION        5
 #define MAX_REPORT_LINES         1000
-#define MAX_BLENDED_NEIGHBORS    400
 #define SMALL_NUMBER_OF_POINTS   20
 #define MAX_CONTROL              10000
 #define MEDIAN_WIDTH             2
@@ -70,7 +67,7 @@
     define structures used in the class methods
 */
 typedef struct {
-    CSW_F      *grid;
+    CSW_F      *grid = NULL;
     int        ncol,
                nrow;
     CSW_F      x1,
@@ -107,9 +104,16 @@ class CSWGrdCalc
     CSWGrdTsurf      *grd_tsurf_ptr = NULL;
     CSWGrdUtils      *grd_utils_ptr = NULL;
 
+    void __init (void) {
+        ConformalGrid.grid = NULL;
+        BaselapGrid.grid = NULL;
+        TruncationGrid.grid = NULL;
+    }
+
+
   public:
 
-    CSWGrdCalc () {};
+    CSWGrdCalc () {__init();};
     ~CSWGrdCalc () {};
 
     void  SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};
@@ -143,7 +147,6 @@ class CSWGrdCalc
   Old static file variables become private class variables
 */
     double            PointNodeRatio {1.0};
-    int               BlendedBackground {-1};
 
     int               SparseFlag {0};
     CSW_F             FaultedErrorMax {1.e30f};
@@ -329,10 +332,6 @@ class CSWGrdCalc
     CSW_F             TinySum {0.0f};
 
     int               FlatGridFlag {0};
-    int               BlendFlag {0};
-
-    int               *BlendedNeighborIndex {NULL};
-    CSW_F             *BlendedNeighborDistance {NULL};
 
     int               *ClosestFault {NULL};
 
@@ -361,11 +360,6 @@ class CSWGrdCalc
                          (int i, int j, int start, int end,
                           int maxquad, int maxloc,
                           int *listout, int *nlist, int *nquad);
-    int               CollectBlendPoints
-                         (int i, int j, double x0, double y0,
-                          int start, int end,
-                          int *list, int *nlist);
-    int               CollectBruteForceBlend (double x, double y, int *listout, int *nlist);
     int               ProcessLocalPoints
                          (int *list, int nlist, int nquad,
                           int irow, int jcol, int cp,
@@ -434,19 +428,6 @@ class CSWGrdCalc
     int               FreeMem (void);
     int               TrendPointErrors (void);
 
-    int               BlendValues (int irow, int jcol,
-                                   int*, int, CSW_F, CSW_F,
-                                   int*, int*, int*, int*,
-                                   int*, int*, int*, int*);
-    void              FindBlendedPointsFromData (int irow,
-                                                 int jcol,
-                                                 int *list,
-                                                 int maxlist,
-                                                 int *nlist);
-
-    int               SmoothBlendedGrid
-                         (CSW_Blended *grid, int ncol, int nrow, int nc);
-    int               BuildBlendedNeighbors (void);
     int               CheckClosePointFaulting
                          (int irow, int jcol, int nc);
     int               AdjustForZeros
@@ -526,12 +507,6 @@ class CSWGrdCalc
         int ncol, int nrow,
         CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,
         GRidCalcOptions *options);
-    int grd_set_blended_background (int blend_bg);
-    int grd_calc_blended_grid
-          (CSW_F *x, CSW_F *y, int *zin, int npts,
-           CSW_Blended *gridout, char *mask, int ncol, int nrow,
-           CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,
-           GRidCalcOptions *options);
     int grd_set_calc_option (int tag, int ival, CSW_F fval);
     int grd_set_calc_options (GRidCalcOptions *options);
     int grd_default_calc_options (GRidCalcOptions *options);
@@ -546,12 +521,6 @@ class CSWGrdCalc
                          CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,
                          CSW_F minval, CSW_F maxval, CSW_F **smgrid);
 
-    int grd_resample_blended_grid (CSW_BlendedNode *gridin, int ncol, int nrow,
-                                   CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,
-                                   FAultLineStruct *faults, int nfaults,
-                                   CSW_BlendedNode *gridout, int ncout, int nrout,
-                                   CSW_F x1out, CSW_F y1out,
-                                   CSW_F x2out, CSW_F y2out);
 
     int grd_filter_grid_spikes (
         CSW_F      *grid,

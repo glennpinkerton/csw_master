@@ -24,7 +24,6 @@ import javax.swing.SwingUtilities;
 import csw.jutils.src.XYZPolyline;
 import csw.jutils.src.ColorPalette;
 
-import csw.jsurfaceworks.src.BlendedGrid;
 import csw.jsurfaceworks.src.Grid;
 import csw.jsurfaceworks.src.TriMesh;
 
@@ -85,7 +84,7 @@ public class JDisplayList extends JDisplayListBase {
     }
 
 
-/*----------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
 
 
  /**
@@ -215,7 +214,7 @@ public class JDisplayList extends JDisplayListBase {
 
 
 
-/*----------------------------------------------------------------------*/
+/*--------------------------------------------------------------*/
 
     private static ArrayList<Integer>      finalizedIDList = 
 		new ArrayList<Integer> ();
@@ -291,10 +290,10 @@ public class JDisplayList extends JDisplayListBase {
     }
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Add an elliptical arc to the display list.  The arc will be filled with the current
@@ -340,7 +339,7 @@ public class JDisplayList extends JDisplayListBase {
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Set the type of page units to use for this display list.  The
@@ -376,7 +375,7 @@ public class JDisplayList extends JDisplayListBase {
 
     private boolean beginPlotCalled = false;
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Initialize a display list for drawing.  The display list should be
@@ -449,7 +448,7 @@ public class JDisplayList extends JDisplayListBase {
         return nativeDlistID;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
     boolean fromClear = false;
   /**
@@ -488,7 +487,7 @@ public class JDisplayList extends JDisplayListBase {
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Add a retangle to the display list, positioned at a corner
@@ -529,7 +528,7 @@ public class JDisplayList extends JDisplayListBase {
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Add a retangle to the display list, positioned at the center
@@ -574,7 +573,7 @@ public class JDisplayList extends JDisplayListBase {
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Add a circle to the display list by specifying its center and radius.
@@ -604,7 +603,7 @@ public class JDisplayList extends JDisplayListBase {
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
      Add a circle to the display list by specifying its center
@@ -642,7 +641,7 @@ public class JDisplayList extends JDisplayListBase {
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
      Add a circle to the display list by specifying 3 points that
@@ -676,7 +675,7 @@ public class JDisplayList extends JDisplayListBase {
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Set an opaque background color.
@@ -697,7 +696,7 @@ public class JDisplayList extends JDisplayListBase {
       );
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Set the background color.
@@ -730,7 +729,7 @@ public class JDisplayList extends JDisplayListBase {
         return;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Set an opaque or transparent background color.
@@ -757,7 +756,7 @@ public class JDisplayList extends JDisplayListBase {
       }
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Set the default foreground color, with an opaque alpha value.
@@ -785,7 +784,7 @@ public class JDisplayList extends JDisplayListBase {
       );
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Set the default foreground color, including the alpha value.
@@ -818,7 +817,7 @@ public class JDisplayList extends JDisplayListBase {
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Set the default foreground color, including the alpha value.
@@ -845,7 +844,7 @@ public class JDisplayList extends JDisplayListBase {
       return istat;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
      Specify an opaque color to use for all subsequent display list objects.
@@ -863,7 +862,7 @@ public class JDisplayList extends JDisplayListBase {
       return(setColor(red, green, blue, 255));
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
      Specify an opaque or transparent color to use for all subsequent display list objects.
@@ -897,7 +896,7 @@ public class JDisplayList extends JDisplayListBase {
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
      Specify an opaque or transparent color to use for all subsequent display list objects.
@@ -926,7 +925,7 @@ public class JDisplayList extends JDisplayListBase {
       return istat;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Specify the minimum gap between attached frames.  The gap value
@@ -954,7 +953,7 @@ public class JDisplayList extends JDisplayListBase {
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
      Define and set a drawing frame on the current drawing page.
@@ -1174,7 +1173,7 @@ public class JDisplayList extends JDisplayListBase {
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
  /**
  Adjust the specified frame to fit slightly larger that the extent of the
@@ -1218,7 +1217,7 @@ public class JDisplayList extends JDisplayListBase {
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
  /**
  Adjust the specified frame to fit slightly larger that the extent of the
@@ -1266,7 +1265,7 @@ public class JDisplayList extends JDisplayListBase {
     }
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
  /**
  Adjust the specified frame to fit slightly larger that the extent of the
@@ -1317,7 +1316,7 @@ public class JDisplayList extends JDisplayListBase {
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
      Define and set a simple attached frame.  This is intended for things like
@@ -1502,7 +1501,7 @@ public class JDisplayList extends JDisplayListBase {
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /*
   Change the parameters for a single frame axis.  This version requires you to
@@ -1585,7 +1584,7 @@ public class JDisplayList extends JDisplayListBase {
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
     private void setupAxisFont(AxisProperties properties) {
       if (properties == null || properties.fontName == null)
@@ -1686,7 +1685,7 @@ public class JDisplayList extends JDisplayListBase {
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set the properties of a frame axis, using an {@link AxisProperties} object.
@@ -1733,7 +1732,7 @@ public class JDisplayList extends JDisplayListBase {
         return istat;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
      Change the visible window for a scaleable frame.  The value of the borderFlag
@@ -1785,7 +1784,7 @@ public class JDisplayList extends JDisplayListBase {
     }
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Add a color image to the display list.  The colors are defined
@@ -1863,7 +1862,7 @@ public class JDisplayList extends JDisplayListBase {
 
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Add a double data image to the display list.  The colors for the
@@ -1928,7 +1927,7 @@ public class JDisplayList extends JDisplayListBase {
     }
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
  Add a float data image to the display list.  The colors for the
@@ -1995,7 +1994,7 @@ public class JDisplayList extends JDisplayListBase {
 
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
  Add an int data image to the display list.  The colors for the
@@ -2061,7 +2060,7 @@ public class JDisplayList extends JDisplayListBase {
 
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
  Add a short data image to the display list.  The colors for the
@@ -2126,7 +2125,7 @@ public class JDisplayList extends JDisplayListBase {
     }
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
  Add a boolean data image to the display list.  The colors for the
@@ -2191,7 +2190,7 @@ public class JDisplayList extends JDisplayListBase {
     }
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Add a complex filled polygons to the display list.  Complex polygons are packed into the x and y arrays
@@ -2253,7 +2252,7 @@ public class JDisplayList extends JDisplayListBase {
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set the fill color and pattern for subsequent polygon fills to the
@@ -2319,7 +2318,7 @@ make the pattern less dense.  Scales less than 1.0 will make the pattern more de
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set the fill color and pattern for subsequent polygon fills to the
@@ -2384,7 +2383,7 @@ make the pattern less dense.  Scales less than 1.0 will make the pattern more de
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set an opaque color to be used for filling subsequent polygons,
@@ -2416,7 +2415,7 @@ make the pattern less dense.  Scales less than 1.0 will make the pattern more de
 
     }
 
-/*---------------------------------------------------------------------
+/*-------------------------------------------------------------
 
   /**
   Set an opaque or transparent color to be used for filling subsequent polygons,
@@ -2449,7 +2448,7 @@ make the pattern less dense.  Scales less than 1.0 will make the pattern more de
 
     }
 
-/*---------------------------------------------------------------------
+/*-------------------------------------------------------------
 
   /**
   Set an opaque or transparent color to be used for filling subsequent polygons,
@@ -2487,7 +2486,7 @@ make the pattern less dense.  Scales less than 1.0 will make the pattern more de
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set an opaque color to be used for drawing the borders of subsequent polygons,
@@ -2519,7 +2518,7 @@ make the pattern less dense.  Scales less than 1.0 will make the pattern more de
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set an opaque or transparent color to be used for drawing the borders of subsequent polygons,
@@ -2552,7 +2551,7 @@ make the pattern less dense.  Scales less than 1.0 will make the pattern more de
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set an opaque or transparent color to be used for drawing the borders of subsequent polygons,
@@ -2590,7 +2589,7 @@ make the pattern less dense.  Scales less than 1.0 will make the pattern more de
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set the fill pattern and fill pattern size. The subsequent fills will
@@ -2642,7 +2641,7 @@ make the pattern less dense.  Scales less than 1.0 will make the pattern more de
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set the font number for subsequent text.  Run the {@link UnitTest}
@@ -2666,7 +2665,7 @@ make the pattern less dense.  Scales less than 1.0 will make the pattern more de
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
  /**
  Set a Java font by specifying its name and style.  This font will be modified by the
@@ -2704,7 +2703,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Add a grid to the display list.  The grid can be contoured, color filled,
@@ -2926,7 +2925,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Add a line to the display list.  The line will be drawn with the current
@@ -2955,7 +2954,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Specify if arrows are to be drawn at the last point of
@@ -2986,7 +2985,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set an opaque color to be used for drawing subsequent lines. If any of
@@ -3017,7 +3016,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set an opaque or transparent color to be used for drawing subsequent lines. If any of
@@ -3049,7 +3048,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set an opaque or transparent color to be used for drawing subsequent lines. If
@@ -3086,7 +3085,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set the line pattern and line pattern size.  There are 30 line patterns
@@ -3130,7 +3129,7 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set the smoothing factor for subsequent lines.  The value specified is
@@ -3160,7 +3159,7 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set the thickness for subsequent lines, symbols and polygon borders.
@@ -3188,7 +3187,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Add a text string representing the specified number to the
@@ -3243,7 +3242,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Static method to open the log file on the native side.  The log file can be
@@ -3291,7 +3290,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set an opaque color used for subsequent polygon fill patterns.  This is only
@@ -3327,7 +3326,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set an opaque or transparent color used for subsequent polygon fill patterns.  This is only
@@ -3364,7 +3363,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Set an opaque or transparent color used for subsequent polygon fill patterns.  This is only
@@ -3405,7 +3404,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Add a complex filled polygons to the display list.  Complex polygons are packed into the x and y arrays
@@ -3467,7 +3466,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
      Set the priority for subsequent drawing.  Frames with higher priority
@@ -3507,7 +3506,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
    Draw the current contents of the display list to the Java window.  You need to
@@ -3527,7 +3526,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
    Set a previously created frame for subsequent drawing.
@@ -3550,7 +3549,7 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
    Set the clipping behavior of subsequently created frames.  Once a frame
@@ -3581,7 +3580,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
    Set the clipping behavior of subsequently created frames.  Once a frame
@@ -3608,7 +3607,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
    Set continuous color bands for subsequent data images.  Specify a {@link ColorPalette}
@@ -3683,7 +3682,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
 /**
   Set discreet opaque color windows for subsequent data images.  The windows are
@@ -3732,7 +3731,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
 
     }
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
 /**
   Set discreet transparent or opaque color windows for subsequent data images.  The windows are
@@ -3785,7 +3784,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
 /**
   Set discreet transparent or opaque color windows for subsequent data images.  The windows are
@@ -3840,7 +3839,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
      Set the name for subsequent images.
@@ -3858,7 +3857,7 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
      Set orientation flags and reporting options for subsequent images.
@@ -3883,7 +3882,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
     Set an item name to be used by subsequent graphics.
@@ -3902,7 +3901,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
     Set a layer name to be used by subsequent graphics.
@@ -3921,7 +3920,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
     Add a symbol to the display list.
@@ -3948,7 +3947,7 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
  /**
   Set an opaque color to be used for drawing subsequent symbols.
@@ -3978,7 +3977,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
  /**
   Set an opaque or transparent color to be used for drawing subsequent symbols.
@@ -4009,7 +4008,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
  /**
   Set an opaque or transparent color to be used for drawing subsequent symbols.
@@ -4046,7 +4045,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
     Set the anchor position for subsequent text and numbers.  The x and y coordinates
@@ -4081,7 +4080,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
     Set x and y offsets for subsequent text and number drawing.  These
@@ -4109,7 +4108,7 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
   /**
    Specify how the background for subsequent text should be drawn.
    The text can have a filled rectangle in the background.  This may
@@ -4149,7 +4148,7 @@ of Font.BOLD|Font.ITALIC.
 
 
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
   Add a single line text string to the
@@ -4188,7 +4187,7 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
   Set an opaque color to be used for drawing subsequent text outlines.
@@ -4218,7 +4217,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
   Set an opaque or transparent opaque color to be used for drawing subsequent text outlines.
@@ -4249,7 +4248,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
   Set an opaque or transparent color to be used for drawing subsequent text outlines.
@@ -4286,7 +4285,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
   Set an opaque color to be used for drawing subsequent text fills.
@@ -4316,7 +4315,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
   Set an opaque or transparent color to be used for drawing subsequent text fills.
@@ -4347,7 +4346,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
   Set an opaque or transparent color to be used for drawing subsequent text fills.
@@ -4384,7 +4383,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
      Set the thickness for subsequent text character lines.
@@ -4405,7 +4404,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
     Unset the current layer, replacing it with nothing.
@@ -4423,7 +4422,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
     Unset the current item, replacing it with nothing.
@@ -4442,7 +4441,7 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-/*------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
 
   /**
     Unset the current frame, replacing it with nothing.
@@ -4461,7 +4460,7 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
    * Cleanup all the native side resources associated with this display list.
@@ -4488,7 +4487,7 @@ of Font.BOLD|Font.ITALIC.
 
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Add a trimesh to the display list.  The trimesh can be contoured, color filled,
@@ -4685,7 +4684,7 @@ of Font.BOLD|Font.ITALIC.
         return 1;
     }
 
-/*-----------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------*/
 
 
   /**
@@ -4784,7 +4783,7 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Set an opaque select color.
@@ -4804,7 +4803,7 @@ of Font.BOLD|Font.ITALIC.
       );
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Set the select color.
@@ -4836,7 +4835,7 @@ of Font.BOLD|Font.ITALIC.
         return;
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
     Set an opaque or transparent select color.
@@ -4862,7 +4861,7 @@ of Font.BOLD|Font.ITALIC.
       }
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
   /**
   Create a new line by picking points with the mouse.  The {@link DLEditListener}
   parameter must be specified in order to get the results back to the application.  If the
@@ -4960,7 +4959,7 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-/*----------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
 
   /**
   Create a new polygon by picking points with the mouse.  A {@link DLEditListener}
@@ -5002,7 +5001,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*----------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
 
   /**
   Create a new polygon by picking points with the mouse.  A {@link DLEditListener}
@@ -5044,7 +5043,7 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
-/*-------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
 /*
  * Note that the zpList member is in the JDisplayListBase class.
@@ -5083,7 +5082,7 @@ of Font.BOLD|Font.ITALIC.
       zpList.clear();
     }
 
-/*---------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
   /*
    * Saved versions of the current graphics properties.  Package scope
@@ -5146,7 +5145,7 @@ of Font.BOLD|Font.ITALIC.
         currentTextYOffset = 0.0,
         currentTextThickness = 0.0;
 
-/*-------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 
     private void saveAllColors (int r, int g, int b, int a)
     {
@@ -5180,7 +5179,7 @@ of Font.BOLD|Font.ITALIC.
         currentTextFillAlpha = a;
     }
 
-/*---------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
 
     void populateLineAttributes (DLLine dline)
     {
@@ -5204,7 +5203,7 @@ of Font.BOLD|Font.ITALIC.
         dline.nativeIndex = -1;
     }
 
-/*----------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
 
     void readSelectable (int selNum)
     {
@@ -5215,7 +5214,7 @@ of Font.BOLD|Font.ITALIC.
         );
     }
 
-/*---------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
      Define and set a drawing frame on the current drawing page.
@@ -5422,491 +5421,16 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-/*-------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------*/
 
-  /*
-   * Called only by calcBlendedGrid to remove zero length segments
-   * from a blended grid "fault".  The xThinFault, yThinFault,
-   * nThinFaultPoints, nThinFault, nThinfaultPointsTotal private
-   * members are populated with the results.
-   */
-
-    private double[]    xThinFault;
-    private double[]    yThinFault;
-    private int[]       nThinFaultPoints;
-    private int         nThinFaults,
-                        nThinFaultPointsTotal;
-
-    private int thinFaultPoints (
-      double[] xf,
-      double[] yf,
-      int[]    nfp,
-      int      nf,
-      int      ntot)
-    {
-      double       x1, y1, x2, y2, tiny, dx, dy, dist;
-      double[]     xw, yw;
-      int[]        npw;
-      int          i, j, n, n2, jtot, closed;
-      double       xfirst, yfirst, xlast, ylast;
-
-  /*
-   * Initialize output in case of error.
-   */
-      xThinFault = yThinFault = null;
-      nThinFaultPoints = null;
-      nThinFaults = 0;
-      nThinFaultPointsTotal = 0;
-
-      if (xf == null  ||  yf == null  ||  nfp == null  ||
-          nf < 1  ||  ntot < 2) {
-        return 0;
-      }
-
-  /*
-   * Find the "zero" distance.
-   */
-      x1 = y1 = 1.e30;
-      x2 = y2 = -1.e30;
-
-      for (i=0; i<ntot; i++) {
-        if (xf[i] < x1) x1 = xf[i];
-        if (yf[i] < y1) y1 = yf[i];
-        if (xf[i] > x2) x2 = xf[i];
-        if (yf[i] > y2) y2 = yf[i];
-      }
-
-      if (x1 >= x2  &&  y1 >= y2) {
-        return 0;
-      }
-
-      tiny = (x2 - x1 + y2 - y1) / 20000.0;
-
-  /*
-   * Allocate workspace.
-   */
-      xw = new double[ntot];
-      yw = new double[ntot];
-      npw = new int[nf];
-
-  /*
-   * Put points that are not zero distance apart into the xw, yw arrays.
-   */
-      n = 0;
-      n2 = 0;
-
-      for (i=0; i<nf; i++) {
-
-        xfirst = xf[n];
-        yfirst = yf[n];
-        xlast = xf[n+nfp[i]-1];
-        ylast = yf[n+nfp[i]-1];
-        closed = 0;
-        dx = xfirst - xlast;
-        dy = yfirst - ylast;
-        dist = dx * dx + dy * dy;
-        dist = Math.sqrt (dist);
-        if (dist <= tiny) {
-            closed = 1;
-        }
-
-        xw[n2] = xfirst;
-        yw[n2] = yfirst;
-        n++;
-        n2++;
-        jtot = 1;
-
-        for (j=1; j<nfp[i]; j++) {
-          dx = xf[n] - xf[n-1];
-          dy = yf[n] - yf[n-1];
-          dist = dx * dx + dy * dy;
-          dist = Math.sqrt (dist);
-          if (dist >= tiny) {
-            xw[n2] = xf[n];
-            yw[n2] = yf[n];
-            n2++;
-            jtot++;
-          }
-          n++;
-        }
-
-        if (closed == 1) {
-          xw[n2-1] = xfirst;
-          yw[n2-1] = yfirst;
-        }
-
-        npw[i] = jtot;
-
-      }
-
-    /*
-     * Transfer to the private members.
-     */
-      nThinFaultPoints = npw;
-      xThinFault = xw;
-      yThinFault = yw;
-      nThinFaults = nf;
-      nThinFaultPointsTotal = n2;
-
-      return 1;
-
-    }
-
-/*-----------------------------------------------------------------------------*/
-
-  /**
-   Add a blended grid image to the display list.  Blended grid
-   images are used for data such as lithology and kerogens that
-   require mixing as opposed to interpolation at the grid nodes.
-   A color image is constructed that reflects the grid values
-   and the color definition values in the props parameter.
-   @param bgrid A {@link BlendedGrid} object with the mixtures at each node.
-   @param tmesh An optional trimesh to use as the clipping area for the image.
-   If this is null, no clipping is done and the entire rectangular image is draw.
-   @param props An {@link NDPGraphicProperties} object which has the clor
-   definition for each "pure" data item in the blended grid.
-  */
-    public int addBlendedGrid (
-        BlendedGrid            bgrid,
-        TriMesh                tmesh,
-        NDPGraphicProperties   props,
-        String                 name)
-    {
-        int       istat;
-
-        istat =
-          setTriMeshData (tmesh);
-        if (istat == -1) {
-            return -1;
-        }
-
-        istat =
-          setNDPGraphicProperties (props);
-        if (istat == -1) {
-            return -1;
-        }
-
-        istat =
-          setImageFaults (bgrid);
-        if (istat == -1) {
-            return -1;
-        }
-
-        int             ncol, nrow, ntot;
-        double          xmin, ymin, xmax, ymax;
-
-        ncol = bgrid.getNCols ();
-        nrow = bgrid.getNRows ();
-        xmin = bgrid.getXMin ();
-        ymin = bgrid.getYMin ();
-        xmax = bgrid.getXMax ();
-        ymax = bgrid.getYMax ();
-
-        ntot = ncol * nrow;
-
-        new_idata (4 * ntot);
-        new_ddata (4 * ntot + 4);
-
-        int    i, j, ival;
-        double fval;
-
-        for (i=0; i<ntot; i++) {
-
-            for (j=0; j<4; j++) {
-
-                ival = bgrid.getMixtureValue (i, j);
-                fval = bgrid.getMixtureFraction (i, j);
-
-                Idata[ntot * j + i] = ival;
-                Ddata[ntot * j + i] = fval;
-
-            }
-
-        }
-
-        Ddata[4*ntot] = xmin;
-        Ddata[4*ntot+1] = ymin;
-        Ddata[4*ntot+2] = xmax;
-        Ddata[4*ntot+3] = ymax;
-        Ilist[0] = ncol;
-        Ilist[1] = nrow;
-
-        sendNativeCommand (
-            GTX_BLENDED_GRID_DATA,
-            Ilist,
-            name,
-            null,
-            null,
-            Idata,
-            null,
-            Ddata);
-
-        return 1;
-    }
-
-/*-----------------------------------------------------------------------------*/
-
-    private int setTriMeshData (TriMesh tmesh)
-    {
-
-        int    i, ntot;
-
-      /*
-       * Send the trimesh data to the native side.
-       */
-        if (tmesh == null) {
-            Ilist[0] = 0;
-            Ilist[1] = 0;
-            Ilist[2] = 0;
-
-            sendNativeCommand (
-                GTX_BLEND_TRIMESH_DATA,
-                Ilist,
-                null,
-                null,
-                null,
-                Idata,
-                null,
-                Ddata);
-            return 1;
-        }
-
-        Ilist[0] = tmesh.getNumNodes ();
-        Ilist[1] = tmesh.getNumEdges ();
-        Ilist[2] = tmesh.getNumTriangles ();
-
-        new_ddata (3 * Ilist[0]);
-        new_idata (Ilist[0] + 5 * Ilist[1] + 4 * Ilist[2]);
-
-        double[] xnode = tmesh.getNodeXArray ();
-        double[] ynode = tmesh.getNodeYArray ();
-        double[] znode = tmesh.getNodeZArray ();
-        int[]    flags = tmesh.getNodeFlagArray ();
-
-        ntot = Ilist[0];
-        for (i=0; i<ntot; i++) {
-            Ddata[i] = xnode[i];
-            Ddata[i+ntot] = ynode[i];
-            Ddata[i+2*ntot] = znode[i];
-            Idata[i] = flags[i];
-        }
-
-        int n0;
-        n0 = ntot;
-
-        int[] n1 = tmesh.getEdgeNode0Array ();
-        int[] n2 = tmesh.getEdgeNode1Array ();
-        int[] t1 = tmesh.getEdgeTriangle0Array ();
-        int[] t2 = tmesh.getEdgeTriangle1Array ();
-        flags = tmesh.getEdgeFlagArray ();
-
-        ntot = Ilist[1];
-        for (i=0; i<ntot; i++) {
-            Idata[n0+i] = n1[i];
-            Idata[n0+ntot+i] = n2[i];
-            Idata[n0+2*ntot+i] = t1[i];
-            Idata[n0+3*ntot+i] = t2[i];
-            Idata[n0+4*ntot+i] = flags[i];
-        }
-
-        n0 += 5 * ntot;
-        int[] e1 = tmesh.getTriangleEdge0Array ();
-        int[] e2 = tmesh.getTriangleEdge1Array ();
-        int[] e3 = tmesh.getTriangleEdge2Array ();
-        flags = tmesh.getTriangleFlagArray ();
-
-        ntot = Ilist[2];
-        for (i=0; i<ntot; i++) {
-            Idata[n0+i] = e1[i];
-            Idata[n0+i+ntot] = e2[i];
-            Idata[n0+i+2*ntot] = e3[i];
-            Idata[n0+i+3*ntot] = flags[i];
-        }
-
-        sendNativeCommand (
-            GTX_BLEND_TRIMESH_DATA,
-            Ilist,
-            null,
-            null,
-            null,
-            Idata,
-            null,
-            Ddata);
-
-        return 1;
-    }
-
-/*-----------------------------------------------------------------------------*/
-
-    private int setNDPGraphicProperties (NDPGraphicProperties props)
-    {
-        if (props == null) {
-            Ilist[0] = 0;
-            sendNativeCommand (
-                GTX_NDP_GRAPHIC_PROPS,
-                Ilist,
-                null,
-                null,
-                null,
-                Idata,
-                null,
-                null);
-            return 1;
-        }
-
-        int     nval;
-
-        nval = props.getNumberOfValues ();
-
-        if (nval < 1) {
-            Ilist[0] = 0;
-            sendNativeCommand (
-                GTX_NDP_GRAPHIC_PROPS,
-                Ilist,
-                null,
-                null,
-                null,
-                Idata,
-                null,
-                null);
-            return 1;
-        }
-
-        new_idata (nval * 5);
-
-        int i, val, red, green, blue, alpha;
-
-        for (i=0; i<nval; i++) {
-            val = props.getValue (i);
-            red = props.getRed (i);
-            green = props.getGreen (i);
-            blue = props.getBlue (i);
-            alpha = props.getAlpha(i);
-            Idata[i] = val;
-            Idata[i+nval] = red;
-            Idata[i+2*nval] = green;
-            Idata[i+3*nval] = blue;
-            Idata[i+4*nval] = alpha;
-        }
-
-        Ilist[0] = nval;
-        sendNativeCommand (
-            GTX_NDP_GRAPHIC_PROPS,
-            Ilist,
-            null,
-            null,
-            null,
-            Idata,
-            null,
-            null);
-
-        return 1;
-
-    }
-
-
-/*-----------------------------------------------------------------------------*/
-
-    private int setImageFaults (BlendedGrid bgrid)
-    {
-
-        int    i, ntot, nf;
-
-      /*
-       * Send the trimesh data to the native side.
-       */
-        if (bgrid == null) {
-            Ilist[0] = 0;
-            Ilist[1] = 0;
-            sendNativeCommand (
-                GTX_IMAGE_FAULT_DATA,
-                Ilist,
-                null,
-                null,
-                null,
-                Idata,
-                null,
-                Ddata);
-            return 1;
-        }
-
-        if (bgrid.getNFaults() < 1) {
-            Ilist[0] = 0;
-            Ilist[1] = 0;
-            sendNativeCommand (
-                GTX_IMAGE_FAULT_DATA,
-                Ilist,
-                null,
-                null,
-                null,
-                Idata,
-                null,
-                Ddata);
-            return 1;
-        }
-
-        double[] xf = bgrid.getXFault ();
-        double[] yf = bgrid.getYFault ();
-        int[] npts = bgrid.getNFaultPoints ();
-        nf = bgrid.getNFaults ();
-        ntot = bgrid.getNFaultTotal ();
-
-        thinFaultPoints (xf, yf, npts,
-                         nf, ntot);
-
-        if (xThinFault == null  ||  yThinFault == null  ||
-            npts == null  ||  nf < 1  || ntot < 2) {
-            Ilist[0] = 0;
-            Ilist[1] = 0;
-            sendNativeCommand (
-                GTX_IMAGE_FAULT_DATA,
-                Ilist,
-                null,
-                null,
-                null,
-                Idata,
-                null,
-                Ddata);
-            return 1;
-        }
-
-        Ilist[0] = nThinFaults;
-        Ilist[1] = nThinFaultPointsTotal;
-
-        ntot = Ilist[1];
-        new_ddata (2 * ntot);
-        new_idata (Ilist[0]);
-
-        for (i=0; i<ntot; i++) {
-            Ddata[i] = xThinFault[i];
-            Ddata[ntot+i] = yThinFault[i];
-        }
-
-        for (i=0; i<Ilist[0]; i++) {
-            Idata[i] = nThinFaultPoints[i];
-        }
-
-        sendNativeCommand (
-            GTX_IMAGE_FAULT_DATA,
-            Ilist,
-            null,
-            null,
-            null,
-            Idata,
-            null,
-            Ddata);
-
-        return 1;
-    }
-
-/*-----------------------------------------------------------------------------*/
     /**
      * Returns the selectable list.
      */
     public ArrayList<DLSelectable> getSelectableList() {
       return selectableList;
     }
-/*-----------------------------------------------------------------------------*/
+
+/*---------------------------------------------------------------------*/
 
 }  // end of JDisplayList class definition
 

@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -11,7 +11,7 @@
 /*
     gtx_wrksizP.h
 
-      defines size of work arrays for line and polygon plotting
+    defines size of work arrays for line and polygon plotting
 */
 
 

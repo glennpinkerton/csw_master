@@ -16,7 +16,7 @@
   from Java.    This is normally called from the jni function.  I have put
   this extra level in to allow for debugging of the native side only via a
   main program that calls this directly.  This isolates the jni functions
-  as much as possible.
+  to a fairly good degree.
 
  ***************************************************************************
 */
@@ -81,7 +81,7 @@ int ezx_process_command (
     int itype;
     int ncol;
     int nrow;
-    int n, nstart, ngrid;
+    int n, nstart;
 
     FILE  *LogFile = NULL;
 
@@ -2075,135 +2075,6 @@ int ezx_process_command (
             break;
 
     /*--------------------------------------------------------------
-     * Set the trimesh boundary for subsequent blended grid images.
-     *
-     *  ilist[0] has numnodes
-     *  ilist[1] has numedges
-     *  ilist[2] has numtriangles
-     *  ddata[0 to numnodes-1] has xnodes
-     *  ddata[numnodes to 2*numnodes-1] has ynodes
-     *  ddata[2*numnodes to 3*numnodes-1] has znodes
-     *  idata[0 to numnodes-1 has node flags]
-     *  next numedges of idata has n1edges
-     *  next numedges of idata has n2edges
-     *  next numedges of idata has t1edges
-     *  next numedges of idata has t2edges
-     *  next numedges of idata has edgeflag
-     *  next numtriangles of idata has e1tri
-     *  next numtriangles of idata has e2tri
-     *  next numtriangles of idata has e3tri
-     *  next numtriangles of idata has triflag
-     */
-        case GTX_BLEND_TRIMESH_DATA:
-
-          #if _EZX_DEBUG_LOG_FILE_
-            if (LogFile) {
-                sprintf (LogFileLine,
-                         "%d %d %d\n",
-                         ilist[0],
-                         ilist[1],
-                         ilist[2]);
-                fputs (LogFileLine, LogFile);
-
-                n = ilist[0];
-                for (i=0; i<n; i++) {
-                    sprintf (LogFileLine,
-                             "%.15e %.15e %.15e %d\n",
-                             ddata[i],
-                             ddata[i+n],
-                             ddata[i+2*n],
-                             idata[i]);
-                    fputs (LogFileLine, LogFile);
-                }
-                nstart = n;
-                n = ilist[1];
-                for (i=0; i<n; i++) {
-                    sprintf (LogFileLine,
-                             "%d %d %d %d %d\n",
-                             idata[nstart + i],
-                             idata[nstart + n + i],
-                             idata[nstart + 2 * n + i],
-                             idata[nstart + 3 * n + i],
-                             idata[nstart + 4 * n + i]);
-                    fputs (LogFileLine, LogFile);
-                }
-
-                nstart += 5 * n;
-                n = ilist[2];
-                for (i=0; i<n; i++) {
-                    sprintf (LogFileLine,
-                             "%d %d %d %d\n",
-                             idata[nstart + i],
-                             idata[nstart + n + i],
-                             idata[nstart + 2 * n + i],
-                             idata[nstart + 3 * n + i]);
-                    fputs (LogFileLine, LogFile);
-                }
-
-            }
-          #endif
-
-            nstart = ilist[0] + 5 * ilist[1];
-
-            istat =
-            dlist->SetBlendedTriMesh (
-                               ddata,
-                               ddata+ilist[0],
-                               ddata+2*ilist[0],
-                               idata,
-                               ilist[0],
-                               idata+ilist[0],
-                               idata+ilist[0]+ilist[1],
-                               idata+ilist[0]+2*ilist[1],
-                               idata+ilist[0]+3*ilist[1],
-                               idata+ilist[0]+4*ilist[1],
-                               ilist[1],
-                               idata+nstart,
-                               idata+nstart+ilist[2],
-                               idata+nstart+2*ilist[2],
-                               idata+nstart+3*ilist[2],
-                               ilist[2]);
-
-            break;
-
-    /*--------------------------------------------------------------
-     * Set the color propetries for subsequent Blended images.
-     *
-     *  ilist[0] has the number of values and colors
-     *  idata[0-nval] = value numbers
-     *  idata[nval-2*nval] = red numbers
-     *  idata[nval*2-nval*3] = green
-     *  idata[nval*3-nval*4] = blue
-     *  idata[nval*4-nval*5] = alpha
-     */
-        case GTX_NDP_GRAPHIC_PROPS:
-
-          #if _EZX_DEBUG_LOG_FILE_
-            if (LogFile) {
-                sprintf (LogFileLine, "%d\n", ilist[0]);
-                fputs (LogFileLine, LogFile);
-                for (i=0; i<ilist[0]*5; i++) {
-                    sprintf (LogFileLine, "%d\n", idata[i]);
-                    fputs (LogFileLine, LogFile);
-                }
-            }
-          #endif
-
-            istat =
-              dlist->SetNDPGraphicProperties (
-                ilist[0],
-                idata,
-                idata+ilist[0],
-                idata+2*ilist[0],
-                idata+3*ilist[0],
-                idata+4*ilist[0]);
-
-            break;
-
-    /*--------------------------------------------------------------
-     * Set the fault lines to use with subsequent blended grid or
-     * real data property image calculation.  These faults are not
-     * used with trimesh or grid elevation images.
      *
      * ilist[0] = nfaults
      * ilist[1] = nfault_total
@@ -2234,83 +2105,6 @@ int ezx_process_command (
               dlist->SetImageFaultData (
                 ddata, ddata+ilist[1],
                 idata, ilist[0], ilist[1]);
-
-            break;
-
-    /*--------------------------------------------------------------
-     * Add a blended grid using the current clip polygon and colors.
-     *
-     *  cdata has the name of the blended grid
-     *  ilist[2] has the id number of the blended grid
-     *  ilist[0] has the number of columns
-     *  ilist[1] has the number of rows
-     *  idata[0-ndat-1] has the value1 numbers
-     *  idata[ndat - 2*ndat-1] has the value2 numbers
-     *  idata[2*ndat - 3*ndat-1] has the value3 numbers
-     *  idata[3*ndat - 4*ndat-1] has the value4 numbers
-     *  ddata[0-ndat-1] has the fraction1 numbers
-     *  ddata[ndat - 2*ndat-1] has fraction2
-     *  ddata[2*ndat - 3*ndat-1] has fraction3
-     *  ddata[3*ndat - 4*ndat-1] has fraction4
-     *  ddata[4*ndat] = xmin
-     *  ddata[4*ndat+1] = ymin
-     *  ddata[4*ndat+2] = xmax
-     *  ddata[4*ndat+3] = ymax
-     */
-        case GTX_BLENDED_GRID_DATA:
-
-            ngrid = ilist[0] * ilist[1];
-
-          #if _EZX_DEBUG_LOG_FILE_
-            if (LogFile) {
-
-                sprintf (LogFileLine, "%s\n", cdata);
-                fputs (LogFileLine, LogFile);
-
-                sprintf (LogFileLine,
-                    "%d %d %d\n",
-                    ilist[0], ilist[1], ilist[2]);
-                fputs (LogFileLine, LogFile);
-
-                sprintf (LogFileLine,
-                         "%.15e %.15e %.15e %.15e\n",
-                         ddata[4*ngrid],
-                         ddata[4*ngrid+1],
-                         ddata[4*ngrid+2],
-                         ddata[4*ngrid+3]);
-                fputs (LogFileLine, LogFile);
-
-                for (i=0; i<ngrid*4; i++) {
-                    sprintf (LogFileLine, "%d\n", idata[i]);
-                    fputs (LogFileLine, LogFile);
-                }
-                for (i=0; i<ngrid*4; i++) {
-                    sprintf (LogFileLine, "%.15e\n", ddata[i]);
-                    fputs (LogFileLine, LogFile);
-                }
-
-            }
-          #endif
-
-            istat =
-              dlist->AddBlendedGridImage (
-                cdata,
-                ilist[2],
-                ilist[0],
-                ilist[1],
-                ddata[ngrid*4],
-                ddata[ngrid*4+1],
-                ddata[ngrid*4+2],
-                ddata[ngrid*4+3],
-                idata,
-                idata+ngrid,
-                idata+2*ngrid,
-                idata+3*ngrid,
-                ddata,
-                ddata+ngrid,
-                ddata+2*ngrid,
-
-                ddata+3*ngrid);
 
             break;
 

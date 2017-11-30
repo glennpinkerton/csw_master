@@ -11,7 +11,7 @@
 /*
     ply_compdata.h
 
-    Define the CSWPolyCompdata class.  This is a rfefactor of the
+    Define the CSWPolyCompdata class.  This is a refactor of the
     old ply_compdata.c functions.  Hopefully these refactors hone
     my C ++ skills a bit and also, the code will hopefully become
     closer to thread safe.

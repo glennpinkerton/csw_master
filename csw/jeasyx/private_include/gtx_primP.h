@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -11,7 +11,7 @@
 /*
     gtx_primP.h
 
-      This file has some general constants defined for the graphic primitive
+    This file has some general constants defined for the graphic primitive
     display list functions.
 
 */

@@ -396,33 +396,6 @@ class CSWConCalc
                                 double *xpoly, double *ypoly, int *ipoly, int npoly,
                                 COntourOutputRec **conclip, int *nconclip);
 
-/*
-    int con_calc_cross_section (GRidStruct *, int,
-                        CRossSectionTraceStruct *, int,
-                        CRossSectionLineStruct **, int *,
-                        CRossSectionFillStruct **, int *,
-                        CSW_F page_units_per_inch);
-    int con_calc_cross_section_polygons
-                                     (CRossSectionLineStruct*,
-                                      CRossSectionLineStruct*,
-                                      CRossSectionFillStruct**,
-                                      int*,
-                                      CSW_F page_units_per_inch);
-    int con_draw_cross_section (CRossSectionLineStruct*, int,
-                                CRossSectionFillStruct*, int,
-                                int, int,
-                                char*, char*,
-                                CSW_F, CSW_F,
-                                CRossSectionLinePrimitive**, int*,
-                                CRossSectionFillPrimitive**, int*);
-    int con_free_cross_section (CRossSectionLineStruct*, int,
-                                CRossSectionFillStruct*, int);
-    int con_free_cross_section_drawing
-                             (CRossSectionLinePrimitive*, int,
-                              CRossSectionFillPrimitive*, int);
-*/
-
-
 }; // end of main class definition
 
 

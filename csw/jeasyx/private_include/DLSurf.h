@@ -133,14 +133,14 @@ class DLSurf {
                        COntourCalcOptions *calc_options);
     int              calc_outline_polygon (void);
 
-    CSW_F            *data;
-    CSW_F            *trigrid;
+    CSW_F            *data = NULL;
+    CSW_F            *trigrid = NULL;
 
-    double           *xpoly,
-                     *ypoly,
-                     *zpoly;
-    int              *ncpoly;
-    int              *nvpoly;
+    double           *xpoly = NULL,
+                     *ypoly = NULL,
+                     *zpoly = NULL;
+    int              *ncpoly = NULL;
+    int              *nvpoly = NULL;
     int              npoly;
 
     int              ncol,
@@ -153,7 +153,7 @@ class DLSurf {
                      width,
                      height;
 
-    FAultLineStruct  *faults;
+    FAultLineStruct  *faults = NULL;
     int              nfaults;
 
     double           zmin_band[1000];
@@ -175,16 +175,16 @@ class DLSurf {
     int              last_image_ncol;
     int              last_image_nrow;
 
-    NOdeStruct       *nodes;
-    EDgeStruct       *edges;
-    TRiangleStruct   *triangles;
+    NOdeStruct       *nodes = NULL;
+    EDgeStruct       *edges = NULL;
+    TRiangleStruct   *triangles = NULL;
     int              num_nodes;
     int              num_edges;
     int              num_triangles;
 
-    NOdeStruct       *cnodes;
-    EDgeStruct       *cedges;
-    TRiangleStruct   *ctriangles;
+    NOdeStruct       *cnodes = NULL;
+    EDgeStruct       *cedges = NULL;
+    TRiangleStruct   *ctriangles = NULL;
     int              cnum_nodes,
                      cnum_edges,
                      cnum_triangles;

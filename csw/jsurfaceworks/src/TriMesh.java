@@ -31,7 +31,6 @@ public class TriMesh {
   private int numNodes;
 
   private double[] rdpValues;
-  private NDPAtValues  ndpValues;
   private int      atType = -1;
 
 /*
@@ -131,17 +130,6 @@ public class TriMesh {
     return atType;
   }
 
-/**
- Set the pernode NDP values that are currently being used
- to color this trimesh on the 3D display.
-*/
-  public void setNDPValues (NDPAtValues vals)
-  {
-    ndpValues = vals;
-    if (vals != null) {
-      rdpValues = null;
-    }
-  }
 
 /**
  Set the pernode RDP values that are currently being used
@@ -150,19 +138,8 @@ public class TriMesh {
   public void setRDPValues (double[] vals)
   {
     rdpValues = vals;
-    if (rdpValues != null) {
-      ndpValues = null;
-    }
   }
 
-/**
- Get the pernode NDP values that are currently being used
- to color this trimesh on the 3D display.
-*/
-  public NDPAtValues getNDPValues ()
-  {
-    return ndpValues;
-  }
 
 /**
  Get the pernode RDP values that are currently being used

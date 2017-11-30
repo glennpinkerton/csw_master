@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (199720078) Glenn Pinkerton.    *
+         *    Copyright (1997 - 2017) Glenn Pinkerton.  *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -11,7 +11,7 @@
 /*
     gpf_trigtab.h
 
-      This header has sin and cosine tables to use for rotating
+    This header has sin and cosine tables to use for rotating
     and drawing vector fonts
 */
 

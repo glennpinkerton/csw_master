@@ -7,6 +7,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#undef csw_jsurfaceworks_src_JSurfaceWorksBase_SW_END_THREAD
+#define csw_jsurfaceworks_src_JSurfaceWorksBase_SW_END_THREAD 6723L
 #undef csw_jsurfaceworks_src_JSurfaceWorksBase_MAX_LIST_ARRAY
 #define csw_jsurfaceworks_src_JSurfaceWorksBase_MAX_LIST_ARRAY 30L
 #undef csw_jsurfaceworks_src_JSurfaceWorksBase_SMALL_CHUNK
@@ -20,7 +22,7 @@ extern "C" {
 /*
  * Class:     csw_jsurfaceworks_src_JSurfaceWorksBase
  * Method:    sendCommand
- * Signature: (II[I[J[DLjava/lang/String;[I[F[D)J
+ * Signature: (II[I[J[DLjava/lang/String;[I[F[DI)J
  */
 JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
   (JNIEnv *, jobject, jint, jint, jintArray, jlongArray, jdoubleArray, jstring, jintArray, jfloatArray, jdoubleArray, jint);
@@ -28,7 +30,7 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
 /*
  * Class:     csw_jsurfaceworks_src_JSurfaceWorksBase
  * Method:    sendStaticCommand
- * Signature: (II[I[J[DLjava/lang/String;[I[F[D)J
+ * Signature: (II[I[J[DLjava/lang/String;[I[F[DI)J
  */
 JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendStaticCommand
   (JNIEnv *, jclass, jint, jint, jintArray, jlongArray, jdoubleArray, jstring, jintArray, jfloatArray, jdoubleArray, jint);

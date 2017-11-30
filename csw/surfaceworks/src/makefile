@@ -63,12 +63,13 @@ LIB_OBJS_CC=\
  Vert$(OBJ_SUFFIX)
 
 
+#$(CP) ../../utils/src/utils.a utils.a
+
 LIB_FILE=$(LIB_PREFIX)surf$(LIB_SUFFIX)
 
 $(LIB_FILE): $(ALL_LIB_OBJS)
 	$(LIB_CMD)
 	$(LIB_COPY)
-	$(CP) ../../utils/src/utils.a utils.a
 
 prog: $(LIB_FILE)
 

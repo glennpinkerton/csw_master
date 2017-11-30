@@ -54,7 +54,7 @@
 
    !!!!
      As of the 2017 refactoring, both CSW_F and CSW_Float MUST
-     be set to double.  The flexibility impled in the preceding
+     be set to double.  The flexibility implied in the preceding
      comment is not particularly useful and the code uses CSW_F,
      CSW_Float and double interchangeably in a few spots.
    !!!!

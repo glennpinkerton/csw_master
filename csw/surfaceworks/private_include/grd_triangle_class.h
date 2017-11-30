@@ -81,7 +81,7 @@ typedef struct {
            y,
            z;
     int    nodenum;
-    int    *edgelist,
+    int    *edgelist = NULL,
            nedge,
            maxedge;
     int    constraint_class;
@@ -101,7 +101,7 @@ typedef struct {
 }  RAwLineSegStruct;
 
 typedef struct {
-    int   *nodes;
+    int   *nodes = NULL;
     int   nlist;
     int   maxlist;
     int   deleted;
@@ -115,7 +115,7 @@ typedef struct {
 } RIdgeLineStruct;
 
 typedef struct {
-    int   *list;
+    int   *list = NULL;
     int   nlist,
           maxlist;
     int   ridgenum;
@@ -151,7 +151,7 @@ typedef struct {
 typedef struct {
     int           id1,
                   id2;
-    INdexStruct   **index;
+    INdexStruct   **index = NULL;
     double        xmin,
                   ymin,
                   xmax,
@@ -165,7 +165,7 @@ typedef struct {
 typedef struct {
     int                  id1,
                          id2;
-    NOdeEdgeListStruct   *list;
+    NOdeEdgeListStruct   *list = NULL;
     int                  nlist;
 }  NOdeEdgeCacheStruct;
 
@@ -192,6 +192,8 @@ class CSWGrdTriangle
     CSWGrdUtils   *grd_utils_ptr = NULL;
 
   public:
+
+    CSWGrdTriangle () {};
 
     void  SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};
     void  SetGrdCalcPtr (CSWGrdCalc *p) {grd_calc_ptr = p;};
@@ -595,27 +597,6 @@ class CSWGrdTriangle
         int            *lineids
         );
 
-    int grd_trimesh_blended_values_from_grid (
-        NOdeStruct     *nodes,
-        int            num_nodes,
-        EDgeStruct     *edges,
-        int            num_edges,
-        TRiangleStruct *tris,
-        int            num_tris,
-        void           *grid,
-        int            ncol,
-        int            nrow,
-        double         gxmin,
-        double         gymin,
-        double         gxmax,
-        double         gymax,
-        FAultLineStruct  *faults,
-        int            nfaults,
-        int            interp_flag,
-        int            *lineids,
-        void           *bpts
-        );
-
     int grd_smooth_trimesh_nodes_directly (
         NOdeStruct     *nodes,
         int            numnodes,
@@ -682,14 +663,6 @@ class CSWGrdTriangle
                   NOdeStruct *nodes, int numnodes,
                   char *filename);
 
-    int grd_WriteBlendedTextTriMesh
-                 (int vused, double *vbase,
-                  TRiangleStruct *triangles, int ntriangles,
-                  EDgeStruct *edges, int nedges,
-                  NOdeStruct *nodes, int numnodes,
-                  void *bpts,
-                  char *filename);
-
     int grd_calc_tri_mesh_from_grid (CSW_F *grid, int nc, int nr,
                              double x1, double y1, double x2, double y2,
                              double *xlines, double *ylines, double *zlines,
@@ -727,9 +700,9 @@ class CSWGrdTriangle
     int                  NumNodeEdgeCache = 0,
                          MaxNodeEdgeCache = 0;
 
-    NOdeStruct           *NodeList, *NlistReturn;
-    EDgeStruct           *EdgeList, *ElistReturn;
-    TRiangleStruct       *TriangleList, *TlistReturn;
+    NOdeStruct           *NodeList = NULL, *NlistReturn = NULL;
+    EDgeStruct           *EdgeList = NULL, *ElistReturn = NULL;
+    TRiangleStruct       *TriangleList = NULL, *TlistReturn = NULL;
 
     INdexStruct          **TriangleIndexGrid = NULL;
     double               TriangleIndexXmin = 1.e30,
@@ -741,7 +714,7 @@ class CSWGrdTriangle
     int                  TriangleIndexNcol = 0,
                          TriangleIndexNrow = 0;
 
-    INdexStruct          **IndexGrid;
+    INdexStruct          **IndexGrid = NULL;
     double               IndexXmin,
                          IndexYmin,
                          IndexXmax,
@@ -755,7 +728,7 @@ class CSWGrdTriangle
     int                  MaxIndexPoint = -1;
     int                  NumLinePoints = 0;
 
-    char                 *SwapFlags;
+    char                 *SwapFlags = NULL;
     int                  FinalSwapFlag,
                          NumSwapped;
 
@@ -776,14 +749,14 @@ class CSWGrdTriangle
     int                  BoundaryEdges[MAX_BOUNDARY_EDGES];
     int                  NumBoundaryEdges;
 
-    RAwPointStruct       *RawPoints;
+    RAwPointStruct       *RawPoints = NULL;
     RAwPointStruct       *ConstraintRawPoints = NULL;
     int                  NumRawPoints,
                          NumRawCheck,
                          MaxRawPoints;
     int                  NumConstraintRawPoints = 0,
                          MaxConstraintRawPoints = 0;
-    RAwLineSegStruct     *RawLines;
+    RAwLineSegStruct     *RawLines = NULL;
     int                  NumRawLines;
 
     int                  CheckNullPointers = 0;
@@ -845,18 +818,18 @@ class CSWGrdTriangle
     double               SegmentIntX = 0.0,
                          SegmentIntY = 0.0;
 
-    double               *Xline,
-                         *Yline,
-                         *Zline;
-    double               *Xout,
-                         *Yout,
-                         *Zout;
+    double               *Xline = NULL,
+                         *Yline = NULL,
+                         *Zline = NULL;
+    double               *Xout = NULL,
+                         *Yout = NULL,
+                         *Zout = NULL;
     double               XoutTiny,
                          XYTiny,
                          XoutLast = 1.e30,
                          YoutLast = 1.e30;
     int                  LastSegmentFlag = 0;
-    int                  *Iout,
+    int                  *Iout = NULL,
                          Nlout,
                          Npout,
                          Npsav,
@@ -866,8 +839,8 @@ class CSWGrdTriangle
                          YlineMin,
                          XlineMax,
                          YlineMax;
-    int                  *Iline,
-                         *Iflag,
+    int                  *Iline = NULL,
+                         *Iflag = NULL,
                          Nline;
     double               ConstraintX1 = 0.0,
                          ConstraintY1 = 0.0,
@@ -892,31 +865,31 @@ class CSWGrdTriangle
     double               Xshift,
                          Yshift;
 
-    RIdgeLineStruct      *RidgeLineList;
+    RIdgeLineStruct      *RidgeLineList = NULL;
     int                  NumRidgeLines,
                          MaxRidgeLines;
-    FOrkInfoStruct       *ForkList;
+    FOrkInfoStruct       *ForkList = NULL;
     int                  NumFork,
                          MaxFork;
-    NOdeEdgeListStruct   *NodeEdgeList;
+    NOdeEdgeListStruct   *NodeEdgeList = NULL;
     int                  NumNodeEdgeList = 0;
 
-    int                  *PolySegs;
-    POlygonStruct        *PolygonList;
+    int                  *PolySegs = NULL;
+    POlygonStruct        *PolygonList = NULL;
     int                  NumPolygons,
                          MaxPolygons;
     int                  DrainageFlag;
     int                  LastUpDipRidgeNumber = -1;
 
-    SPillpointStruct     *SpillpointList;
+    SPillpointStruct     *SpillpointList = NULL;
     int                  NumSpillpoints;
-    SPillpointStruct     *SpillFilterList;
+    SPillpointStruct     *SpillFilterList = NULL;
     int                  NumSpillFilters;
     double               SpillFilterDistance;
     int                  SpillTypeForSearch;
     int                  NcolSaddle = 0,
                          NrowSaddle = 0;
-    CSW_F                *GridSaddle;
+    CSW_F                *GridSaddle = NULL;
     double               X1Saddle,
                          Y1Saddle,
                          XspaceSaddle,
@@ -1147,10 +1120,6 @@ class CSWGrdTriangle
     int ProcessConstraintSegment (int, int*, int, int);
     int CreateNewTriangleForConstraint (int node1, int node2);
     int SwapForExactConstraintSegment (int, int*, int, int);
-/*
-    int SplitIntoFour (int t1num, int t2num, int edgenum, int nodenum,
-                       int *elist);
-*/
     int FindTriangleEdge (TRiangleStruct*, int, int);
     int SamePointAsNode (double, double, int);
 
@@ -1172,9 +1141,6 @@ class CSWGrdTriangle
                           int *elist,
                           int nlist);
     int RemoveNode (int nodenum);
-/*
-    int RemoveEdge (int edgenum);
-*/
     int AddEdgeToNodeList (int nodenum, int edgenum);
     void RemoveEdgeFromNodeList (int nodenum, int edgenum);
 
@@ -1186,9 +1152,6 @@ class CSWGrdTriangle
     void RemoveZeroAreaTriangle (int tnum);
 
     double CalcEquilateralness (int n1, int n2, int n3);
-/*
-    int PointOnSegment (double xp, double yp, int n1, int n2, double *dperp);
-*/
     int NodeOnSegment (int nchk, int n1, int n2, double *dperp);
     int NodeOnSegmentForNodeRemoval (int nchk, int n1, int n2, double *dperp);
     int NodeOnEdge (int, int);
@@ -1354,7 +1317,6 @@ class CSWGrdTriangle
     void RecurseChew (int index, int *nwork, int *work1, int *work2);
 
     double CalcLocalZ (double *xloc, double *yloc, double *zloc, int nloc);
-    CSW_Blended *CalcLocalBlend (CSW_Blended *z, int npts);
 
     int CalcBezierControlPoints (TRiangleStruct *tptr,
                                  double *bcpoints);
@@ -1369,7 +1331,6 @@ class CSWGrdTriangle
                                EDgeStruct *eptr);
 
     int SmoothTrimeshUsingGrid (int sfact, double avlen);
-/*  int SmoothTrimeshDirectly (int sfact, double avlen);*/
 
     void TrianglePoints2 (TRiangleStruct *tptr,
                           NOdeStruct *nodes,

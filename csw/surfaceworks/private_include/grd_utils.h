@@ -160,13 +160,6 @@ class CSWGrdUtils
     int grd_expand_one_level_new
         (CSW_F *grid1, CSW_F *grid2, int ncol, int nrow,
          CSW_F nval, int eflag, int flag, char *process_flags);
-    int grd_fill_blended_cell
-        (CSW_Blended *grid, char *done,
-         int irow, int jcol, int nc, int ncol);
-    int grd_expand_blended_values
-        (CSW_Blended *grid, int ncol, int nrow,
-         int nc, char *done,
-         int fault_flag, int *closest_fault);
     int grd_fill_plateau
         (CSW_F *grid, int nc, int nr,
          CSW_F value, CSW_F null_value, CSW_F zrange);
@@ -180,17 +173,6 @@ class CSWGrdUtils
         double x3, double y3, double x4, double y4, int nc2, int nr2);
 
 
-    int grd_set_blend_min_max (int min, int max);
-    int grd_interpolate_blended_grid
-        (CSW_BlendedNode *grid, int ncol, int nrow,
-         CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,
-         FAultLineStruct *faults, int nfaults,
-         int firstflag,
-         CSW_F x, CSW_F y, CSW_F range, CSW_Mixture *mixture);
-    int grd_get_blended_grid_node
-        (CSW_BlendedNode *grid, int ncol, int nrow,
-         int col, int row,
-         CSW_F range, CSW_Mixture *mixture);
     int grd_get_err (void);
     int grd_recommended_size
         (CSW_F *x, CSW_F *y, int npts,

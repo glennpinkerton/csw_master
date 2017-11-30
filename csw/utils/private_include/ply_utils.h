@@ -223,20 +223,6 @@ class CSWPolyUtils
                         double *x1, double *y1, int n1);
     int ply_UtilMaxPts (int val);
 
-/*
-    int ply_build_polygons_from_lines (double *xline, double *yline,
-                                       int nline, int *line_pts,
-                                       double *xpout, double *ypout,
-                                       int *npolyout, int *nptsout,
-                                       int maxpts, int maxpoly);
-    int ply_build_polygons_from_tagged_lines
-                                      (double *xline, double *yline, void **tags,
-                                       int nline, int *line_pts,
-                                       double *xpout, double *ypout, void **tagout,
-                                       int *npolyout, int *nptsout,
-                                       int maxpts, int maxpoly);
-*/
-
 }; // end of main class definition
 
 

@@ -243,18 +243,6 @@
         int         id,
         int         major);
 
-    void jni_call_add_blended_nodes_method (
-        int       *values1,
-        int       *values2,
-        int       *values3,
-        int       *values4,
-        double    *fractions1,
-        double    *fractions2,
-        double    *fractions3,
-        double    *fractions4,
-        int       npts);
-
-
   #ifdef __cplusplus
   }
   #endif

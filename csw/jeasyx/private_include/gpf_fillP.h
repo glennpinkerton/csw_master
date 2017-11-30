@@ -46,7 +46,7 @@
 /*  define some data structures for polyfill plotting  */
 
 typedef struct {
-    CSW_F          *xypts;
+    CSW_F          *xypts = NULL;
     int            npts, maxpts;
     CSW_F          xmin, ymin, xmax, ymax;
     CSW_F          thick, patscale, dashscale;
@@ -72,9 +72,9 @@ typedef struct {
     int            sub_prims[2];
     int            numsub;
     int            scaleable;
-    CSW_F          *x_orig,
-                   *y_orig;
-    int            *npts_orig,
+    CSW_F          *x_orig = NULL,
+                   *y_orig = NULL;
+    int            *npts_orig = NULL,
                    ncomp_orig;
 } FIllPrim;
 

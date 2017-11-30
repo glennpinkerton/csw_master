@@ -76,12 +76,12 @@
     define structures for graph parts
 */
 typedef struct {
-    char          *text;
+    char          *text = NULL;
     CSW_F         position;
 }  AXisLabelStruct;
 
 typedef struct {
-    AXisLabelStruct   *list;
+    AXisLabelStruct   *list = NULL;
     int               nlist,
                       flag;
 }  AXisLabelSet;
@@ -133,7 +133,7 @@ typedef struct {
                   monthflag,
                   ismirror,
                   nlabels;
-    int           *primnums,
+    int           *primnums = NULL,
                   nprim,
                   frame,
                   item,
@@ -144,16 +144,16 @@ typedef struct {
                   autoscale,
                   captiontext[MAX_TITLE_LEN],
                   name[MAX_NAME_LEN + 8];
-    void          *mirrorptr;
+    void          *mirrorptr = NULL;
     AXisLabelSet  labels;
 }  GRaphAxisRec;
 
 typedef struct {
-    CSW_F         *x,
-                  *y,
-                  *origx,
-                  *origy,
-                  *ebars,
+    CSW_F         *x = NULL,
+                  *y = NULL,
+                  *origx = NULL,
+                  *origy = NULL,
+                  *ebars = NULL,
                   x1, y1, x2, y2,
                   symbolsize,
                   ebarthick,
@@ -170,7 +170,7 @@ typedef struct {
                   smoothflag,
                   norig,
                   npts;
-    int           *primnums,
+    int           *primnums = NULL,
                   nprim,
                   baselineprim,
                   frame,
@@ -206,8 +206,8 @@ typedef struct {
 }  GRaphCurveRec;
 
 typedef struct {
-    CSW_F         *x,
-                  *y,
+    CSW_F         *x = NULL,
+                  *y = NULL,
                   x1, y1, x2, y2,
                   labelsize,
                   labelthick,
@@ -237,7 +237,7 @@ typedef struct {
                   labelfillcolor,
                   basepattern,
                   basecolor;
-    int           *primnums,
+    int           *primnums = NULL,
                   baselineprim,
                   nprim;
     char          notneeded,
@@ -256,17 +256,17 @@ typedef struct {
 }  GRaphBarRec;
 
 typedef struct {
-    CSW_F         *x,
-                  *y,
+    CSW_F         *x = NULL,
+                  *y = NULL,
                   x1, y1, x2, y2,
                   size,
                   thick;
-    int           *tag,
+    int           *tag = NULL,
                   color,
                   symbol,
                   mask,
                   npts;
-    int           *primnums,
+    int           *primnums = NULL,
                   nprim,
                   frame,
                   item,
@@ -297,8 +297,8 @@ typedef struct {
     int           usecount,
                   nfree,
                   nleg;
-    void          *leglist;
-    int           *freelist;
+    void          *leglist = NULL;
+    int           *freelist = NULL;
     int           usedflag,
                   outputflag,
                   firstptr,
@@ -309,7 +309,7 @@ typedef struct {
                   titleheight,
                   textthick;
     CSW_F         x1, y1, y2, autox1;
-    int           *primnums,
+    int           *primnums = NULL,
                   nprim,
                   frame,
                   item,
@@ -334,7 +334,7 @@ typedef struct {
                   legnotneeded,
                   needsdeleted,
                   title[MAX_TITLE_LEN];
-    int           *primnums,
+    int           *primnums = NULL,
                   nprim,
                   frame,
                   item,
@@ -350,7 +350,7 @@ typedef struct {
                   bottomnum,
                   ntop,
                   nbottom,
-                  *primnums,
+                  *primnums = NULL,
                   nprim,
                   frame,
                   item,
@@ -371,7 +371,7 @@ typedef struct {
 }  GRaphCurveFillRec;
 
 typedef struct {
-    void                 *gptr;
+    void                 *gptr = NULL;
     int                  type,
                          num,
                          tag;
@@ -381,7 +381,7 @@ typedef struct {
     int                  type,
                          xaxis,
                          yaxis;
-    void                 *prim;
+    void                 *prim = NULL;
 }  GRaphScaledPrimRec;
 
 typedef struct {
@@ -409,7 +409,7 @@ typedef struct {
                          notneeded;
     char                 name[MAX_NAME_LEN],
                          label[MAX_TITLE_LEN];
-    void                 *parent;
+    void                 *parent = NULL;
 }  PIeSliceRec;
 
 typedef struct {
@@ -439,7 +439,7 @@ typedef struct {
                          gy2;
     int                  drawneeded;
     GRaphPrimRec         *gprimlist[MAX_GPRIMS];
-    GRaphPrimRec         **usedgprimlist;
+    GRaphPrimRec         **usedgprimlist = NULL;
     int                  ngprim;
     int                  maxusedgprim,
                          nusedgprim;
@@ -460,7 +460,7 @@ typedef struct {
                          pie_ymin,
                          pie_xmax,
                          pie_ymax;
-    GRaphScaledPrimRec   *scaledprims;
+    GRaphScaledPrimRec   *scaledprims = NULL;
     int                  nscaledprim,
                          maxscaledprim;
 }  GRaphRec;

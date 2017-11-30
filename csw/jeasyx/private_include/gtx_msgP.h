@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -203,9 +203,6 @@
 #define GTX_CONTOUR_LINE       111
 #define GTX_GRID_DATA          121
 #define GTX_FAULT_LINE_DATA    131
-#define GTX_BLENDED_GRID_DATA  132
-#define GTX_BLEND_TRIMESH_DATA 133
-#define GTX_NDP_GRAPHIC_PROPS  134
 #define GTX_IMAGE_FAULT_DATA   135
 
 /*

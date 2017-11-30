@@ -499,23 +499,6 @@ class SWCalc
         int        num_tri
     );
     
-    int sw_CalcBlendedGrid (
-        double*             x,
-        double*             y,
-        int*                z,
-        double*             xfault,
-        double*             yfault,
-        int*                nFaultPts,
-        int                 npts,
-        int                 nFaults,
-        int                 nrows,
-        int                 ncols,
-        double              xmin,
-        double              ymin,
-        double              xmax,
-        double              ymax,
-        SWGridOptionsStruct *grid_options);
-    
     int sw_ReadGrid (char *fname);
     
 }; // end of main class

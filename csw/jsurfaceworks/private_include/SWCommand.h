@@ -38,12 +38,10 @@ extern "C" {
 
 #define SW_REMOVE_TRI_INDEX       22
 #define SW_REMOVE_ALL_TRI_INDEXES 23
-#define SW_CALC_BLENDED_GRID      24
 
 #define SW_START_AT_TRI_MESH      25
 #define SW_SET_AT_POLYLINE        26
 #define SW_ADD_AT_RDP_POINTS      27
-#define SW_ADD_AT_NDP_POINTS      28
 #define SW_CALC_AT_TRI_MESH       29
 
 #define SW_TEST_TRI_SPEED         98

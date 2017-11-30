@@ -99,8 +99,6 @@ class CSWGrdImage
 
   private:
 
-
-
 /*
     Old static file variables are now private class variables.
 */
@@ -153,13 +151,6 @@ class CSWGrdImage
 /*
     Old static file functions are now private class methods.
 */
-
-    int BlendColors (
-    int v1, int v2, int v3, int v4,
-    double f1, double f2, double f3, double f4,
-    int nvals, int *vals,
-    int *red, int *green, int *blue, int *alpha,
-    CSW_F *fr, CSW_F *fg, CSW_F *fb, CSW_F *fa);
 
     int SetupRow1Col1(void);
     int SetEdges(void);

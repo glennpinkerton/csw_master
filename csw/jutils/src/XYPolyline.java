@@ -238,22 +238,22 @@ public class XYPolyline {
   /**
    * Return a copy of the internal x array.
    */
-	public double[] getXArrayCopy ()
-	{
-		int size = xArray.length;
-		double[] copy = new double[size];
-		System.arraycopy (xArray, 0, copy, 0, size);
-		return copy;
-	}
+    public double[] getXArrayCopy ()
+    {
+    	int size = xArray.length;
+    	double[] copy = new double[size];
+    	System.arraycopy (xArray, 0, copy, 0, size);
+    	return copy;
+    }
 
   /**
    * Return a copy of the internal y array.
    */
-	public double[] getYArrayCopy ()
-	{
-		int size = yArray.length;
-		double[] copy = new double[size];
-		System.arraycopy (yArray, 0, copy, 0, size);
-		return copy;
-	}
+    public double[] getYArrayCopy ()
+    {
+    	int size = yArray.length;
+    	double[] copy = new double[size];
+    	System.arraycopy (yArray, 0, copy, 0, size);
+    	return copy;
+    }
 }

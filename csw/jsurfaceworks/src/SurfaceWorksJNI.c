@@ -38,7 +38,11 @@
 #include <csw/jsurfaceworks/private_include/SurfaceWorksJNI.h>
 #include <csw/jsurfaceworks/private_include/SWCommand.h>
 
-#include "JSurfaceWorksBase.h"
+//#include "JSurfaceWorksBase.h"
+
+#include "csw_jsurfaceworks_src_JSurfaceWorks_FinalizedTmeshID.h"
+#include "csw_jsurfaceworks_src_JSurfaceWorks.h"
+#include "csw_jsurfaceworks_src_JSurfaceWorksBase.h"
 
 #define MAX_LIST_ARRAY \
 csw_jsurfaceworks_src_JSurfaceWorksBase_MAX_LIST_ARRAY
@@ -70,10 +74,8 @@ static jmethodID StartProtoPatchMethodID = NULL;
 static jmethodID EndProtoPatchMethodID = NULL;
 static jmethodID AddNativeTindexResultMethodID = NULL;
 static jmethodID AddFaultMajorMinorMethodID = NULL;
-static jmethodID AddBlendedNodesMethodID = NULL;
 static jmethodID AddNativeAtTriMeshMethodID = NULL;
 static jmethodID AddNativeRDPValueMethodID = NULL;
-static jmethodID AddNativeNDPValueMethodID = NULL;
 
 static JNIEnv         *JavaEnv = NULL;
 static jobject        JavaObj = NULL;
@@ -177,10 +179,8 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
     EndProtoPatchMethodID = NULL;
     AddNativeTindexResultMethodID = NULL;
     AddFaultMajorMinorMethodID = NULL;
-    AddBlendedNodesMethodID = NULL;
     AddNativeAtTriMeshMethodID = NULL;
     AddNativeRDPValueMethodID = NULL;
-    AddNativeNDPValueMethodID = NULL;
 
     if (expect_return) {
 
@@ -357,13 +357,6 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
             return -1;
         }
 
-        AddBlendedNodesMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addBlendedNodes",
-                                           "([I[I[I[I[D[D[D[D)V");
-        if (AddBlendedNodesMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
         AddNativeAtTriMeshMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addNativeAtTriMesh",
                                         "([D[D[D[II[I[I[I[I[II[I[I[I[II)V");
         if (AddNativeAtTriMeshMethodID == NULL) {
@@ -378,12 +371,6 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
             return -1;
         }
 
-        AddNativeNDPValueMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addNativeNDPValue",
-                                        "(I[B[B[B[B[B[B[B[BI)V");
-        if (AddNativeNDPValueMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
 
         JavaEnv = jnienv;
         JavaObj = jobj;
@@ -3198,172 +3185,6 @@ void jni_call_add_fault_major_minor_method (
 
 }
 
-/*------------------------------------------------------------------------*/
-
-void jni_call_add_blended_nodes_method (
-    int       *values1,
-    int       *values2,
-    int       *values3,
-    int       *values4,
-    double    *fractions1,
-    double    *fractions2,
-    double    *fractions3,
-    double    *fractions4,
-    int       npts)
-{
-    jint *jint_values1;
-    jint *jint_values2;
-    jint *jint_values3;
-    jint *jint_values4;
-    jintArray j_values1;
-    jintArray j_values2;
-    jintArray j_values3;
-    jintArray j_values4;
-    jdoubleArray j_fractions1;
-    jdoubleArray j_fractions2;
-    jdoubleArray j_fractions3;
-    jdoubleArray j_fractions4;
-
-    if (AddBlendedNodesMethodID == NULL) {
-        return;
-    }
-
-    /*
-     * If the native int is not 32 bit signed, don't support.
-     */
-#if INT_MAX == 2147483647
-    jint_values1 = (jint *)values1;
-    jint_values2 = (jint *)values2;
-    jint_values3 = (jint *)values3;
-    jint_values4 = (jint *)values4;
-#else
-    #error The surfaceworks native code does not support non 32 bit signed int.
-#endif
-
-    j_values1 = (*JavaEnv)->NewIntArray (JavaEnv, (jsize)npts);
-    if (j_values1 == NULL) {
-        return;
-    }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
-        j_values1,
-        0,
-        npts,
-        jint_values1
-    );
-
-    j_values2 = (*JavaEnv)->NewIntArray (JavaEnv, (jsize)npts);
-    if (j_values2 == NULL) {
-        return;
-    }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
-        j_values2,
-        0,
-        npts,
-        jint_values2
-    );
-
-    j_values3 = (*JavaEnv)->NewIntArray (JavaEnv, (jsize)npts);
-    if (j_values3 == NULL) {
-        return;
-    }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
-        j_values3,
-        0,
-        npts,
-        jint_values3
-    );
-
-    j_values4 = (*JavaEnv)->NewIntArray (JavaEnv, (jsize)npts);
-    if (j_values4 == NULL) {
-        return;
-    }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
-        j_values4,
-        0,
-        npts,
-        jint_values4
-    );
-
-    j_fractions1 = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
-    if (j_fractions1 == NULL) {
-        return;
-    }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
-        j_fractions1,
-        0,
-        npts,
-        fractions1
-    );
-
-    j_fractions2 = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
-    if (j_fractions2 == NULL) {
-        return;
-    }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
-        j_fractions2,
-        0,
-        npts,
-        fractions2
-    );
-
-    j_fractions3 = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
-    if (j_fractions3 == NULL) {
-        return;
-    }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
-        j_fractions3,
-        0,
-        npts,
-        fractions3
-    );
-
-    j_fractions4 = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
-    if (j_fractions4 == NULL) {
-        return;
-    }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
-        j_fractions4,
-        0,
-        npts,
-        fractions4
-    );
-
-
-  /*
-   * Call the java object's method.
-   */
-      (*JavaEnv)->CallVoidMethod (
-          JavaEnv,
-          JavaObj,
-          AddBlendedNodesMethodID,
-          j_values1,
-          j_values2,
-          j_values3,
-          j_values4,
-          j_fractions1,
-          j_fractions2,
-          j_fractions3,
-          j_fractions4
-      );
-
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_values1);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_values2);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_values3);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_values4);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_fractions1);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_fractions2);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_fractions3);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_fractions4);
-
-}
 
 /*------------------------------------------------------------------------*/
 
@@ -3735,218 +3556,6 @@ void jni_call_add_native_at_tri_mesh_method (
 
 /*------------------------------------------------------------------------*/
 
-void jni_call_add_native_ndp_value_method (
-    int         id,
-    signed char *v1,
-    signed char *v2,
-    signed char *v3,
-    signed char *v4,
-    signed char *p1,
-    signed char *p2,
-    signed char *p3,
-    signed char *p4,
-    int         npts
-)
-{
-    jint        jid;
-    jbyte       *jv1,
-                *jv2,
-                *jv3,
-                *jv4,
-                *jp1,
-                *jp2,
-                *jp3,
-                *jp4;
-    jint        jnpts;
-
-
-    jbyteArray          j_v1;
-    jbyteArray          j_v2;
-    jbyteArray          j_v3;
-    jbyteArray          j_v4;
-    jbyteArray          j_p1;
-    jbyteArray          j_p2;
-    jbyteArray          j_p3;
-    jbyteArray          j_p4;
-
-
-    if (AddNativeNDPValueMethodID == NULL) {
-        return;
-    }
-
-    jv1 = (jbyte *)v1;
-    jv2 = (jbyte *)v2;
-    jv3 = (jbyte *)v3;
-    jv4 = (jbyte *)v4;
-    jp1 = (jbyte *)p1;
-    jp2 = (jbyte *)p2;
-    jp3 = (jbyte *)p3;
-    jp4 = (jbyte *)p4;
-
-/*
- * Put the ndp values into java arrays.
- */
-    j_v1 = (*JavaEnv)->NewByteArray (JavaEnv, npts);
-    if (j_v1 == NULL) {
-        return;
-    }
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
-        j_v1,
-        0,
-        npts,
-        jv1
-    );
-
-    j_v2 = (*JavaEnv)->NewByteArray (JavaEnv, npts);
-    if (j_v2 == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v1);
-        return;
-    }
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
-        j_v2,
-        0,
-        npts,
-        jv2
-    );
-
-    j_v3 = (*JavaEnv)->NewByteArray (JavaEnv, npts);
-    if (j_v3 == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v1);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v2);
-        return;
-    }
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
-        j_v3,
-        0,
-        npts,
-        jv3
-    );
-
-    j_v4 = (*JavaEnv)->NewByteArray (JavaEnv, npts);
-    if (j_v4 == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v1);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v2);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v3);
-        return;
-    }
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
-        j_v4,
-        0,
-        npts,
-        jv4
-    );
-
-    j_p1 = (*JavaEnv)->NewByteArray (JavaEnv, npts);
-    if (j_p1 == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v1);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v2);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v3);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v4);
-        return;
-    }
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
-        j_p1,
-        0,
-        npts,
-        jp1
-    );
-
-    j_p2 = (*JavaEnv)->NewByteArray (JavaEnv, npts);
-    if (j_p2 == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v1);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v2);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v3);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v4);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_p1);
-        return;
-    }
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
-        j_p2,
-        0,
-        npts,
-        jp2
-    );
-
-    j_p3 = (*JavaEnv)->NewByteArray (JavaEnv, npts);
-    if (j_p3 == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v1);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v2);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v3);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v4);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_p1);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_p2);
-        return;
-    }
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
-        j_p3,
-        0,
-        npts,
-        jp3
-    );
-
-    j_p4 = (*JavaEnv)->NewByteArray (JavaEnv, npts);
-    if (j_p4 == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v1);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v2);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v3);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v4);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_p1);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_p2);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_p3);
-        return;
-    }
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
-        j_p4,
-        0,
-        npts,
-        jp4
-    );
-
-    jid = (jint)id;
-    jnpts = (jint)npts;
-
-/*
- * Call the java object's method.
- */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
-        AddNativeNDPValueMethodID,
-        jid,
-        j_v1,
-        j_v2,
-        j_v3,
-        j_v4,
-        j_p1,
-        j_p2,
-        j_p3,
-        j_p4,
-        jnpts
-    );
-
-/*
- * Delete the local java arrays.
- */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v1);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v2);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v3);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_v4);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_p1);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_p2);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_p3);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_p4);
-
-    return;
-
-}
 
 /*------------------------------------------------------------------------*/
 

@@ -31,17 +31,17 @@
  * Define structures used in patch spliting
  */
 typedef struct {
-    double *x;
-    double *y;
-    double *z;
+    double *x = NULL;
+    double *y = NULL;
+    double *z = NULL;
     int    npts;
     int    id;
 } ORiginalPoints;
 
 typedef struct {
-    double      *x,
-                *y,
-                *z;
+    double      *x = NULL,
+                *y = NULL,
+                *z = NULL;
     double      xleft,
                 yleft,
                 xright,
@@ -64,34 +64,34 @@ typedef struct {
 } FAultCenterline;
 
 typedef struct {
-    double      *x,
-                *y,
-                *z;
+    double      *x = NULL,
+                *y = NULL,
+                *z = NULL;
     int         npts;
     int         patchid1;
     int         patchid2;
 } COntactLine;
 
 typedef struct {
-    double      *x,
-                *y,
-                *z;
+    double      *x = NULL,
+                *y = NULL,
+                *z = NULL;
     int         npts,
                 flag;
 } BAseLine;
 
 typedef struct {
-    BAseLine    *list;
+    BAseLine    *list = NULL;
     int         nlist,
                 id;
 } ORiginalLines;
 
 typedef struct {
-    NOdeStruct       *nodes;
+    NOdeStruct       *nodes = NULL;
     int              num_nodes;
-    EDgeStruct       *edges;
+    EDgeStruct       *edges = NULL;
     int              num_edges;
-    TRiangleStruct   *triangles;
+    TRiangleStruct   *triangles = NULL;
     int              num_triangles;
     int              fault_id,
                      flag;
@@ -103,7 +103,7 @@ typedef struct {
                      dy;
     int              steep_flag;
     int              extended_flag;
-    void             *tindex;
+    void             *tindex = NULL;
     double           txmin,
                      tymin,
                      txmax,
@@ -115,9 +115,9 @@ typedef struct {
 } FAultSurface;
 
 typedef struct {
-    double           *x,
-                     *y,
-                     *z;
+    double           *x = NULL,
+                     *y = NULL,
+                     *z = NULL;
     int              npts;
     int              type;
     int              direction;
@@ -131,21 +131,21 @@ typedef struct {
 } BOrderSegment;
 
 typedef struct {
-    double           *x,
-                     *y,
-                     *z;
+    double           *x = NULL,
+                     *y = NULL,
+                     *z = NULL;
     int              npts;
-    BOrderSegment    *borderList;
+    BOrderSegment    *borderList = NULL;
     int              numBorderList,
                      maxBorderList;
-    BAseLine         *lineList;
+    BAseLine         *lineList = NULL;
     int              numLineList,
                      maxLineList;
-    NOdeStruct       *nodes;
+    NOdeStruct       *nodes = NULL;
     int              num_nodes;
-    EDgeStruct       *edges;
+    EDgeStruct       *edges = NULL;
     int              num_edges;
-    TRiangleStruct   *triangles;
+    TRiangleStruct   *triangles = NULL;
     int              num_triangles;
     int              patchid;
     int              sgpflag;
@@ -153,18 +153,18 @@ typedef struct {
 } PRotoPatch;
 
 typedef struct {
-    double           *x,
-                     *y,
-                     *z;
+    double           *x = NULL,
+                     *y = NULL,
+                     *z = NULL;
     int              npts;
-    CSW_F            *grid;
+    CSW_F            *grid = NULL;
     int              ncol, nrow;
     double           xmin, ymin, xmax, ymax;
-    double           *xp,
-                     *yp,
-                     *zp;
+    double           *xp = NULL,
+                     *yp = NULL,
+                     *zp = NULL;
     int              np;
-    BAseLine         *minor_lines;
+    BAseLine         *minor_lines = NULL;
     int              num_minor_lines;
     int              max_minor_lines;
 } WOrkPoly;
@@ -201,7 +201,7 @@ class PATCHSplit
                    *OrigZBorder = NULL;
     int            OrigNBorder = 0;
 
-    FaultConnect  *FConnect;
+    FaultConnect  *FConnect = NULL;
 
     int           local_calc_first = 1;
 

@@ -72,7 +72,7 @@ typedef struct {
 }  FRameAxisStruct;
 
 typedef struct {
-    FRameAxisStruct    *ap;
+    FRameAxisStruct    *ap = NULL;
     CSW_F              fx1,
                        fy1,
                        fx2,
@@ -112,12 +112,12 @@ typedef struct {
     int          clipflag;
     int          rescaleable;
     int          moveable;
-    int          **line_index,
-                 **fill_index,
-                 **text_index,
-                 **symb_index,
-                 **shape_index,
-                 **contour_index;
+    int          **line_index = NULL,
+                 **fill_index = NULL,
+                 **text_index = NULL,
+                 **symb_index = NULL,
+                 **shape_index = NULL,
+                 **contour_index = NULL;
     int          num_line_index,
                  num_fill_index,
                  num_text_index,

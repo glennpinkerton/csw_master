@@ -94,7 +94,6 @@ Define grid option constants.
 #define GRD_NORMAL_GRID_FILE         1
 #define GRD_THICKNESS_GRID_FILE      2
 #define GRD_STEP_GRID_FILE           3
-#define GRD_BLENDED_GRID_FILE        4
 
 #define GRD_OUTSIDE_ONLY             0
 #define GRD_INSIDE_AND_OUTSIDE       1
@@ -292,34 +291,6 @@ class CSWGrdAPI
                       CSW_Float, CSW_Float, CSW_Float, CSW_Float,
                       FAultLineStruct*, int,
                       GRidCalcOptions *);
-    int grd_CalcBlendedGridFromDouble
-                     (double*, double*, int*, int,
-                      CSW_Blended*, char*, int, int,
-                      double, double, double, double,
-                      FAultLineStruct *faults, int nfaults,
-                      GRidCalcOptions*);
-    int grd_CalcBlendedGrid
-                     (CSW_Float*, CSW_Float*, int*, int,
-                      CSW_Blended*, char*, int, int,
-                      CSW_Float, CSW_Float, CSW_Float, CSW_Float,
-                      FAultLineStruct *faults, int nfaults,
-                      GRidCalcOptions*);
-    int grd_MixtureToBlendedNode (CSW_Mixture*, CSW_Blended*);
-    int grd_BlendedNodeToMixture (CSW_Blended*, CSW_Float, CSW_Mixture*);
-    int grd_SeparateBlendedGrid (CSW_Blended*, int, int, int, int,
-                                 int, CSW_F, CSW_F*);
-    int grd_InterpolateBlendedGrid (CSW_BlendedNode*, int, int,
-                                    CSW_Float, CSW_Float, CSW_Float, CSW_Float,
-                                    FAultLineStruct *faults, int nfaults, int firstflag,
-                                    CSW_Float, CSW_Float, CSW_Float, CSW_Mixture*);
-    int grd_InterpolateBlendedGridFromDouble
-                                   (CSW_BlendedNode*, int, int,
-                                    double, double, double, double,
-                                    FAultLineStruct *faults, int nfaults, int firstflag,
-                                    double, double, CSW_Float, CSW_Mixture*);
-    int grd_GetBlendedGridNode (CSW_BlendedNode*, int, int,
-                                int, int,
-                                CSW_Float, CSW_Mixture*);
     int grd_SetCalcOption (int, int, CSW_Float);
     int grd_SetCalcOptions (GRidCalcOptions *);
     int grd_DefaultCalcOptions (GRidCalcOptions *);
@@ -344,9 +315,6 @@ class CSWGrdAPI
     int grd_WriteTextFile (CSW_F *grid, int ncol, int nrow,
                            double x1, double y1, double x2, double y2,
                            char *fname);
-    int grd_WriteBlendedGrid (CSW_Blended *grid, int ncol, int nrow, int nskip,
-                              double x1, double y1, double x2, double y2,
-                              char *fname);
     int grd_WriteFaultLines (FAultLineStruct *faults, int nfaults, const char *fname);
     int grd_ReadFile (const char*, char*,
                       CSW_Float**, char**, char **mask2,
@@ -356,16 +324,6 @@ class CSWGrdAPI
     int grd_WriteMultipleFile (char*, GRidFileRec*, int);
     int grd_ReadMultipleFile (char*, GRidFileRec*, int);
     void grd_CleanFileRecList (GRidFileRec *list, int nlist);
-    int grd_WriteBlendedFile (const char*, const char*,
-                              CSW_Blended  *, char*,
-                              int, int,
-                              double, double, double, double,
-                              FAultLineStruct *faults, int nfaults);
-    int grd_ReadBlendedFile (const char*, char*,
-                             CSW_Blended  **, char**,
-                             int*, int*,
-                             double*, double*, double*, double*,
-                             FAultLineStruct **faults, int *nfaults);
     int grd_OneGridArith (CSW_Float*, CSW_Float*,
                           int, int, int, CSW_Float,
                           CSW_Float, void(*)(GRidArithData *), void*);
@@ -400,24 +358,12 @@ class CSWGrdAPI
                           CSW_Float*, char*, int, int,
                           CSW_Float, CSW_Float, CSW_Float, CSW_Float,
                           int);
-    int grd_ResampleBlendedGrid (CSW_BlendedNode *gridin, int ncol, int nrow,
-                                 CSW_Float x1, CSW_Float y1, CSW_Float x2, CSW_Float y2,
-                                 FAultLineStruct *faults, int nfaults,
-                                 CSW_BlendedNode *gridout, int ncout, int nrout,
-                                 CSW_Float x1out, CSW_Float y1out,
-                                 CSW_Float x2out, CSW_Float y2out);
     int grd_ResampleGridFromDouble (CSW_Float*, char*, int, int,
                           double, double, double, double,
                           FAultLineStruct*, int,
                           CSW_Float*, char*, int, int,
                           double, double, double, double,
                           int);
-    int grd_ResampleBlendedGridFromDouble (CSW_BlendedNode *gridin, int ncol, int nrow,
-                                 double x1, double y1, double x2, double y2,
-                                 FAultLineStruct *faults, int nfaults,
-                                 CSW_BlendedNode *gridout, int ncout, int nrout,
-                                 double x1out, double y1out,
-                                 double x2out, double y2out);
     int grd_BackInterpolateFromDouble (CSW_Float*, int, int,
                              double, double, double, double,
                              FAultLineStruct*, int,
@@ -815,14 +761,6 @@ class CSWGrdAPI
                       NOdeStruct *nodes, int numnodes,
                       char *filename);
     
-        int grd_WriteBlendedTextTriMesh
-                     (int vused, double *vbase,
-                      TRiangleStruct *triangles, int ntriangles,
-                      EDgeStruct *edges, int nedges,
-                      NOdeStruct *nodes, int numnodes,
-                      void *bpts,
-                      char *filename);
-    
         int grd_WriteBinaryTriMeshFile
                      (int vused, double *vbase,
                       TRiangleStruct *triangles, int ntriangles,
@@ -1092,27 +1030,6 @@ class CSWGrdAPI
             int            nfaults,
             int            interp_flag,
             int            *lineids
-            );
-    
-        int grd_TriMeshBlendedValuesFromGrid (
-            NOdeStruct     *nodes,
-            int            num_nodes,
-            EDgeStruct     *edges,
-            int            num_edges,
-            TRiangleStruct *tris,
-            int            num_tris,
-            void           *grid,
-            int            ncol,
-            int            nrow,
-            double         gxmin,
-            double         gymin,
-            double         gxmax,
-            double         gymax,
-            void           *faults,
-            int            nfaults,
-            int            interp_flag,
-            int            *lineids,
-            void           *bpts
             );
     
         int grd_SmoothTriMeshNodes (
