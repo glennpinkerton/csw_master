@@ -29,7 +29,7 @@ int main (int argc, char *argv[])
 {
     int              command_id, end_flag;
     int              i, cval;
-    int              npts, nline, n0, ntot, start;
+    int              npts, nline, n0, ntot;
     char             *ctmp, local_line[200];
     FILE             *fptr;
 
@@ -3259,98 +3259,6 @@ int main (int argc, char *argv[])
 
     /*---------------------------------------------------------------------*/
 
-           case SW_CALC_BLENDED_GRID:
-
-               end_flag = 0;
-
-               ctmp = futil.csw_fgets (inbuff, 1000, fptr);
-               if (ctmp == NULL) {
-                   end_flag = 1;
-                   break;
-               }
-               sscanf (
-                   inbuff,
-                   "%d %d %d %d %d",
-                   ilist,
-                   ilist+1,
-                   ilist+2,
-                   ilist+3,
-                   ilist+4);
-
-               ctmp = futil.csw_fgets (inbuff, 1000, fptr);
-               if (ctmp == NULL) {
-                   end_flag = 1;
-                   break;
-               }
-               sscanf (
-                   inbuff,
-                   "%lf %lf %lf %lf",
-                   dlist,
-                   dlist+1,
-                   dlist+2,
-                   dlist+3);
-
-               nline = ilist[3];
-               for (i=0; i<nline; i++) {
-                   ctmp = futil.csw_fgets (inbuff, 1000, fptr);
-                   if (ctmp == NULL) {
-                       end_flag = 1;
-                       break;
-                   }
-                   sscanf (inbuff, "%d", ilist+i+5);
-               }
-               if (end_flag == 1) {
-                   break;
-               }
-
-               nline = ilist[0];
-               for (i=0; i<nline; i++) {
-                   ctmp = futil.csw_fgets (inbuff, 1000, fptr);
-                   if (ctmp == NULL) {
-                       end_flag = 1;
-                       break;
-                   }
-                   sscanf (inbuff, "%lf %lf %d",
-                       ddata+i,
-                       ddata+nline+i,
-                       idata+i);
-               }
-               if (end_flag == 1) {
-                   break;
-               }
-
-               start = nline * 2;
-               nline = ilist[4];
-               for (i=0; i<nline; i++) {
-                   ctmp = futil.csw_fgets (inbuff, 1000, fptr);
-                   if (ctmp == NULL) {
-                       end_flag = 1;
-                       break;
-                   }
-                   sscanf (inbuff, "%lf %lf",
-                       ddata+i+start,
-                       ddata+nline+i+start);
-               }
-               if (end_flag == 1) {
-                   break;
-               }
-
-               sw_process_command (
-                   command_id,
-                    SINGLE_THREAD_ID,
-                   ilist,
-                   llist,
-                   dlist,
-                   cdata,
-                   idata,
-                   fdata,
-                   ddata
-               );
-
-               break;
-
-    /*---------------------------------------------------------------------*/
-
            case SW_START_AT_TRI_MESH:
 
                ctmp = futil.csw_fgets (inbuff, 1000, fptr);
@@ -3519,115 +3427,11 @@ int main (int argc, char *argv[])
 
 /*-----------------------------------------------------------------------*/
 
-           case SW_ADD_AT_RDP_POINTS:
-
-               ctmp = futil.csw_fgets (inbuff, 1000, fptr);
-               if (ctmp == NULL) {
-                   end_flag = 1;
-                   break;
-               }
-               ilist[3] = 1;
-               sscanf (
-                   inbuff,
-                   "%d %d %d",
-                   ilist+0,
-                   ilist+1,
-                   ilist+2
-               );
-
-               npts = ilist[0];
-               for (i=0; i<npts; i++) {
-                   ctmp = futil.csw_fgets (inbuff, 1000, fptr);
-                   if (ctmp == NULL) {
-                       end_flag = 1;
-                       break;
-                   }
-                   sscanf (
-                       inbuff,
-                       "%lf %lf %lf",
-                       ddata+i,
-                       ddata+npts+i,
-                       ddata+2*npts+i
-                   );
-               }
-
-               if (end_flag == 1) {
-                   break;
-               }
-
-               sw_process_command (
-                   command_id,
-                    SINGLE_THREAD_ID,
-                   ilist,
-                   llist,
-                   dlist,
-                   cdata,
-                   idata,
-                   fdata,
-                   ddata
-               );
-
-               break;
-
-/*-----------------------------------------------------------------------*/
-
-           case SW_ADD_AT_NDP_POINTS:
-
-               ctmp = futil.csw_fgets (inbuff, 1000, fptr);
-               if (ctmp == NULL) {
-                   end_flag = 1;
-                   break;
-               }
-               ilist[3] = 1;
-               sscanf (
-                   inbuff,
-                   "%d %d %d",
-                   ilist+0,
-                   ilist+1,
-                   ilist+2
-               );
-
-               npts = ilist[0];
-               for (i=0; i<npts; i++) {
-                   ctmp = futil.csw_fgets (inbuff, 1000, fptr);
-                   if (ctmp == NULL) {
-                       end_flag = 1;
-                       break;
-                   }
-                   sscanf (
-                       inbuff,
-                       "%lf %lf %lf",
-                       ddata+i,
-                       ddata+npts+i,
-                       ddata+2*npts+i
-                   );
-               }
-
-               if (end_flag == 1) {
-                   break;
-               }
-
-               sw_process_command (
-                   command_id,
-                    SINGLE_THREAD_ID,
-                   ilist,
-                   llist,
-                   dlist,
-                   cdata,
-                   idata,
-                   fdata,
-                   ddata
-               );
-
-               break;
-
-/*-----------------------------------------------------------------------*/
-
             case SW_CALC_AT_TRI_MESH:
 
                sw_process_command (
                    command_id,
-                    SINGLE_THREAD_ID,
+                   SINGLE_THREAD_ID,
                    ilist,
                    llist,
                    dlist,

@@ -163,7 +163,7 @@ class GTXDrawPrim
 
     CSW_F                  PageUnitsPerInch = 1.e30f;
 
-    FILE                   *dfile;
+    FILE                   *dfile = NULL;
 
 
     int ArrowCalc (CSW_F x1, CSW_F y1t, CSW_F x2, CSW_F y2, CSW_F size,

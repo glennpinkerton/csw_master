@@ -25,9 +25,9 @@
 typedef struct {
 
     int         cnum;
-    void        *LastCurvePtr,
-                *LastPointPtr,
-                *LastBarPtr;
+    void        *LastCurvePtr = NULL,
+                *LastPointPtr = NULL,
+                *LastBarPtr = NULL;
     int         LastCurveFlag,
                 LastPointFlag,
                 LastBarFlag;

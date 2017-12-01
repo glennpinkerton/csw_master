@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -11,12 +11,12 @@
 /*
     gpf_cfont.h
 
-      Header file with data for the complex stroked vector font.
+    Header file with data for the complex stroked vector font.
     This is only used in the gpf_font.c file.  This header file
     depends on some constant and structure definitions in the 
     gpf_font.c file.
 
-      This data is used to produce font numbers 4 to 7.
+    This data is used to produce font numbers 4 to 7.
 
 */
 

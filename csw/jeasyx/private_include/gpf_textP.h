@@ -36,7 +36,7 @@
 
 typedef struct {
     CSW_F          x, y;
-    char           *chardata;
+    char           *chardata = NULL;
     CSW_F          xmin, ymin, xmax, ymax;
     CSW_F          bg_thick, thick, angle, size;
     CSW_F          xoff, yoff;

@@ -75,11 +75,6 @@
         int numtris
     );
 
-    void jni_call_add_native_rdp_value_method (
-        int      id,
-        double   *values,
-        int      npts);
-
     void jni_call_add_native_ndp_value_method (
         int             id,
         signed char     *v1,
@@ -242,18 +237,6 @@
     void jni_call_add_fault_major_minor_method (
         int         id,
         int         major);
-
-    void jni_call_add_blended_nodes_method (
-        int       *values1,
-        int       *values2,
-        int       *values3,
-        int       *values4,
-        double    *fractions1,
-        double    *fractions2,
-        double    *fractions3,
-        double    *fractions4,
-        int       npts);
-
 
   #ifdef __cplusplus
   }

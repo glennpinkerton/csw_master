@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -64,25 +64,25 @@ class DLSelectable {
 
     int              select_state;
 
-    int              *lines,
+    int              *lines = NULL,
                      nlines,
                      maxlines;
-    int              *fills,
+    int              *fills = NULL,
                      nfills,
                      maxfills;
-    int              *texts,
+    int              *texts = NULL,
                      ntexts,
                      maxtexts;
-    int              *symbs,
+    int              *symbs = NULL,
                      nsymbs,
                      maxsymbs;
-    int              *shapes,
+    int              *shapes = NULL,
                      nshapes,
                      maxshapes;
-    int              *contours,
+    int              *contours = NULL,
                      ncontours,
                      maxcontours;
-    int              *axes,
+    int              *axes = NULL,
                      naxes,
                      maxaxes;
 

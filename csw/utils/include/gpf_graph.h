@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -11,7 +11,7 @@
 /*
     gpf_graph.h
 
-      This function defines constants and structures needed to
+    This function defines constants and structures needed to
     interface with the graph functions in the EasyX API.  
 */
 

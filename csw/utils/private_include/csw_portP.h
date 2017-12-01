@@ -12,7 +12,7 @@
 
     csw_portP.h
 
-      This header file is used to define platform specific items for
+    This header file is used to define platform specific items for
     various Colorado Softworks products.  The comments below describe
     each platform specific item in detail.
 

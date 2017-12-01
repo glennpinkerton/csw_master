@@ -964,9 +964,6 @@ int CSWGrdTriangle::grd_grid_to_equilateral_trimesh
         NodeList[interp[i]].z = zinterp2[i];
     }
 
-    xinterp = yinterp = zinterp2 = NULL;
-    interp = NULL;
-
 /*
    Create the edges.  Each grid cell has an edge on its left side, on its
    bottom side and a diagonal edge.  For cells in even numbered rows, the
@@ -4325,26 +4322,32 @@ int CSWGrdTriangle::FreeMem (void)
     if (PolygonList) {
         for (i=0; i<NumPolygons; i++) {
             if (PolygonList[i].x) csw_Free (PolygonList[i].x);
+            PolygonList[i].x = NULL;
         }
         csw_Free (PolygonList);
+        PolygonList = NULL;
     }
 
     if (SpillpointList) {
         for (i=0; i<NumSpillpoints; i++) {
             if (SpillpointList[i].polygons_using) {
                 csw_Free (SpillpointList[i].polygons_using);
+                SpillpointList[i].polygons_using = NULL;
             }
         }
         csw_Free (SpillpointList);
+        SpillpointList = NULL;
     }
 
     if (RidgeLineList) {
         for (i=0; i<NumRidgeLines; i++) {
             if (RidgeLineList[i].nodes) {
                 csw_Free (RidgeLineList[i].nodes);
+                RidgeLineList[i].nodes = NULL;
             }
         }
         csw_Free (RidgeLineList);
+        RidgeLineList = NULL;
     }
 
     istat = IsNodeEdgeInCache (NodeEdgeList);
@@ -4370,31 +4373,43 @@ int CSWGrdTriangle::FreeMem (void)
             }
         }
         csw_Free (EdgeList);
+        EdgeList = NULL;
     }
-    if (TriangleList) csw_Free (TriangleList);
+    if (TriangleList) {
+        csw_Free (TriangleList);
+        TriangleList = NULL;
+    }
     if (RawPoints) {
         for (i=0; i<MaxRawPoints; i++) {
             if (RawPoints[i].edgelist != NULL) {
                 csw_Free (RawPoints[i].edgelist);
+                RawPoints[i].edgelist = NULL;
             }
         }
         csw_Free (RawPoints);
+        RawPoints = NULL;
     }
     if (RawLines) csw_Free (RawLines);
+    RawLines = NULL;
     if (Xline) csw_Free (Xline);
+    Xline = NULL;
     if (Iline) csw_Free (Iline);
+    Iline = NULL;
 
     if (ConstraintRawPoints) {
         for (i=0; i<NumConstraintRawPoints; i++) {
             if (ConstraintRawPoints[i].edgelist != NULL) {
                 csw_Free (ConstraintRawPoints[i].edgelist);
+                ConstraintRawPoints[i].edgelist = NULL;
             }
         }
         csw_Free (ConstraintRawPoints);
+        ConstraintRawPoints = NULL;
     }
 
     if (ForkList) {
         csw_Free (ForkList);
+        ForkList = NULL;
     }
 
     PolygonList = NULL;
@@ -4443,6 +4458,7 @@ int CSWGrdTriangle::FreeMem (void)
                 if (iptr->list) csw_Free (iptr->list);
                 csw_Free (iptr);
             }
+            IndexGrid[i] = NULL;
         }
         csw_Free (IndexGrid);
     }
@@ -11406,6 +11422,7 @@ int CSWGrdTriangle::AddPolygonToOutput (int nseg)
     }
 
     if (NumPolygons >= MaxPolygons) {
+        int   mp_sav = MaxPolygons;
         MaxPolygons += 10;
         PolygonList = (POlygonStruct *)csw_Realloc
                       (PolygonList, MaxPolygons * sizeof(POlygonStruct));
@@ -11413,6 +11430,7 @@ int CSWGrdTriangle::AddPolygonToOutput (int nseg)
             grd_utils_ptr->grd_set_err (1);
             return -1;
         }
+        memset ((void *)(PolygonList + mp_sav), 0, 10 * sizeof(POlygonStruct));
     }
 
     xp = (double *)csw_Malloc (npts * 2 * sizeof(double));
@@ -27459,512 +27477,6 @@ double CSWGrdTriangle::CalcLocalZ (double *x, double *y, double *z, int npts)
 }
 
 
-/*-----------------------------------------------------------------------------*/
-
-int CSWGrdTriangle::grd_trimesh_blended_values_from_grid (
-    NOdeStruct     *nodes,
-    int            num_nodes,
-    EDgeStruct     *edges,
-    int            num_edges,
-    TRiangleStruct *tris,
-    int            num_tris,
-    void           *vgrid,
-    int            ncol,
-    int            nrow,
-    double         gxmin,
-    double         gymin,
-    double         gxmax,
-    double         gymax,
-    FAultLineStruct  *faults,
-    int            nfaults,
-    int            interp_flag,
-    int            *lineids,
-    void           *vbpts
-    )
-{
-    EDgeStruct     *eptr = NULL;
-    TRiangleStruct *tptr = NULL;
-    NOdeStruct     *nptr = NULL;
-    double         *xa = NULL, *ya = NULL, *za = NULL;
-    CSW_Blended    *bgrid = NULL, *bpts = NULL, *btmp = NULL, bloc[100];
-    CSW_Mixture    mix;
-    int            *ia = NULL, *list = NULL;
-    int            istat, i, j, n, n1, n2, n3, nlist, ndone;
-    int            nloc, ndo, firstflag;
-    double         *origz = NULL;
-
-
-    auto fscope = [&]()
-    {
-        csw_Free (origz);
-        csw_Free (xa);
-    };
-    CSWScopeGuard func_scope_guard (fscope);
-
-
-    num_tris = num_tris;
-    lineids = lineids;
-    interp_flag = interp_flag;
-
-    bgrid = (CSW_Blended *)vgrid;
-    bpts = (CSW_Blended *)vbpts;
-
-    origz = (double *)csw_Malloc (num_nodes * sizeof(double));
-    if (origz == NULL) {
-        return -1;
-    }
-
-/*
- * Set the on_border and tflag members of the nodes to zero.
- * Then, set any node either on or adjacent to a constraint
- * to tflag = 1.  In addition, nodes on a constraint have
- * on_border set to 1.
- */
-    for (i=0; i<num_nodes; i++) {
-        nptr = nodes + i;
-        nptr->on_border = 0;
-        nptr->bflag = 0;
-        origz[i] = nptr->z;
-        nptr->z = 1.e30;
-    }
-
-    for (i=0; i<num_edges; i++) {
-        eptr = edges + i;
-
-        n1 = eptr->node1;
-        n2 = eptr->node2;
-        if (nodes[n1].x > 140  &&  nodes[n1].x < 145  &&
-            nodes[n1].y > 400  &&  nodes[n1].y < 405) {
-            eptr = eptr;
-        }
-        if (nodes[n2].x > 140  &&  nodes[n2].x < 145  &&
-            nodes[n2].y > 400  &&  nodes[n2].y < 405) {
-            eptr = eptr;
-        }
-
-        if (eptr->deleted == 1) {
-            continue;
-        }
-        if (eptr->isconstraint == 0) {
-            continue;
-        }
-        if (eptr->tri2 >= 0) {
-            continue;
-        }
-        if (eptr->tri1 < 0) {
-            continue;
-        }
-        tptr = tris + eptr->tri1;
-        n1 = eptr->node1;
-        nodes[n1].on_border = 1;
-        n1 = eptr->node2;
-        nodes[n1].on_border = 1;
-
-        istat = grd_get_nodes_for_triangle (
-            tptr, edges, &n1, &n2, &n3);
-        if (istat != 1) {
-            continue;
-        }
-        nodes[n1].bflag = 1;
-        nodes[n2].bflag = 1;
-        nodes[n3].bflag = 1;
-
-    }
-
-/*
- * Allocate space for x, y and z to use in back interpolation.
- */
-    xa = (double *)csw_Malloc (num_nodes * 4 * sizeof(double));
-    if (xa == NULL) {
-        return -1;
-    }
-    ya = xa + num_nodes;
-    za = ya + num_nodes;
-    ia = (int *)(za + num_nodes);
-
-/*
- * Put nodes that are not close to faults into the arrays.
- */
-    n = 0;
-    for (i=0; i<num_nodes; i++) {
-        nptr = nodes + i;
-        if (nptr->bflag == 1  ||  nptr->deleted == 1) {
-            continue;
-        }
-        xa[n] = nptr->x;
-        ya[n] = nptr->y;
-        za[n] = nptr->z;
-        ia[n] = i;
-        n++;
-    }
-
-/*
- * If no nodes were found, try again using adjacent nodes but
- * not border nodes.
- */
-    if (n == 0) {
-        for (i=0; i<num_nodes; i++) {
-            nptr = nodes + i;
-            if (nptr->bflag == 1) {
-                continue;
-            }
-            xa[n] = nptr->x;
-            ya[n] = nptr->y;
-            za[n] = nptr->z;
-            ia[n] = i;
-            n++;
-        }
-    }
-
-/*
- * If there are still no nodes, no interpolation can be done.
- */
-    if (n == 0) {
-        return 0;
-    }
-
-/*
- * Interpolate at these nodes from the grid.
- */
-    firstflag = 1;
-    for (i=0; i<n; i++) {
-
-        grd_utils_ptr->grd_interpolate_blended_grid (
-          bgrid, ncol, nrow,
-          (CSW_F)gxmin, (CSW_F)gymin,
-          (CSW_F)gxmax, (CSW_F)gymax,
-          faults, nfaults, firstflag,
-          (CSW_F)xa[i], (CSW_F)ya[i], 255.0f, &mix);
-
-        j = ia[i];
-        bpts[j].v1 = (unsigned char)mix.value1;
-        bpts[j].v2 = (unsigned char)mix.value2;
-        bpts[j].v3 = (unsigned char)mix.value3;
-        bpts[j].v4 = (unsigned char)mix.value4;
-        bpts[j].p1 = (unsigned char)mix.percent1;
-        bpts[j].p2 = (unsigned char)mix.percent2;
-        bpts[j].p3 = (unsigned char)mix.percent3;
-        bpts[j].p4 = (unsigned char)mix.percent4;
-        nodes[j].z = 0.0;
-
-        firstflag = 0;
-
-    }
-
-/*
- * Build a list of edges connected to nodes.
- */
-    EdgeList = edges;
-    NodeList = nodes;
-    NumEdges = num_edges;
-    NumNodes = num_nodes;
-    istat =
-      BuildNodeEdgeLists ();
-    EdgeList = NULL;
-    NumEdges = 0;
-    NodeList = NULL;
-    NumNodes = 0;
-    if (istat == -1) {
-        return -1;
-    }
-
-/*
- * Calculate blended at each trimesh node that still has
- * a null z value.  Nodes adjacent to constraints but not
- * on constraints are done here.
- */
-    ndo = 0;
-    for (;;) {
-
-        ndone = 0;
-        for (i=0; i<num_nodes; i++) {
-            nptr = nodes + i;
-            if (nptr->z < 1.e20) {
-                continue;
-            }
-            if (nptr->on_border == 1) {
-                continue;
-            }
-            list = NodeEdgeList[i].list;
-            nlist = NodeEdgeList[i].nlist;
-            if (list == NULL  ||  nlist < 1) {
-                assert (0);
-            }
-            nloc = 0;
-            for (j=0; j<nlist; j++) {
-                eptr = edges + list[j];
-                n1 = eptr->node1;
-                if (n1 == i) {
-                    n1 = eptr->node2;
-                }
-                if (nodes[n1].z < 1.e20) {
-                    bloc[nloc].v1 = bpts[n1].v1;
-                    bloc[nloc].v2 = bpts[n1].v2;
-                    bloc[nloc].v3 = bpts[n1].v3;
-                    bloc[nloc].v4 = bpts[n1].v4;
-                    bloc[nloc].p1 = bpts[n1].p1;
-                    bloc[nloc].p2 = bpts[n1].p2;
-                    bloc[nloc].p3 = bpts[n1].p3;
-                    bloc[nloc].p4 = bpts[n1].p4;
-                    nloc++;
-                    if (nloc > 99) nloc = 99;
-                }
-            }
-            if (nloc == 0) {
-                continue;
-            }
-            btmp = CalcLocalBlend (bloc, nloc);
-
-            if (btmp != NULL) {
-                ia[ndone] = i;
-                za[ndone] = 0.0;
-                memcpy (bpts+i, btmp, sizeof(CSW_Blended));
-                ndone++;
-            }
-        }
-        if (ndone == 0) {
-            break;
-        }
-        for (i=0; i<ndone; i++) {
-            j = ia[i];
-            nodes[j].z = za[i];
-        }
-        ndo++;
-        if (ndo >= num_nodes) {
-            printf ("infinite loop setting blended values\n");
-            assert (0);
-        }
-    }
-
-/*
- * Calculate z values at each trimesh node that still has
- * a null value.  All nodes still NULL are done here.
- */
-    ndo = 0;
-    for (;;) {
-        ndone = 0;
-        for (i=0; i<num_nodes; i++) {
-            nptr = nodes + i;
-            if (nptr->z < 1.e20) {
-                continue;
-            }
-            list = NodeEdgeList[i].list;
-            nlist = NodeEdgeList[i].nlist;
-            if (list == NULL  ||  nlist < 1) {
-                assert (0);
-            }
-            nloc = 0;
-            for (j=0; j<nlist; j++) {
-                eptr = edges + list[j];
-                n1 = eptr->node1;
-                if (n1 == i) {
-                    n1 = eptr->node2;
-                }
-                if (nodes[n1].z < 1.e20) {
-                    bloc[nloc].v1 = bpts[n1].v1;
-                    bloc[nloc].v2 = bpts[n1].v2;
-                    bloc[nloc].v3 = bpts[n1].v3;
-                    bloc[nloc].v4 = bpts[n1].v4;
-                    bloc[nloc].p1 = bpts[n1].p1;
-                    bloc[nloc].p2 = bpts[n1].p2;
-                    bloc[nloc].p3 = bpts[n1].p3;
-                    bloc[nloc].p4 = bpts[n1].p4;
-                    nloc++;
-                    if (nloc > 99) nloc = 99;
-                }
-            }
-            if (nloc == 0) {
-                continue;
-            }
-            btmp = CalcLocalBlend (bloc, nloc);
-
-            if (btmp != NULL) {
-                ia[ndone] = i;
-                za[ndone] = 0.0;
-                memcpy (bpts+i, btmp, sizeof(CSW_Blended));
-                ndone++;
-            }
-        }
-        if (ndone == 0) {
-            break;
-        }
-        for (i=0; i<ndone; i++) {
-            j = ia[i];
-            nodes[j].z = za[i];
-        }
-        ndo++;
-        if (ndo >= num_nodes) {
-            printf ("infinite loop setting blended values\n");
-            assert (0);
-        }
-    }
-
-/*
- * Debug code to check if any null z values still exist.
- */
-    for (i=0; i<num_nodes; i++) {
-        if (nodes[i].z > 1.e20) {
-            printf ("Node %d still has NULL z value.\n", i);
-        }
-    }
-
-/*
- * Reset the node flags back to zeros.
- */
-    for (i=0; i<num_nodes; i++) {
-        nptr = nodes + i;
-        nptr->on_border = 0;
-        nptr->bflag = 0;
-        nptr->z = origz[i];
-    }
-
-    return 1;
-}
-
-/*------------------------------------------------------------------------*/
-
-CSW_Blended *CSWGrdTriangle::CalcLocalBlend (
-  CSW_Blended *z, int npts)
-{
-    int            i, j, n, imax;
-    int            valcount[256];
-    double         ptotal[256], pmax,
-                   p1, p2, p3, p4, psum;
-    CSW_Blended    bout;
-    CSW_Blended    *bp;
-
-    if (npts < 1) {
-        return NULL;
-    }
-
-    if (npts == 1) {
-       memcpy (&bout, z, sizeof(CSW_Blended));
-       bp = &bout;
-       return bp;
-    }
-
-    memset (valcount, 0, 256 * sizeof(int));
-    memset (ptotal, 0, 256 * sizeof(double));
-    for (i=0; i<npts; i++) {
-        j = z[i].v1;
-        if (j >= 0) {
-            valcount[j]++;
-            ptotal[j] += z[i].p1;
-        }
-        j = z[i].v2;
-        if (j >= 0) {
-            valcount[j]++;
-            ptotal[j] += z[i].p2;
-        }
-        j = z[i].v3;
-        if (j >= 0) {
-            valcount[j]++;
-            ptotal[j] += z[i].p3;
-        }
-        j = z[i].v4;
-        if (j >= 0) {
-            valcount[j]++;
-            ptotal[j] += z[i].p4;
-        }
-    }
-
-    n = 0;
-    for (i=0; i<npts; i++) {
-        j = z[i].v1;
-        if (valcount[j] > 0) {
-            ptotal[j] /= valcount[j];
-            n++;
-        }
-    }
-
-    if (n == 0) {
-        return NULL;
-    }
-
-    bp = &bout;
-
-    memset (bp, 0, sizeof(CSW_Blended));
-    p1 = p2 = p3 = p4 = 0.0;
-
-    pmax = 0.0;
-    imax = -1;
-    for (i=0; i<255; i++) {
-        if (valcount[i] > 0) {
-            if (ptotal[i] > pmax) {
-                pmax = ptotal[i];
-                imax = i;
-            }
-        }
-    }
-    bp->v1 = (unsigned char)(imax);
-    if (imax >= 0) valcount[imax] = 0;
-    p1 = pmax;
-
-    pmax = 0.0;
-    imax = -1;
-    for (i=0; i<255; i++) {
-        if (valcount[i] > 0) {
-            if (ptotal[i] > pmax) {
-                pmax = ptotal[i];
-                imax = i;
-            }
-        }
-    }
-    bp->v2 = (unsigned char)(imax);
-    if (imax >= 0) valcount[imax] = 0;
-    p2 = pmax;
-
-    pmax = 0.0;
-    imax = -1;
-    for (i=0; i<255; i++) {
-        if (valcount[i] > 0) {
-            if (ptotal[i] > pmax) {
-                pmax = ptotal[i];
-                imax = i;
-            }
-        }
-    }
-    bp->v3 = (unsigned char)(imax);
-    if (imax >= 0) valcount[imax] = 0;
-    p3 = pmax;
-
-    pmax = 0.0;
-    imax = -1;
-    for (i=0; i<255; i++) {
-        if (valcount[i] > 0) {
-            if (ptotal[i] > pmax) {
-                pmax = ptotal[i];
-                imax = i;
-            }
-        }
-    }
-    bp->v4 = (unsigned char)(imax);
-    if (imax >= 0) valcount[imax] = 0;
-    p4 = pmax;
-
-    psum = p1 + p2 + p3 + p4;
-
-    if (psum > 0) {
-        psum /= 255.0;
-        p1 /= psum;
-        p2 /= psum;
-        p3 /= psum;
-        p4 /= psum;
-        bp->p1 = (unsigned char)(p1 + .5);
-        bp->p2 = (unsigned char)(p2 + .5);
-        bp->p3 = (unsigned char)(p3 + .5);
-        bp->p4 = (unsigned char)(p4 + .5);
-    }
-    else {
-        bp->p1 = (unsigned char)255;
-    }
-
-    return bp;
-
-}
-
-
-
 /*
   ****************************************************************************
 
@@ -31216,98 +30728,6 @@ long CSWGrdTriangle::grd_AppendTextTriMeshFile
 
 
 
-/*
- ************************************************************************************
-
-              g r d _ W r i t e B l e n d e d T e x t T r i M e s h
-
- ************************************************************************************
-
-*/
-
-int CSWGrdTriangle::grd_WriteBlendedTextTriMesh
-                 (int vused,
-                  double *vbasein,
-                  TRiangleStruct *triangles, int ntriangles,
-                  EDgeStruct *edges, int nedges,
-                  NOdeStruct *nodes, int numnodes,
-                  void *vbpts,
-                  char *filename)
-
-{
-    FILE         *fptr;
-    int          i;
-    char         line[500];
-    double       vb[6], *vbase;
-    CSW_Blended  *bpts;
-
-    bpts = (CSW_Blended *)vbpts;
-
-    fptr = fopen (filename, "w");
-    if (fptr == NULL) {
-        printf ("Cannot open the new tri mesh file\n");
-        return -1;
-    }
-
-    vb[0] = 1.e30;
-    vb[1] = 1.e30;
-    vb[2] = 1.e30;
-    vb[3] = 1.e30;
-    vb[4] = 1.e30;
-    vb[5] = 1.e30;
-
-    vbase = vbasein;
-    if (vbase == NULL) {
-        vused = 0;
-        vbase = vb;
-    }
-
-    sprintf (line, "!BLENDED_TXT_TMESH %s\n", TEXT_TMESH_VERSION);
-    fputs (line, fptr);
-
-    sprintf (line, "%d %g %g %g %g %g %g\n",
-             vused,
-             vbase[0],
-             vbase[1],
-             vbase[2],
-             vbase[3],
-             vbase[4],
-             vbase[5]);
-    fputs (line, fptr);
-
-    sprintf (line, "%d %d %d\n", numnodes, nedges, ntriangles);
-    fputs (line, fptr);
-
-    for (i=0; i<numnodes; i++) {
-        sprintf (line, "%g %g %g %d %d %d %d %d %d %d %d %d\n",
-            nodes[i].x, nodes[i].y,
-            nodes[i].z, nodes[i].flag,
-            bpts[i].v1, bpts[i].v2, bpts[i].v3, bpts[i].v4,
-            bpts[i].p1, bpts[i].p2, bpts[i].p3, bpts[i].p4);
-        fputs (line, fptr);
-    }
-
-    for (i=0; i<nedges; i++) {
-        sprintf (line, "%d %d %d %d %d\n",
-            edges[i].node1, edges[i].node2, edges[i].tri1,
-            edges[i].tri2, edges[i].flag);
-        fputs (line, fptr);
-    }
-
-    for (i=0; i<ntriangles; i++) {
-        sprintf (line, "%d %d %d %d\n",
-            triangles[i].edge1, triangles[i].edge2,
-            triangles[i].edge3, triangles[i].flag);
-        fputs (line, fptr);
-    }
-
-    fclose (fptr);
-
-    return 1;
-
-}
-
-
 
 /*
  *************************************************************************
@@ -31530,7 +30950,7 @@ int CSWGrdTriangle::grd_WriteXYZGridFile (
                     nodes where that is possible.  If not possible, or if
                     the null node is far from non null nodes, a simple
                     average of non null nodes is also used.  For most
-                    filled nodes, the values will be a blend of the
+                    filled nodes, the values will be a combination of the
                     gradient extrapolation and the simple average.
 
   return value:     status code

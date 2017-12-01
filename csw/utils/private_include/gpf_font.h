@@ -12,7 +12,7 @@
     gpf_font.h
 
     This is a private header file that has function prototypes for the 
-    functions in file gpf_font.c.
+    functions in file gpf_font.cc
 */
 
 

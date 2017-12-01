@@ -46,17 +46,17 @@ typedef struct {
                  firstcircle, ncircle,
                  firstline, nline,
                  firsttext, ntext;
-}  SYmbolDef;                             /*  main symbol definition structure  */
+}  SYmbolDef;
 
 typedef struct {
     long int      firstvec, nvec, fill;
-}  SYmVecList;                            /*  symbol line definition structure  */
+}  SYmVecList;
 
 typedef struct {
     CSW_F        x, y, r1, r2;
     int          ifill;
     CSW_F        ang1, ang2;
-}  SYmCircle;                             /*  symbol circle definition structure  */
+}  SYmCircle;
 
 typedef struct {
     CSW_F        x, y, size, angle;

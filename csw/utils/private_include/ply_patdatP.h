@@ -11,7 +11,7 @@
 /*
     ply_patdatP.h
 
-      This file has data defining polygon pattern fills.
+    This file has data defining polygon pattern fills.
 */
 
 

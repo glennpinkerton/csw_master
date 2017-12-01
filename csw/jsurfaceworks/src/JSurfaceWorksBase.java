@@ -37,7 +37,6 @@ public class JSurfaceWorksBase {
 
     protected void finalize() throws Throwable {
       super.finalize();
-      //endThread (initial_tid);
     }
 
   /*
@@ -429,11 +428,8 @@ public class JSurfaceWorksBase {
   /*
    * Get the returned node, edge and triangle arrays from the currently
    * active calcAtTriMesh call.  The native code will first populate
-   * the topology of the trimesh via this call.  Subsequently, multiple
-   * calls to add attribute values at the nodes are made via
-   * addNativeRDPValue and addNativeNDPValue.  The end of the attribute
-   * value addition is signalled by a call to addAtValues with an npts
-   * value of zero.
+   * the topology of the trimesh via this call.  Attributes have been removed
+   * for the 2017 refactor.  Maybe rewrite differently in the future.
    */
     public void addNativeAtTriMesh (
         double[] xnode,
@@ -472,76 +468,13 @@ public class JSurfaceWorksBase {
 
 /*--------------------------------------------------------------------------*/
 
-    public void addNativeRDPValue (
-        int        id,
-        double[]   values,
-        int        npts)
-    {
-        if (activeAtTmesh == false  ||
-            nativeAtTriMesh == null) {
-            return;
-        }
-
-        if (npts == 0) {
-            activeAtTmesh = false;
-            return;
-        }
-
-        nativeAtTriMesh.addRDPValue (
-            atValueName[id],
-            values,
-            npts);
-
-    }
-
-/*--------------------------------------------------------------------------*/
-
     String[] atValueName = new String[100];
-
-    public void addNativeNDPValue (
-        int       id,
-        byte[]    v1,
-        byte[]    v2,
-        byte[]    v3,
-        byte[]    v4,
-        byte[]    p1,
-        byte[]    p2,
-        byte[]    p3,
-        byte[]    p4,
-        int       npts)
-    {
-        if (activeAtTmesh == false  ||
-            nativeAtTriMesh == null) {
-            return;
-        }
-
-        if (npts == 0) {
-            activeAtTmesh = false;
-            return;
-        }
-
-        nativeAtTriMesh.addNDPValue (
-            atValueName[id],
-            v1, v2, v3, v4,
-            p1, p2, p3, p4,
-            npts);
-    }
-
-
-/*--------------------------------------------------------------------------*/
 
 /*--------------------------------------------------------------------------*/
 
     protected AttributeTriMesh buildAtTriMesh ()
     {
         if (nativeAtTriMesh == null) {
-            return null;
-        }
-
-        int ntot;
-        ntot = nativeAtTriMesh.getNumRDPAttributes ();
-        ntot += nativeAtTriMesh.getNumNDPAttributes ();
-        if (ntot < 1) {
             return null;
         }
 
@@ -931,32 +864,6 @@ public class JSurfaceWorksBase {
 
         return;
     }
-
-/*--------------------------------------------------------------------------*/
-    protected CSWBlendedNodes blendedNodes;
-
-    public void addBlendedNodes(
-        int[] values1,
-        int[] values2,
-        int[] values3,
-        int[] values4,
-        double[] fractions1,
-        double[] fractions2,
-        double[] fractions3,
-        double[] fractions4
-    ) {
-        blendedNodes = new CSWBlendedNodes(
-            values1,
-            values2,
-            values3,
-            values4,
-            fractions1,
-            fractions2,
-            fractions3,
-            fractions4
-        );
-    }
-
 
 /*--------------------------------------------------------------------------*/
 

@@ -67,21 +67,21 @@
 typedef struct {
     int            x1, y1, x2, y2;
     int            start, size;
-    int            *seglist,
+    int            *seglist = NULL,
                    maxseg,
                    nseg,
                    used;
 }  BOxStruct;
 
 typedef struct {
-    int            *x1,
-                   *y1,
-                   *x2,
-                   *y2;
-    void           **tag1;
-    void           **tag2;
-    int            *bbid;
-    int            *compid;
+    int            *x1 = NULL,
+                   *y1 = NULL,
+                   *x2 = NULL,
+                   *y2 = NULL;
+    void           **tag1 = NULL;
+    void           **tag2 = NULL;
+    int            *bbid = NULL;
+    int            *compid = NULL;
     int            nvec;
     int            xmin,
                    ymin,
@@ -94,7 +94,7 @@ typedef struct {
     int            ncol,
                    nrow,
                    gspace;
-    BOxStruct      *bblist;
+    BOxStruct      *bblist = NULL;
     int            nbblist;
     int            inside_grid[LOCAL_MAX_GRID_SIZE * 2];
 }  RAwEdgeStruct;
@@ -121,15 +121,15 @@ typedef struct {
                    yorig;
     int            seglist[MAXSEG],
                    nseg;
-    void           *tag;
+    void           *tag = NULL;
     char           tempflag;
     char           flags[MAXSEG];
 }  PLY_NOdeStruct;
 
 typedef struct {
-    int            *x,
-                   *y;
-    void           *tag;
+    int            *x = NULL,
+                   *y = NULL;
+    void           *tag = NULL;
     int            npts,
                    holeflag;
     int            xmin,
@@ -139,8 +139,8 @@ typedef struct {
 }  COmponentStruct;
 
 typedef struct {
-    int    *nodes;
-    int    *segs;
+    int    *nodes = NULL;
+    int    *segs = NULL;
     int    nloop;
 } LOopStruct;
 

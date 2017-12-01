@@ -1230,7 +1230,7 @@ int CSWGrdCtog::InterpolateOnBoundary (void)
 
   This function does a linear interpolation based on the Hcross array,
   followed by a linear interpolation based on the Vcross array.  The 
-  Vcross values are blended with the Hcross values with weighting higher
+  Vcross values are combined with the Hcross values with weighting higher
   for the values closer to a crossing point.
 
   If both the Hcross and Vcross data are based on equal z values, the
@@ -1373,7 +1373,7 @@ int CSWGrdCtog::InterpolateBetweenCrossings (void)
      * crossings were found in the row, the interpolation is
      * done between the end nodes, but the distance to nearest
      * crossing is set very high so these node values will be
-     * weighted very little when blended with the value 
+     * weighted very little when combined with the value 
      * from a closer vertical crossing.
      */
         j2 = Ncol - 1;
@@ -1399,7 +1399,7 @@ int CSWGrdCtog::InterpolateBetweenCrossings (void)
 
 /*
  * Do the Vcross array in a similar fashion, with the exception
- * of blending the z value based on closest crossing distance.
+ * of combining the z value based on closest crossing distance.
  * The idist array (same as the ClosestCrossing array) will be
  * set to the smallest of the horizontal or vertical crossing
  * distance for use later.
@@ -1432,7 +1432,7 @@ int CSWGrdCtog::InterpolateBetweenCrossings (void)
 
         /*
          * Scan through the nodes bracketed by the
-         * vertical crossings.  Use this blended
+         * vertical crossings.  Use this combined
          * with any previous horizontally derived
          * values for the final data array value.
          */
@@ -1472,7 +1472,7 @@ int CSWGrdCtog::InterpolateBetweenCrossings (void)
                 wvert *= wvert;
 
             /*
-             * Blend the vertical and horizontal values.
+             * Combine the vertical and horizontal values.
              */
                 zhoriz = data[kk];
                 if (zhoriz > 1.e20) {
@@ -1538,7 +1538,7 @@ int CSWGrdCtog::InterpolateBetweenCrossings (void)
             wvert *= wvert;
 
         /*
-         * Blend the vertical and horizontal values.
+         * Combine the vertical and horizontal values.
          */
             zhoriz = data[kk];
             if (zhoriz > 1.e20) {

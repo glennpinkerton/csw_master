@@ -4,8 +4,6 @@ include $(CSW_PARENT)/build/system.mk
 
 JAVA_SRC=\
  AttributeTriMesh.java\
- BlendedGrid.java\
- CSWBlendedNodes.java\
  CSWGrid.java\
  DBContactLine.java\
  DBDrapeLine.java\
@@ -23,10 +21,8 @@ JAVA_SRC=\
  JSResult3D.java\
  JSurfaceWorksBase.java\
  JSurfaceWorks.java\
- NDPAtValues.java\
  PatchLine.java\
  ProtoPatch.java\
- RDPAtValues.java\
  TetgenFace.java\
  TetgenFaceList.java\
  TetgenNode.java\
@@ -40,8 +36,6 @@ JAVA_SRC=\
 
 JAVA_CLASSES=\
  AttributeTriMesh.class\
- BlendedGrid.class\
- CSWBlendedNodes.class\
  CSWGrid.class\
  DBContactLine.class\
  DBDrapeLine.class\
@@ -59,10 +53,8 @@ JAVA_CLASSES=\
  JSResult3D.class\
  JSurfaceWorksBase.class\
  JSurfaceWorks.class\
- NDPAtValues.class\
  PatchLine.class\
  ProtoPatch.class\
- RDPAtValues.class\
  TetgenFace.class\
  TetgenFaceList.class\
  TetgenNode.class\

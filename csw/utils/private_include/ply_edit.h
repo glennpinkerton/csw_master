@@ -52,7 +52,7 @@
 
 typedef struct {
     double    x, y;
-    void      *vp;
+    void      *vp = NULL;
     int       iprev, inext;
     double    xint, yint;
     int       flag;

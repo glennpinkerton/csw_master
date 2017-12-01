@@ -49,7 +49,6 @@
 #include <csw/jeasyx/private_include/gtx_graphP.h>
 #include <csw/jeasyx/private_include/gtx_frinfoP.h>
 #include <csw/jeasyx/private_include/gtx_layerP.h>
-#include <csw/jeasyx/private_include/NDPSurf.h>
 
 #ifndef _DISPLAYLIST_H_
 #define _DISPLAYLIST_H_
@@ -487,64 +486,9 @@ bool  _bbr_ = false;
                     int *flagtri,
                     int numtri);
 
-  /*
-   * Set the trimesh border for subsequent blended grids.
-   */
-    int SetBlendedTriMesh (
-                    double *xnode,
-                    double *ynode,
-                    double *znode,
-                    int    *flagnode,
-                    int numnode,
-                    int *n1edge,
-                    int *n2edge,
-                    int *t1edge,
-                    int *t2edge,
-                    int *flagedge,
-                    int numedge,
-                    int *e1tri,
-                    int *e2tri,
-                    int *e3tri,
-                    int *flagtri,
-                    int numtri);
-
-  /*
-   * Set graphic properties for subsequent Nominal Data Property
-   * images, such as litology and kerogens.
-   */
-    int SetNDPGraphicProperties (
-        int    nvalues,
-        int    *values,
-        int    *red,
-        int    *green,
-        int    *blue,
-        int    *alpha);
-
     int SetImageFaultData (
         double *xf, double *yf,
         int    *npf, int nf, int ntot);
-
-  /*
-   * Add a blended grid image.
-   */
-    int AddBlendedGridImage (
-        char   *name,
-        int    id,
-        int    ncol,
-        int    nrow,
-        double xmin,
-        double ymin,
-        double xmax,
-        double ymax,
-        int    *value1,
-        int    *value2,
-        int    *value3,
-        int    *value4,
-        double *fraction1,
-        double *fraction2,
-        double *fraction3,
-        double *fraction4
-        );
 
   /*
    * AddGrid
@@ -1017,35 +961,17 @@ private:
 
     int      page_units_type;
 
-    CSW_F    *xywork,
-             *xywork2;
-    int      *iwork;
+    CSW_F    *xywork = NULL,
+             *xywork2 = NULL;
+    int      *iwork = NULL;
 
     int      ImageID;
 
-    double   *BlendedXout,
-             *BlendedYout,
-             *BlendedZout;
-    int      *BlendedNcout,
-             *BlendedNvout,
-             BlendedNpout;
-
-    int      NDPNvalues;
-    int      *NDPValue,
-             *NDPRed,
-             *NDPGreen,
-             *NDPBlue,
-             *NDPAlpha;
-
-    double   *ImageXFault,
-             *ImageYFault;
-    int      *ImageNFaultPoints,
+    double   *ImageXFault = NULL,
+             *ImageYFault = NULL;
+    int      *ImageNFaultPoints = NULL,
              ImageNFaults,
              ImageNFaultTotal;
-
-    NDPSurf  **NDPSurfList;
-    int      numNDPSurfList,
-             maxNDPSurfList;
 
   /*
    * graphic attribute state members
@@ -1058,7 +984,7 @@ private:
 
     int             current_graph_num;
     int             current_selectable_object_num;
-    DLSelectable    *current_selectable_object;
+    DLSelectable    *current_selectable_object = NULL;
     int             current_xaxis_num;
     int             current_yaxis_num;
 
@@ -1132,52 +1058,52 @@ private:
   /*
    * lists of grids, trimeshes and contours.
    */
-    DLContour       **contour_list;
+    DLContour       **contour_list = NULL;
     int             num_contour_list,
                     max_contour_list;
 
-    DLSurf          **surf_list;
+    DLSurf          **surf_list = NULL;
     int             num_surf_list,
                     max_surf_list;
 
     DLContourProperties   tmp_contour_props;
     void            default_contour_properties (void);
 
-    FAultLineStruct *tmp_contour_faults;
+    FAultLineStruct *tmp_contour_faults = NULL;
     int             num_tmp_contour_faults;
 
   /*
    * members with various lists of primitives
    */
-    LInePrim        *contour_line_prim_list;
+    LInePrim        *contour_line_prim_list = NULL;
     int             num_contour_line_prim_list,
                     max_contour_line_prim_list;
 
-    LInePrim        *line_prim_list;
+    LInePrim        *line_prim_list = NULL;
     int             num_line_prim_list,
                     max_line_prim_list;
 
-    FIllPrim        *fill_prim_list;
+    FIllPrim        *fill_prim_list = NULL;
     int             num_fill_prim_list,
                     max_fill_prim_list;
 
-    SYmbPrim        *symb_prim_list;
+    SYmbPrim        *symb_prim_list = NULL;
     int             num_symb_prim_list,
                     max_symb_prim_list;
 
-    TExtPrim        *text_prim_list;
+    TExtPrim        *text_prim_list = NULL;
     int             num_text_prim_list,
                     max_text_prim_list;
 
-    SHapePrim       *shape_prim_list;
+    SHapePrim       *shape_prim_list = NULL;
     int             num_shape_prim_list,
                     max_shape_prim_list;
 
-    IMagePrim       *image_prim_list;
+    IMagePrim       *image_prim_list = NULL;
     int             num_image_prim_list,
                     max_image_prim_list;
 
-    AXisPrim        *axis_prim_list;
+    AXisPrim        *axis_prim_list = NULL;
     int             num_axis_prim_list,
                     max_axis_prim_list;
 
@@ -1186,39 +1112,39 @@ private:
    * primitives can become available when they are
    * deleted, rescaled from a frame, etc.
    */
-    int             *line_available_list;
+    int             *line_available_list = NULL;
     int             num_line_available_list,
                     max_line_available_list;
 
-    int             *contour_available_list;
+    int             *contour_available_list = NULL;
     int             num_contour_available_list,
                     max_contour_available_list;
 
-    int             *contour_line_available_list;
+    int             *contour_line_available_list = NULL;
     int             num_contour_line_available_list,
                     max_contour_line_available_list;
 
-    int             *fill_available_list;
+    int             *fill_available_list = NULL;
     int             num_fill_available_list,
                     max_fill_available_list;
 
-    int             *symb_available_list;
+    int             *symb_available_list = NULL;
     int             num_symb_available_list,
                     max_symb_available_list;
 
-    int             *text_available_list;
+    int             *text_available_list = NULL;
     int             num_text_available_list,
                     max_text_available_list;
 
-    int             *shape_available_list;
+    int             *shape_available_list = NULL;
     int             num_shape_available_list,
                     max_shape_available_list;
 
-    int             *axis_available_list;
+    int             *axis_available_list = NULL;
     int             num_axis_available_list,
                     max_axis_available_list;
 
-    int             *image_available_list;
+    int             *image_available_list = NULL;
     int             num_image_available_list,
                     max_image_available_list;
 
@@ -1227,58 +1153,58 @@ private:
    * primitives can become hidden when they are
    * deleted, rescaled from a frame, etc.
    */
-    int             *line_hidden_list;
+    int             *line_hidden_list = NULL;
     int             num_line_hidden_list,
                     max_line_hidden_list;
 
-    int             *fill_hidden_list;
+    int             *fill_hidden_list = NULL;
     int             num_fill_hidden_list,
                     max_fill_hidden_list;
 
-    int             *symb_hidden_list;
+    int             *symb_hidden_list = NULL;
     int             num_symb_hidden_list,
                     max_symb_hidden_list;
 
-    int             *text_hidden_list;
+    int             *text_hidden_list = NULL;
     int             num_text_hidden_list,
                     max_text_hidden_list;
 
-    int             *shape_hidden_list;
+    int             *shape_hidden_list = NULL;
     int             num_shape_hidden_list,
                     max_shape_hidden_list;
 
-    int             *axis_hidden_list;
+    int             *axis_hidden_list = NULL;
     int             num_axis_hidden_list,
                     max_axis_hidden_list;
 
-    int             *contour_hidden_list;
+    int             *contour_hidden_list = NULL;
     int             num_contour_hidden_list,
                     max_contour_hidden_list;
 
   /*
    * patch drawing lists.
    */
-    int             *contour_line_patch_list;
+    int             *contour_line_patch_list = NULL;
     int             num_contour_line_patch_list,
                     max_contour_line_patch_list;
 
-    int             *line_patch_list;
+    int             *line_patch_list = NULL;
     int             num_line_patch_list,
                     max_line_patch_list;
 
-    int             *fill_patch_list;
+    int             *fill_patch_list = NULL;
     int             num_fill_patch_list,
                     max_fill_patch_list;
 
-    int             *symb_patch_list;
+    int             *symb_patch_list = NULL;
     int             num_symb_patch_list,
                     max_symb_patch_list;
 
-    int             *text_patch_list;
+    int             *text_patch_list = NULL;
     int             num_text_patch_list,
                     max_text_patch_list;
 
-    int             *shape_patch_list;
+    int             *shape_patch_list = NULL;
     int             num_shape_patch_list,
                     max_shape_patch_list;
 
@@ -1287,12 +1213,12 @@ private:
   /*
    * spatial indexing arrays.
    */
-    int             **line_spatial_index;
-    int             **fill_spatial_index;
-    int             **symb_spatial_index;
-    int             **text_spatial_index;
-    int             **shape_spatial_index;
-    int             **contour_spatial_index;
+    int             **line_spatial_index = NULL;
+    int             **fill_spatial_index = NULL;
+    int             **symb_spatial_index = NULL;
+    int             **text_spatial_index = NULL;
+    int             **shape_spatial_index = NULL;
+    int             **contour_spatial_index = NULL;
 
     int             num_line_index,
                     num_fill_index,
@@ -1347,23 +1273,23 @@ private:
   /*
    * Lists of various grouping objects.
    */
-    FRameStruct     *frame_list;
+    FRameStruct     *frame_list = NULL;
     int             num_frame_list,
                     max_frame_list;
 
-    GRaphStruct     *graph_list;
+    GRaphStruct     *graph_list = NULL;
     int             num_graph_list,
                     max_graph_list;
 
-    DLSelectable    **selectable_object_list;
+    DLSelectable    **selectable_object_list = NULL;
     int             num_selectable_object_list,
                     max_selectable_object_list;
 
-    LAyerStruct     *layer_list;
+    LAyerStruct     *layer_list = NULL;
     int             num_layer_list,
                     max_layer_list;
 
-    ITemStruct      *item_list;
+    ITemStruct      *item_list = NULL;
     int             num_item_list,
                     max_item_list;
 
@@ -1397,7 +1323,7 @@ private:
 
     int             border_margin_only_flag;
 
-    FILE            *dfile;
+    FILE            *dfile = NULL;
 
     int             HideFlag;
 
@@ -1410,7 +1336,7 @@ private:
     int             saved_frame_num;
     int             saved_graph_num;
     int             saved_selectable_object_num;
-    DLSelectable    *saved_selectable_object;
+    DLSelectable    *saved_selectable_object = NULL;
     int             saved_xaxis_num;
     int             saved_yaxis_num;
 

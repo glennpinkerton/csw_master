@@ -39,10 +39,10 @@
 */
 typedef struct {
     char               name[100];
-    unsigned char      *red_data,
-                       *green_data,
-                       *blue_data,
-                       *transparency_data;
+    unsigned char      *red_data = NULL,
+                       *green_data = NULL,
+                       *blue_data = NULL,
+                       *transparency_data = NULL;
     int                ncol, nrow;
     CSW_F              xmin, ymin, xmax, ymax;
     int                grid_num;

@@ -292,7 +292,7 @@ typedef struct {
 }  GRaphSymRec;
 
 typedef struct {
-    char      *text;
+    char      *text = NULL;
     CSW_F     x,
               y,
               size,
@@ -311,8 +311,8 @@ typedef struct {
               pattcolor,
               linecolor,
               outline;
-    CSW_F     *x,
-              *y;
+    CSW_F     *x = NULL,
+              *y = NULL;
     CSW_F     linethick,
               patsize;
     int       npts;
@@ -342,8 +342,8 @@ typedef struct {
     int       bgflag;
     int       linepat,
               linecolor;
-    CSW_F     *x,
-              *y,
+    CSW_F     *x = NULL,
+              *y = NULL,
               dashscale,
               linethick;
     CSW_F     x1,
@@ -356,7 +356,7 @@ typedef struct {
 typedef union {
     CSW_F     fval;
     int       ival;
-    char      *cval;
+    char      *cval = NULL;
 }  GRaphUnion;
 
 typedef struct {
@@ -378,9 +378,9 @@ typedef struct {
                  pattcolor,
                  symbol;
     char         text[MAX_LEG_TEXT];
-    void         *prev, *next;
+    void         *prev = NULL, *next = NULL;
     int          prevoffset, nextoffset;
-    void         *element;
+    void         *element = NULL;
     int          element_type;
 }  LEgendRec;
 
@@ -439,7 +439,7 @@ class GPFGraph  :  public GraphBase
     int         *FreeLegend = NULL;
     int         NfreeLegend = 0;
     LEgendRec   *LastLegPtr = NULL,
-                   *FirstLegPtr = NULL;
+                *FirstLegPtr = NULL;
     int         ReportedLastLegPtr = -1;
     int         FirstLegOffset = 0,
                 LastLegOffset = 0;

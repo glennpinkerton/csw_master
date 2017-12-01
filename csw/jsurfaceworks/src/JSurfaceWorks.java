@@ -72,11 +72,8 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
     static private final int SW_CALC_CONSTANT_TRI_MESH = 21;
     static private final int SW_REMOVE_TRI_INDEX     = 22;
     static private final int SW_REMOVE_ALL_TRI_INDEXES = 23;
-    static private final int SW_CALC_BLENDED_GRID    = 24;
     static private final int SW_START_AT_TRI_MESH    = 25;
     static private final int SW_SET_AT_POLYLINE      = 26;
-    static private final int SW_ADD_AT_RDP_POINTS    = 27;
-    static private final int SW_ADD_AT_NDP_POINTS    = 28;
     static private final int SW_CALC_AT_TRI_MESH     = 29;
     static private final int SW_TEST_TRI_SPEED       = 98;
     static private final int SW_CLEAR_DRAPE_CACHE    = 99;
@@ -184,7 +181,7 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
         }
     }
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
     static public long openLogFile (String fileName)
     {
@@ -251,7 +248,7 @@ System.out.flush();
         return;
     }
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
     static public void setModelBounds (
         double      xmin,
@@ -285,7 +282,7 @@ System.out.flush();
     }
 
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
     static public void psSetModelBounds (
         double      xmin,
@@ -318,7 +315,7 @@ System.out.flush();
 
     }
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
     static public void setModelBounds (
         Bounds3D         sp)
@@ -365,7 +362,7 @@ System.out.flush();
 
     }
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
     static public void psSetModelBounds (
         Bounds3D         sp)
@@ -412,7 +409,7 @@ System.out.flush();
 
     }
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
 
     private int badBoundaryAction = 1;
@@ -445,7 +442,7 @@ System.out.flush();
     {
         return badBoundaryAction;
     }
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
 /**
  Old version of calcTriMesh method.
@@ -479,7 +476,7 @@ System.out.flush();
     }
 
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
 /**
  New version of calcTriMesh method.
@@ -845,7 +842,7 @@ set to false if the trimesh is for anything else.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*---------------------------------------------------------*/
 
  /**
  Convert a rectangular grid to a {@link TriMesh} object.  The grid data are
@@ -1167,7 +1164,7 @@ set to false if the trimesh is for anything else.
 
     }
 
-/*--------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
 
     /*
      * Send the grid calculation options.  Used by grid or trimesh calc.
@@ -1209,7 +1206,7 @@ set to false if the trimesh is for anything else.
         return;
     }
 
-/*--------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
 
     private void sendGridGeometry (GridGeometry gp)
     {
@@ -1234,18 +1231,18 @@ set to false if the trimesh is for anything else.
     }
 
 
-/*---------------------------------------------------------------------*/
+/*---------------------------------------------------------*/
 
     static private long          lastDrapedTriMesh = 0;
 
-/*---------------------------------------------------------------------*/
+/*---------------------------------------------------------*/
 
     public void setLastDrapedTriMesh (long tmid)
     {
         lastDrapedTriMesh = tmid;
     }
 
-/*---------------------------------------------------------------------*/
+/*---------------------------------------------------------*/
 
   /*
    * Remove the cached triangle indexes associated with a particular
@@ -1298,7 +1295,7 @@ set to false if the trimesh is for anything else.
     }
 
 
-/*---------------------------------------------------------------------*/
+/*---------------------------------------------------------*/
 
     static private class FinalizedTmeshID {
         public int id1, id2;
@@ -1390,7 +1387,7 @@ set to false if the trimesh is for anything else.
     }
 
 
-/*---------------------------------------------------------------------*/
+/*---------------------------------------------------------*/
 
   /**
    * Free all indexes for all trimeshs currently cached in the native C
@@ -1421,7 +1418,7 @@ set to false if the trimesh is for anything else.
     }
 
 
-/*---------------------------------------------------------------------*/
+/*---------------------------------------------------------*/
 
   /**
   Calculate draped lines on the specified trimesh.  If the trimesh is
@@ -1620,7 +1617,7 @@ set to false if the trimesh is for anything else.
 
 
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
     private boolean verticalFaultFlag = false;
 
@@ -1653,7 +1650,7 @@ set to false if the trimesh is for anything else.
         return staticVfaultFlag;
     }
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
 /**
  Calculate a triangular mesh from points and constraint lines.  This is the
@@ -1949,238 +1946,13 @@ or set to false if the trimesh will be used for anything else.
     }
 
 
-/*-------------------------------------------------------------------------*/
-
-  /*
-   * Called only by calcBlendedGrid to remove zero length segments
-   * from a blended grid "fault".  The xThinFault, yThinFault,
-   * nThinFaultPoints, nThinFault, nThinfaultPointsTotal private
-   * members are populated with the results.
-   */
-
-    private double[]    xThinFault;
-    private double[]    yThinFault;
-    private int[]       nThinFaultPoints;
-    private int         nThinFaults,
-                        nThinFaultPointsTotal;
-
-    private int thinFaultPoints (
-      double[] xf,
-      double[] yf,
-      int[]    nfp,
-      int      nf,
-      int      ntot)
-    {
-      double       x1, y1, x2, y2, tiny, dx, dy, dist;
-      double[]     xw, yw;
-      int[]        npw;
-      int          i, j, n, n2, jtot, closed;
-      double       xfirst, yfirst, xlast, ylast;
-
-  /*
-   * Initialize output in case of error.
-   */
-      xThinFault = yThinFault = null;
-      nThinFaultPoints = null;
-      nThinFaults = 0;
-      nThinFaultPointsTotal = 0;
-
-      if (xf == null  ||  yf == null  ||  nfp == null  ||
-          nf < 1  ||  ntot < 2) {
-        return 0;
-      }
-
-  /*
-   * Find the "zero" distance.
-   */
-      x1 = y1 = 1.e30;
-      x2 = y2 = -1.e30;
-
-      for (i=0; i<ntot; i++) {
-        if (xf[i] < x1) x1 = xf[i];
-        if (yf[i] < y1) y1 = yf[i];
-        if (xf[i] > x2) x2 = xf[i];
-        if (yf[i] > y2) y2 = yf[i];
-      }
-
-      if (x1 >= x2  &&  y1 >= y2) {
-        return 0;
-      }
-
-      tiny = (x2 - x1 + y2 - y1) / 20000.0;
-
-  /*
-   * Allocate workspace.
-   */
-      xw = new double[ntot];
-      yw = new double[ntot];
-      npw = new int[nf];
-
-  /*
-   * Put points that are not zero distance apart into the xw, yw arrays.
-   */
-      n = 0;
-      n2 = 0;
-
-      for (i=0; i<nf; i++) {
-
-        xfirst = xf[n];
-        yfirst = yf[n];
-        xlast = xf[n+nfp[i]-1];
-        ylast = yf[n+nfp[i]-1];
-        closed = 0;
-        dx = xfirst - xlast;
-        dy = yfirst - ylast;
-        dist = dx * dx + dy * dy;
-        dist = Math.sqrt (dist);
-        if (dist <= tiny) {
-            closed = 1;
-        }
-
-        xw[n2] = xfirst;
-        yw[n2] = yfirst;
-        n++;
-        n2++;
-        jtot = 1;
-
-        for (j=1; j<nfp[i]; j++) {
-          dx = xf[n] - xf[n-1];
-          dy = yf[n] - yf[n-1];
-          dist = dx * dx + dy * dy;
-          dist = Math.sqrt (dist);
-          if (dist >= tiny) {
-            xw[n2] = xf[n];
-            yw[n2] = yf[n];
-            n2++;
-            jtot++;
-          }
-          n++;
-        }
-
-        if (closed == 1) {
-          xw[n2-1] = xfirst;
-          yw[n2-1] = yfirst;
-        }
-
-        npw[i] = jtot;
-
-      }
-
-    /*
-     * Transfer to the private members.
-     */
-      nThinFaultPoints = npw;
-      xThinFault = xw;
-      yThinFault = yw;
-      nThinFaults = nf;
-      nThinFaultPointsTotal = n2;
-
-      return 1;
-
-    }
-
-
-/*-------------------------------------------------------------------------*/
-
-    public CSWBlendedNodes calcBlendedGrid(
-      double[] xList,
-      double[] yList,
-      int[] zList,
-      double[] xFault,
-      double[] yFault,
-      int[] nFaultPoints,
-      int nFaults,
-      int nTotalFaultPoints,
-      int nrow,
-      int ncol,
-      double xmin,
-      double ymin,
-      double xmax,
-      double ymax,
-      GridCalcOptions options
-    ) {
-      int[] ilist = new int[5 + nFaults];
-
-      thinFaultPoints (xFault, yFault,
-                       nFaultPoints, nFaults, nTotalFaultPoints);
-
-      ilist[0] = xList.length;
-      ilist[1] = nrow;
-      ilist[2] = ncol;
-      ilist[3] = nThinFaults;
-      ilist[4] = nThinFaultPointsTotal;
-
-      if (nThinFaults > 0) {
-        int start = 5;
-        for (int i = 0; i < nThinFaults; i++) {
-          ilist[i + start] = nThinFaultPoints[i];
-        }
-      }
-
-      double[] dlist = new double[4];
-      dlist[0] = xmin;
-      dlist[1] = ymin;
-      dlist[2] = xmax;
-      dlist[3] = ymax;
-
-      int length = xList.length + yList.length;
-      if (nFaults > 0) {
-        length = length +  xFault.length + yFault.length;
-      }
-      double[] ddata =  new double[length];
-
-      for (int i = 0; i < xList.length; i++) {
-        ddata[i] = xList[i];
-      }
-
-      int start = xList.length;
-      for (int i = 0; i < yList.length; i++) {
-        ddata[i + start] = yList[i];
-      }
-
-      if (nThinFaults > 0) {
-        start = start + yList.length;
-        for (int i = 0; i < nThinFaultPointsTotal; i++) {
-          ddata[i + start] = xThinFault[i];
-        }
-
-        start = start + nThinFaultPointsTotal;
-        for (int i = 0; i < nThinFaultPointsTotal; i++) {
-          ddata[i + start] = yThinFault[i];
-        }
-      }
-
-      int[] idata = new int[zList.length];
-      for (int i = 0; i < zList.length; i++) {
-        idata[i] = zList[i];
-      }
-
-      sendGridCalcOptions(options);
-
-      sendNativeCommand(
-        SW_CALC_BLENDED_GRID,
-        1,
-        ilist,
-        null,
-        dlist,
-        null,
-        idata,
-        null,
-        ddata
-      );
-
-      return blendedNodes;
-
-    }
-
-
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
 /*
  * Group of methods used for splitting and sealing models.
  */
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Start a sealed model definition.  This method will clear all
@@ -2200,7 +1972,7 @@ or set to false if the trimesh will be used for anything else.
                            null);
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Convert the faults and horizons added since the {@link #psStartSealedModelDefinition}
@@ -2221,7 +1993,7 @@ or set to false if the trimesh will be used for anything else.
                            null);
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Return the input horizons from the native sealed model object.  These input
@@ -2236,7 +2008,7 @@ or set to false if the trimesh will be used for anything else.
                            null);
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
 
   /**
@@ -2254,7 +2026,7 @@ or set to false if the trimesh will be used for anything else.
                            null);
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Set the fraction for which smaller lines are trimmed in the patch splitting
@@ -2278,7 +2050,7 @@ or set to false if the trimesh will be used for anything else.
                            Ddata);
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Calculate intersections between the currently defined faults and time surfaces
@@ -2304,7 +2076,7 @@ or set to false if the trimesh will be used for anything else.
 
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Determine if the two specified lines are essentially the same line.
@@ -2378,7 +2150,7 @@ or set to false if the trimesh will be used for anything else.
 
 
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
   /**
   Add a fault surface to the model sealing input.  This is passed directly to the
@@ -2542,7 +2314,7 @@ or set to false if the trimesh will be used for anything else.
     }
 
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Split the patch that was set up with {@link #psSetPoints},
@@ -2583,7 +2355,7 @@ or set to false if the trimesh will be used for anything else.
 
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Split the patch that was set up with {@link #psSetPoints},
@@ -2622,7 +2394,7 @@ or set to false if the trimesh will be used for anything else.
     }
 
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Clear all data currently set up for patch splitting.
@@ -2635,7 +2407,7 @@ or set to false if the trimesh will be used for anything else.
                            null);
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Clear the horizon data currently set up for patch splitting.  When a {@link #psCalcSplit} call is
@@ -2652,7 +2424,7 @@ or set to false if the trimesh will be used for anything else.
                            null);
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Set the points used for the unsplit input patch.  These will be broken up into
@@ -2689,7 +2461,7 @@ or set to false if the trimesh will be used for anything else.
         return (int)istat;
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Set the points used for the unsplit input patch.  These will be broken up into
@@ -2734,7 +2506,7 @@ or set to false if the trimesh will be used for anything else.
 
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Set the points used for the unsplit input patch.  These will be broken up into
@@ -2779,7 +2551,7 @@ or set to false if the trimesh will be used for anything else.
 
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Add a border polygon segment to be used by the splitting algorithm.  These should
@@ -2830,7 +2602,7 @@ or set to false if the trimesh will be used for anything else.
         return (int)istat;
     }
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
   /**
   Add the outline of the specified trimesh as a border segment to use in the
@@ -2862,7 +2634,7 @@ or set to false if the trimesh will be used for anything else.
     }
 
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
   /**
   Add a horizon surface patch to the model sealing input.  The patch is added as is.
@@ -2993,7 +2765,7 @@ or set to false if the trimesh will be used for anything else.
     }
 
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
   /**
   Set the sediment surface for the model sealing.
@@ -3121,7 +2893,7 @@ or set to false if the trimesh will be used for anything else.
         return (int)istat;
     }
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
   /**
   Set the model bottom for the model sealing.
@@ -3249,7 +3021,7 @@ or set to false if the trimesh will be used for anything else.
         return (int)istat;
     }
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
   /**
   Add a fault surface to the model sealing input.  This is passed directly to the
@@ -3381,7 +3153,7 @@ or set to false if the trimesh will be used for anything else.
         return (int)istat;
     }
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
   /**
   Add a fault centerline that intersects the surface patch being split.  This version
@@ -3434,7 +3206,7 @@ or set to false if the trimesh will be used for anything else.
         return (int)istat;
     }
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
 
   /**
@@ -3495,7 +3267,7 @@ or set to false if the trimesh will be used for anything else.
     }
 
 
-/*-----------------------------------------------------------------------------------
+/*-----------------------------------------------------------------------
  *
  * The following group of methods are related to "vertical" or at least steeply
  * dipping surfaces.  These surfaces need special handling in the native code.
@@ -3504,7 +3276,7 @@ or set to false if the trimesh will be used for anything else.
  * VertBaseline object.
  */
 
-/*----------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------*/
 
 /**
  Determine if a set of points is best represented using "steep surface coordinates".
@@ -3559,7 +3331,7 @@ or set to false if the trimesh will be used for anything else.
 
     }
 
-/*----------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 /**
 Set the vertical baseline data for subsequent calculations.  You should specify a
@@ -3603,7 +3375,7 @@ will not be correct for the current data.
                            Ddata);
     }
 
-/*---------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------*/
 
 /**
  Determine if a set of points is best represented using "steep surface coordinates".
@@ -3719,7 +3491,7 @@ will not be correct for the current data.
 
     }
 
-/*----------------------------------------------------------------------*/
+/*----------------------------------------------------------*/
 
 /**
  Convert a node and triangle list to a node, edge, triangle {@link TriMesh}
@@ -3833,7 +3605,7 @@ will not be correct for the current data.
 
     }
 
-/*------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 
   /**
    * Write a {@link TriMesh} object to a portable binary file.  If the file is successfully
@@ -3860,7 +3632,7 @@ will not be correct for the current data.
       return(position);
     }
 
-/*------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 
   /**
    * Write a {@link TriMesh} object to an ascii text file.  If the file is successfully
@@ -3887,7 +3659,7 @@ will not be correct for the current data.
       return(position);
     }
 
-/*------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 
 /**
  Read a trimesh from the specified file.  The file can be a binary file written
@@ -3928,7 +3700,7 @@ will not be correct for the current data.
     }
 
 
-/*------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 
 /**
  Read a csw grid file of the specified name.  The file is used to create a
@@ -3952,7 +3724,7 @@ will not be correct for the current data.
       return cgrid;
     }
 
-/*------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 
 
     private long writeTriMeshFile (
@@ -4044,7 +3816,7 @@ will not be correct for the current data.
         return(position);
     }
 
-/*-----------------------------------------------------------------------*/
+/*-----------------------------------------------------------*/
 
     public TriMesh extendFault (
         TriMesh     tmesh,
@@ -4108,7 +3880,7 @@ will not be correct for the current data.
 
     }
 
-/*------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 
   /*
    * package scope, only used for debug from unit test.
@@ -4200,7 +3972,7 @@ will not be correct for the current data.
 
     }
 
-/*------------------------------------------------------------------*/
+/*------------------------------------------------------*/
 
 /*
  * Return the outer boundary of a trimesh.  The boundary does not
@@ -4282,7 +4054,7 @@ will not be correct for the current data.
 
     }
 
-/*------------------------------------------------------------------*/
+/*------------------------------------------------------*/
 
 /**
  Calculate the convex hull outline of the specified set of points.
@@ -4321,7 +4093,7 @@ will not be correct for the current data.
     }
 
 
-/*------------------------------------------------------------------*/
+/*------------------------------------------------------*/
 
     private double      grazingValue = 1.0;
 
@@ -4419,7 +4191,7 @@ value of zero means the point is on the edge.
 
     }
 
-/*-----------------------------------------------------------------------*/
+/*-----------------------------------------------------------*/
 
     public void testTriSpeed (int npts)
     {
@@ -4442,7 +4214,7 @@ value of zero means the point is on the edge.
     }
 
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
 /**
  Calculate a trimesh that exactly honors the specified lines.  This is the
@@ -4697,7 +4469,7 @@ or set to false if the trimesh will be used for anything else.
 
     }
 
-/*---------------------------------------------------------------------*/
+/*---------------------------------------------------------*/
 
  /**
   * Clear all the native side draped line caches, including trimesh data
@@ -4717,7 +4489,7 @@ or set to false if the trimesh will be used for anything else.
         return;
     }
 
-/*---------------------------------------------------------------------*/
+/*---------------------------------------------------------*/
 
   /**
   Calculate draped points on the specified trimesh.  If the trimesh is
@@ -4920,7 +4692,7 @@ or set to false if the trimesh will be used for anything else.
         return list;
     }
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
 
 /**
@@ -4994,7 +4766,7 @@ or set to false if the trimesh will be used for anything else.
 
     }
 
-/*-----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 
     /**
      * Resample a line at equally spaced points as close as possible to the specified
@@ -5169,7 +4941,7 @@ or set to false if the trimesh will be used for anything else.
 
 
 
-/*-----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 
     /**
      * Resample each segment of a line as close as possibly to the specifed average
@@ -5282,7 +5054,7 @@ or set to false if the trimesh will be used for anything else.
 
     }
 
-/*-----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 
     /*
      * Resample a line at equally spaced points as close as possible to the specified
@@ -5417,7 +5189,7 @@ or set to false if the trimesh will be used for anything else.
     }
 
 
-/*-----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 
     /**
      * Resample each segment of a line as close as possibly to the specifed average
@@ -5559,7 +5331,7 @@ or set to false if the trimesh will be used for anything else.
 
     }
 
-/*-----------------------------------------------------------------------*/
+/*-----------------------------------------------------------*/
 
     /*
      * This group of methods is used to pair up a TriangleIndex3D object with
@@ -5746,7 +5518,7 @@ or set to false if the trimesh will be used for anything else.
     }
 
 
-/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------*/
 
     static ArrayList<FinalizedTmeshID>    finalized3DIndexList = 
         new ArrayList<FinalizedTmeshID> (10);
@@ -5851,13 +5623,13 @@ or set to false if the trimesh will be used for anything else.
 
 
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
 /*
  * Methods used to calculate fault connection groups.
  */
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Start a fault connection definition.
@@ -5882,7 +5654,7 @@ or set to false if the trimesh will be used for anything else.
     }
 
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   End a fault connection definition.
@@ -5898,7 +5670,7 @@ or set to false if the trimesh will be used for anything else.
     }
 
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
    Connect the faults specified by {@link #psAddConnectingFault} with the detachment
@@ -5924,7 +5696,7 @@ or set to false if the trimesh will be used for anything else.
         }
     }
 
-/*-----------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
 
   /**
   Add a fault that will be connected to the detachment in the currently open
@@ -6052,7 +5824,7 @@ or set to false if the trimesh will be used for anything else.
         return (int)istat;
     }
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
   /**
   Set the detachment surface for a
@@ -6181,7 +5953,7 @@ or set to false if the trimesh will be used for anything else.
         return (int)istat;
     }
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
   /**
   Set the lower trimesh to be used for a surface to surface operation.
@@ -6300,7 +6072,7 @@ or set to false if the trimesh will be used for anything else.
         return (int)istat;
     }
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
   /**
   Set the upper trimesh to be used for a surface to surface operation.
@@ -6418,7 +6190,7 @@ or set to false if the trimesh will be used for anything else.
         return (int)istat;
     }
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Calculate a detachment trimesh between the most recently set lower trimesh
@@ -6451,7 +6223,7 @@ or set to false if the trimesh will be used for anything else.
 
     }
 
-/*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------*/
 
   /**
   Add to the detachment surface for a
@@ -6580,7 +6352,7 @@ or set to false if the trimesh will be used for anything else.
     }
 
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
     private String[]        atNameArray = new String[100];
     private int             numAtNameArray;
@@ -6589,10 +6361,8 @@ or set to false if the trimesh will be used for anything else.
 Start the definition of an attribute trimesh.  An attribute trimesh is
 an existing trimesh that has attribute values calculated at each of its
 nodes.  Subsequent to calling this method, you should use the
-{@link #setAtConstraintLines} method, the {@link #addAtNDPPoints} method and the
-{@link #addAtRDPPoints} method to setup the data for the attribute
-trimesh.  Once all data have been setup the {@link #calcAtTriMesh} method
-can be used to calculae an {@link AttributeTriMesh} object.
+h.  Once all data have been setup the {@link #calcAtTriMesh} method
+can be used to calculate an {@link AttributeTriMesh} object.
 @param tmesh A {@link TriMesh} object that already has its x, y and z
 topology calculated.
 @param changeTriMesh Set to true if the trimesh should be changed to honor
@@ -6709,7 +6479,7 @@ xyz trimesh topology.
 
     }
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
 /**
  Set constraint lines to be used in spreading attributes across a trimesh.
@@ -6807,149 +6577,8 @@ xyz trimesh topology.
     }
 
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
-/**
- Add a set of nominal data points to the attribute calculation input.  Nominal
- data points are currently either lithology or kerogen type.  These are interpolated
- differently than real data (e.g. TOC, initial porosity).
- @param x Array of x coordinates for the points.
- @param y Array of y coordinates for the points.
- @param ndpValues Array of numbers specifying the pure types at each xy point.
- @param numPoints The number of points defined.
- @param name The name of this attribute.  If the name has already been used, the values
- defied will be lumped together with those defimed for prior uses of the name.
- If the name is null or blank, the values
- will be lumped together with any other null or blank labeled values that are defined.
-*/
-    public int addAtNDPPoints (
-      double[]      x,
-      double[]      y,
-      double[]      ndpValues,
-      int           numPoints,
-      double        background,
-      String        name)
-    {
-
-        int id = addToAtNameArray (name);
-
-        Ilist[0] = numPoints;
-        Ilist[1] = id;
-        if (background > 1.e6  ||  background < 0) {
-          Ilist[2] = -1;
-        }
-        else {
-          Ilist[2] = (int)(background + .01);
-        }
-
-        if (numPoints > 0) {
-            newDdata (numPoints * 3);
-            for (int i=0; i<numPoints; i++) {
-                Ddata[i] = x[i];
-                Ddata[numPoints+i] = y[i];
-                Ddata[numPoints*2+i] = ndpValues[i];
-            }
-        }
-
-        long istat = sendNativeCommand (SW_ADD_AT_NDP_POINTS,
-                                        0,
-                                        Ilist,
-                                        Ddata);
-
-        return (int)istat;
-
-    }
-
-
-/*-------------------------------------------------------------------------------------*/
-
-/**
- NOT IMPLEMENTED YET
- <p>
- Add a set of nominal data points to the attribute calculation input.  Nominal
- data points are currently either lithology or kerogen type.  These are interpolated
- differently than real data (e.g. TOC, initial porosity).
- <p>
- Note that if the specified blended grid has fault lines associated with it, then
- these fault lines will be used as the attribute constraint lines implicitly.  They
- will override any constraint lines previously specified with the {@link #setAtConstraintLines}
- method.  If more than one faulted blended grid is added to a calculation setup,
- the last one added is used.  Because of this, make sure you do not mix faulted blended
- grids with other
- attribute data that is not consistent with the faulted blended grid.
- @param blendedGrid A {@link BlendedGrid} object previously calculated for
- this NDP attribute.
- @param name The name of this attribute.  If the name has already been used, the values
- defied will be lumped together with those defimed for prior uses of the name.
- If the name is null or blank, the values
- will be lumped together with any other null or blank labeled values that are defined.
-*/
-    public int addAtNDPGrid (
-      BlendedGrid   blendedGrid,
-      String        name)
-    {
-        if (blendedGrid == null) {
-            return 0;
-        }
-
-        System.out.println ("addNDPAtGrid not implemented yet.");
-        return 1;
-
-    }
-
-
-/*-------------------------------------------------------------------------------------*/
-
-/**
- Add a set of real data points to the attribute calculation input.
- @param x Array of x coordinates for the points.
- @param y Array of y coordinates for the points.
- @param rdpValues Array of numbers specifying the pure types at each xy point.
- @param numPoints The number of points defined.
- @param name The name of this attribute.  If the name has already been used, the values
- defied will be lumped together with those defimed for prior uses of the name.
- If the name is null or blank, the values
- will be lumped together with any other null or blank labeled values that are defined.
-*/
-    public int addAtRDPPoints (
-      double[]      x,
-      double[]      y,
-      double[]      rdpValues,
-      int           numPoints,
-      double        background,
-      String        name)
-    {
-
-        int id = addToAtNameArray (name);
-
-        Ilist[0] = numPoints;
-        Ilist[1] = id;
-        Dlist[0] = background;
-
-        if (numPoints > 0) {
-            newDdata (numPoints * 3);
-            for (int i=0; i<numPoints; i++) {
-                Ddata[i] = x[i];
-                Ddata[numPoints+i] = y[i];
-                Ddata[numPoints*2+i] = rdpValues[i];
-            }
-        }
-
-        long istat = sendNativeCommand (SW_ADD_AT_RDP_POINTS,
-                                        0,
-                                        Ilist,
-                                        null,
-                                        Dlist,
-                                        null,
-                                        null,
-                                        null,
-                                        Ddata);
-
-        return (int)istat;
-
-    }
-
-/*-------------------------------------------------------------------------------------*/
 
     private int addToAtNameArray (String name)
     {
@@ -6982,7 +6611,7 @@ xyz trimesh topology.
 
     }
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
 /**
  Calculate and return an {@link AttributeTriMesh} object based on the various
@@ -7006,7 +6635,7 @@ xyz trimesh topology.
     }
 
 
-/*----------------------------------------------------------------------*/
+/*----------------------------------------------------------*/
 
 /**
   Convert x,y,z node coordinate arrays accompanied by n1, n2, n3 nodes
@@ -7117,7 +6746,7 @@ xyz trimesh topology.
 
     }
 
-/*-------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
 
   /**
@@ -7154,4 +6783,4 @@ xyz trimesh topology.
 
 
 
-/*---------------------------------------------------------------------*/
+/*---------------------------------------------------------*/

@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -11,7 +11,7 @@
 /*
     gpf_bfill.h
 
-      Header file with data for the block filled polygon font.
+    Header file with data for the block filled polygon font.
     This is only used in the gpf_font.c file.  This header file
     depends on some constant and structure definitions in the 
     gpf_font.c file.

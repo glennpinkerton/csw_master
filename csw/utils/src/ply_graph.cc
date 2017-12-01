@@ -4891,23 +4891,21 @@ int CSWPolyGraph::FreeAllMem (void)
     }
 
     for (i=0; i<MAX_SEG_INDEX * 16; i++) {
-        if (SegIndex[i]) {
-            csw_Free (SegIndex[i]);
-            SegIndex[i] = NULL;
-        }
+        csw_Free (SegIndex[i]);
+        SegIndex[i] = NULL;
     }
 
     for (i=0; i<MAX_NODE_INDEX * 2; i++) {
-        if (NodeIndex[i]) {
-            csw_Free (NodeIndex[i]);
-            NodeIndex[i] = NULL;
-        }
+        csw_Free (NodeIndex[i]);
+        NodeIndex[i] = NULL;
     }
 
     if (CompList) {
         for (i=0; i<Pmaxcomp; i++) {
-            if (CompList[i].x) csw_Free (CompList[i].x);
-            if (CompList[i].tag) csw_Free (CompList[i].tag);
+            csw_Free (CompList[i].x);
+            CompList[i].x = NULL;
+            csw_Free (CompList[i].tag);
+            CompList[i].tag = NULL;
         }
         csw_Free (CompList);
         CompList = NULL;
@@ -9573,15 +9571,11 @@ int CSWPolyGraph::InitAllMem (void)
     memset ((void *)&Raw2, 0, sizeof(Raw2));
 
     for (i=0; i<MAX_SEG_INDEX * 16; i++) {
-        if (SegIndex[i]) {
-            SegIndex[i] = NULL;
-        }
+        SegIndex[i] = NULL;
     }
 
     for (i=0; i<MAX_NODE_INDEX * 2; i++) {
-        if (NodeIndex[i]) {
-            NodeIndex[i] = NULL;
-        }
+        NodeIndex[i] = NULL;
     }
 
     for (i=0; i<LOCAL_MAX_GRID_SIZE * 2; i++) {

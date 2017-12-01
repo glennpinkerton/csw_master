@@ -2160,125 +2160,6 @@ int main (int argc, char *argv[])
                 );
                 break;
 
-           case GTX_BLEND_TRIMESH_DATA:
-
-               ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
-               if (ctmp == NULL) {
-                   end_flag = 1;
-                   break;
-               }
-
-               sscanf (inbuff,
-                       "%d %d %d",
-                       ilist,
-                       ilist+1,
-                       ilist+2);
-
-               n = ilist[0];
-               for (i=0; i<n; i++) {
-                   ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
-                   if (ctmp == NULL) {
-                       end_flag = 1;
-                       break;
-                   }
-                   sscanf (inbuff,
-                           "%lf %lf %lf %d",
-                           ddata+i,
-                           ddata+i+n,
-                           ddata+i+2*n,
-                           idata+i);
-               }
-
-               nstart = n;
-               n = ilist[1];
-               for (i=0; i<n; i++) {
-                   ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
-                   if (ctmp == NULL) {
-                       end_flag = 1;
-                       break;
-                   }
-                   sscanf (inbuff,
-                           "%d %d %d %d %d",
-                           idata+nstart+i,
-                           idata+nstart+i+n,
-                           idata+nstart+i+2*n,
-                           idata+nstart+i+3*n,
-                           idata+nstart+i+4*n);
-               }
-
-               nstart += 5 * n;
-               n = ilist[2];
-               for (i=0; i<n; i++) {
-                   ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
-                   if (ctmp == NULL) {
-                       end_flag = 1;
-                       break;
-                   }
-                   sscanf (inbuff,
-                           "%d %d %d %d",
-                           idata+nstart+i,
-                           idata+nstart+i+n,
-                           idata+nstart+i+2*n,
-                           idata+nstart+i+3*n);
-               }
-
-               ezx_process_command (
-                   dlist_index,
-                   command_id,
-                   threadid,
-                   longlist,
-                   ilist,
-                   cdata,
-                   bdata,
-                   sdata,
-                   idata,
-                   fdata,
-                   ddata,
-                   dfile
-               );
-
-               break;
-
-
-            case GTX_NDP_GRAPHIC_PROPS:
-
-               ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
-               if (ctmp == NULL) {
-                   end_flag = 1;
-                   break;
-               }
-               sscanf (inbuff,
-                       "%d",
-                       ilist);
-
-               for (i=0; i<5*ilist[0]; i++) {
-                   ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
-                   if (ctmp == NULL) {
-                       end_flag = 1;
-                       break;
-                   }
-                   sscanf (inbuff,
-                           "%d",
-                           idata+i);
-               }
-
-               ezx_process_command (
-                   dlist_index,
-                   command_id,
-                   threadid,
-                   longlist,
-                   ilist,
-                   cdata,
-                   bdata,
-                   sdata,
-                   idata,
-                   fdata,
-                   ddata,
-                   dfile
-               );
-
-               break;
-
             case GTX_IMAGE_FAULT_DATA:
 
                ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
@@ -2331,80 +2212,6 @@ int main (int argc, char *argv[])
                break;
 
 
-           case GTX_BLENDED_GRID_DATA:
-
-               ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
-               if (ctmp == NULL) {
-                   end_flag = 1;
-                   break;
-               }
-               strcpy (cdata, inbuff);
-
-               ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
-               if (ctmp == NULL) {
-                   end_flag = 1;
-                   break;
-               }
-               sscanf (inbuff,
-                       "%d %d %d\n",
-                       ilist,
-                       ilist+1,
-                       ilist+2);
-
-               n = ilist[0] * ilist[1];
-               n *= 4;
-
-               ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
-               if (ctmp == NULL) {
-                   end_flag = 1;
-                   break;
-               }
-               sscanf (inbuff,
-                       "%lf %lf %lf %lf\n",
-                       ddata+n,
-                       ddata+n+1,
-                       ddata+n+2,
-                       ddata+n+3);
-
-               for (i=0; i<n; i++) {
-                   ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
-                   if (ctmp == NULL) {
-                       end_flag = 1;
-                       break;
-                   }
-                   sscanf (inbuff,
-                           "%d\n",
-                           idata+i);
-               }
-
-               for (i=0; i<n; i++) {
-                   ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
-                   if (ctmp == NULL) {
-                       end_flag = 1;
-                       break;
-                   }
-                   sscanf (inbuff,
-                           "%lf\n",
-                           ddata+i);
-               }
-
-               ezx_process_command (
-                   dlist_index,
-                   command_id,
-                   threadid,
-                   longlist,
-                   ilist,
-                   cdata,
-                   bdata,
-                   sdata,
-                   idata,
-                   fdata,
-                   ddata,
-                   dfile
-               );
-
-               break;
-
             default:
 
                 break;
@@ -2436,6 +2243,13 @@ int main (int argc, char *argv[])
     ThreadGuard::RemoveAllThreadData ();
 
     fprintf (stdout, "EasyX native only test completed.\n");
+
+    if (fptr != NULL) {
+        fclose (fptr);
+    }
+    if (dfile != NULL) {
+        fclose (dfile);
+    }
 
     return 1;
 

@@ -33,7 +33,6 @@ JAVA_SRC=\
  LithFill.java\
  LocalDraw.java\
  NativePrim.java\
- NDPGraphicProperties.java\
  JEasyXGraphicsPanel.java\
  SymbolButton.java\
  SymbolParts.java\
@@ -70,7 +69,6 @@ JAVA_CLASSES=\
  LithFill.class\
  LocalDraw.class\
  NativePrim.class\
- NDPGraphicProperties.class\
  JEasyXGraphicsPanel.class\
  SymbolButton.class\
  SymbolParts.class\
@@ -90,8 +88,7 @@ LIB_SRC_CC=\
  DLSurf.cc\
  DrawPrim.cc\
  EZXCommand.cc\
- EZXJavaArea.cc\
- NDPSurf.cc
+ EZXJavaArea.cc
 
 LIB_OBJS_C=\
  shr_lib_link$(OBJ_SUFFIX)\
@@ -104,8 +101,7 @@ LIB_OBJS_CC=\
  DLSurf$(OBJ_SUFFIX)\
  DrawPrim$(OBJ_SUFFIX)\
  EZXCommand$(OBJ_SUFFIX)\
- EZXJavaArea$(OBJ_SUFFIX)\
- NDPSurf$(OBJ_SUFFIX)
+ EZXJavaArea$(OBJ_SUFFIX)
 
 LIB_FILE=$(LIB_PREFIX)jeasyx$(LIB_SUFFIX)
 

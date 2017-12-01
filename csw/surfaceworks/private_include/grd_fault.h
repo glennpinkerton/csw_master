@@ -423,11 +423,6 @@ class CSWGrdFault
     int grd_get_fault_end_point
         (int k, CSW_F *x, CSW_F *y);
 
-
-
-
-
-
     int con_correct_narrow_grid
         (CSW_F **newgrid, int *newncol, int *newnrow);
 
@@ -473,11 +468,6 @@ class CSWGrdFault
 
     FAultLineStruct *grd_copy_fault_line_structs
         (FAultLineStruct *in, int n);
-
-
-
-
-
 
     void grd_set_grazing_grid_nodes (void);
     void grd_set_grazing_trimesh_nodes
