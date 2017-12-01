@@ -964,9 +964,6 @@ int CSWGrdTriangle::grd_grid_to_equilateral_trimesh
         NodeList[interp[i]].z = zinterp2[i];
     }
 
-    xinterp = yinterp = zinterp2 = NULL;
-    interp = NULL;
-
 /*
    Create the edges.  Each grid cell has an edge on its left side, on its
    bottom side and a diagonal edge.  For cells in even numbered rows, the

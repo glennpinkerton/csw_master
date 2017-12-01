@@ -37,6 +37,20 @@
 
 
 
+// Private free work array method
+
+void CSWConDraw::FreeWork ()
+{
+    csw_Free (Xline);
+    Xline = NULL;
+    Yline = NULL;
+    Xwork = NULL;
+    Ywork = NULL;
+    LineDistance = NULL;
+}
+
+
+
 
 /*
   *****************************************************************************
@@ -1731,7 +1745,7 @@ int CSWConDraw::con_draw_fill
 
 /*
     Scale the polygon into the page units and store in
-    the Xline, Yline arrays.
+    the fill prim arrays.
 */
     fprim->npts = npts;
     for (i=0; i<npts; i++) {

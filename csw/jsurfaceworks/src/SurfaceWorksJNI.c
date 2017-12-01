@@ -38,8 +38,6 @@
 #include <csw/jsurfaceworks/private_include/SurfaceWorksJNI.h>
 #include <csw/jsurfaceworks/private_include/SWCommand.h>
 
-//#include "JSurfaceWorksBase.h"
-
 #include "csw_jsurfaceworks_src_JSurfaceWorks_FinalizedTmeshID.h"
 #include "csw_jsurfaceworks_src_JSurfaceWorks.h"
 #include "csw_jsurfaceworks_src_JSurfaceWorksBase.h"
@@ -75,7 +73,6 @@ static jmethodID EndProtoPatchMethodID = NULL;
 static jmethodID AddNativeTindexResultMethodID = NULL;
 static jmethodID AddFaultMajorMinorMethodID = NULL;
 static jmethodID AddNativeAtTriMeshMethodID = NULL;
-static jmethodID AddNativeRDPValueMethodID = NULL;
 
 static JNIEnv         *JavaEnv = NULL;
 static jobject        JavaObj = NULL;
@@ -180,7 +177,6 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
     AddNativeTindexResultMethodID = NULL;
     AddFaultMajorMinorMethodID = NULL;
     AddNativeAtTriMeshMethodID = NULL;
-    AddNativeRDPValueMethodID = NULL;
 
     if (expect_return) {
 
@@ -360,13 +356,6 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
         AddNativeAtTriMeshMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addNativeAtTriMesh",
                                         "([D[D[D[II[I[I[I[I[II[I[I[I[II)V");
         if (AddNativeAtTriMeshMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddNativeRDPValueMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addNativeRDPValue",
-                                        "(I[DI)V");
-        if (AddNativeRDPValueMethodID == NULL) {
             printf("Method not found at %s:%i\n", __FILE__, __LINE__);
             return -1;
         }
@@ -3549,70 +3538,6 @@ void jni_call_add_native_at_tri_mesh_method (
     (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
     (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e3tri);
     (*JavaEnv)->DeleteLocalRef (JavaEnv, j_triflags);
-
-    return;
-
-}
-
-/*------------------------------------------------------------------------*/
-
-
-/*------------------------------------------------------------------------*/
-
-void jni_call_add_native_rdp_value_method (
-    int         id,
-    double      *values,
-    int         npts
-)
-{
-    jint        jid;
-    jdouble     *jvalues;
-    jint        jnpts;
-
-
-    jbyteArray          j_values;
-
-
-    if (AddNativeRDPValueMethodID == NULL) {
-        return;
-    }
-
-    jvalues = (jdouble *)values;
-
-/*
- * Put the rdp values into a java array.
- */
-    j_values = (*JavaEnv)->NewDoubleArray (JavaEnv, npts);
-    if (j_values == NULL) {
-        return;
-    }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
-        j_values,
-        0,
-        npts,
-        jvalues
-    );
-
-    jid = (jint)id;
-    jnpts = (jint)npts;
-
-/*
- * Call the java object's method.
- */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
-        AddNativeRDPValueMethodID,
-        jid,
-        j_values,
-        jnpts
-    );
-
-/*
- * Delete the local java arrays.
- */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_values);
 
     return;
 

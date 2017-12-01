@@ -3427,58 +3427,6 @@ int main (int argc, char *argv[])
 
 /*-----------------------------------------------------------------------*/
 
-           case SW_ADD_AT_RDP_POINTS:
-
-               ctmp = futil.csw_fgets (inbuff, 1000, fptr);
-               if (ctmp == NULL) {
-                   end_flag = 1;
-                   break;
-               }
-               ilist[3] = 1;
-               sscanf (
-                   inbuff,
-                   "%d %d %d",
-                   ilist+0,
-                   ilist+1,
-                   ilist+2
-               );
-
-               npts = ilist[0];
-               for (i=0; i<npts; i++) {
-                   ctmp = futil.csw_fgets (inbuff, 1000, fptr);
-                   if (ctmp == NULL) {
-                       end_flag = 1;
-                       break;
-                   }
-                   sscanf (
-                       inbuff,
-                       "%lf %lf %lf",
-                       ddata+i,
-                       ddata+npts+i,
-                       ddata+2*npts+i
-                   );
-               }
-
-               if (end_flag == 1) {
-                   break;
-               }
-
-               sw_process_command (
-                   command_id,
-                    SINGLE_THREAD_ID,
-                   ilist,
-                   llist,
-                   dlist,
-                   cdata,
-                   idata,
-                   fdata,
-                   ddata
-               );
-
-               break;
-
-/*-----------------------------------------------------------------------*/
-
             case SW_CALC_AT_TRI_MESH:
 
                sw_process_command (

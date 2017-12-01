@@ -74,7 +74,6 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
     static private final int SW_REMOVE_ALL_TRI_INDEXES = 23;
     static private final int SW_START_AT_TRI_MESH    = 25;
     static private final int SW_SET_AT_POLYLINE      = 26;
-    static private final int SW_ADD_AT_RDP_POINTS    = 27;
     static private final int SW_CALC_AT_TRI_MESH     = 29;
     static private final int SW_TEST_TRI_SPEED       = 98;
     static private final int SW_CLEAR_DRAPE_CACHE    = 99;
@@ -6580,57 +6579,6 @@ xyz trimesh topology.
 
 /*-------------------------------------------------------------------------*/
 
-
-/**
- Add a set of real data points to the attribute calculation input.
- @param x Array of x coordinates for the points.
- @param y Array of y coordinates for the points.
- @param rdpValues Array of numbers specifying the pure types at each xy point.
- @param numPoints The number of points defined.
- @param name The name of this attribute.  If the name has already been used, the values
- defied will be lumped together with those defimed for prior uses of the name.
- If the name is null or blank, the values
- will be lumped together with any other null or blank labeled values that are defined.
-*/
-    public int addAtRDPPoints (
-      double[]      x,
-      double[]      y,
-      double[]      rdpValues,
-      int           numPoints,
-      double        background,
-      String        name)
-    {
-
-        int id = addToAtNameArray (name);
-
-        Ilist[0] = numPoints;
-        Ilist[1] = id;
-        Dlist[0] = background;
-
-        if (numPoints > 0) {
-            newDdata (numPoints * 3);
-            for (int i=0; i<numPoints; i++) {
-                Ddata[i] = x[i];
-                Ddata[numPoints+i] = y[i];
-                Ddata[numPoints*2+i] = rdpValues[i];
-            }
-        }
-
-        long istat = sendNativeCommand (SW_ADD_AT_RDP_POINTS,
-                                        0,
-                                        Ilist,
-                                        null,
-                                        Dlist,
-                                        null,
-                                        null,
-                                        null,
-                                        Ddata);
-
-        return (int)istat;
-
-    }
-
-/*-------------------------------------------------------------------------*/
 
     private int addToAtNameArray (String name)
     {

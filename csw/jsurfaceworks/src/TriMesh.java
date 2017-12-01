@@ -30,7 +30,6 @@ public class TriMesh {
   private int[] nodeFlagArray;
   private int numNodes;
 
-  private double[] rdpValues;
   private int      atType = -1;
 
 /*
@@ -130,25 +129,6 @@ public class TriMesh {
     return atType;
   }
 
-
-/**
- Set the pernode RDP values that are currently being used
- to color this trimesh on the 3D display.
-*/
-  public void setRDPValues (double[] vals)
-  {
-    rdpValues = vals;
-  }
-
-
-/**
- Get the pernode RDP values that are currently being used
- to color this trimesh on the 3D display.
-*/
-  public double[] getRDPValues ()
-  {
-    return rdpValues;
-  }
 
 /*-------------------------------------------------------------------------------*/
 

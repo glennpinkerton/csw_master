@@ -2244,6 +2244,13 @@ int main (int argc, char *argv[])
 
     fprintf (stdout, "EasyX native only test completed.\n");
 
+    if (fptr != NULL) {
+        fclose (fptr);
+    }
+    if (dfile != NULL) {
+        fclose (dfile);
+    }
+
     return 1;
 
 }

@@ -63,11 +63,13 @@ class CSWConDraw
   public:
 
     CSWConDraw () {};
-    ~CSWConDraw () {};
+    ~CSWConDraw () {FreeWork ();};
 
     void  SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};
 
   private:
+
+    void FreeWork (void);
 
 /*
     Old static file variables become private class variables

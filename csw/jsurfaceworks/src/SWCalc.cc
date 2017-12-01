@@ -19,13 +19,14 @@
 
 #include <assert.h>
 
-#include <csw/jsurfaceworks/private_include/SurfaceWorksJNI.h>
-#include <csw/jsurfaceworks/private_include/SWCalc.h>
-#include <csw/surfaceworks/private_include/Vert.h>
-#include <csw/surfaceworks/include/grid_api.h>
-#include <csw/utils/include/csw_.h>
-#include <csw/utils/private_include/gpf_utils.h>
-#include <csw/utils/private_include/ply_protoP.h>
+#include "csw/jsurfaceworks/private_include/SurfaceWorksJNI.h"
+#include "csw/jsurfaceworks/private_include/SWCalc.h"
+#include "csw/surfaceworks/private_include/Vert.h"
+#include "csw/surfaceworks/include/grid_api.h"
+#include "csw/utils/include/csw_.h"
+#include "csw/utils/private_include/csw_scope.h"
+#include "csw/utils/private_include/gpf_utils.h"
+#include "csw/utils/private_include/ply_protoP.h"
 
 
 
@@ -218,7 +219,7 @@ int SWCalc::sw_CalcTriMesh (
             }
         }
 
-        xpg = (double *)malloc ((npts + ntot) * 3 * sizeof(double));
+        xpg = (double *)csw_Malloc ((npts + ntot) * 3 * sizeof(double));
         if (xpg == NULL) {
             return -1;
         }
@@ -306,7 +307,7 @@ int SWCalc::sw_CalcTriMesh (
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
-                free (xpg);
+                csw_Free (xpg);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -339,7 +340,7 @@ int SWCalc::sw_CalcTriMesh (
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
-                free (xpg);
+                csw_Free (xpg);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -445,13 +446,13 @@ int SWCalc::sw_CalcTriMesh (
     /*
      * Allocate space for the grid.
      */
-        gdata = (CSW_F *)malloc (ncol * nrow * sizeof(CSW_F));
+        gdata = (CSW_F *)csw_Malloc (ncol * nrow * sizeof(CSW_F));
         if (gdata == NULL) {
             if (xbounds != xbounds_in) {
-                free (xbounds);
-                free (ybounds);
+                csw_Free (xbounds);
+                csw_Free (ybounds);
             }
-            free (xpg);
+            csw_Free (xpg);
             vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
             return -1;
         }
@@ -469,11 +470,11 @@ int SWCalc::sw_CalcTriMesh (
                  &flist, &nflist);
             if (istat == -1) {
                 if (xbounds != xbounds_in) {
-                    free (xbounds);
-                    free (ybounds);
+                    csw_Free (xbounds);
+                    csw_Free (ybounds);
                 }
-                free (gdata);
-                free (xpg);
+                csw_Free (gdata);
+                csw_Free (xpg);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -510,7 +511,7 @@ int SWCalc::sw_CalcTriMesh (
              gxmin, gymin, gxmax, gymax,
              flist, nflist,
              &options);
-        free (xpg);
+        csw_Free (xpg);
         xpg = NULL;
         ypg = NULL;
         zpg = NULL;
@@ -519,10 +520,10 @@ int SWCalc::sw_CalcTriMesh (
         nflist = 0;
         if (istat == -1) {
             if (xbounds != xbounds_in) {
-                free (xbounds);
-                free (ybounds);
+                csw_Free (xbounds);
+                csw_Free (ybounds);
             }
-            free (gdata);
+            csw_Free (gdata);
             vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
             return -1;
         }
@@ -550,24 +551,24 @@ int SWCalc::sw_CalcTriMesh (
             }
             ntot += nbounds;
             nline2 = nline;
-            xline2 = (double *)malloc (ntot * sizeof(double));
-            yline2 = (double *)malloc (ntot * sizeof(double));
-            zline2 = (double *)malloc (ntot * sizeof(double));
-            npline2 = (int *)malloc ((nline2 + 1) * sizeof(int));
+            xline2 = (double *)csw_Malloc (ntot * sizeof(double));
+            yline2 = (double *)csw_Malloc (ntot * sizeof(double));
+            zline2 = (double *)csw_Malloc (ntot * sizeof(double));
+            npline2 = (int *)csw_Malloc ((nline2 + 1) * sizeof(int));
             linetypes2 = (int *)calloc (1, (nline2 + 1) * sizeof(int));
             if (xline2 == NULL  ||
                 yline2 == NULL  ||
                 zline2 == NULL  ||
                 npline2 == NULL  ||
                 linetypes2 == NULL) {
-                free (xline2);
-                free (yline2);
-                free (zline2);
-                free (npline2);
-                free (linetypes2);
+                csw_Free (xline2);
+                csw_Free (yline2);
+                csw_Free (zline2);
+                csw_Free (npline2);
+                csw_Free (linetypes2);
                 if (xbounds != xbounds_in) {
-                    free (xbounds);
-                    free (ybounds);
+                    csw_Free (xbounds);
+                    csw_Free (ybounds);
                 }
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
@@ -645,9 +646,9 @@ int SWCalc::sw_CalcTriMesh (
         ResampleConstraintLines (
             &xline2, &yline2, &zline2,
             npline2, NULL, nline2, avspace);
-        free (xsav);
-        free (ysav);
-        free (zsav);
+        csw_Free (xsav);
+        csw_Free (ysav);
+        csw_Free (zsav);
         xsav = ysav = zsav = NULL;
 
         sprintf (fcname, "constraint_%d.xyz", FileID);
@@ -673,13 +674,13 @@ int SWCalc::sw_CalcTriMesh (
                  GRD_EQUILATERAL,
                  &nodes, &edges, &triangles,
                  &num_nodes, &num_edges, &num_triangles);
-        free (gdata);
+        csw_Free (gdata);
         gdata = NULL;
         if (istat == -1) {
             vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
             if (xbounds != xbounds_in) {
-                free (xbounds);
-                free (ybounds);
+                csw_Free (xbounds);
+                csw_Free (ybounds);
             }
             return -1;
         }
@@ -687,11 +688,11 @@ int SWCalc::sw_CalcTriMesh (
     /*
      * Free the temporary constraints.
      */
-        free (xline2);
-        free (yline2);
-        free (zline2);
-        free (npline2);
-        free (linetypes2);
+        csw_Free (xline2);
+        csw_Free (yline2);
+        csw_Free (zline2);
+        csw_Free (npline2);
+        csw_Free (linetypes2);
         nline2 = 0;
         xline2 = NULL;
         yline2 = NULL;
@@ -720,13 +721,13 @@ int SWCalc::sw_CalcTriMesh (
                  &triangles, &num_triangles,
                  xbounds, ybounds, &nbounds, 1, 1);
             if (istat == -1) {
-                free (nodes);
-                free (edges);
-                free (triangles);
+                csw_Free (nodes);
+                csw_Free (edges);
+                csw_Free (triangles);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 if (xbounds != xbounds_in) {
-                    free (xbounds);
-                    free (ybounds);
+                    csw_Free (xbounds);
+                    csw_Free (ybounds);
                 }
                 return -1;
             }
@@ -742,8 +743,8 @@ int SWCalc::sw_CalcTriMesh (
             &vused, gvert);
 
         if (xbounds != xbounds_in  ||  convex_hull_flag == 1) {
-            free (xbounds);
-            free (ybounds);
+            csw_Free (xbounds);
+            csw_Free (ybounds);
             xbounds = NULL;
             ybounds = NULL;
         }
@@ -803,9 +804,9 @@ int SWCalc::sw_CalcTriMesh (
                          edges, num_edges,
                          triangles, num_triangles);
 
-        free (nodes);
-        free (edges);
-        free (triangles);
+        csw_Free (nodes);
+        csw_Free (edges);
+        csw_Free (triangles);
         nodes = NULL;
         edges = NULL;
         triangles = NULL;
@@ -880,7 +881,7 @@ int SWCalc::SendBackTriMesh
 /*
  * Allocate space for node arrays.
  */
-    xnode = (double *)malloc (3 * num_nodes * sizeof(double));
+    xnode = (double *)csw_Malloc (3 * num_nodes * sizeof(double));
     if (xnode == NULL) {
         return -1;
     }
@@ -889,7 +890,7 @@ int SWCalc::SendBackTriMesh
 
     flagnode = (int *)calloc (1, num_nodes * sizeof(int));
     if (flagnode == NULL) {
-        free (xnode);
+        csw_Free (xnode);
         return -1;
     }
 
@@ -898,8 +899,8 @@ int SWCalc::SendBackTriMesh
  */
     n1edge = (int *)calloc (1, 5 * num_edges * sizeof(int));
     if (n1edge == NULL) {
-        free (xnode);
-        free (flagnode);
+        csw_Free (xnode);
+        csw_Free (flagnode);
         return -1;
     }
     n2edge = n1edge + num_edges;
@@ -912,9 +913,9 @@ int SWCalc::SendBackTriMesh
  */
     e1tri = (int *)calloc (1, num_triangles * 4 * sizeof(int));
     if (e1tri == NULL) {
-        free (xnode);
-        free (flagnode);
-        free (n1edge);
+        csw_Free (xnode);
+        csw_Free (flagnode);
+        csw_Free (n1edge);
         return -1;
     }
     e2tri = e1tri + num_triangles;
@@ -982,10 +983,10 @@ int SWCalc::SendBackTriMesh
 /*
  * Free the arrays.
  */
-    free (xnode);
-    free (flagnode);
-    free (n1edge);
-    free (e1tri);
+    csw_Free (xnode);
+    csw_Free (flagnode);
+    csw_Free (n1edge);
+    csw_Free (e1tri);
 
     return 1;
 
@@ -1118,21 +1119,21 @@ int SWCalc::sw_CalcGrid (
 /*
  * Allocate space for the grid, mask and error array.
  */
-    gdata = (CSW_F *)malloc (ncol * nrow * sizeof(CSW_F));
+    gdata = (CSW_F *)csw_Malloc (ncol * nrow * sizeof(CSW_F));
     if (gdata == NULL) {
         return -1;
     }
 
     mask = (char *)calloc (1, ncol * nrow * sizeof(char));
     if (mask == NULL) {
-        free (gdata);
+        csw_Free (gdata);
         return -1;
     }
 
     zerr = (CSW_F *)calloc (1, npts * sizeof(CSW_F));
     if (zerr == NULL) {
-        free (gdata);
-        free (mask);
+        csw_Free (gdata);
+        csw_Free (mask);
         return -1;
     }
 
@@ -1149,9 +1150,9 @@ int SWCalc::sw_CalcGrid (
              npline, linetypes, nline,
              &flist, &nflist);
         if (istat == -1) {
-            free (gdata);
-            free (mask);
-            free (zerr);
+            csw_Free (gdata);
+            csw_Free (mask);
+            csw_Free (zerr);
             return -1;
         }
     }
@@ -1176,9 +1177,9 @@ int SWCalc::sw_CalcGrid (
     flist = NULL;
     nflist = 0;
     if (istat == -1) {
-        free (gdata);
-        free (mask);
-            free (zerr);
+        csw_Free (gdata);
+        csw_Free (mask);
+            csw_Free (zerr);
         return -1;
     }
 
@@ -1194,9 +1195,9 @@ int SWCalc::sw_CalcGrid (
                                      GRD_OUTSIDE_POLYGON,
                                      xbounds, ybounds, 1, &nbounds, &ncomp);
         if (istat == -1) {
-            free (gdata);
-            free (mask);
-            free (zerr);
+            csw_Free (gdata);
+            csw_Free (mask);
+            csw_Free (zerr);
             return -1;
         }
     }
@@ -1213,9 +1214,9 @@ int SWCalc::sw_CalcGrid (
         npts,
         mask);
 
-    free (gdata);
-    free (mask);
-    free (zerr);
+    csw_Free (gdata);
+    csw_Free (mask);
+    csw_Free (zerr);
 
     return istat;
 }
@@ -1242,7 +1243,7 @@ int SWCalc::SendBackGrid (
  * If the double data cannot be allocated, it is an error.
  */
     ntot = ncol * nrow;
-    ddata = (double *)malloc (ntot * sizeof(double));
+    ddata = (double *)csw_Malloc (ntot * sizeof(double));
     if (ddata == NULL) {
         return -1;
     }
@@ -1253,7 +1254,7 @@ int SWCalc::SendBackGrid (
  */
     derror = NULL;
     if (point_errors != NULL  &&  npts > 0) {
-        derror = (double *)malloc (npts * sizeof(double));
+        derror = (double *)csw_Malloc (npts * sizeof(double));
     }
     if (derror == NULL) {
         npts = 0;
@@ -1293,8 +1294,8 @@ int SWCalc::SendBackGrid (
 /*
  * Free the arrays.
  */
-    free (ddata);
-    free (derror);
+    csw_Free (ddata);
+    csw_Free (derror);
 
     return 1;
 
@@ -1312,8 +1313,8 @@ int SWCalc::SendBackGrid (
 
 void SWCalc::free_drape_lines (void)
 {
-    free (drapeXline);
-    free (drapeNpline);
+    csw_Free (drapeXline);
+    csw_Free (drapeNpline);
     drapeNline = 0;
     drapeXline = NULL;
     drapeYline = NULL;
@@ -1323,7 +1324,7 @@ void SWCalc::free_drape_lines (void)
 
 void SWCalc::free_drape_points (void)
 {
-    free (drapeXpoint);
+    csw_Free (drapeXpoint);
     drapeNpoint = 0;
     drapeXpoint = NULL;
     drapeYpoint = NULL;
@@ -1332,9 +1333,9 @@ void SWCalc::free_drape_points (void)
 
 void SWCalc::free_drape_trimesh (void)
 {
-    free (drapeNodes);
-    free (drapeEdges);
-    free (drapeTriangles);
+    csw_Free (drapeNodes);
+    csw_Free (drapeEdges);
+    csw_Free (drapeTriangles);
     drapeNodes = NULL;
     drapeEdges = NULL;
     drapeTriangles = NULL;
@@ -1364,7 +1365,7 @@ void SWCalc::sw_ClearDrapeCache (void)
 /*
  * Set the raw input lines.  These are allocated by the
  * calling function, but their ownership is relinquished
- * to this function, which is responsible for freeing
+ * to this function, which is responsible for csw_Freeing
  * the line data.
  */
 void SWCalc::sw_SetDrapeLineCache (
@@ -1385,14 +1386,14 @@ void SWCalc::sw_SetDrapeLineCache (
         ntot += np[i];
     }
 
-    drapeXline = (double *)malloc (ntot * 3 * sizeof(double));
+    drapeXline = (double *)csw_Malloc (ntot * 3 * sizeof(double));
     if (drapeXline == NULL) {
         return;
     }
     drapeYline = drapeXline + ntot;
     drapeZline = drapeYline + ntot;
 
-    drapeNpline = (int *)malloc (nline * sizeof(int));
+    drapeNpline = (int *)csw_Malloc (nline * sizeof(int));
     if (drapeNpline == NULL) {
         free_drape_lines ();
         return;
@@ -1411,7 +1412,7 @@ void SWCalc::sw_SetDrapeLineCache (
 /*
  * Set the raw input points.  These are allocated by the
  * calling function, but their ownership is relinquished
- * to this function, which is responsible for freeing
+ * to this function, which is responsible for csw_Freeing
  * the point data.
  */
 void SWCalc::sw_SetDrapePointCache (
@@ -1424,7 +1425,7 @@ void SWCalc::sw_SetDrapePointCache (
 {
     free_drape_points ();
 
-    drapeXpoint = (double *)malloc (ntot * 3 * sizeof(double));
+    drapeXpoint = (double *)csw_Malloc (ntot * 3 * sizeof(double));
     if (drapeXpoint == NULL) {
         return;
     }
@@ -1613,10 +1614,10 @@ int SWCalc::sw_CalcDrapedLines (void)
         n += iout[i];
     }
 
-    free (xout);
-    free (yout);
-    free (zout);
-    free (iout);
+    csw_Free (xout);
+    csw_Free (yout);
+    csw_Free (zout);
+    csw_Free (iout);
 
     return 1;
 
@@ -1673,7 +1674,7 @@ int SWCalc::sw_ConvertNodeTrimesh (
         1, nnodes * sizeof (NOdeStruct)
     );
     if (nodes == NULL) {
-        free (node_tris);
+        csw_Free (node_tris);
         return -1;
     }
 
@@ -1695,10 +1696,10 @@ int SWCalc::sw_ConvertNodeTrimesh (
         &edges, &num_edges,
         &triangles, &num_triangles);
 
-    free (node_tris);
+    csw_Free (node_tris);
     node_tris = NULL;
     if (istat == -1) {
-        free (nodes);
+        csw_Free (nodes);
         return -1;
     }
 
@@ -1729,9 +1730,9 @@ int SWCalc::sw_ConvertNodeTrimesh (
                      edges, num_edges,
                      triangles, num_triangles);
 
-    free (nodes);
-    free (edges);
-    free (triangles);
+    csw_Free (nodes);
+    csw_Free (edges);
+    csw_Free (triangles);
 
     return istat;
 
@@ -1758,8 +1759,8 @@ int SWCalc::sw_ReadGrid (char *fname)
         &gxmin, &gymin, &gxmax, &gymax,
         &gtype, NULL, NULL);
     if (istat == -1) {
-        free (gdata);
-        free (mask);
+        csw_Free (gdata);
+        csw_Free (mask);
         return -1;
     }
 
@@ -1775,8 +1776,8 @@ int SWCalc::sw_ReadGrid (char *fname)
         0,
         mask);
 
-    free (gdata);
-    free (mask);
+    csw_Free (gdata);
+    csw_Free (mask);
 
     return istat;
 }
@@ -1899,15 +1900,15 @@ int SWCalc::sw_WriteTriMesh (
     edges = (EDgeStruct *)calloc (
         1, nedge * sizeof(EDgeStruct));
     if (edges == NULL) {
-        free (nodes);
+        csw_Free (nodes);
         return -1;
     }
 
     triangles = (TRiangleStruct *)calloc (
         1, ntri * sizeof(TRiangleStruct));
     if (triangles == NULL) {
-        free (edges);
-        free (nodes);
+        csw_Free (edges);
+        csw_Free (nodes);
         return -1;
     }
 
@@ -1964,7 +1965,6 @@ int SWCalc::sw_WriteTriMesh (
 /*
  * Write the trimesh data to the specified file in the specified format.
  */
-
 long SWCalc::sw_AppendTriMesh (
     char      *fname,
     int       bflag,
@@ -1991,26 +1991,36 @@ long SWCalc::sw_AppendTriMesh (
     int                i;
     long istat;
 
+
+    auto fscope = [&]()
+    {
+        csw_Free (nodes);
+        csw_Free (edges);
+        csw_Free (triangles);
+    };
+    CSWScopeGuard func_scope_guard (fscope);
+
+
 /*
  * Allocate space for nodes, edges and triangles.
  */
-    nodes = (NOdeStruct *)calloc (
-        1, nnode * sizeof(NOdeStruct));
+    nodes = (NOdeStruct *)csw_Calloc (
+        nnode * sizeof(NOdeStruct));
     if (nodes == NULL) {
         return -1;
     }
     edges = (EDgeStruct *)calloc (
         1, nedge * sizeof(EDgeStruct));
     if (edges == NULL) {
-        free (nodes);
+        csw_Free (nodes);
         return -1;
     }
 
     triangles = (TRiangleStruct *)calloc (
         1, ntri * sizeof(TRiangleStruct));
     if (triangles == NULL) {
-        free (edges);
-        free (nodes);
+        csw_Free (edges);
+        csw_Free (nodes);
         return -1;
     }
 
@@ -2125,7 +2135,7 @@ int SWCalc::sw_ExtendFault (
 /*
  * Allocate space for old node xyz arrays.
  */
-    x = (double *)malloc (3 * nnode * sizeof(double));
+    x = (double *)csw_Malloc (3 * nnode * sizeof(double));
     if (x == NULL) {
         return -1;
     }
@@ -2202,7 +2212,7 @@ int SWCalc::sw_ExtendFault (
     }
 
     if (xmax <= xmin  ||  ymax <= ymin) {
-        free (x);
+        csw_Free (x);
         return -1;
     }
 
@@ -2232,9 +2242,9 @@ int SWCalc::sw_ExtendFault (
     if (ncol < 2) ncol = 2;
     if (nrow < 2) nrow = 2;
 
-    gdata = (CSW_F *)malloc (ncol * nrow * sizeof(CSW_F));
+    gdata = (CSW_F *)csw_Malloc (ncol * nrow * sizeof(CSW_F));
     if (gdata == NULL) {
-        free (x);
+        csw_Free (x);
         return -1;
     }
 
@@ -2265,13 +2275,13 @@ int SWCalc::sw_ExtendFault (
         xmax, ymax,
         NULL, 0, &options);
 
-    free (x);
+    csw_Free (x);
     x = NULL;
     y = NULL;
     z = NULL;
 
     if (istat == -1) {
-        free (gdata);
+        csw_Free (gdata);
         return -1;
     }
 
@@ -2292,7 +2302,7 @@ int SWCalc::sw_ExtendFault (
          GRD_EQUILATERAL,
          &nodes, &edges, &triangles,
          &num_nodes, &num_edges, &num_triangles);
-    free (gdata);
+    csw_Free (gdata);
     gdata = NULL;
     if (istat == -1) {
         return -1;
@@ -2387,9 +2397,9 @@ int SWCalc::sw_ExtendFaultFromJava (
                      edges, num_edges,
                      triangles, num_triangles);
 
-    free (nodes);
-    free (edges);
-    free (triangles);
+    csw_Free (nodes);
+    csw_Free (edges);
+    csw_Free (triangles);
     nodes = NULL;
     edges = NULL;
     triangles = NULL;
@@ -2442,7 +2452,7 @@ int SWCalc::sw_GridToTriMesh (
         return -1;
     }
 
-    grid = (CSW_F *)malloc (ncol * nrow * sizeof (CSW_F));
+    grid = (CSW_F *)csw_Malloc (ncol * nrow * sizeof (CSW_F));
     if (grid == NULL) {
         return -1;
     }
@@ -2474,7 +2484,7 @@ int SWCalc::sw_GridToTriMesh (
         &num_edges,
         &num_triangles);
 
-    free (grid);
+    csw_Free (grid);
 
     if (istat == -1) {
         return -1;
@@ -2488,9 +2498,9 @@ int SWCalc::sw_GridToTriMesh (
         1.e20, -1);
 
     if (istat == -1) {
-        free (nodes);
-        free (edges);
-        free (triangles);
+        csw_Free (nodes);
+        csw_Free (edges);
+        csw_Free (triangles);
         return -1;
     }
 
@@ -2515,9 +2525,9 @@ int SWCalc::sw_GridToTriMesh (
                      edges, num_edges,
                      triangles, num_triangles);
 
-    free (nodes);
-    free (edges);
-    free (triangles);
+    csw_Free (nodes);
+    csw_Free (edges);
+    csw_Free (triangles);
     nodes = NULL;
     edges = NULL;
     triangles = NULL;
@@ -2617,7 +2627,7 @@ void SWCalc::WriteConstraintLines
  *
  *      Note: All the output arrays are allocated here in this function,
  *            but the ownership is relinquished to the calling function.
- *            The calling function should free the arrays when appropriate.
+ *            The calling function should csw_Free the arrays when appropriate.
  *
  *    nodes_out           Returned NOdeStruct array.
  *    num_nodes_out       Number of nodes returned.
@@ -2741,7 +2751,7 @@ int SWCalc::sw_CalcTriMeshLocally
             }
         }
 
-        xpg = (double *)malloc ((npts + ntot) * 3 * sizeof(double));
+        xpg = (double *)csw_Malloc ((npts + ntot) * 3 * sizeof(double));
         if (xpg == NULL) {
             return -1;
         }
@@ -2789,7 +2799,7 @@ int SWCalc::sw_CalcTriMeshLocally
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
-                free (xpg);
+                csw_Free (xpg);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -2820,7 +2830,7 @@ int SWCalc::sw_CalcTriMeshLocally
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
-                free (xpg);
+                csw_Free (xpg);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -2918,9 +2928,9 @@ int SWCalc::sw_CalcTriMeshLocally
     /*
      * Allocate space for the grid.
      */
-        gdata = (CSW_F *)malloc (ncol * nrow * sizeof(CSW_F));
+        gdata = (CSW_F *)csw_Malloc (ncol * nrow * sizeof(CSW_F));
         if (gdata == NULL) {
-            free (xpg);
+            csw_Free (xpg);
             vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
             return -1;
         }
@@ -2937,8 +2947,8 @@ int SWCalc::sw_CalcTriMeshLocally
                  npline, linetypes, nline,
                  &flist, &nflist);
             if (istat == -1) {
-                free (gdata);
-                free (xpg);
+                csw_Free (gdata);
+                csw_Free (xpg);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -2968,7 +2978,7 @@ int SWCalc::sw_CalcTriMeshLocally
              gxmin, gymin, gxmax, gymax,
              flist, nflist,
              &options);
-        free (xpg);
+        csw_Free (xpg);
         xpg = NULL;
         ypg = NULL;
         zpg = NULL;
@@ -2976,7 +2986,7 @@ int SWCalc::sw_CalcTriMeshLocally
         flist = NULL;
         nflist = 0;
         if (istat == -1) {
-            free (gdata);
+            csw_Free (gdata);
             vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
             return -1;
         }
@@ -3002,21 +3012,21 @@ int SWCalc::sw_CalcTriMeshLocally
                 }
             }
             nline2 = nline;
-            xline2 = (double *)malloc (ntot * sizeof(double));
-            yline2 = (double *)malloc (ntot * sizeof(double));
-            zline2 = (double *)malloc (ntot * sizeof(double));
-            npline2 = (int *)malloc ((nline2 + 1) * sizeof(int));
+            xline2 = (double *)csw_Malloc (ntot * sizeof(double));
+            yline2 = (double *)csw_Malloc (ntot * sizeof(double));
+            zline2 = (double *)csw_Malloc (ntot * sizeof(double));
+            npline2 = (int *)csw_Malloc ((nline2 + 1) * sizeof(int));
             linetypes2 = (int *)calloc (1, (nline2 + 1) * sizeof(int));
             if (xline2 == NULL  ||
                 yline2 == NULL  ||
                 zline2 == NULL  ||
                 npline2 == NULL  ||
                 linetypes2 == NULL) {
-                free (xline2);
-                free (yline2);
-                free (zline2);
-                free (npline2);
-                free (linetypes2);
+                csw_Free (xline2);
+                csw_Free (yline2);
+                csw_Free (zline2);
+                csw_Free (npline2);
+                csw_Free (linetypes2);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -3071,7 +3081,7 @@ int SWCalc::sw_CalcTriMeshLocally
              GRD_EQUILATERAL,
              &nodes, &edges, &triangles,
              &num_nodes, &num_edges, &num_triangles);
-        free (gdata);
+        csw_Free (gdata);
         gdata = NULL;
         if (istat == -1) {
             vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
@@ -3104,11 +3114,11 @@ int SWCalc::sw_CalcTriMeshLocally
     /*
      * Free the temporary constraints.
      */
-        free (xline2);
-        free (yline2);
-        free (zline2);
-        free (npline2);
-        free (linetypes2);
+        csw_Free (xline2);
+        csw_Free (yline2);
+        csw_Free (zline2);
+        csw_Free (npline2);
+        csw_Free (linetypes2);
         nline2 = 0;
         xline2 = NULL;
         yline2 = NULL;
@@ -3126,9 +3136,9 @@ int SWCalc::sw_CalcTriMeshLocally
                  &triangles, &num_triangles,
                  xbounds, ybounds, &nbounds, 1, 1);
             if (istat == -1) {
-                free (nodes);
-                free (edges);
-                free (triangles);
+                csw_Free (nodes);
+                csw_Free (edges);
+                csw_Free (triangles);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -3160,8 +3170,8 @@ int SWCalc::sw_CalcTriMeshLocally
 
 
         if (convex_hull_flag == 1  ||  xbounds != xbounds_in) {
-            free (xbounds);
-            free (ybounds);
+            csw_Free (xbounds);
+            csw_Free (ybounds);
             xbounds = NULL;
             ybounds = NULL;
         }
@@ -3222,8 +3232,8 @@ int SWCalc::sw_OutlinePoints (
 
     istat =
     SendBackPointOutline (xpoly, ypoly, npoly);
-    free (xpoly);
-    free (ypoly);
+    csw_Free (xpoly);
+    csw_Free (ypoly);
 
     return istat;
 
@@ -3308,7 +3318,7 @@ int SWCalc::check_for_steep (
         return 0;
     }
 
-    xpts = (double *)malloc (3 * num_nodes * sizeof(double));
+    xpts = (double *)csw_Malloc (3 * num_nodes * sizeof(double));
     if (xpts == NULL) {
         return 0;
     }
@@ -3475,14 +3485,14 @@ int SWCalc::sw_CalcTriMeshOutline (
     edges = (EDgeStruct *)calloc
                  (1, num_edge * sizeof(EDgeStruct));
     if (edges == NULL) {
-        free (nodes);
+        csw_Free (nodes);
         return -1;
     }
     triangles = (TRiangleStruct *)calloc
                      (1, num_tri * sizeof(TRiangleStruct));
     if (triangles == NULL) {
-        free (nodes);
-        free (edges);
+        csw_Free (nodes);
+        csw_Free (edges);
         return -1;
     }
 
@@ -3514,23 +3524,23 @@ int SWCalc::sw_CalcTriMeshOutline (
     maxpts = num_node + 1;
     maxcomp = 100;
 
-    xout = (double *)malloc (maxpts * 4 * sizeof(double));
+    xout = (double *)csw_Malloc (maxpts * 4 * sizeof(double));
     if (xout == NULL) {
-        free (nodes);
-        free (edges);
-        free (triangles);
+        csw_Free (nodes);
+        csw_Free (edges);
+        csw_Free (triangles);
         return -1;
     }
     yout = xout + maxpts;
     zout = yout + maxpts;
     nodeout = (int *)(zout + maxpts);
 
-    ncout = (int *)malloc (maxcomp * 2 * sizeof(int));
+    ncout = (int *)csw_Malloc (maxcomp * 2 * sizeof(int));
     if (ncout == NULL) {
-        free (nodes);
-        free (edges);
-        free (triangles);
-        free (xout);
+        csw_Free (nodes);
+        csw_Free (edges);
+        csw_Free (triangles);
+        csw_Free (xout);
         return -1;
     }
     nvout = ncout + maxcomp;
@@ -3548,24 +3558,24 @@ int SWCalc::sw_CalcTriMeshOutline (
         &npout, ncout, nvout,
         maxpts, maxcomp);
 
-    free (nodes);
+    csw_Free (nodes);
     nodes = NULL;
-    free (edges);
+    csw_Free (edges);
     edges = NULL;
-    free (triangles);
+    csw_Free (triangles);
     triangles = NULL;
 
     if (istat == -1  ||  npout != 1  ||  ncout[0] != 1) {
-        free (xout);
-        free (ncout);
+        csw_Free (xout);
+        csw_Free (ncout);
         return -1;
     }
 
     jni_call_set_outline3d_method (
         xout, yout, zout, nvout[0]);
 
-    free (xout);
-    free (ncout);
+    csw_Free (xout);
+    csw_Free (ncout);
 
     return 1;
 
@@ -3721,9 +3731,9 @@ int SWCalc::sw_CalcExactTriMesh (
             }
         }
 
-        xpg = (double *)malloc ((npts + ntot) * 3 * sizeof(double));
+        xpg = (double *)csw_Malloc ((npts + ntot) * 3 * sizeof(double));
         if (xpg == NULL) {
-            free (line_exact_flags);
+            csw_Free (line_exact_flags);
             return -1;
         }
         ypg = xpg + npts + ntot;
@@ -3781,8 +3791,8 @@ int SWCalc::sw_CalcExactTriMesh (
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
-                free (xpg);
-                free (line_exact_flags);
+                csw_Free (xpg);
+                csw_Free (line_exact_flags);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -3828,8 +3838,8 @@ int SWCalc::sw_CalcExactTriMesh (
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
-                free (xpg);
-                free (line_exact_flags);
+                csw_Free (xpg);
+                csw_Free (line_exact_flags);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -3927,10 +3937,10 @@ int SWCalc::sw_CalcExactTriMesh (
     /*
      * Allocate space for the grid.
      */
-        gdata = (CSW_F *)malloc (ncol * nrow * sizeof(CSW_F));
+        gdata = (CSW_F *)csw_Malloc (ncol * nrow * sizeof(CSW_F));
         if (gdata == NULL) {
-            free (xpg);
-            free (line_exact_flags);
+            csw_Free (xpg);
+            csw_Free (line_exact_flags);
             vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
             return -1;
         }
@@ -3962,7 +3972,7 @@ int SWCalc::sw_CalcExactTriMesh (
              gxmin, gymin, gxmax, gymax,
              flist, nflist,
              &options);
-        free (xpg);
+        csw_Free (xpg);
         xpg = NULL;
         ypg = NULL;
         zpg = NULL;
@@ -3970,8 +3980,8 @@ int SWCalc::sw_CalcExactTriMesh (
         flist = NULL;
         nflist = 0;
         if (istat == -1) {
-            free (gdata);
-            free (line_exact_flags);
+            csw_Free (gdata);
+            csw_Free (line_exact_flags);
             vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
             return -1;
         }
@@ -3996,22 +4006,22 @@ int SWCalc::sw_CalcExactTriMesh (
             }
             ntot += nbounds;
             nline2 = nline;
-            xline2 = (double *)malloc (ntot * sizeof(double));
-            yline2 = (double *)malloc (ntot * sizeof(double));
-            zline2 = (double *)malloc (ntot * sizeof(double));
-            npline2 = (int *)malloc ((nline2 + 1) * sizeof(int));
+            xline2 = (double *)csw_Malloc (ntot * sizeof(double));
+            yline2 = (double *)csw_Malloc (ntot * sizeof(double));
+            zline2 = (double *)csw_Malloc (ntot * sizeof(double));
+            npline2 = (int *)csw_Malloc ((nline2 + 1) * sizeof(int));
             linetypes2 = (int *)calloc (1, (nline2 + 1) * sizeof(int));
             if (xline2 == NULL  ||
                 yline2 == NULL  ||
                 zline2 == NULL  ||
                 npline2 == NULL  ||
                 linetypes2 == NULL) {
-                free (xline2);
-                free (yline2);
-                free (zline2);
-                free (npline2);
-                free (linetypes2);
-                free (line_exact_flags);
+                csw_Free (xline2);
+                csw_Free (yline2);
+                csw_Free (zline2);
+                csw_Free (npline2);
+                csw_Free (linetypes2);
+                csw_Free (line_exact_flags);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -4088,11 +4098,11 @@ int SWCalc::sw_CalcExactTriMesh (
         ResampleConstraintLines (
             &xline2, &yline2, &zline2,
             npline2, line_exact_flags, nline2, avspace);
-        free (xsav);
-        free (ysav);
-        free (zsav);
+        csw_Free (xsav);
+        csw_Free (ysav);
+        csw_Free (zsav);
         xsav = ysav = zsav = NULL;
-        free (line_exact_flags);
+        csw_Free (line_exact_flags);
         line_exact_flags = NULL;
 
 
@@ -4123,14 +4133,14 @@ int SWCalc::sw_CalcExactTriMesh (
              GRD_EQUILATERAL,
              &nodes, &edges, &triangles,
              &num_nodes, &num_edges, &num_triangles);
-        free (gdata);
+        csw_Free (gdata);
         gdata = NULL;
         if (istat == -1) {
-            free (xline2);
-            free (yline2);
-            free (zline2);
-            free (npline2);
-            free (linetypes2);
+            csw_Free (xline2);
+            csw_Free (yline2);
+            csw_Free (zline2);
+            csw_Free (npline2);
+            csw_Free (linetypes2);
             nline2 = 0;
             xline2 = NULL;
             yline2 = NULL;
@@ -4154,11 +4164,11 @@ int SWCalc::sw_CalcExactTriMesh (
     /*
      * Free the temporary constraints.
      */
-        free (xline2);
-        free (yline2);
-        free (zline2);
-        free (npline2);
-        free (linetypes2);
+        csw_Free (xline2);
+        csw_Free (yline2);
+        csw_Free (zline2);
+        csw_Free (npline2);
+        csw_Free (linetypes2);
         nline2 = 0;
         xline2 = NULL;
         yline2 = NULL;
@@ -4167,9 +4177,9 @@ int SWCalc::sw_CalcExactTriMesh (
         linetypes2 = NULL;
 
         if (istat == -1) {
-            free (nodes);
-            free (edges);
-            free (triangles);
+            csw_Free (nodes);
+            csw_Free (edges);
+            csw_Free (triangles);
             vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
             return -1;
         }
@@ -4184,9 +4194,9 @@ int SWCalc::sw_CalcExactTriMesh (
                  &triangles, &num_triangles,
                  xbounds, ybounds, &nbounds, 1, 1);
             if (istat == -1) {
-                free (nodes);
-                free (edges);
-                free (triangles);
+                csw_Free (nodes);
+                csw_Free (edges);
+                csw_Free (triangles);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -4214,8 +4224,8 @@ int SWCalc::sw_CalcExactTriMesh (
      */
 
         if (convex_hull_flag == 1) {
-            free (xbounds);
-            free (ybounds);
+            csw_Free (xbounds);
+            csw_Free (ybounds);
             xbounds = NULL;
             ybounds = NULL;
         }
@@ -4241,9 +4251,9 @@ int SWCalc::sw_CalcExactTriMesh (
                          edges, num_edges,
                          triangles, num_triangles);
 
-        free (nodes);
-        free (edges);
-        free (triangles);
+        csw_Free (nodes);
+        csw_Free (edges);
+        csw_Free (triangles);
         nodes = NULL;
         edges = NULL;
         triangles = NULL;
@@ -4258,7 +4268,7 @@ int SWCalc::sw_CalcExactTriMesh (
     }  /* end of trimesh from grid block */
 
 
-    free (line_exact_flags);
+    csw_Free (line_exact_flags);
 
     return 1;
 }
@@ -4410,7 +4420,7 @@ int SWCalc::sw_CalcExactTriMeshLocally (
             }
         }
 
-        xpg = (double *)malloc ((npts + ntot) * 3 * sizeof(double));
+        xpg = (double *)csw_Malloc ((npts + ntot) * 3 * sizeof(double));
         if (xpg == NULL) {
             return -1;
         }
@@ -4469,7 +4479,7 @@ int SWCalc::sw_CalcExactTriMeshLocally (
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
-                free (xpg);
+                csw_Free (xpg);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -4509,7 +4519,7 @@ int SWCalc::sw_CalcExactTriMeshLocally (
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
-                free (xpg);
+                csw_Free (xpg);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -4607,9 +4617,9 @@ int SWCalc::sw_CalcExactTriMeshLocally (
     /*
      * Allocate space for the grid.
      */
-        gdata = (CSW_F *)malloc (ncol * nrow * sizeof(CSW_F));
+        gdata = (CSW_F *)csw_Malloc (ncol * nrow * sizeof(CSW_F));
         if (gdata == NULL) {
-            free (xpg);
+            csw_Free (xpg);
             vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
             return -1;
         }
@@ -4641,7 +4651,7 @@ int SWCalc::sw_CalcExactTriMeshLocally (
              gxmin, gymin, gxmax, gymax,
              flist, nflist,
              &options);
-        free (xpg);
+        csw_Free (xpg);
         xpg = NULL;
         ypg = NULL;
         zpg = NULL;
@@ -4649,7 +4659,7 @@ int SWCalc::sw_CalcExactTriMeshLocally (
         flist = NULL;
         nflist = 0;
         if (istat == -1) {
-            free (gdata);
+            csw_Free (gdata);
             vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
             return -1;
         }
@@ -4674,21 +4684,21 @@ int SWCalc::sw_CalcExactTriMeshLocally (
             }
             ntot += nbounds;
             nline2 = nline;
-            xline2 = (double *)malloc (ntot * sizeof(double));
-            yline2 = (double *)malloc (ntot * sizeof(double));
-            zline2 = (double *)malloc (ntot * sizeof(double));
-            npline2 = (int *)malloc ((nline2 + 1) * sizeof(int));
+            xline2 = (double *)csw_Malloc (ntot * sizeof(double));
+            yline2 = (double *)csw_Malloc (ntot * sizeof(double));
+            zline2 = (double *)csw_Malloc (ntot * sizeof(double));
+            npline2 = (int *)csw_Malloc ((nline2 + 1) * sizeof(int));
             linetypes2 = (int *)calloc (1, (nline2 + 1) * sizeof(int));
             if (xline2 == NULL  ||
                 yline2 == NULL  ||
                 zline2 == NULL  ||
                 npline2 == NULL  ||
                 linetypes2 == NULL) {
-                free (xline2);
-                free (yline2);
-                free (zline2);
-                free (npline2);
-                free (linetypes2);
+                csw_Free (xline2);
+                csw_Free (yline2);
+                csw_Free (zline2);
+                csw_Free (npline2);
+                csw_Free (linetypes2);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -4774,14 +4784,14 @@ int SWCalc::sw_CalcExactTriMeshLocally (
              GRD_EQUILATERAL,
              &nodes, &edges, &triangles,
              &num_nodes, &num_edges, &num_triangles);
-        free (gdata);
+        csw_Free (gdata);
         gdata = NULL;
         if (istat == -1) {
-            free (xline2);
-            free (yline2);
-            free (zline2);
-            free (npline2);
-            free (linetypes2);
+            csw_Free (xline2);
+            csw_Free (yline2);
+            csw_Free (zline2);
+            csw_Free (npline2);
+            csw_Free (linetypes2);
             nline2 = 0;
             xline2 = NULL;
             yline2 = NULL;
@@ -4826,11 +4836,11 @@ int SWCalc::sw_CalcExactTriMeshLocally (
     /*
      * Free the temporary constraints.
      */
-        free (xline2);
-        free (yline2);
-        free (zline2);
-        free (npline2);
-        free (linetypes2);
+        csw_Free (xline2);
+        csw_Free (yline2);
+        csw_Free (zline2);
+        csw_Free (npline2);
+        csw_Free (linetypes2);
         nline2 = 0;
         xline2 = NULL;
         yline2 = NULL;
@@ -4839,9 +4849,9 @@ int SWCalc::sw_CalcExactTriMeshLocally (
         linetypes2 = NULL;
 
         if (istat == -1) {
-            free (nodes);
-            free (edges);
-            free (triangles);
+            csw_Free (nodes);
+            csw_Free (edges);
+            csw_Free (triangles);
             vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
             return -1;
         }
@@ -4881,9 +4891,9 @@ int SWCalc::sw_CalcExactTriMeshLocally (
                  &triangles, &num_triangles,
                  xbounds, ybounds, &nbounds, 1, 1);
             if (istat == -1) {
-                free (nodes);
-                free (edges);
-                free (triangles);
+                csw_Free (nodes);
+                csw_Free (edges);
+                csw_Free (triangles);
                 vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
                 return -1;
             }
@@ -4918,8 +4928,8 @@ int SWCalc::sw_CalcExactTriMeshLocally (
 
 
         if (convex_hull_flag == 1) {
-            free (xbounds);
-            free (ybounds);
+            csw_Free (xbounds);
+            csw_Free (ybounds);
             xbounds = NULL;
             ybounds = NULL;
         }
@@ -5019,9 +5029,9 @@ int SWCalc::ResampleConstraintLines (
                                &xnew, &ynew, &znew, &n_new);
             if (istat == -1) {
                 for (j=0; j<nline; j++) {
-                    free (tline[j].x);
+                    csw_Free (tline[j].x);
                 }
-                free (tline);
+                csw_Free (tline);
                 return -1;
             }
         }
@@ -5034,19 +5044,19 @@ int SWCalc::ResampleConstraintLines (
                                    &xnew, &ynew, &znew, &n_new);
                 if (istat == -1) {
                     for (j=0; j<nline; j++) {
-                        free (tline[j].x);
+                        csw_Free (tline[j].x);
                     }
-                    free (tline);
+                    csw_Free (tline);
                     return -1;
                 }
             }
             else {
-                xnew = (double *)malloc (3 * npts * sizeof(double));
+                xnew = (double *)csw_Malloc (3 * npts * sizeof(double));
                 if (xnew == NULL) {
                     for (j=0; j<nline; j++) {
-                        free (tline[j].x);
+                        csw_Free (tline[j].x);
                     }
-                    free (tline);
+                    csw_Free (tline);
                     return -1;
                 }
                 ynew = xnew + npts;
@@ -5073,14 +5083,14 @@ int SWCalc::ResampleConstraintLines (
         n += tline[i].npts;
     }
 
-    xline = (double *)malloc (n * sizeof(double));
-    yline = (double *)malloc (n * sizeof(double));
-    zline = (double *)malloc (n * sizeof(double));
+    xline = (double *)csw_Malloc (n * sizeof(double));
+    yline = (double *)csw_Malloc (n * sizeof(double));
+    zline = (double *)csw_Malloc (n * sizeof(double));
     if (xline == NULL  ||  yline == NULL  ||  zline == NULL) {
-        free (xline);
-        free (yline);
-        free (zline);
-        free (tline);
+        csw_Free (xline);
+        csw_Free (yline);
+        csw_Free (zline);
+        csw_Free (tline);
         return -1;
     }
 
@@ -5102,9 +5112,9 @@ int SWCalc::ResampleConstraintLines (
     *zline_io = zline;
 
     for (j=0; j<nline; j++) {
-        free (tline[j].x);
+        csw_Free (tline[j].x);
     }
-    free (tline);
+    csw_Free (tline);
 
     return 1;
 
@@ -5146,9 +5156,9 @@ int SWCalc::sw_CalcDrapedPoints (void)
         nout
     );
 
-    free (xout);
-    free (yout);
-    free (zout);
+    csw_Free (xout);
+    csw_Free (yout);
+    csw_Free (zout);
 
     return 1;
 
@@ -5222,7 +5232,7 @@ int SWCalc::sw_CalcConstantTriMesh (
     avspace += (gy2 - gy1) / (nrow - 1);
     avspace /= 2.0;
 
-    grid = (CSW_F *)malloc (ncol * nrow * sizeof (CSW_F));
+    grid = (CSW_F *)csw_Malloc (ncol * nrow * sizeof (CSW_F));
     if (grid == NULL) {
         return -1;
     }
@@ -5235,9 +5245,9 @@ int SWCalc::sw_CalcConstantTriMesh (
  * Allocate space for z values of the boundary and set all
  * these z values to the constant z value.
  */
-    zbounds = (double *)malloc (nbounds * sizeof(double));
+    zbounds = (double *)csw_Malloc (nbounds * sizeof(double));
     if (zbounds == NULL) {
-        free (grid);
+        csw_Free (grid);
         return -1;
     }
     for (i=0; i<nbounds; i++) {
@@ -5261,10 +5271,10 @@ int SWCalc::sw_CalcConstantTriMesh (
          GRD_EQUILATERAL,
          &nodes, &edges, &triangles,
          &num_nodes, &num_edges, &num_triangles);
-    free (grid);
+    csw_Free (grid);
     grid = NULL;
     if (istat == -1) {
-        free (zbounds);
+        csw_Free (zbounds);
         return -1;
     }
 
@@ -5277,7 +5287,7 @@ int SWCalc::sw_CalcConstantTriMesh (
         xbounds, ybounds, zbounds, nbounds,
         avspace,
         &xresamp, &yresamp, &zresamp, &nresamp);
-    free (zbounds);
+    csw_Free (zbounds);
     zbounds = NULL;
     if (istat == -1) {
         return -1;
@@ -5304,14 +5314,14 @@ int SWCalc::sw_CalcConstantTriMesh (
          &edges, &num_edges,
          &triangles, &num_triangles,
          xresamp, yresamp, &nresamp, 1, 1);
-    free (xresamp);
+    csw_Free (xresamp);
     xresamp = NULL;
     yresamp = NULL;
     zresamp = NULL;
     if (istat == -1) {
-        free (nodes);
-        free (edges);
-        free (triangles);
+        csw_Free (nodes);
+        csw_Free (edges);
+        csw_Free (triangles);
         return -1;
     }
 
@@ -5340,9 +5350,9 @@ int SWCalc::sw_CalcConstantTriMesh (
                      edges, num_edges,
                      triangles, num_triangles);
 
-    free (nodes);
-    free (edges);
-    free (triangles);
+    csw_Free (nodes);
+    csw_Free (edges);
+    csw_Free (triangles);
     nodes = NULL;
     edges = NULL;
     triangles = NULL;
@@ -5407,9 +5417,9 @@ int SWCalc::UncrossConstraints (
         if (npline[i] > n) n = npline[i];
     }
     if (n < 100) n = 100;
-    xw = (double *)malloc (n * sizeof(double));
+    xw = (double *)csw_Malloc (n * sizeof(double));
     if (xw == NULL) {
-        free (icross);
+        csw_Free (icross);
         return -1;
     }
 
@@ -5438,8 +5448,8 @@ int SWCalc::UncrossConstraints (
                 xa2, ya2, np2,
                 tiny);
             if (istat == -1) {
-                free (icross);
-                free (xw);
+                csw_Free (icross);
+                csw_Free (xw);
                 return -1;
             }
             if (istat != 0) {
@@ -5490,8 +5500,8 @@ int SWCalc::UncrossConstraints (
 
     *nlineout = n;
 
-    free (icross);
-    free (xw);
+    csw_Free (icross);
+    csw_Free (xw);
 
     return 1;
 

@@ -29,4 +29,4 @@ clean:
 	$(RM)  *.class *.jar
 	$(RM) ezx_test$(EXE_SUFFIX) sw_test$(EXE_SUFFIX) gendata$(EXE_SUFFIX)
 	$(RM) $(LIB_PREFIX)*$(LIB_SUFFIX) 
-	$(RM) *$(OBJ_SUFFIX) *.log utest.*
+	$(RM) *$(OBJ_SUFFIX) *.log

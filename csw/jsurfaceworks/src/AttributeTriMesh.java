@@ -28,8 +28,6 @@ public class AttributeTriMesh {
   private static final int    maxList = 100;
 
   TriMesh               tmesh;
-  RDPAtValues[]         rdpList;
-  int                   numRDP;
 
 /*------------------------------------------------------------------------*/
 
@@ -40,50 +38,14 @@ public class AttributeTriMesh {
 */
   AttributeTriMesh ()
   {
-    rdpList = new RDPAtValues [maxList];
-    numRDP = 0;
   }
 
   AttributeTriMesh (TriMesh tmesh)
   {
-    rdpList = new RDPAtValues [maxList];
-    numRDP = 0;
     this.tmesh = tmesh;
   }
 
 /*------------------------------------------------------------------------*/
-
-/**
- Package scope method to add an RDP attribute value.
-*/
-  void addRDPValue (
-    String         name,
-    double[]       values,
-    int            npts)
-  {
-    if (numRDP >= maxList) {
-      return;
-    }
-
-    RDPAtValues   rdpVal = new RDPAtValues ();
-
-    if (name == null) {
-      rdpVal.name = null;
-    }
-    else {
-      rdpVal.name = new String (name);
-    }
-    rdpVal.values = new double[npts];
-    System.arraycopy (values, 0, rdpVal.values, 0, npts);
-    rdpVal.nValues = npts;
-
-    rdpList[numRDP] = rdpVal;
-    numRDP++;
-
-    return;
-  }
-
-/*-----------------------------------------------------------------------*/
 
   public TriMesh getTriMesh ()
   {
@@ -92,33 +54,6 @@ public class AttributeTriMesh {
 
 /*------------------------------------------------------------------------*/
 
-  public int getNumRDPAttributes ()
-  {
-    return numRDP;
-  }
-
-/*------------------------------------------------------------------------*/
-
-/**
- Get the specified rdp attribute from the list.
-*/
-  public RDPAtValues getRDPValues (int index)
-  {
-    return rdpList[index];
-  }
-
-/**
- Get the first rdp attribute from the list.  This is meant as a
- convenience method for the case where there is only one attribute
- defined in the list.
-*/
-  public RDPAtValues getRDPValues ()
-  {
-    return rdpList[0];
-  }
-
-
-/*------------------------------------------------------------------------*/
 
 /**
  Public method to transfer the contents of this object to another
@@ -127,8 +62,6 @@ public class AttributeTriMesh {
 */
   public void transfer (AttributeTriMesh at)
   {
-    System.arraycopy (rdpList, 0, at.rdpList, 0, maxList);
-    at.numRDP = numRDP;
     at.tmesh = tmesh;
   }
 

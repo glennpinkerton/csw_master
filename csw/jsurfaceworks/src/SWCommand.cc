@@ -3132,58 +3132,6 @@ long sw_process_command (
 
             break;
 
-    /*--------------------------------------------------------------
-     * Add a point set for an RDP attribute to be draped onto the
-     * active attribute trimesh.
-     *
-     *  ilist[0] has npts
-     *  ilist[1] has the id of the point set
-     *  dlist[0] has the background rdp value
-     *  ddata[0 to npts-1] has the x coordinates
-     *  ddata[npts to 2*npts-1] has the y coordinates
-     *  ddata[2*npts to 3*npts-1] has the rdp values
-     */
-        case SW_ADD_AT_RDP_POINTS:
-
-          #if _SW_DEBUG_LOG_FILE_
-            if (LogFile) {
-                sprintf (LogFileLine,
-                         "%d %d %f\n",
-                         ilist[0],
-                         ilist[1],
-                         dlist[0]
-                        );
-                fputs (LogFileLine, LogFile);
-                npts = ilist[0];
-                for (i=0; i<npts; i++) {
-                    sprintf (LogFileLine,
-                             "%.15e %.15e %.15e\n",
-                             ddata[i],
-                             ddata[npts+i],
-                             ddata[2*npts+i]
-                            );
-                    fputs (LogFileLine, LogFile);
-                }
-                fflush (LogFile);
-            }
-          #endif
-
-            npts = ilist[0];
-
-/*
-            istat =
-              AddAtRDPPoints (
-                ilist[1],
-                dlist[0],
-                ddata,
-                ddata+npts,
-                ddata+2*npts,
-                npts);
-*/
-
-            break;
-
-
     /*----------------------------------------------------------------
      * Calculate the draped attribute points
      * based on the constraints and points specified for the active

@@ -8183,19 +8183,29 @@ void CDisplayList::free_lines (void)
     int           i;
     LInePrim      *prim;
 
-    if (line_prim_list == NULL) {
-        return;
+    if (line_prim_list != NULL) {
+        for (i=0; i<num_line_prim_list; i++) {
+            prim = line_prim_list + i;
+            csw_Free (prim->xypts);
+        }
+        csw_Free (line_prim_list);
     }
 
-    for (i=0; i<num_line_prim_list; i++) {
-        prim = line_prim_list + i;
-        csw_Free (prim->xypts);
+    if (contour_line_prim_list != NULL) {
+        for (i=0; i<num_contour_line_prim_list; i++) {
+            prim = contour_line_prim_list + i;
+            csw_Free (prim->xypts);
+        }
+        csw_Free (contour_line_prim_list);
     }
 
-    csw_Free (line_prim_list);
     line_prim_list = NULL;
     num_line_prim_list = 0;
     max_line_prim_list = 0;
+
+    contour_line_prim_list = NULL;
+    num_contour_line_prim_list = 0;
+    max_contour_line_prim_list = 0;
 
     return;
 }

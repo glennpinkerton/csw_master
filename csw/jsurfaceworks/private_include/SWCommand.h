@@ -41,7 +41,6 @@ extern "C" {
 
 #define SW_START_AT_TRI_MESH      25
 #define SW_SET_AT_POLYLINE        26
-#define SW_ADD_AT_RDP_POINTS      27
 #define SW_CALC_AT_TRI_MESH       29
 
 #define SW_TEST_TRI_SPEED         98

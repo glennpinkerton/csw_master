@@ -23,7 +23,6 @@ JAVA_SRC=\
  JSurfaceWorks.java\
  PatchLine.java\
  ProtoPatch.java\
- RDPAtValues.java\
  TetgenFace.java\
  TetgenFaceList.java\
  TetgenNode.java\
@@ -56,7 +55,6 @@ JAVA_CLASSES=\
  JSurfaceWorks.class\
  PatchLine.class\
  ProtoPatch.class\
- RDPAtValues.class\
  TetgenFace.class\
  TetgenFaceList.class\
  TetgenNode.class\

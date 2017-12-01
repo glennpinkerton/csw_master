@@ -75,11 +75,6 @@
         int numtris
     );
 
-    void jni_call_add_native_rdp_value_method (
-        int      id,
-        double   *values,
-        int      npts);
-
     void jni_call_add_native_ndp_value_method (
         int             id,
         signed char     *v1,

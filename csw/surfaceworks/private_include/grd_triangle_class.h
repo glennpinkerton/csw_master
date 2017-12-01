@@ -729,7 +729,7 @@ class CSWGrdTriangle
     int                  NumLinePoints = 0;
 
     char                 *SwapFlags = NULL;
-    int                  FinalSwapFlag,
+    int                  FinalSwapFlag = 0,
                          NumSwapped;
 
     int                  SplitLongFlag = 0;

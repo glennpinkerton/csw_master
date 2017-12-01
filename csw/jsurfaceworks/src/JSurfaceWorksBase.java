@@ -428,11 +428,8 @@ public class JSurfaceWorksBase {
   /*
    * Get the returned node, edge and triangle arrays from the currently
    * active calcAtTriMesh call.  The native code will first populate
-   * the topology of the trimesh via this call.  Subsequently, multiple
-   * calls to add attribute values at the nodes are made via
-   * addNativeRDPValue.  The end of the attribute
-   * value addition is signalled by a call to addAtValues with an npts
-   * value of zero.
+   * the topology of the trimesh via this call.  Attributes have been removed
+   * for the 2017 refactor.  Maybe rewrite differently in the future.
    */
     public void addNativeAtTriMesh (
         double[] xnode,
@@ -471,30 +468,6 @@ public class JSurfaceWorksBase {
 
 /*--------------------------------------------------------------------------*/
 
-    public void addNativeRDPValue (
-        int        id,
-        double[]   values,
-        int        npts)
-    {
-        if (activeAtTmesh == false  ||
-            nativeAtTriMesh == null) {
-            return;
-        }
-
-        if (npts == 0) {
-            activeAtTmesh = false;
-            return;
-        }
-
-        nativeAtTriMesh.addRDPValue (
-            atValueName[id],
-            values,
-            npts);
-
-    }
-
-/*--------------------------------------------------------------------------*/
-
     String[] atValueName = new String[100];
 
 /*--------------------------------------------------------------------------*/
@@ -502,12 +475,6 @@ public class JSurfaceWorksBase {
     protected AttributeTriMesh buildAtTriMesh ()
     {
         if (nativeAtTriMesh == null) {
-            return null;
-        }
-
-        int ntot;
-        ntot = nativeAtTriMesh.getNumRDPAttributes ();
-        if (ntot < 1) {
             return null;
         }
 
