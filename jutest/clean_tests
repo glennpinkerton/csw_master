@@ -1,0 +1,15 @@
+#!/bin/bash
+
+cd $CSW_PARENT/csw/jutils/junit_tests;make clean;
+
+#cd $CSW_PARENT/csw/images/junit_tests;make clean;
+
+#cd $CSW_PARENT/csw/uistuff/junit_tests;make clean;
+
+#cd $CSW_PARENT/csw/j3d/junit_tests;make clean;
+
+#cd $CSW_PARENT/csw/jsurfaceworks/junit_tests;make clean;
+
+#cd $CSW_PARENT/csw/jeasyx/junit_tests;make clean;
+
+#cd $CSW_PARENT/csw/jtest/junit_tests;make clean;

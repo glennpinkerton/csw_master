@@ -3,14 +3,14 @@
 include $(CSW_PARENT)/build/system.mk
 
 JAVA_SRC=\
-  TestRunner.java \
   TestJutils.java \
-  Log4jTestWatcher.java
+  Log4jTestWatcher.java \
+  TestRunner.java
   
 JAVA_CLASSES=\
-  TestRunner.class \
   TestJutils.class \
-  Log4jTestWatcher.class
+  Log4jTestWatcher.class \
+  TestRunner.class
 
 PACKAGE_PATH=csw/jutils/junit_tests
 JAR_FILE=junit_tests.jar
