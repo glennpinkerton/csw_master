@@ -27,6 +27,7 @@ echo
 echo   ==== building archive jutils
 echo
 cd $CSW_PARENT/csw/jutils/src;make clean;make;
+cd $CSW_PARENT/csw/jutils/junit_tests;make clean;make;
 
 echo
 echo   ==== not building archive jogl

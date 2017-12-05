@@ -8,6 +8,7 @@ cd $CSW_PARENT/csw/hlevutils/src;make clean;
 cd $CSW_PARENT/csw/utils/src;make clean;
 cd $CSW_PARENT/csw/surfaceworks/src;make clean;
 cd $CSW_PARENT/csw/jutils/src;make clean;
+cd $CSW_PARENT/csw/jutils/junit_tests;make clean;
 cd $CSW_PARENT/csw/jogl;make clean;
 cd $CSW_PARENT/csw/jsurfaceworks/src;make clean;
 cd $CSW_PARENT/csw/images;make clean;

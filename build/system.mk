@@ -128,10 +128,12 @@ CSW_LIBS = $(CSW_PARENT)/csw/hlevutils/src/hlutil.a \
 #
 # define the java compiler and flags for it
 #
-CSW_CLASS_PATH = $(CSW_PARENT):$(CSW_PARENT)/csw/jar/jogl-all.jar:$(CSW_PARENT)/csw/jar/gluegen-rt.jar
+CSW_CLASS_PATH = $(CSW_PARENT):$(CSW_PARENT)/csw/jar/jogl-all.jar:$(CSW_PARENT)/csw/jar/gluegen-rt.jar:
+JUCP=$(JUNIT_HOME)/junit.jar:$(JUNIT_HOME)/hamcrest/core.jar:
+JLCP=$(CSW_PARENT)/csw/jar/log4j/log4j-api-2.10.0.jar:$(CSW_PARENT)/csw/jar/log4j/log4j-core-2.10.0.jar
 
-JAVA_C      = javac
-JAVA_C_OPTIONS  = -classpath $(CSW_CLASS_PATH) -Xlint
+JAVA_C = javac
+JAVA_C_OPTIONS  = -classpath $(CSW_CLASS_PATH)$(JUCP)$(JLCP)  -Xlint
 
 #
 # create a new list of suffixes
