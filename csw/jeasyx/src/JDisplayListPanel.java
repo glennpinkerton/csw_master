@@ -43,6 +43,7 @@ import javax.swing.event.MouseInputAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import csw.jutils.src.CSWLogger;
 
 /**
  This class provides a swing component that can be drawn to using
