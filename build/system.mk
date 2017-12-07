@@ -133,7 +133,7 @@ JUCP=$(JUNIT_HOME)/junit.jar:$(JUNIT_HOME)/hamcrest/core.jar:
 JLCP=$(CSW_PARENT)/csw/jar/log4j/log4j-api-2.10.0.jar:$(CSW_PARENT)/csw/jar/log4j/log4j-core-2.10.0.jar
 
 JAVA_C = javac
-JAVA_C_OPTIONS  = -classpath $(CSW_CLASS_PATH)$(JUCP)$(JLCP)  -Xlint -implicit:none -Xlint:-processing
+JAVA_C_OPTIONS  = -classpath $(CSW_CLASS_PATH)$(JUCP)$(JLCP)  -implicit:class -Xlint 
 
 #
 # create a new list of suffixes

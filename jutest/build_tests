@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm -r *.class *.log; javac *.java;
+
 cd $CSW_PARENT/csw/jutils/junit_tests;make clean;make;
 
 #cd $CSW_PARENT/csw/images/junit_tests;make clean;make;

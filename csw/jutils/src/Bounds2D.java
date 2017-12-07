@@ -45,25 +45,32 @@ public class Bounds2D {
   /**
    * Constructor from two arrays.
    *
-   * @param xs array of xs.
-   * @param ys array of ys.
+   * @param xa array of x values.
+   * @param ya array of y values.
    */
-    public Bounds2D(double[] xs, double[] ys)
+    public Bounds2D(double[] xa, double[] ya)  throws IllegalArgumentException
     {
 
-        if (xs.length != ys.length)
+        if (xa == null  ||  ya == null) {
+            throw new IllegalArgumentException("Bounds2D array is null");
+        }
+        if (xa.length != ya.length) {
             throw new IllegalArgumentException("Bounds2D array lengths differ");
+        }
+        if (xa.length < 2) {
+            throw new IllegalArgumentException("Bounds2D array with < 2 points");
+        }
 
-        for (int index=0; index<xs.length; index++) {
+        for (int index=0; index<xa.length; index++) {
 
-            if (xs[index] > -1.e20  &&  xs[index] < 1.e20) {
-                if (xs[index] < minX) minX = xs[index];
-                if (xs[index] > maxX) maxX = xs[index];
+            if (xa[index] > -1.e20  &&  xa[index] < 1.e20) {
+                if (xa[index] < minX) minX = xa[index];
+                if (xa[index] > maxX) maxX = xa[index];
             }
 
-            if (ys[index] > -1.e20  &&  ys[index] < 1.e20) {
-                if (ys[index] < minY) minY = ys[index];
-                if (ys[index] > maxY) maxY = ys[index];
+            if (ya[index] > -1.e20  &&  ya[index] < 1.e20) {
+                if (ya[index] < minY) minY = ya[index];
+                if (ya[index] > maxY) maxY = ya[index];
             }
 
         }
@@ -87,8 +94,16 @@ public class Bounds2D {
    * Constructor from an {@link XYZPolyline}.
    * @param polyline the XYZPolyline from which to construct a new Bounds2D.
    */
-    public Bounds2D(XYZPolyline polyline)
+    public Bounds2D(XYZPolyline polyline)  throws IllegalArgumentException
     {
+        if (polyline == null) {
+            throw new IllegalArgumentException("Bounds2D XYZPolyline is null");
+        }
+        if (polyline.size() < 2) {
+            throw new IllegalArgumentException
+              ("Bounds2D XYZPolyline has less than 2 points");
+        }
+
         reset ();
         this.minX = Math.min(minX, polyline.getMinX());
         this.maxX = Math.max(maxX, polyline.getMaxX());
@@ -102,8 +117,8 @@ public class Bounds2D {
    * If minX is equal to maxX or minY is equal to maxY,
    * modify the problematic values to be sane.  The min is
    * lowered a little and the max is raised a little, with
-   * the "little" value determined by the actual values
-   * of the equivalent limits.
+   * the "little" value determined by any non problematic
+   * values of min and max.
    */
     private void correctZeroDimensions ()
     {
@@ -111,14 +126,26 @@ public class Bounds2D {
         double   dy = maxY - minY;
 
         if (dx <= 0.0) {
-            double  ddx = maxX / 100000.0;
+            double  ddx;
+            if (dy <= 0.0) {
+                ddx = maxX / 100000.0;
+            }
+            else {
+                ddx = dy / 100000.0;
+            }
             if (ddx < 0.0) ddx = -ddx;
             if (ddx < DD_TINY) ddx = DD_TINY;
             minX -= ddx;
             maxX += ddx;
         }
         if (dy <= 0.0) {
-            double  ddy = maxY / 100000.0;
+            double  ddy;
+            if (dx <= 0.0) {
+                ddy = maxY / 100000.0;
+            }
+            else {
+                ddy = dx / 100000.0;
+            }
             if (ddy < 0.0) ddy = -ddy;
             if (ddy < DD_TINY) ddy = DD_TINY;
             minY -= ddy;
@@ -138,8 +165,16 @@ public class Bounds2D {
    * @param polyline {@link XYZPolyline} used to update bounds.
    */
     public void expandTo(XYZPolyline polyline)
+      throws  IllegalArgumentException
     {
-        if (polyline == null) return;
+        if (polyline == null) {
+            throw new IllegalArgumentException("Bounds2D XYZPolyline is null");
+        }
+        if (polyline.size() < 2) {
+            throw new IllegalArgumentException
+              ("Bounds2D XYZPolyline has less than 2 points");
+        }
+
         minX = Math.min(minX, polyline.getMinX());
         maxX = Math.max(maxX, polyline.getMaxX());
         minY = Math.min(minY, polyline.getMinY());

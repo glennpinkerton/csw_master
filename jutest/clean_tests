@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm -f *.class  *.log
+
 cd $CSW_PARENT/csw/jutils/junit_tests;make clean;
 
 #cd $CSW_PARENT/csw/images/junit_tests;make clean;

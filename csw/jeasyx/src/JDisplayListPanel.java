@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -40,6 +40,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.MouseInputAdapter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
 /**
  This class provides a swing component that can be drawn to using
  {@link JDisplayList} methods.  The panel implicitly creates a
@@ -55,7 +59,9 @@ import javax.swing.event.MouseInputAdapter;
 */
 public class JDisplayListPanel extends JPanel
 {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
     private JDisplayList dlist = null;
 
@@ -91,6 +97,8 @@ public class JDisplayListPanel extends JPanel
         addMouseMotionListener(mouse_listen);
 
         addComponentListener (new JDLPComponentListener ());
+
+        logger.info ("    JDisplayListPanel successfully constructed    ");
     }
 
 /*---------------------------------------------------------------------------*/
@@ -307,7 +315,7 @@ public class JDisplayListPanel extends JPanel
 /*---------------------------------------------------------------------------*/
 
     static ArrayList<JDisplayList>    finalizedDlist = 
-		new ArrayList<JDisplayList> ();
+        new ArrayList<JDisplayList> ();
     static boolean      cleanupNeeded = false;
 
   /**

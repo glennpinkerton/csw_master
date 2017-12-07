@@ -8,7 +8,7 @@
             <PatternLayout pattern="%n%n%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n%n"/>
         </File>
         <File name="RunFile" fileName="csw_run.log" immediateFlush="true" append="false">
-            <PatternLayout pattern="%n%n%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n%n"/>
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss} [%t] %-5level - %msg%n"/>
         </File>
     </Appenders>
     <Loggers>
@@ -18,11 +18,11 @@
         </Root>
         <Logger name="csw_utest" level="INFO" additivity="false">
             <AppenderRef ref="Console" level="off"/>
-            <AppenderRef ref="TestFile"/>
+            <AppenderRef ref="TestFile" level="info"/>
         </Logger>
         <Logger name="csw_run" level="INFO" additivity="false">
             <AppenderRef ref="Console" level="error"/>
-            <AppenderRef ref="RunFile" level="info"/>
+            <AppenderRef ref="RunFile" level="error"/>
         </Logger>
     </Loggers>
 </Configuration>
