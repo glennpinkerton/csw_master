@@ -44,11 +44,16 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
+//import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import csw.jeasyx.src.*;
 
 import csw.jutils.src.ColorPalette;
 
 import csw.jsurfaceworks.src.Grid;
+
+import csw.jutils.src.CSWLogger;
 
 
 /**
@@ -60,6 +65,8 @@ import csw.jsurfaceworks.src.Grid;
 */
 public class JEasyXTest {
 
+    private static Logger  logger = CSWLogger.getMyLogger ();
+    
     static {
         System.loadLibrary ("_csw_all");
     }
@@ -80,6 +87,8 @@ public class JEasyXTest {
 
     public static void runMainMethod ()
     {
+
+        logger.info ("    Running main method in JEasyXTest\n\n");
 
 //Thread t = Thread.currentThread ();
 //System.out.println ("at start of runMainMethod, thread = "+t);
@@ -160,6 +169,9 @@ class JEasyXTestFrame extends JFrame
     private Frame1Frame      frame1 = null;
     private Frame2Frame      frame2 = null;
     private TextFrameTest    frame3 = null;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
+    
 
     public JEasyXTestFrame ()
     {
@@ -372,6 +384,9 @@ catch (Exception e) {
         contentPane.add (jfont_button);
         contentPane.add (sync_button);
         contentPane.add (noaspect_button);
+
+        logger.info ("    EasyX Test Frame Constructed Successfully    ");
+
     }
 
     void get_sparts ()
@@ -417,6 +432,8 @@ class RandomPrimFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
+    private static Logger  logger = CSWLogger.getMyLogger ();
+    
     public RandomPrimFrame ()
     {
         double[] xline, yline;
@@ -498,6 +515,7 @@ class RandomPrimFrame extends JFrame
         dl.addNumber (15.0, 170.0, .15, 0.0, 1.23456e15, 5, 0);
         dl.addNumber (15.0, 190.0, .15, 0.0, 123456789, 0, 1);
 
+        logger.info ("    Random primitives without a freme finished    ");
     }
 
 };
@@ -506,6 +524,8 @@ class SymbolFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
+    private static Logger  logger = CSWLogger.getMyLogger ();
+    
     public SymbolFrame ()
     {
         double xsym, ysym;
@@ -546,6 +566,8 @@ class TextTableFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
+    private static Logger  logger = CSWLogger.getMyLogger ();
+    
     public TextTableFrame ()
     {
 
@@ -825,11 +847,14 @@ class Text3TableFrame extends JFrame
 };
 
 
-class Frame1Frame extends JFrame implements DLRightClickListener, DLSelectListener,
-DLZoomPanListener
+class Frame1Frame
+  extends JFrame
+  implements DLRightClickListener, DLSelectListener, DLZoomPanListener
 
 {
     private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
     public void zoomPanChanged (String frameName,
                                 double oldX1,
@@ -878,6 +903,8 @@ int idum = System.in.read();
 catch (Exception e) {
 }
 */
+
+        logger.info ("    Random Frame Constructed    ");
 
         xline = new double[10];
         yline = new double[10];
@@ -1115,6 +1142,8 @@ class Frame2Frame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
+    private static Logger  logger = CSWLogger.getMyLogger ();
+    
     public Frame2Frame ()
     {
         double xsym, ysym;

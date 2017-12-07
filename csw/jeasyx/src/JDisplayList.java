@@ -21,14 +21,20 @@ import java.util.Iterator;
 
 import javax.swing.SwingUtilities;
 
+
+//import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
 import csw.jutils.src.XYZPolyline;
 import csw.jutils.src.ColorPalette;
+import csw.jutils.src.CSWLogger;
 
 import csw.jsurfaceworks.src.Grid;
 import csw.jsurfaceworks.src.TriMesh;
 
-/**
 
+/**
   This class has the API functions to draw to and otherwise
   interact with and manage the 2D graphics display list.  This
   class is meant to be a collection of services to draw and
@@ -39,6 +45,8 @@ import csw.jsurfaceworks.src.TriMesh;
 
 */
 public class JDisplayList extends JDisplayListBase {
+
+    private static Logger logger = CSWLogger.getMyLogger ();
 
  /*
   * Static methods.
@@ -95,11 +103,15 @@ public class JDisplayList extends JDisplayListBase {
     JDisplayList (JDisplayListPanel dlp)
     {
         if (dlp == null) {
-            throw
-            new IllegalArgumentException
-            ("The panel must be specified when constructing a JDisplayList object");
+            String emsg =
+               new String
+                 ("The panel must be specified when constructing a JDisplayList object");
+            logger.error (emsg);
+            throw new IllegalArgumentException (emsg);
         }
         dlPanel = dlp;
+
+        logger.info ("    JDisplayList constructor succeeded.    ");
 
         setFont ("arial", Font.PLAIN);
     }
@@ -2248,6 +2260,8 @@ public class JDisplayList extends JDisplayListBase {
             Ddata
         );
 
+        logger.info ("    Added fill with " + ncomp + " components    ");
+
         return 1;
 
     }
@@ -2950,6 +2964,8 @@ of Font.BOLD|Font.ITALIC.
             Ddata
         );
 
+        logger.info ("    Added line with " + npts + " points    ");
+
         return 1;
 
     }
@@ -3461,6 +3477,8 @@ of Font.BOLD|Font.ITALIC.
             null,
             Ddata
         );
+
+        logger.info ("    Added polygon with " + ncomp + " components    ");
 
         return 1;
 
