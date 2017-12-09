@@ -67,6 +67,7 @@ public class AtColorLookup
         double          atmin, atmax, atdelta;
 
         colorValues = null;
+        colorIndex = null;
         minValue = 1.e30;
         deltaValue = -1.0;
 
@@ -84,12 +85,18 @@ public class AtColorLookup
         for (i=0; i<nValues; i++) {
             if (low[i] < atmin) atmin = low[i];
             if (high[i] > atmax) atmax = high[i];
-            colorValues[i] = new Color(
+            try {
+                colorValues[i] = new Color(
                                        colors[i].getRed(),
                                        colors[i].getGreen(),
                                        colors[i].getBlue(),
                                        colors[i].getAlpha()
                                       );
+            }
+            catch (Throwable e) {
+                colorValues = null;
+                throw (e);
+            }
         }
 
         if (atmin >= atmax) {
@@ -98,7 +105,14 @@ public class AtColorLookup
 
         atdelta = (atmax - atmin) / 2000.0;
 
-        colorIndex = new int[2000];
+        try {
+            colorIndex = new int[2000];
+        }
+        catch (Throwable e) {
+            colorValues = null;
+            throw (e);
+        }
+
         for (i=0; i<2000; i++) {
             colorIndex[i] = -1;
         }
