@@ -65,12 +65,12 @@ import com.jogamp.opengl.GLAutoDrawable;
 
 
 import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL4;
+//import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLDrawable;
-import com.jogamp.opengl.GLDrawableFactory;
+//import com.jogamp.opengl.GLDrawable;
+//import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.glu.GLU;
 

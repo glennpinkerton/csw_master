@@ -22,7 +22,7 @@
         </Logger>
         <Logger name="csw_run" level="INFO" additivity="false">
             <AppenderRef ref="Console" level="error"/>
-            <AppenderRef ref="RunFile" level="error"/>
+            <AppenderRef ref="RunFile" level="info"/>
         </Logger>
     </Loggers>
 </Configuration>

@@ -31,7 +31,7 @@ import java.beans.PropertyChangeListener;
 import csw.jutils.src.View3DProperties;
 import csw.jutils.src.TranslationManager;
 
-import   csw.uistuff.*;
+//import   csw.uistuff.*;
 
 
 

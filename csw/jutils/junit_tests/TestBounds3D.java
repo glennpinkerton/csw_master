@@ -18,6 +18,7 @@ import org.junit.rules.TestWatcher;
 import jutest.Log4jTestWatcher;
 
 import csw.jutils.src.Bounds3D;
+import csw.jutils.src.XYZPolyline;
 
 
 
@@ -70,6 +71,28 @@ public class TestBounds3D {
         d = b3d.getDepth();
         assertEquals(w2, w, 0.001);
         assertEquals(h2, h, 0.001);
+        assertEquals(d2, d, 0.001);
+    }
+
+    @Test
+    public void testB3DExpand111() {
+        Bounds3D  b3d = new Bounds3D (0.0, 0.0, 0.0, 200.0, 100.0, 100.0);
+        double  epx = 5.0;
+        double  epy = -2000.0;
+        double  epz = 10.0;
+        b3d.expandByPercentage (epx, epy, epz);
+        epx /= 100.0;
+        epy /= 100.0;
+        epz /= 100.0;
+        double  w, h, d, w2, h2, d2;
+        w2 = 200.0 * (1. + epx);
+        h2 = 100.0 * (1. + epy);
+        d2 = 100.0 * (1. + epz);
+        w = b3d.getWidth();
+        h = b3d.getHeight();
+        d = b3d.getDepth();
+        assertEquals(w2, w, 0.001);
+        assertEquals(h2, h, 0.01);
         assertEquals(d2, d, 0.001);
     }
 
@@ -301,4 +324,182 @@ public class TestBounds3D {
     }
 
 
+// Test expand when constructed from "sane" XYZPolyline
+    @Test
+    public void testB3DPolyline1() {
+        double[] xa, ya, za;
+        xa = new double[5];
+        ya = new double[5];
+        za = new double[5];
+        for (int i=0; i<5; i++) {
+            xa[i] = (double) i;
+            ya[i] = (double) i;
+            za[i] = (double) i;
+        } 
+        XYZPolyline  xyzp = new XYZPolyline (xa, ya, za);
+
+        Bounds3D  b3d;
+        try {
+            b3d = new Bounds3D (xyzp);
+        }
+        catch (IllegalArgumentException ex) {
+            Assert.fail(ex.toString());
+            return;
+        }
+        double  epx = 5.0;
+        double  epy = 10.0;
+        double  epz = -8.0;
+        b3d.expandByPercentage (epx, epy, epz);
+        epx /= 100.0;
+        epy /= 100.0;
+        epz /= 100.0;
+        double  w, h, d, w2, h2, d2;
+        w2 = 4.0 * (1. + epx);
+        h2 = 4.0 * (1. + epy);
+        d2 = 4.0 * (1. + epz);
+        w = b3d.getWidth();
+        h = b3d.getHeight();
+        d = b3d.getDepth();
+        assertEquals(w2, w, 0.001);
+        assertEquals(h2, h, 0.001);
+        assertEquals(d2, d, 0.001);
+    }
+
+// Test expand when constructed from polyline only varying in x
+    @Test
+    public void testB3DPolyline2() {
+        double[] xa, ya, za;
+        xa = new double[5];
+        ya = new double[5];
+        za = new double[5];
+        for (int i=0; i<5; i++) {
+            xa[i] = (double) i;
+            ya[i] = 2.0;
+            za[i] = 2.0;
+        } 
+        XYZPolyline  xyzp = new XYZPolyline (xa, ya, za);
+
+        Bounds3D  b3d;
+        try {
+            b3d = new Bounds3D (xyzp);
+        }
+        catch (IllegalArgumentException ex) {
+            Assert.fail(ex.toString());
+            return;
+        }
+        double  epx = 5.0;
+        double  epy = -10.0;
+        double  epz = 12.0;
+        b3d.expandByPercentage (epx, epy, epz);
+        epx /= 100.0;
+        epy /= 100.0;
+        epz /= 100.0;
+        double  w, h, d, w2, h2, d2;
+        w2 = 4.0 * (1. + epx);
+        h2 = 0.0;
+        d2 = 0.0;
+        w = b3d.getWidth();
+        h = b3d.getHeight();
+        d = b3d.getDepth();
+        assertEquals(w2, w, 0.01);
+        assertEquals(h2, h, 0.01);
+        assertEquals(d2, d, 0.01);
+    }
+
+// Test expand when constructed from polyline only varying in y
+    @Test
+    public void testB3DPolyline3() {
+        double[] xa, ya, za;
+        xa = new double[5];
+        ya = new double[5];
+        za = new double[5];
+        for (int i=0; i<5; i++) {
+            xa[i] = 2.0;
+            ya[i] = (double) i;
+            za[i] = 2.0;
+        } 
+        XYZPolyline  xyzp = new XYZPolyline (xa, ya, za);
+
+        Bounds3D  b3d;
+        try {
+            b3d = new Bounds3D (xyzp);
+        }
+        catch (IllegalArgumentException ex) {
+            Assert.fail(ex.toString());
+            return;
+        }
+        double  epx = 5.0;
+        double  epy = -10.0;
+        double  epz = -9.0;
+        b3d.expandByPercentage (epx, epy, epz);
+        epx /= 100.0;
+        epy /= 100.0;
+        epz /= 100.0;
+        double  w, h, d, w2, h2, d2;
+        w2 = 0.0;
+        h2 = 4.0 * (1. + epy);
+        d2 = 0.0;
+        w = b3d.getWidth();
+        h = b3d.getHeight();
+        d = b3d.getDepth();
+        assertEquals(w2, w, 0.01);
+        assertEquals(h2, h, 0.01);
+        assertEquals(d2, d, 0.01);
+    }
+
+// Test when constructed from null polyline
+    @Test
+    public void testB3DNullPolyline() {
+        Bounds3D  b3d;
+        try {
+            b3d = new Bounds3D ((XYZPolyline) null);
+        }
+        catch (IllegalArgumentException ex) {
+            return;
+        }
+        Assert.fail();
+    }
+
+
+// Test expand when constructed from polyline all at same point
+    @Test
+    public void testB3DPolyline4() {
+        double[] xa, ya, za;
+        xa = new double[5];
+        ya = new double[5];
+        za = new double[5];
+        for (int i=0; i<5; i++) {
+            xa[i] = 2.0;
+            ya[i] = 2.0;
+            za[i] = 2.0;
+        } 
+        XYZPolyline  xyzp = new XYZPolyline (xa, ya, za);
+
+        Bounds3D  b3d;
+        try {
+            b3d = new Bounds3D (xyzp);
+        }
+        catch (IllegalArgumentException ex) {
+            Assert.fail(ex.toString());
+            return;
+        }
+        double  epx = 5.0;
+        double  epy = -10.0;
+        double  epz = -10.0;
+        b3d.expandByPercentage (epx, epy, epz);
+        epx /= 100.0;
+        epy /= 100.0;
+        double  w, h, d, w2, h2, d2;
+        w2 = 0.0;
+        h2 = 0.0;
+        d2 = 0.0;
+        w = b3d.getWidth();
+        h = b3d.getHeight();
+        d = b3d.getHeight();
+        assertEquals(w2, w, 0.01);
+        assertEquals(h2, h, 0.01);
+        assertEquals(d2, d, 0.01);
+    }
+
 }
+

@@ -186,8 +186,8 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
     static public long openLogFile (String fileName)
     {
 
-System.out.println ("JSW log file attempt: " + fileName);
-System.out.flush();
+//System.out.println ("JSW log file attempt: " + fileName);
+//System.out.flush();
 
         if (fileName == null) {
             return -1;
@@ -210,8 +210,7 @@ System.out.flush();
         //jsw.endThread ();
 
         // Bypass warning.
-        if (false && isPaused)
-          return(status);
+        if (false && isPaused) return(status);
 
         return status;
     }

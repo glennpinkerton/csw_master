@@ -358,10 +358,10 @@ class LocalDraw {
             nprim = nativeFillArray.size ();
             for (i=0; i<nprim; i++) {
                 native_fill = nativeFillArray.get(i);
-                if (native_fill.image >= 0) {
+                if (native_fill == null) {
                     continue;
                 }
-                if (native_fill == null) {
+                if (native_fill.image >= 0) {
                     continue;
                 }
                 small_flag = native_fill.pattern / 10000;
@@ -473,10 +473,10 @@ class LocalDraw {
             nprim = nativeFilledArcArray.size ();
             for (i=0; i<nprim; i++) {
                 native_filled_arc = nativeFilledArcArray.get(i);
-                if (native_filled_arc.image >= 0) {
+                if (native_filled_arc == null) {
                     continue;
                 }
-                if (native_filled_arc == null) {
+                if (native_filled_arc.image >= 0) {
                     continue;
                 }
                 small_flag = native_filled_arc.closure / 10000;
@@ -606,21 +606,16 @@ class LocalDraw {
                 for (i=0; i<nprim; i++) {
 
                     native_line = nativeLineArray.get(i);
-                    if (native_line.image >= 0) {
+                    if (native_line == null) {
                         continue;
                     }
-                    if (native_line == null) {
+                    if (native_line.image >= 0) {
                         continue;
                     }
                     if (native_line.npts < 2) {
                         continue;
                     }
                     small_flag = native_line.pattern / 10000;
-/*
-                    if (small_flag != 0) {
-                        continue;
-                    }
-*/
                     pattern = native_line.pattern % 10000;
 
                     if (ido == 0) {
@@ -700,10 +695,10 @@ class LocalDraw {
             nprim = nativeArcArray.size ();
             for (i=0; i<nprim; i++) {
                 native_arc = nativeArcArray.get(i);
-                if (native_arc.image >= 0) {
+                if (native_arc == null) {
                     continue;
                 }
-                if (native_arc == null) {
+                if (native_arc.image >= 0) {
                     continue;
                 }
                 small_flag = native_arc.closure / 10000;
@@ -802,10 +797,10 @@ class LocalDraw {
             nprim = nativeFillArray.size ();
             for (i=0; i<nprim; i++) {
                 native_fill = nativeFillArray.get(i);
-                if (native_fill.image >= 0) {
+                if (native_fill == null) {
                     continue;
                 }
-                if (native_fill == null) {
+                if (native_fill.image >= 0) {
                     continue;
                 }
                 if (native_fill.npts < 3) {
@@ -881,10 +876,10 @@ class LocalDraw {
             nprim = nativeFilledArcArray.size ();
             for (i=0; i<nprim; i++) {
                 native_filled_arc = nativeFilledArcArray.get(i);
-                if (native_filled_arc.image >= 0) {
+                if (native_filled_arc == null) {
                     continue;
                 }
-                if (native_filled_arc == null) {
+                if (native_filled_arc.image >= 0) {
                     continue;
                 }
                 small_flag = native_filled_arc.closure / 10000;
@@ -1007,10 +1002,10 @@ class LocalDraw {
             nprim = nativeArcArray.size ();
             for (i=0; i<nprim; i++) {
                 native_arc = nativeArcArray.get(i);
-                if (native_arc.image >= 0) {
+                if (native_arc == null) {
                     continue;
                 }
-                if (native_arc == null) {
+                if (native_arc.image >= 0) {
                     continue;
                 }
                 small_flag = native_arc.closure / 10000;
@@ -1109,10 +1104,10 @@ class LocalDraw {
             nprim = nativeLineArray.size ();
             for (i=0; i<nprim; i++) {
                 native_line = nativeLineArray.get(i);
-                if (native_line.image >= 0) {
+                if (native_line == null) {
                     continue;
                 }
-                if (native_line == null) {
+                if (native_line.image >= 0) {
                     continue;
                 }
                 if (native_line.npts < 2) {
@@ -1189,10 +1184,10 @@ class LocalDraw {
             nprim = nativeFillArray.size ();
             for (i=0; i<nprim; i++) {
                 native_fill = nativeFillArray.get(i);
-                if (native_fill.image >= 0) {
+                if (native_fill == null) {
                     continue;
                 }
-                if (native_fill == null) {
+                if (native_fill.image >= 0) {
                     continue;
                 }
                 if (native_fill.npts < 3) {
@@ -1270,10 +1265,10 @@ class LocalDraw {
             nprim = nativeLineArray.size ();
             for (i=0; i<nprim; i++) {
                 native_line = nativeLineArray.get(i);
-                if (native_line.image >= 0) {
+                if (native_line == null) {
                     continue;
                 }
-                if (native_line == null) {
+                if (native_line.image >= 0) {
                     continue;
                 }
                 if (native_line.npts < 2) {
@@ -1350,10 +1345,10 @@ class LocalDraw {
             nprim = nativeFillArray.size ();
             for (i=0; i<nprim; i++) {
                 native_fill = nativeFillArray.get(i);
-                if (native_fill.image >= 0) {
+                if (native_fill == null) {
                     continue;
                 }
-                if (native_fill == null) {
+                if (native_fill.image >= 0) {
                     continue;
                 }
                 if (native_fill.npts < 3) {
@@ -1437,10 +1432,10 @@ class LocalDraw {
             nprim = nativeLineArray.size ();
             for (i=0; i<nprim; i++) {
                 native_line = nativeLineArray.get(i);
-                if (native_line.image >= 0) {
+                if (native_line == null) {
                     continue;
                 }
-                if (native_line == null) {
+                if (native_line.image >= 0) {
                     continue;
                 }
                 if (native_line.npts < 2) {
@@ -1526,10 +1521,10 @@ class LocalDraw {
             for (i=0; i<nprim; i++) {
 
                 native_text = nativeTextArray.get(i);
-                if (native_text.image >= 0) {
+                if (native_text == null) {
                     continue;
                 }
-                if (native_text == null) {
+                if (native_text.image >= 0) {
                     continue;
                 }
 
@@ -1945,12 +1940,11 @@ class LocalDraw {
             for (int ido=0; ido<2; ido++) {
 
                 for (i=0; i<nprim; i++) {
-
                     native_line = nativeLineArray.get(i);
-                    if (native_line.image != image_id) {
+                    if (native_line == null) {
                         continue;
                     }
-                    if (native_line == null) {
+                    if (native_line.image != image_id) {
                         continue;
                     }
                     if (native_line.npts < 2) {
@@ -2036,10 +2030,10 @@ class LocalDraw {
             nprim = nativeFillArray.size ();
             for (i=0; i<nprim; i++) {
                 native_fill = nativeFillArray.get(i);
-                if (native_fill.image != image_id) {
+                if (native_fill == null) {
                     continue;
                 }
-                if (native_fill == null) {
+                if (native_fill.image != image_id) {
                     continue;
                 }
                 if (native_fill.npts < 3) {
@@ -2115,10 +2109,10 @@ class LocalDraw {
             nprim = nativeFilledArcArray.size ();
             for (i=0; i<nprim; i++) {
                 native_filled_arc = nativeFilledArcArray.get(i);
-                if (native_filled_arc.image != image_id) {
+                if (native_filled_arc == null) {
                     continue;
                 }
-                if (native_filled_arc == null) {
+                if (native_filled_arc.image != image_id) {
                     continue;
                 }
                 small_flag = native_filled_arc.closure / 10000;
@@ -2241,10 +2235,10 @@ class LocalDraw {
             nprim = nativeArcArray.size ();
             for (i=0; i<nprim; i++) {
                 native_arc = nativeArcArray.get(i);
-                if (native_arc.image != image_id) {
+                if (native_arc == null) {
                     continue;
                 }
-                if (native_arc == null) {
+                if (native_arc.image != image_id) {
                     continue;
                 }
                 small_flag = native_arc.closure / 10000;
@@ -2343,10 +2337,10 @@ class LocalDraw {
             nprim = nativeLineArray.size ();
             for (i=0; i<nprim; i++) {
                 native_line = nativeLineArray.get(i);
-                if (native_line.image != image_id) {
+                if (native_line == null) {
                     continue;
                 }
-                if (native_line == null) {
+                if (native_line.image != image_id) {
                     continue;
                 }
                 if (native_line.npts < 2) {
@@ -2423,10 +2417,10 @@ class LocalDraw {
             nprim = nativeFillArray.size ();
             for (i=0; i<nprim; i++) {
                 native_fill = nativeFillArray.get(i);
-                if (native_fill.image != image_id) {
+                if (native_fill == null) {
                     continue;
                 }
-                if (native_fill == null) {
+                if (native_fill.image != image_id) {
                     continue;
                 }
                 if (native_fill.npts < 3) {

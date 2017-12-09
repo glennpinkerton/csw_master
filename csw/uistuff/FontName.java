@@ -30,7 +30,7 @@ import javax.swing.Icon;
 import java.text.NumberFormat;
 import javax.swing.JFormattedTextField;
 
-import csw.jutils.src.TranslationManager;
+//import csw.jutils.src.TranslationManager;
 
   /**
    *  This class uses a private JComboBox to select a font name for

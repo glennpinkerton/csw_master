@@ -20,7 +20,7 @@ class TriMeshDraw3D
    * Change this debug flag to true to enable triangle labeling for
    * debugging purposes.
    */
-    private static final boolean DEBUG_LABEL_TRIANGLES = false;
+    private static boolean DEBUG_LABEL_TRIANGLES = false;
 
 
     double[] nodeWorldXArray,
