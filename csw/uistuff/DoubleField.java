@@ -30,7 +30,7 @@ import javax.swing.Icon;
 import java.text.NumberFormat;
 import javax.swing.JFormattedTextField;
 
-import csw.jutils.src.TranslationManager;
+//import csw.jutils.src.TranslationManager;
 
   /**
    * Display a double number on a text field.

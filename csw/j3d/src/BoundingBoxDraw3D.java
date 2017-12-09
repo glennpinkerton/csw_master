@@ -80,10 +80,20 @@ class BoundingBoxDraw3D  implements TextPositionFilter
                            xmax, ymax, zmax);
         this.labelsFont = labelsFont;
         this.numbersFont = numbersFont;
-        if (labelsFont == null)
-          labelsFont = new Font("SansSerif", Font.PLAIN, 18);
-        if (numbersFont == null)
-          numbersFont = new Font("SansSerif", Font.PLAIN, 14);
+
+        try {
+          if (this.labelsFont == null) {
+            this.labelsFont = new Font("SansSerif", Font.PLAIN, 18);
+          }
+          if (this.numbersFont == null) {
+            this.numbersFont = new Font("SansSerif", Font.PLAIN, 14);
+          }
+        }
+        catch (Throwable e) {
+          this.labelsFont = null;
+          this.numbersFont = null;
+          throw (e);
+        }
     }
 
 /*--------------------------------------------------------------------------------*/

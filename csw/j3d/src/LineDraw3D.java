@@ -419,7 +419,7 @@ class LineDraw3D
                     yt = nodeYArray[n2];
                     zt = nodeZArray[n2];
                     pt2 = scalePoint (xt, yt, zt);
-                    if (pt1 == null) {
+                    if (pt2 == null) {
                         continue;
                     }
 

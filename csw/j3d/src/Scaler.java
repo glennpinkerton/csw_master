@@ -109,7 +109,7 @@ class Scaler
     JPoint3D scalePoint (double x, double y, double z)
     {
         double             xt, yt, zt;
-        JPoint3D            pt;
+        JPoint3D           pt = null;
 
         xt = (x - xCenter) / cScale;
         yt = (y - yCenter) / cScale;
@@ -132,7 +132,12 @@ class Scaler
             zt = 1.e30;
         }
 
-        pt = new JPoint3D (xt, zt, yt);
+        try {
+            pt = new JPoint3D (xt, zt, yt);
+        }
+        catch (Throwable e) {
+            pt = null;
+        }
 
         return pt;
 

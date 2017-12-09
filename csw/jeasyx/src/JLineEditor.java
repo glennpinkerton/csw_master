@@ -1768,9 +1768,6 @@ public class JLineEditor implements JDLEditListener {
             lines = new ArrayList<DLLine> (10);
             dls.lineList = lines;
         }
-        if (lines == null) {
-            return -1;
-        }
 
         DLLine        dline;
         boolean       dlfound;

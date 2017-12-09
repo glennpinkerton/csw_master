@@ -21,8 +21,8 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.glu.GLU;
 
-import static com.jogamp.opengl.GL.*;
-import static com.jogamp.opengl.GL2.*;
+//import static com.jogamp.opengl.GL.*;
+//import static com.jogamp.opengl.GL2.*;
 
 
 /**
@@ -92,7 +92,6 @@ public class JGL
 
     private int     selected_name_stack[] = new int[100];
 
-    //private GL        gl = null;
     private GL2        gl = null;
     private GLU       glu = null;
 

@@ -19,6 +19,7 @@ import jutest.Log4jTestWatcher;
 
 
 import csw.jutils.src.Bounds2D;
+import csw.jutils.src.XYZPolyline;
 
 
 public class TestBounds2D {
@@ -63,6 +64,23 @@ public class TestBounds2D {
         w = b2d.getWidth();
         h = b2d.getHeight();
         assertEquals(w2, w, 0.001);
+        assertEquals(h2, h, 0.001);
+    }
+
+    @Test
+    public void testB2DExpand111() {
+        Bounds2D  b2d = new Bounds2D (0.0, 0.0, 200.0, 100.0);
+        double  epx = -2345.0;
+        double  epy = 10.0;
+        b2d.expandByPercentage (epx, epy);
+        epx /= 100.0;
+        epy /= 100.0;
+        double  w, h, w2, h2;
+        w2 = 200.0 * (1. + epx);
+        h2 = 100.0 * (1. + epy);
+        w = b2d.getWidth();
+        h = b2d.getHeight();
+        assertEquals(w2, w, 0.01);
         assertEquals(h2, h, 0.001);
     }
 
@@ -239,7 +257,7 @@ public class TestBounds2D {
         Assert.fail();
     }
 
-// Test expand when constructed from null arrays
+// Test when constructed from null arrays
     @Test
     public void testB2DNullArrays() {
         Bounds2D  b2d;
@@ -250,6 +268,164 @@ public class TestBounds2D {
             return;
         }
         Assert.fail();
+    }
+
+// Test expand when constructed from "sane" XYZPolyline
+    @Test
+    public void testB2DPolyline1() {
+        double[] xa, ya, za;
+        xa = new double[5];
+        ya = new double[5];
+        za = new double[5];
+        for (int i=0; i<5; i++) {
+            xa[i] = (double) i;
+            ya[i] = (double) i;
+            za[i] = (double) i;
+        } 
+        XYZPolyline  xyzp = new XYZPolyline (xa, ya, za);
+
+        Bounds2D  b2d;
+        try {
+            b2d = new Bounds2D (xyzp);
+        }
+        catch (IllegalArgumentException ex) {
+            Assert.fail(ex.toString());
+            return;
+        }
+        double  epx = 5.0;
+        double  epy = 10.0;
+        b2d.expandByPercentage (epx, epy);
+        epx /= 100.0;
+        epy /= 100.0;
+        double  w, h, w2, h2;
+        w2 = 4.0 * (1. + epx);
+        h2 = 4.0 * (1. + epy);
+        w = b2d.getWidth();
+        h = b2d.getHeight();
+        assertEquals(w2, w, 0.001);
+        assertEquals(h2, h, 0.001);
+    }
+
+// Test expand when constructed from polyline only varying in x
+    @Test
+    public void testB2DPolyline2() {
+        double[] xa, ya, za;
+        xa = new double[5];
+        ya = new double[5];
+        za = new double[5];
+        for (int i=0; i<5; i++) {
+            xa[i] = (double) i;
+            ya[i] = 2.0;
+            za[i] = 2.0;
+        } 
+        XYZPolyline  xyzp = new XYZPolyline (xa, ya, za);
+
+        Bounds2D  b2d;
+        try {
+            b2d = new Bounds2D (xyzp);
+        }
+        catch (IllegalArgumentException ex) {
+            Assert.fail(ex.toString());
+            return;
+        }
+        double  epx = 5.0;
+        double  epy = -10.0;
+        b2d.expandByPercentage (epx, epy);
+        epx /= 100.0;
+        epy /= 100.0;
+        double  w, h, w2, h2;
+        w2 = 4.0 * (1. + epx);
+        h2 = 0.0;
+        w = b2d.getWidth();
+        h = b2d.getHeight();
+        assertEquals(w2, w, 0.01);
+        assertEquals(h2, h, 0.01);
+    }
+
+// Test expand when constructed from polyline only varying in y
+    @Test
+    public void testB2DPolyline3() {
+        double[] xa, ya, za;
+        xa = new double[5];
+        ya = new double[5];
+        za = new double[5];
+        for (int i=0; i<5; i++) {
+            xa[i] = 2.0;
+            ya[i] = (double) i;
+            za[i] = 2.0;
+        } 
+        XYZPolyline  xyzp = new XYZPolyline (xa, ya, za);
+
+        Bounds2D  b2d;
+        try {
+            b2d = new Bounds2D (xyzp);
+        }
+        catch (IllegalArgumentException ex) {
+            Assert.fail(ex.toString());
+            return;
+        }
+        double  epx = 5.0;
+        double  epy = -10.0;
+        b2d.expandByPercentage (epx, epy);
+        epx /= 100.0;
+        epy /= 100.0;
+        double  w, h, w2, h2;
+        w2 = 0.0;
+        h2 = 4.0 * (1. + epy);
+        w = b2d.getWidth();
+        h = b2d.getHeight();
+        assertEquals(w2, w, 0.01);
+        assertEquals(h2, h, 0.01);
+    }
+
+// Test when constructed from null polyline
+    @Test
+    public void testB2DNullPolyline() {
+        Bounds2D  b2d;
+        try {
+            b2d = new Bounds2D ((XYZPolyline) null);
+        }
+        catch (IllegalArgumentException ex) {
+            return;
+        }
+        Assert.fail();
+    }
+
+
+// Test expand when constructed from polyline all at same point
+    @Test
+    public void testB2DPolyline4() {
+        double[] xa, ya, za;
+        xa = new double[5];
+        ya = new double[5];
+        za = new double[5];
+        for (int i=0; i<5; i++) {
+            xa[i] = 2.0;
+            ya[i] = 2.0;
+            za[i] = 2.0;
+        } 
+        XYZPolyline  xyzp = new XYZPolyline (xa, ya, za);
+
+        Bounds2D  b2d;
+        try {
+            b2d = new Bounds2D (xyzp);
+        }
+        catch (IllegalArgumentException ex) {
+            Assert.fail(ex.toString());
+            return;
+        }
+        double  epx = 5.0;
+        double  epy = -10.0;
+        b2d.expandByPercentage (epx, epy);
+        epx /= 100.0;
+        epy /= 100.0;
+        double  w, h, w2, h2;
+        w2 = 0.0;
+        h2 = 0.0;
+        w = b2d.getWidth();
+        h = b2d.getHeight();
+        assertEquals(w2, w, 0.01);
+        assertEquals(h2, h, 0.01);
     }
 
 }

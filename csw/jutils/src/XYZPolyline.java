@@ -252,7 +252,7 @@ public class XYZPolyline
      */
     public double getMinY ()
     {
-        double val = MathUtils.getMin (xArray);
+        double val = MathUtils.getMin (yArray);
         return val;
     }
 
@@ -282,7 +282,7 @@ public class XYZPolyline
      */
     public double getMaxY ()
     {
-        double val = MathUtils.getMax (xArray);
+        double val = MathUtils.getMax (yArray);
         return val;
     }
 

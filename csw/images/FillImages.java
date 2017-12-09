@@ -35,9 +35,9 @@ public final class FillImages extends Object {
       URL url = FillImages.class.getResource(imgFilename);
       if (url == null) {
         throw new IllegalArgumentException(
-          "Could not find resource for filename:" + imgFilename
+          "Could not find resource for filename: " + imgFilename
         );
-	  }
+      }
 
       Image image = new ImageIcon(url).getImage();
 
