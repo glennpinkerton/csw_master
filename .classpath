@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="lib" path="/home/gpinkerton/git/csw_master/csw/jar/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="/home/gpinkerton/git/csw_master/csw/jar/gluegen-rt-natives-linux-i586.jar"/>
+	<classpathentry kind="lib" path="/home/gpinkerton/git/csw_master/csw/jar/jogl-all.jar"/>
+	<classpathentry kind="lib" path="/home/gpinkerton/git/csw_master/csw/jar/jogl-all-natives-linux-i586.jar"/>
+	<classpathentry kind="lib" path="/home/gpinkerton/git/csw_master/csw/jar/log4j/log4j-api-2.10.0.jar"/>
+	<classpathentry kind="lib" path="/home/gpinkerton/git/csw_master/csw/jar/log4j/log4j-core-2.10.0.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/junit.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/hamcrest/core.jar"/>
+	<classpathentry kind="output" path=""/>
+</classpath>
