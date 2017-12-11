@@ -43,8 +43,7 @@ JAVA_SRC=\
  TriMeshDraw3D.java\
  View3DLightingOptionsPanel.java\
  View3DPropertiesPanel.java\
- View3DPropertiesDialog.java\
- UnitTest.java
+ View3DPropertiesDialog.java
 
 JAVA_CLASSES=\
  AttributeDef.class\
@@ -86,8 +85,8 @@ JAVA_CLASSES=\
  TriMeshDraw3D.class\
  View3DLightingOptionsPanel.class\
  View3DPropertiesPanel.class\
- View3DPropertiesDialog.class\
- UnitTest.class
+ View3DPropertiesDialog.class
+
 
 JAR_FILE=j3d.jar
 PACKAGE_PATH=csw/j3d/src
