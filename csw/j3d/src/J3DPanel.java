@@ -1,4 +1,3 @@
-
 /*
          ************************************************
          *                                              *
@@ -1200,7 +1199,6 @@ public class J3DPanel extends JPanel implements GLEventListener
                 }
             }
             pickMouseEvent = null;
-            listDrawFlag = false;
             if (targetZoomFlag) {
                 setPickModeMessage (null);
                 cmove = true;
@@ -1396,7 +1394,6 @@ public class J3DPanel extends JPanel implements GLEventListener
     private double            xyUnits = 1.0;
     private double            zUnits = 1.0;
 
-    private boolean listDrawFlag = false;
     boolean opaqueFlag = false;
 
 /*-------------------------------------------------------------------------*/
@@ -3546,7 +3543,6 @@ public class J3DPanel extends JPanel implements GLEventListener
     {
         pickScheduled = true;
         pickMouseEvent = e;
-            listDrawFlag = false;
         localRepaint ();
     }
 
