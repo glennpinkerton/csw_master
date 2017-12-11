@@ -61,8 +61,7 @@ class LineDraw3D
     void setLine (XYZPolyline line)
     {
         double[] nodex, nodey, nodez;
-        int[]    edge1, edge2, tri1, tri2, tri3;
-        int      nnode, nedge, ntri, i, size;
+        int      nnode, i, size;
 
         nodeXArray = null;
         nodeYArray = null;
@@ -294,15 +293,10 @@ class LineDraw3D
         JGL jgl
        )
     {
-        double               x_exag,
-                             y_exag,
-                             z_exag,
+        double               z_exag,
                              cscale,
-                             xcenter,
-                             ycenter,
                              zcenter;
-        double               ct, xt, yt, zt, dx, dy, dz;
-        double               xpct, ypct, zpct;
+        double               ct, xt, yt, zt;
         int                  i;
         double               drawRed, drawGreen, drawBlue, drawAlpha;
 
@@ -340,8 +334,8 @@ class LineDraw3D
         }
 
         cscale = ct / 2.0;
-        xcenter = (pretty_xmin + pretty_xmax) / 2.0;
-        ycenter = (pretty_ymin + pretty_ymax) / 2.0;
+        //xcenter = (pretty_xmin + pretty_xmax) / 2.0;
+        //ycenter = (pretty_ymin + pretty_ymax) / 2.0;
         zcenter = (pretty_zmin + pretty_zmax) / 2.0;
 
     /*
@@ -349,8 +343,8 @@ class LineDraw3D
      * and adjust the x and y scales so the z doesn't go out
      * of the cube.
      */
-        x_exag = 1.0;
-        y_exag = 1.0;
+        //x_exag = 1.0;
+        //y_exag = 1.0;
         z_exag = raw_z_exag;
         if (cscale > 1.e20) {
             return;
@@ -358,8 +352,8 @@ class LineDraw3D
         zt = (pretty_zmax - zcenter) / cscale * z_exag;
         if (zt > 1.0) {
             z_exag /= zt;
-            x_exag /= zt;
-            y_exag /= zt;
+            //x_exag /= zt;
+            //y_exag /= zt;
         }
 
         boolean          acolor;
@@ -369,8 +363,8 @@ class LineDraw3D
             acolor = true;
         }
 
-        int              n1, n2, nend;
-        JPoint3D         pt, pt1, pt2;
+        int              n1, n2;
+        JPoint3D         pt1, pt2;
 
     /*
      * Draw as lines.

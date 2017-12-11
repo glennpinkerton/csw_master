@@ -999,7 +999,7 @@ public class JGL
     int ProcessHits (int hits, IntBuffer buffer)
     {
         int         i, j, found, istat;
-        int         zt1, zt2, names;
+        int         zt1, names;
         int         nstack[];
         int         trap_stack[], trap_found, trap_stack_size;
         long        real_trap_dist, trap_dist, dist, zt, z1, d1, d2, zdelta;
@@ -1332,7 +1332,7 @@ public class JGL
         UpdateMatrices ();
         double width = viewport_matrix[2];
         double height = viewport_matrix[3];
-        double depth = 100;
+        //double depth = 100;
 
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
@@ -1500,7 +1500,7 @@ public class JGL
 
         int nrow = bi.getHeight();
         int ncol = bi.getWidth();
-        int i, j, rgb, r, offset, k, nbit;
+        int i, j, rgb, offset, k, nbit;
 
         int bcol = ncol / 32;
         bcol++;
@@ -2023,7 +2023,7 @@ System.out.println (projection_matrix[12]+" "+
     {
         byte[]       bdata;
         int          width, height, ncol, nrow;
-        int          i, j, rgb, r, offset, k, nbit, bcol;
+        int          i, j, rgb, offset, k, nbit, bcol;
 
         if (textPositionLock != -1  &&  anchor != textPositionLock) {
             return 0;
@@ -2255,11 +2255,9 @@ System.out.println (projection_matrix[12]+" "+
         JPoint2D[] p2dArray,
         int        max2d)
     {
-        double       params[];
         int          iparams[];
         int          i;
 
-        params = new double[5];
         iparams = new int[5];
 
         IntBuffer  ib = toIB (iparams);

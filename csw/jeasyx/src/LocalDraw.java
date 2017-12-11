@@ -326,8 +326,6 @@ class LocalDraw {
                */
                 int iwidth = (int)(native_image.x2 - native_image.x1);
                 int iheight = (int)(native_image.y2 - native_image.y1);
-                int ix = (int)native_image.x1;
-                int iy = (int)native_image.y1;
 
                 g2d.drawImage (bimage,
                                (int)native_image.x1,
@@ -1511,7 +1509,6 @@ class LocalDraw {
             Font  font = null;
             double xtext, ytext, descent, rang;
             AffineTransform tsave;
-            double[] metrics = new double[3];
 
             for (i=0; i<nprim; i++) {
 
@@ -1576,9 +1573,7 @@ class LocalDraw {
                * based on the descent of the font.   Rotation of the descent
                * distance is also needed.
                */
-                metrics = FontUtils.getTextMetrics (
-                    native_text.text,
-                    font);
+
                 descent = 0.0;
                 xtext = native_text.x;
                 ytext = native_text.y;
@@ -1906,11 +1901,9 @@ class LocalDraw {
         Graphics2D g2d_fg,
         Graphics2D g2d_bg)
     {
-        int             nprim, i, ntot, j;
-        int             r, g, b;
+        int             nprim, i, j;
         int             closure, pattern, small_flag;
         Graphics2D      g2d;
-        double          patScale;
 
         NativePrim.Arc       native_arc;
         NativePrim.FilledArc native_filled_arc;
@@ -1920,8 +1913,6 @@ class LocalDraw {
 
         Color           fill_color;
         Color           arc_color;
-
-        int             fgflag = 0;
 
     /*
      * Draw all the lines that have their small flag set
@@ -1962,7 +1953,6 @@ class LocalDraw {
 
                     g2d = g2d_bg;
                     if (native_line.selectable == 1) {
-                        fgflag = 1;
                         g2d = g2d_fg;
                     }
 
@@ -2043,7 +2033,6 @@ class LocalDraw {
                 pattern = native_fill.pattern % 10000;
                 g2d = g2d_bg;
                 if (native_fill.selectable == 1) {
-                    fgflag = 1;
                     g2d = g2d_fg;
                 }
 
@@ -2119,7 +2108,6 @@ class LocalDraw {
                 closure = native_filled_arc.closure % 10000;
                 g2d = g2d_bg;
                 if (native_filled_arc.selectable == 1) {
-                    fgflag = 1;
                     g2d = g2d_fg;
                 }
 
@@ -2245,7 +2233,6 @@ class LocalDraw {
                 closure = native_arc.closure % 10000;
                 g2d = g2d_bg;
                 if (native_arc.selectable == 1) {
-                    fgflag = 1;
                     g2d = g2d_fg;
                 }
 
@@ -2350,8 +2337,7 @@ class LocalDraw {
                 pattern = native_line.pattern % 10000;
                 g2d = g2d_bg;
                 if (native_line.selectable == 1) {
-                    fgflag = 1;
-                    g2d = g2d_fg;
+                     g2d = g2d_fg;
                 }
 
               /*
@@ -2430,7 +2416,6 @@ class LocalDraw {
                 pattern = native_fill.pattern % 10000;
                 g2d = g2d_bg;
                 if (native_fill.selectable == 1) {
-                    fgflag = 1;
                     g2d = g2d_fg;
                 }
 
@@ -2509,7 +2494,6 @@ class LocalDraw {
                 pattern = native_line.pattern % 10000;
                 g2d = g2d_bg;
                 if (native_line.selectable == 1) {
-                    fgflag = 1;
                     g2d = g2d_fg;
                 }
 
@@ -2586,7 +2570,6 @@ class LocalDraw {
                 pattern = native_fill.pattern % 10000;
                 g2d = g2d_bg;
                 if (native_fill.selectable == 1) {
-                    fgflag = 1;
                     g2d = g2d_fg;
                 }
 
@@ -2665,7 +2648,6 @@ class LocalDraw {
                 pattern = native_line.pattern % 10000;
                 g2d = g2d_bg;
                 if (native_line.selectable == 1) {
-                    fgflag = 1;
                     g2d = g2d_fg;
                 }
 
@@ -2733,7 +2715,6 @@ class LocalDraw {
             Font  font = null;
             double xtext, ytext, descent, rang;
             AffineTransform tsave;
-            double[] metrics = new double[3];
 
             for (i=0; i<nprim; i++) {
 
@@ -2751,7 +2732,6 @@ class LocalDraw {
 
                 g2d = g2d_bg;
                 if (native_text.selectable == 1) {
-                    fgflag = 1;
                     g2d = g2d_fg;
                 }
 
@@ -2794,9 +2774,7 @@ class LocalDraw {
                * based on the descent of the font.   Rotation of the descent
                * distance is also needed.
                */
-                metrics = FontUtils.getTextMetrics (
-                    native_text.text,
-                    font);
+
                 descent = 0.0;
                 xtext = native_text.x;
                 ytext = native_text.y;

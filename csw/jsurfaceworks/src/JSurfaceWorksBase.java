@@ -78,7 +78,7 @@ public class JSurfaceWorksBase {
 
     protected synchronized void endThread ()
     {
-        int    tid = Thread.currentThread().hashCode();
+        //int    tid = Thread.currentThread().hashCode();
 
 /*
         long status =

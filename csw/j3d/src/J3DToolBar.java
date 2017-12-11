@@ -463,7 +463,7 @@ class J3DToolBar extends JToolBar {
      * Get the view properties from the panel for the initial values
      * in the global options and lighting options dialogs.
      */
-      View3DProperties viewProperties = panel.getViewProperties();
+      //View3DProperties viewProperties = panel.getViewProperties();
 
 
     /*

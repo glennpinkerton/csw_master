@@ -377,7 +377,7 @@ public class View3DLightingOptionsPanel extends JPanel
 // Method to respond to value changes on individual controls
 // in the panel.
   public void valueChange(csw.uistuff.ValueChangeEvent ev) {
-    Object source = ev.getValueChangeObject();
+    //Object source = ev.getValueChangeObject();
   }
 
 }  // end of main class

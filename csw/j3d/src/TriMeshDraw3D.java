@@ -63,7 +63,7 @@ class TriMeshDraw3D
 
     private Scaler   scaler;
 
-    private boolean  triMeshAllowed = true;
+    //private boolean  triMeshAllowed = true;
 
 /*--------------------------------------------------------------------------------*/
 
@@ -112,7 +112,7 @@ class TriMeshDraw3D
       int[]    tri3)
 
     {
-        int      nnode, nedge, ntri, i, size;
+        int      nnode, ntri, i, size;
 
         nodeWorldXArray = null;
         nodeWorldYArray = null;
@@ -196,7 +196,7 @@ class TriMeshDraw3D
 
         CalcNormals ();
 
-        triMeshAllowed = false;
+        //triMeshAllowed = false;
 
     }
 
@@ -310,12 +310,11 @@ class TriMeshDraw3D
         n2TriArray = new int[size];
         n3TriArray = new int[size];
 
-        int e1, e2, e3, n1, n2, node1, node2, node3;
+        int e1, e2, n1, n2, node1, node2, node3;
 
         for (i=0; i<ntri; i++) {
             e1 = tri1[i];
             e2 = tri2[i];
-            e3 = tri3[i];
             node1 = edge1[e1];
             node2 = edge2[e1];
             n1 = edge1[e2];
@@ -773,8 +772,6 @@ class TriMeshDraw3D
                              y_exag,
                              z_exag,
                              cscale,
-                             xcenter,
-                             ycenter,
                              zcenter;
         double               ct, xt, yt, zt, dx, dy, dz;
         double               xpct, ypct, zpct;
@@ -815,8 +812,8 @@ class TriMeshDraw3D
         }
 
         cscale = ct / 2.0;
-        xcenter = (pretty_xmin + pretty_xmax) / 2.0;
-        ycenter = (pretty_ymin + pretty_ymax) / 2.0;
+        //xcenter = (pretty_xmin + pretty_xmax) / 2.0;
+        //ycenter = (pretty_ymin + pretty_ymax) / 2.0;
         zcenter = (pretty_zmin + pretty_zmax) / 2.0;
 
     /*
@@ -902,11 +899,9 @@ class TriMeshDraw3D
     /*
      * Set up for triangle drawing.
      */
-        Color            color;
+        //Color            color;
         int              n1, n2, n3;
-        JPoint3D         pt, pt1, pt2, pt3;
-        int              nstart = 0;
-        int              ntri = 0;
+        JPoint3D         pt1, pt2, pt3;
 
         panel.pushName (J3DConst.TRIANGLES_NAME);
         panel.pushName (0);
@@ -973,7 +968,6 @@ class TriMeshDraw3D
         /*
          * Draw the individual triangles one at a time.
          */
-int ndump = 0;
             for (i=0; i<numTriangles; i++) {
 
                 if (selectionMode) {

@@ -255,7 +255,7 @@ public class JLineEditor implements JDLEditListener {
 
     private void processDelete ()
     {
-        EPoint          ep, ep1, ept;
+        EPoint          ep, ep1;
 
         // Can't delete in point mode for now.
         if (pickingMode == POINT_EDITING || pickingMode == POINT_PICKING)
@@ -1303,7 +1303,6 @@ public class JLineEditor implements JDLEditListener {
                     currentLine.add (ep);
                 }
                 else {
-                    int nn = npts - 1;
                     currentLine.add (npts-1, ep);
                     npts = currentLine.size ();
                 }

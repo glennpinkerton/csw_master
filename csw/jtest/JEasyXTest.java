@@ -440,7 +440,6 @@ class RandomPrimFrame extends JFrame
     {
         double[] xline, yline;
         int[]    icomp;
-        int      i;
 
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -893,7 +892,6 @@ class Frame1Frame
     {
         double[] xline, yline;
         int[]    icomp;
-        int      i;
 
         DLSelectable    dls;
 
@@ -1486,8 +1484,7 @@ class ReversePrimFrame extends JFrame
     {
         double[] xline, yline;
         int[]    icomp;
-        int      i;
-
+ 
         xline = new double[10];
         yline = new double[10];
         icomp = new int[10];
@@ -1808,7 +1805,6 @@ class HugeFrame extends JFrame
 
         double[] xline, yline;
         int[]    icomp;
-        int      i;
         Random   random;
         double   xr, yr;
         int      ndo;
@@ -2101,9 +2097,7 @@ class LithFrame extends JFrame
 
     public LithFrame ()
     {
-        double[] x, y;
-        double   xt, yt;
-        int i, patnum;
+        int i;
 
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -2177,7 +2171,6 @@ class LithFrame extends JFrame
 
         dl.addText (0.0, yc, 0.10, 0.0, "1.0");
         for (i=0; i<8; i++) {
-            patnum = i + 1;
             dl.setLithFill (i, 255, 255);
             xc = i * 2 + 1.5;
             dl.addCenteredRectangle (
@@ -2189,7 +2182,6 @@ class LithFrame extends JFrame
         yc = 7.0;
         dl.addText (0.0, yc, 0.10, 0.0, "1.5");
         for (i=0; i<8; i++) {
-            patnum = i + 1;
             dl.setLithFill (i, 1.5, 255, 255);
             xc = i * 2 + 1.5;
             dl.addCenteredRectangle (
@@ -2201,7 +2193,6 @@ class LithFrame extends JFrame
         yc = 5.0;
         dl.addText (0.0, yc, 0.10, 0.0, "2.0");
         for (i=0; i<8; i++) {
-            patnum = i + 1;
             dl.setLithFill (i, 2.0, 255, 255);
             xc = i * 2 + 1.5;
             dl.addCenteredRectangle (
@@ -2213,7 +2204,6 @@ class LithFrame extends JFrame
         yc = 3.0;
         dl.addText (0.0, yc, 0.10, 0.0, "a=50");
         for (i=0; i<8; i++) {
-            patnum = i + 1;
             dl.setLithFill (i, 25, 50);
             xc = i * 2 + 1.5;
             dl.addCenteredRectangle (
@@ -2225,7 +2215,6 @@ class LithFrame extends JFrame
         yc = 1.0;
         dl.addText (0.0, yc, 0.10, 0.0, "a=100");
         for (i=0; i<8; i++) {
-            patnum = i + 1;
             dl.setLithFill (i, 50, 100);
             xc = i * 2 + 1.5;
             dl.addCenteredRectangle (
@@ -2245,10 +2234,7 @@ class FontFrame extends JFrame
 
     public FontFrame ()
     {
-        double[] x, y;
-        double   xt, yt;
-        int i, patnum;
-
+  
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle ("Java Font Test");
@@ -2702,8 +2688,7 @@ class NoAspectFrame extends JFrame implements DLRightClickListener, DLSelectList
     {
         double[] xline, yline;
         int[]    icomp;
-        int      i;
-
+ 
         DLSelectable    dls;
 
         xline = new double[10];

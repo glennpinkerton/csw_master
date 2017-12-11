@@ -156,19 +156,17 @@ class BoundingBoxDraw3D  implements TextPositionFilter
                                    double ymax,
                                    double zmax)
     {
-        int         upl;
-        double            xt, yt, zt, at,
+        double            xt, yt, zt,
                           xlog, ylog, zlog,
-                          dx, dy, dz, da;
-        double            xtick, ytick, ztick;
+                          dx, dy, dz;
         int               nx, ny, nz, itmp;
         int               izlog, ixlog, iylog;
 
-        xtick = (xmax - xmin) / 8.0;
-        ytick = (ymax - ymin) / 8.0;
-        ztick = 1.e30;
+        //xtick = (xmax - xmin) / 8.0;
+        //ytick = (ymax - ymin) / 8.0;
+        //ztick = 1.e30;
         if (zmin <= zmax) {
-            ztick = (zmax - zmin) / 8.0;
+            //ztick = (zmax - zmin) / 8.0;
         }
 
     /*
@@ -503,7 +501,7 @@ class BoundingBoxDraw3D  implements TextPositionFilter
     /*
      * Draw the bounding box as line segments.
      */
-        JPoint3D   p, pt1, pt2;
+        JPoint3D   p;
 
         // JNEWP
         float[] rgb = bgColor.getRGBColorComponents(null);
@@ -652,7 +650,6 @@ class BoundingBoxDraw3D  implements TextPositionFilter
                      xt1, yt1, zt1,
                      xt2, yt2, zt2;
         int          i, j, nx, ny, nz;
-        int          n;
 
         JPoint3D      p;
 
@@ -737,7 +734,6 @@ class BoundingBoxDraw3D  implements TextPositionFilter
      * Draw top grid
      */
         zt = z2;
-        n = 0;
         for (i=0; i<ny; i++) {
             yt1 = y1 + i * dy;
             yt2 = yt1 + dy;
@@ -761,7 +757,6 @@ class BoundingBoxDraw3D  implements TextPositionFilter
      * Draw west grid
      */
         xt = x1;
-        n = 0;
         for (i=0; i<nz; i++) {
             zt1 = z1 + i * dz;
             zt2 = zt1 + dz;
@@ -785,7 +780,6 @@ class BoundingBoxDraw3D  implements TextPositionFilter
      * Draw east grid
      */
         xt = x2;
-        n = 0;
         for (i=0; i<nz; i++) {
             zt1 = z1 + i * dz;
             zt2 = zt1 + dz;
@@ -809,8 +803,7 @@ class BoundingBoxDraw3D  implements TextPositionFilter
      * Draw south grid
      */
         yt = y1;
-        n = 0;
-        for (i=0; i<nz; i++) {
+         for (i=0; i<nz; i++) {
             zt1 = z1 + i * dz;
             zt2 = zt1 + dz;
             jgl.StartDrawMode ();
@@ -833,7 +826,6 @@ class BoundingBoxDraw3D  implements TextPositionFilter
      * Draw north grid
      */
         yt = y2;
-        n = 0;
         for (i=0; i<nz; i++) {
             zt1 = z1 + i * dz;
             zt2 = zt1 + dz;
@@ -895,9 +887,6 @@ class BoundingBoxDraw3D  implements TextPositionFilter
         if (cubeOutline == null) {
             return false;
         }
-
-        double xmid = (x1in + x2in) / 2.0;
-        double ymid = (y1in + y2in) / 2.0;
 
         int istat = jsw.pointInPoly (
             x1in,
@@ -3440,7 +3429,7 @@ pmsg ("can't find spot for "+zt);
     private String formatNumber (double val, int ndec)
     {
         int      i, ival, ival2;
-        double   pval, left, right, mult;
+        double   pval, left, right;
 
         pval = val;
         if (val < 0.0) {
@@ -3486,9 +3475,8 @@ pmsg ("can't find spot for "+zt);
             return;
         }
 
-        JPoint3D    p, pa;
-        JPoint2D    p2, p22;
-
+        JPoint3D    p;
+ 
     /*
      * Convert each corner of the cube into a point in the opengl 3d
      * coordinates.  Then get the raqster position of each point.
