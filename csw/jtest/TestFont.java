@@ -34,7 +34,7 @@ public class TestFont extends JFrame
 {
 	private static final long serialVersionUID = 1L;
 
-    private String                 fileName;
+    //private String                 fileName;
     private JDisplayList           dl;
 
     JTextField       nameField, angleField;

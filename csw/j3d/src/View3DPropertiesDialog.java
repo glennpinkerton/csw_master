@@ -4,7 +4,7 @@ package csw.j3d.src;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
-import java.awt.Insets;
+//import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 

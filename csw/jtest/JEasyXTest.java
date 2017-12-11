@@ -32,7 +32,7 @@ import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-import java.util.Date;
+//import java.util.Date;
 import java.util.Random;
 
 import javax.swing.JButton;
@@ -120,6 +120,7 @@ public class JEasyXTest {
 
     }
 
+    /*
     static private void timerTest ()
     {
         double[] d1, d2;
@@ -160,6 +161,7 @@ public class JEasyXTest {
 
          return;
     }
+    */
 }
 
 class JEasyXTestFrame extends JFrame
@@ -524,7 +526,7 @@ class SymbolFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
-    private static Logger  logger = CSWLogger.getMyLogger ();
+    //private static Logger  logger = CSWLogger.getMyLogger ();
     
     public SymbolFrame ()
     {
@@ -566,7 +568,7 @@ class TextTableFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
-    private static Logger  logger = CSWLogger.getMyLogger ();
+    //private static Logger  logger = CSWLogger.getMyLogger ();
     
     public TextTableFrame ()
     {
@@ -1142,7 +1144,7 @@ class Frame2Frame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
-    private static Logger  logger = CSWLogger.getMyLogger ();
+    //private static Logger  logger = CSWLogger.getMyLogger ();
     
     public Frame2Frame ()
     {

@@ -1733,7 +1733,7 @@ class JDisplayListBase extends DLConst {
 
         int             status;
         int             nprim, i, ntot, j;
-        int             a, r, g, b;
+        int             r, g, b;
         int             closure, pattern, small_flag;
         int[]           rgb_array;
         Graphics2D      g2d, g2d_fg, g2d_bg;
@@ -1746,8 +1746,7 @@ class JDisplayListBase extends DLConst {
         NativePrim.Fill      native_fill;
 
         Color           fill_color;
-        Color           arc_color;
-
+ 
         if (foregroundImage == null  ||  backgroundImage == null) {
             return 0;
         }

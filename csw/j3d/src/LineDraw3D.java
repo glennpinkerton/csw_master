@@ -277,7 +277,7 @@ class LineDraw3D
 
 /*-----------------------------------------------------------------------------*/
 
-    private boolean          labelFlag = false;
+    //private boolean          labelFlag = false;
 
     void scaleAndDrawLine (
         double pretty_xmin,

@@ -437,7 +437,7 @@ class TFileFrame extends JFrame
 
 	private static final long serialVersionUID = 1L;
 
-    private String                 fileName;
+    //private String                 fileName;
     private JTextField             tField, tField2, tField3;
 
     private JDisplayList           dl;
@@ -883,7 +883,7 @@ class FileioFrame extends JFrame
 
 	private static final long serialVersionUID = 1L;
 
-    private String                 fileName;
+    //private String                 fileName;
     private JTextField             tField;
 
     private JDisplayList           dl;
@@ -1153,7 +1153,7 @@ class PFileFrame extends JFrame
 
 	private static final long serialVersionUID = 1L;
 
-    private String                 fileName;
+    //private String                 fileName;
     private JTextField             tField, tField2;
 
     private JDisplayList           dl;
@@ -1675,7 +1675,7 @@ class DivideFrame extends JFrame
 
 	private static final long serialVersionUID = 1L;
 
-    private String                 fileName;
+   // private String                 fileName;
     private JTextField             tField, tField2, tField3;
     private JButton                flipButton;
     private JButton                flipButton2;
@@ -2196,7 +2196,7 @@ class GridFileFrame extends JFrame
 
 	private static final long serialVersionUID = 1L;
 
-    private String                 fileName;
+    //private String                 fileName;
     private JTextField             tField;
     private JTextField             tField2;
     private JCheckBox              checkBox;

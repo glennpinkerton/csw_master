@@ -57,7 +57,7 @@ class LocalDraw {
     private int background_blue = -1;
     private int background_alpha = -1;
 
-    private int anti_alias_ok = 1;
+    //private int anti_alias_ok = 1;
 
     private float[] dashLine2 = new float[2];
     private float[] dashLine4 = new float[4];
@@ -1418,16 +1418,11 @@ class LocalDraw {
         }  /* end of text foreground polygon section */
 
     /*
-     * Text character vectors are the only things that might use
-     * anti aliasing in drawing.
-     */
-        anti_alias_ok = 1;
-
-    /*
      * Draw all the lines that have their small flag set
      * to three to the appropriate buffers.  These are lines for
      * drawing text characters
      */
+        
         if (nativeLineArray != null) {
             nprim = nativeLineArray.size ();
             for (i=0; i<nprim; i++) {
@@ -1890,11 +1885,13 @@ class LocalDraw {
 
     }
 
+    /*
     private void printClip (Graphics2D g2d)
     {
         System.out.println ("clip rectangle");
         System.out.println (g2d.getClipBounds());
     }
+    */
 
 
 
@@ -1910,7 +1907,7 @@ class LocalDraw {
         Graphics2D g2d_bg)
     {
         int             nprim, i, ntot, j;
-        int             a, r, g, b;
+        int             r, g, b;
         int             closure, pattern, small_flag;
         Graphics2D      g2d;
         double          patScale;
@@ -2497,13 +2494,11 @@ class LocalDraw {
         if (nativeLineArray != null) {
             nprim = nativeLineArray.size ();
             for (i=0; i<nprim; i++) {
-                native_line = nativeLineArray.get(i);
+                native_line = nativeLineArray.get(i);                
                 if (native_line.image != image_id) {
                     continue;
                 }
-                if (native_line == null) {
-                    continue;
-                }
+
                 if (native_line.npts < 2) {
                     continue;
                 }
@@ -2581,9 +2576,6 @@ class LocalDraw {
                 if (native_fill.image != image_id) {
                     continue;
                 }
-                if (native_fill == null) {
-                    continue;
-                }
                 if (native_fill.npts < 3) {
                     continue;
                 }
@@ -2651,24 +2643,16 @@ class LocalDraw {
         }  /* end of text foreground polygon section */
 
     /*
-     * Text character vectors are the only things that might use
-     * anti aliasing in drawing.
-     */
-        anti_alias_ok = 1;
-
-    /*
      * Draw all the lines that have their small flag set
      * to three to the appropriate buffers.  These are lines for
      * drawing text characters
      */
+        
         if (nativeLineArray != null) {
             nprim = nativeLineArray.size ();
             for (i=0; i<nprim; i++) {
                 native_line = nativeLineArray.get(i);
                 if (native_line.image != image_id) {
-                    continue;
-                }
-                if (native_line == null) {
                     continue;
                 }
                 if (native_line.npts < 2) {
@@ -2757,10 +2741,6 @@ class LocalDraw {
                 if (native_text.image != image_id) {
                     continue;
                 }
-                if (native_text == null) {
-                    continue;
-                }
-
                 if (native_text.text == null) {
                     continue;
                 }

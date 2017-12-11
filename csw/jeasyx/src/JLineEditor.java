@@ -529,9 +529,9 @@ public class JLineEditor implements JDLEditListener {
 /*--------------------------------------------------------------------*/
 
     private int       buttonNumber = 0;
-    private boolean   button1Pressed,
-                      button2Pressed,
-                      button3Pressed;
+    private boolean   button1Pressed;
+    //private boolean   button2Pressed;
+    //private boolean   button3Pressed;
 
 /*--------------------------------------------------------------------*/
 
@@ -616,11 +616,11 @@ public class JLineEditor implements JDLEditListener {
             button1Pressed = true;
         }
         else if (buttonNumber == 2) {
-            button2Pressed = true;
+            //button2Pressed = true;
             return;
         }
         else if (buttonNumber == 3) {
-            button3Pressed = true;
+            //button3Pressed = true;
             return;
         }
 
@@ -782,11 +782,11 @@ public class JLineEditor implements JDLEditListener {
             button1Pressed = false;
         }
         else if (buttonNumber == 2) {
-            button2Pressed = false;
+            //button2Pressed = false;
             return;
         }
         else if (buttonNumber == 3) {
-            button3Pressed = false;
+            //button3Pressed = false;
         }
 
         if (appendMode == false  &&  prependMode == false) {
@@ -1741,9 +1741,11 @@ public class JLineEditor implements JDLEditListener {
         );
     }
 
+    /*
     private boolean isLineEditing() {
         return (pickingMode == LINE_EDITING);
     }
+    */
 
     private boolean isPointPicking() {
         return (pickingMode == POINT_PICKING);

@@ -53,15 +53,19 @@ class BoundingBoxDraw3D  implements TextPositionFilter
         //System.out.println ();
     }
 
+    /*
     private void pmsg2 (String str)
     {
         //System.out.println (str);
     }
+    */
 
+    /*
     private void pmsg2 ()
     {
         //System.out.println ();
     }
+    */
 
 /*--------------------------------------------------------------------------------*/
 

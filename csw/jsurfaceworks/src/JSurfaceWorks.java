@@ -10,11 +10,11 @@
 
 package csw.jsurfaceworks.src;
 
-import java.lang.Thread;
+//import java.lang.Thread;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
+//import java.util.Iterator;
 
 import javax.swing.SwingUtilities;
 
@@ -183,6 +183,8 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
 
 /*-------------------------------------------------------------*/
 
+    private static boolean isPaused;
+    
     static public long openLogFile (String fileName)
     {
 
@@ -209,12 +211,10 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
 
         //jsw.endThread ();
 
-        // Bypass warning.
-
         return status;
     }
 
-    private static boolean isPaused;
+    //private static boolean isPaused;
 
     public void pauseLogging ()
     {
@@ -6578,6 +6578,7 @@ xyz trimesh topology.
 /*-------------------------------------------------------------------------*/
 
 
+    /*
     private int addToAtNameArray (String name)
     {
         int        i, same, id;
@@ -6608,6 +6609,7 @@ xyz trimesh topology.
         return id;
 
     }
+    */
 
 /*-------------------------------------------------------------------------*/
 

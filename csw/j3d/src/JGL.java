@@ -14,7 +14,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.DoubleBuffer;
-import java.util.HashMap;
+//import java.util.HashMap;
 
 
 import com.jogamp.opengl.GL;
@@ -32,7 +32,7 @@ import com.jogamp.opengl.glu.GLU;
 public class JGL
 {
 
-    private static final double MAX_DEPTH_32 = 0xffffffff;
+    //private static final double MAX_DEPTH_32 = 0xffffffff;
 
     private static final double PERSPECTIVE_ANGLE = 65.0;
     private static final double PERSPECTIVE_CMIN = 0.001;
@@ -68,8 +68,7 @@ public class JGL
     private double   hit_z_value;
 
     private double   xscale, yscale, zscale;
-    private double   xtrans, ytrans, ztrans;
-
+    
     private double   near_slice, far_slice;
     private int      slicing_enabled;
 
@@ -548,9 +547,9 @@ public class JGL
 
     void TranslateD (double xt, double yt, double zt)
     {
-        xtrans = xt;
-        ytrans = yt;
-        ztrans = zt;
+        //xtrans = xt;
+        //ytrans = yt;
+        //ztrans = zt;
         gl.glTranslated (xt, yt, zt);
     }
 
