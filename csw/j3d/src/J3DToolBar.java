@@ -17,7 +17,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
+//import javax.swing.JComboBox;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
@@ -463,7 +463,7 @@ class J3DToolBar extends JToolBar {
      * Get the view properties from the panel for the initial values
      * in the global options and lighting options dialogs.
      */
-      View3DProperties viewProperties = panel.getViewProperties();
+      //View3DProperties viewProperties = panel.getViewProperties();
 
 
     /*

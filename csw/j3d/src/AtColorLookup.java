@@ -63,7 +63,7 @@ public class AtColorLookup
                            Color[] colors,
                            int nValues)
     {
-        int             size, i, n;
+        int             i;
         double          atmin, atmax, atdelta;
 
         colorValues = null;

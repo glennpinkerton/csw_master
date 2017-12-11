@@ -17,36 +17,36 @@ package csw.j3d.src;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
+//import java.awt.Component;
+//import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
+//import java.awt.Graphics2D;
 import java.awt.GridLayout;
-import java.awt.Image;
+//import java.awt.Image;
 import java.awt.Point;
 import java.awt.Robot;
-import java.awt.Toolkit;
+//import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.image.BufferedImage;
+//import java.awt.image.BufferedImage;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Date;
+//import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
+//import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
-import javax.swing.JButton;
+//import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -55,7 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
+//import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.MouseInputAdapter;
@@ -111,12 +111,12 @@ public class J3DPanel extends JPanel implements GLEventListener
     public static final long    serialVersionUID = 39923498;
 
     private final static double REASONABLE_Z_VALUE_LIMIT = 1e20;
-
-    private boolean isTesting = false;
+    
+    //private boolean isTesting = false;
 
     private boolean isPropertyApply = false;
 
-    private static J3DPanel currentPanel = null;
+    //private static J3DPanel currentPanel = null;
 
     private View3DProperties  view3DProperties;
 
@@ -132,11 +132,7 @@ public class J3DPanel extends JPanel implements GLEventListener
     private JGL               jgl;
     private GLCanvas          canvas = null;
 
-    private JLabel    pickModeLabel,
-                      objectNameLabel,
-                      xPositionLabel,
-                      yPositionLabel,
-                      zPositionLabel;
+    private JLabel    pickModeLabel;
     private JPanel    statusPanel;
 
     J3DToolBar           toolBar;
@@ -148,7 +144,7 @@ public class J3DPanel extends JPanel implements GLEventListener
 
     private AttributeDefList  atDefList = new AttributeDefList ();
 
-    private double pickTolerance = 0.0;
+    //private double pickTolerance = 0.0;
 
     /*------------------------------------------------------------------------*/
     /**
@@ -219,9 +215,9 @@ public class J3DPanel extends JPanel implements GLEventListener
         xRot = 20.0;
         yRot = 40.0;
         zRot = 0.0;
-        xRotDef = 20.0;
-        yRotDef = 40.0;
-        zRotDef = 0.0;
+        //xRotDef = 20.0;
+        //yRotDef = 40.0;
+        //zRotDef = 0.0;
         xRotHome = 20.0;
         yRotHome = 40.0;
         zRotHome = 0.0;
@@ -241,7 +237,7 @@ public class J3DPanel extends JPanel implements GLEventListener
     /*
      * By default, the panel is not in a testing mode.
      */
-        isTesting = false;
+        //isTesting = false;
 
     /*
      * Draw surfaces with solid fill and without wireframe.
@@ -301,10 +297,10 @@ public class J3DPanel extends JPanel implements GLEventListener
         nextSolidListID = 1000;
         nextWireListID = 1001;
 
-        currentPanel = this;
+        //currentPanel = this;
         tool = new J3DSelectionTool(this, jgl);
 
-        pickTolerance = 0.0;
+        //pickTolerance = 0.0;
     }
 
 /*------------------------------------------------------------------------------------------------*/
@@ -1155,7 +1151,7 @@ public class J3DPanel extends JPanel implements GLEventListener
 
 /*--------------The GLEventListener interface (JOGL)-------------------*/
 
-    private boolean displayActive = false;
+    //private boolean displayActive = false;
 
   /**
   Method used only by jogl, do not call this directly.
@@ -1200,7 +1196,6 @@ public class J3DPanel extends JPanel implements GLEventListener
                 }
             }
             pickMouseEvent = null;
-            listDrawFlag = false;
             if (targetZoomFlag) {
                 setPickModeMessage (null);
                 cmove = true;
@@ -1365,7 +1360,7 @@ public class J3DPanel extends JPanel implements GLEventListener
 
     private JFrame            parentFrame = null;
 
-    private int               isListening = 0;
+    //private int               isListening = 0;
 
     private double            externalXmin = 1.e30,
                               externalYmin = 1.e30,
@@ -1383,10 +1378,10 @@ public class J3DPanel extends JPanel implements GLEventListener
     boolean                   visibleLimitsUpdateNeeded = true;
 
     protected Scaler            scaler;
-    private double            dTiny = 0.0;
+    //private double            dTiny = 0.0;
 
-    private static final double PI = 3.1415926;
-    private static final double DTOR = PI / 180.0;
+    //private static final double PI = 3.1415926;
+    //private static final double DTOR = PI / 180.0;
 
     BoundingBoxDraw3D         boundingBox;
 
@@ -1396,7 +1391,7 @@ public class J3DPanel extends JPanel implements GLEventListener
     private double            xyUnits = 1.0;
     private double            zUnits = 1.0;
 
-    private boolean listDrawFlag = false;
+    //private boolean listDrawFlag = false;
     boolean opaqueFlag = false;
 
 /*-------------------------------------------------------------------------*/
@@ -1467,8 +1462,8 @@ public class J3DPanel extends JPanel implements GLEventListener
     private void drawMain ()
     {
 
-        Date date = new Date ();
-        long t1 = date.getTime ();
+        //Date date = new Date ();
+        //long t1 = date.getTime ();
 
     /*
      * Update the limits of the model if anything has been
@@ -1542,10 +1537,10 @@ public class J3DPanel extends JPanel implements GLEventListener
 
         drawDirty = false;
 
-        date = new Date ();
-        long t2 = date.getTime ();
+        //date = new Date ();
+        //long t2 = date.getTime ();
 
-        int delta = (int)(t2 - t1);
+        //int delta = (int)(t2 - t1);
 
 //System.out.println ("drawing time in milliseconds = "+delta);
 
@@ -1560,7 +1555,6 @@ public class J3DPanel extends JPanel implements GLEventListener
     void setDrawMatrices ()
     {
 
-        int       x1, y1, w, h;
 
         jgl.MatrixModeModel ();
         jgl.LoadIdentity ();
@@ -1820,8 +1814,6 @@ public class J3DPanel extends JPanel implements GLEventListener
         int                i, n;
         J3DFault           fp;
         J3DHorizonPatch    hp;
-        J3DLine            lp;
-        J3DText            tp;
         TriMesh            tmesh;
         double             xmin, ymin, zmin,
                            xmax, ymax, zmax;
@@ -2020,9 +2012,9 @@ public class J3DPanel extends JPanel implements GLEventListener
                           visibleZmax,
                           drawingAttributes.getVerticalExageration()
                          );
-        dTiny = (visibleXmax - visibleXmin +
-                 visibleYmax - visibleYmin +
-                 visibleZmax - visibleZmin) / 100.0;
+        //dTiny = (visibleXmax - visibleXmin +
+          //       visibleYmax - visibleYmin +
+            //     visibleZmax - visibleZmin) / 100.0;
 
     /*
      * Create new bounding "cube" objects for the new limits
@@ -2067,9 +2059,9 @@ public class J3DPanel extends JPanel implements GLEventListener
                           drawingAttributes.getVerticalExageration()
                          );
 
-        dTiny = (visibleXmax - visibleXmin +
-                 visibleYmax - visibleYmin +
-                 visibleZmax - visibleZmin) / 100.0;
+        //dTiny = (visibleXmax - visibleXmin +
+          //       visibleYmax - visibleYmin +
+            //     visibleZmax - visibleZmin) / 100.0;
 
         return;
 
@@ -2103,9 +2095,9 @@ public class J3DPanel extends JPanel implements GLEventListener
                           1.0
                          );
 
-        dTiny = (visibleXmax - visibleXmin +
-                 visibleYmax - visibleYmin +
-                 visibleZmax - visibleZmin) / 100.0;
+        //dTiny = (visibleXmax - visibleXmin +
+          //       visibleYmax - visibleYmin +
+            //     visibleZmax - visibleZmin) / 100.0;
 
         return;
 
@@ -2115,7 +2107,6 @@ public class J3DPanel extends JPanel implements GLEventListener
 
     void drawHorizonSurface (J3DHorizonPatch hp)
     {
-        int             i;
 
         if (linePickFlag == true) {
             return;
@@ -2411,7 +2402,6 @@ public class J3DPanel extends JPanel implements GLEventListener
 
     void drawFaultSurface (J3DFault fp)
     {
-        int             i;
 
         if (linePickFlag == true) {
             return;
@@ -2598,7 +2588,7 @@ public class J3DPanel extends JPanel implements GLEventListener
     double            xRot, yRot, zRot, xRotPress;
     double            xScale, yScale, zScale;
     private double            xTransDef, yTransDef, zTransDef;
-    private double            xRotDef, yRotDef, zRotDef;
+    //private double            xRotDef, yRotDef, zRotDef;
     private double            xScaleDef, yScaleDef, zScaleDef;
     private double            xTransHome, yTransHome, zTransHome;
     private double            xRotHome, yRotHome, zRotHome;
@@ -2647,7 +2637,7 @@ public class J3DPanel extends JPanel implements GLEventListener
         }
 
         J3DLineTool lineTool = (J3DLineTool) tool;
-        int         npoint, i, j, istat;
+        int         npoint, i, j;
 
         initNames();
         pushName (J3DConst.LINE3D_NAME);
@@ -2698,7 +2688,6 @@ public class J3DPanel extends JPanel implements GLEventListener
                     za = la.getZArray();
                     int n2 = xa.length;
 
-                    int nt = 0;
                     jgl.StartDrawMode ();
                     jgl.SetDrawStyle (JGL.DG_MESH);
                     jgl.SetDrawCulling (0);
@@ -3159,7 +3148,7 @@ public class J3DPanel extends JPanel implements GLEventListener
         jgl.MatrixModeModel ();
         jgl.LoadIdentity ();
 
-        String unitString, xyString, zString, valString;
+        String unitString, xyString, zString;
 
         if (xyUnits < 0.9) {
             xyString = "feet";
@@ -3546,7 +3535,6 @@ public class J3DPanel extends JPanel implements GLEventListener
     {
         pickScheduled = true;
         pickMouseEvent = e;
-            listDrawFlag = false;
         localRepaint ();
     }
 
@@ -4089,7 +4077,7 @@ public class J3DPanel extends JPanel implements GLEventListener
         return;
 
     }
-
+/*
     private void callPickModeChangedListeners (int oldmode, int newmode)
     {
 
@@ -4107,7 +4095,7 @@ public class J3DPanel extends JPanel implements GLEventListener
         return;
 
     }
-
+*/
 
 /*---------------------------------------------------------------------*/
 
@@ -4182,6 +4170,7 @@ public class J3DPanel extends JPanel implements GLEventListener
         visibleListenerList.clear ();
     }
 
+    /*
     private void callVisibleListeners ()
     {
         ArrayList<J3DFault>         flist;
@@ -4222,7 +4211,8 @@ public class J3DPanel extends JPanel implements GLEventListener
 
         return;
     }
-
+*/
+    
  /*------------------------------------------------------------------------------*/
 
 /**
@@ -4285,6 +4275,8 @@ public class J3DPanel extends JPanel implements GLEventListener
  *  Return an {@link ArrayList}<J3DLine> of all J3DLine objects currently visible.
  *  If there are none, the array list will be empty.
  */
+    
+    /*
     private ArrayList<J3DLine> getVisibleLines ()
     {
         if (lineList == null) {
@@ -4297,10 +4289,10 @@ public class J3DPanel extends JPanel implements GLEventListener
 
         J3DLine lp;
 
-    /*
-     * Create and populate the returned array of J3DLine
-     * objects.
-     */
+    //
+    // Create and populate the returned array of J3DLine
+    // objects.
+    //
         ArrayList<J3DLine> lines = new ArrayList<J3DLine> ();
 
         for (i=0; i<n; i++) {
@@ -4316,6 +4308,8 @@ public class J3DPanel extends JPanel implements GLEventListener
 
         return lines;
     }
+
+*/
 
 /*--------------------------------------------------------------------------------*/
 
@@ -4837,9 +4831,7 @@ public class J3DPanel extends JPanel implements GLEventListener
  */
       public void hideSelectedHorizons ()
       {
-          int                i, n;
-          J3DHorizonPatch    hp;
-          ArrayList<J3DHorizonPatch> selectedPatches = new ArrayList<J3DHorizonPatch>();
+          //ArrayList<J3DHorizonPatch> selectedPatches = new ArrayList<J3DHorizonPatch>();
       /*
        * Make selected horizon surfaces invisible.
        */
@@ -5811,12 +5803,12 @@ public class J3DPanel extends JPanel implements GLEventListener
 /*---------------------------------------------------------------------------------*/
 
 
-    private boolean debugProperties = false;
-    private int NumSetProp = 0;
+    //private boolean debugProperties = false;
+    //private int NumSetProp = 0;
 
     public void setDebugProperties (boolean bval)
     {
-      debugProperties = true;
+     // debugProperties = true;
     }
 
 /*---------------------------------------------------------------------------------*/

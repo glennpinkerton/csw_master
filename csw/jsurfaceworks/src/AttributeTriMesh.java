@@ -25,7 +25,7 @@ package csw.jsurfaceworks.src;
 */
 public class AttributeTriMesh {
 
-  private static final int    maxList = 100;
+//  private static final int    maxList = 100;
 
   TriMesh               tmesh;
 

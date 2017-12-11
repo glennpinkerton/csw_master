@@ -43,8 +43,7 @@ class Scaler
                              xcenter,
                              ycenter,
                              zcenter;
-        double               ct, xt, yt, zt, dx, dy, dz;
-        int                  i;
+        double               ct, xt, yt, zt;
 
         if (raw_z_exag < 0.01) {
             raw_z_exag = 0.01;

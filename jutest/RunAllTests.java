@@ -1,7 +1,7 @@
 
 package jutest;
 
-import org.junit.runner.JUnitCore;
+//import org.junit.runner.JUnitCore;
 
 
 public class RunAllTests {

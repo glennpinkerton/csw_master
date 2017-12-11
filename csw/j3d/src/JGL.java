@@ -14,7 +14,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.DoubleBuffer;
-import java.util.HashMap;
+//import java.util.HashMap;
 
 
 import com.jogamp.opengl.GL;
@@ -32,7 +32,7 @@ import com.jogamp.opengl.glu.GLU;
 public class JGL
 {
 
-    private static final double MAX_DEPTH_32 = 0xffffffff;
+    //private static final double MAX_DEPTH_32 = 0xffffffff;
 
     private static final double PERSPECTIVE_ANGLE = 65.0;
     private static final double PERSPECTIVE_CMIN = 0.001;
@@ -68,8 +68,7 @@ public class JGL
     private double   hit_z_value;
 
     private double   xscale, yscale, zscale;
-    private double   xtrans, ytrans, ztrans;
-
+    
     private double   near_slice, far_slice;
     private int      slicing_enabled;
 
@@ -548,9 +547,9 @@ public class JGL
 
     void TranslateD (double xt, double yt, double zt)
     {
-        xtrans = xt;
-        ytrans = yt;
-        ztrans = zt;
+        //xtrans = xt;
+        //ytrans = yt;
+        //ztrans = zt;
         gl.glTranslated (xt, yt, zt);
     }
 
@@ -1000,7 +999,7 @@ public class JGL
     int ProcessHits (int hits, IntBuffer buffer)
     {
         int         i, j, found, istat;
-        int         zt1, zt2, names;
+        int         zt1, names;
         int         nstack[];
         int         trap_stack[], trap_found, trap_stack_size;
         long        real_trap_dist, trap_dist, dist, zt, z1, d1, d2, zdelta;
@@ -1333,7 +1332,7 @@ public class JGL
         UpdateMatrices ();
         double width = viewport_matrix[2];
         double height = viewport_matrix[3];
-        double depth = 100;
+        //double depth = 100;
 
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
@@ -1501,7 +1500,7 @@ public class JGL
 
         int nrow = bi.getHeight();
         int ncol = bi.getWidth();
-        int i, j, rgb, r, offset, k, nbit;
+        int i, j, rgb, offset, k, nbit;
 
         int bcol = ncol / 32;
         bcol++;
@@ -2024,7 +2023,7 @@ System.out.println (projection_matrix[12]+" "+
     {
         byte[]       bdata;
         int          width, height, ncol, nrow;
-        int          i, j, rgb, r, offset, k, nbit, bcol;
+        int          i, j, rgb, offset, k, nbit, bcol;
 
         if (textPositionLock != -1  &&  anchor != textPositionLock) {
             return 0;
@@ -2256,11 +2255,9 @@ System.out.println (projection_matrix[12]+" "+
         JPoint2D[] p2dArray,
         int        max2d)
     {
-        double       params[];
         int          iparams[];
         int          i;
 
-        params = new double[5];
         iparams = new int[5];
 
         IntBuffer  ib = toIB (iparams);

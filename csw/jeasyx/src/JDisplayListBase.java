@@ -1732,21 +1732,7 @@ class JDisplayListBase extends DLConst {
     protected int localDrawFunc () {
 
         int             status;
-        int             nprim, i, ntot, j;
-        int             a, r, g, b;
-        int             closure, pattern, small_flag;
-        int[]           rgb_array;
-        Graphics2D      g2d, g2d_fg, g2d_bg;
-
-        NativePrim.Image     native_image;
-        NativePrim.Arc       native_arc;
-        NativePrim.FilledArc native_filled_arc;
-        NativePrim.Text      native_text;
-        NativePrim.Line      native_line;
-        NativePrim.Fill      native_fill;
-
-        Color           fill_color;
-        Color           arc_color;
+        Graphics2D      g2d_fg, g2d_bg;
 
         if (foregroundImage == null  ||  backgroundImage == null) {
             return 0;
@@ -1953,7 +1939,6 @@ class JDisplayListBase extends DLConst {
 
     boolean getEditPrimitives (int dlNum)
     {
-        NativePrim.Frame    frame;
 
         clearSelectedPrims ();
 
@@ -3164,7 +3149,6 @@ class JDisplayListBase extends DLConst {
 
     void createDefaultPopup (int ix, int iy)
     {
-        boolean    good = false;
 
         int nsel = checkSelectedPrims ();
 
