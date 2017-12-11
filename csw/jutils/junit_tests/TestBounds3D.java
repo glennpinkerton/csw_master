@@ -300,12 +300,12 @@ public class TestBounds3D {
             ya[i] = 2.0;
             za[i] = 2.0;
         } 
-        Bounds3D  b3d;
+        Bounds3D  b3d = null;
         try {
             b3d = new Bounds3D (xa, ya, za);
         }
         catch (IllegalArgumentException ex) {
-            return;
+            if (b3d == null) return;
         }
         Assert.fail();
     }
@@ -313,12 +313,12 @@ public class TestBounds3D {
 // Test expand when constructed from null arrays
     @Test
     public void testB3DNullArrays() {
-        Bounds3D  b3d;
+        Bounds3D  b3d = null;
         try {
             b3d = new Bounds3D (null, null, null);
         }
         catch (IllegalArgumentException ex) {
-            return;
+            if (b3d == null) return;
         }
         Assert.fail();
     }
@@ -450,12 +450,12 @@ public class TestBounds3D {
 // Test when constructed from null polyline
     @Test
     public void testB3DNullPolyline() {
-        Bounds3D  b3d;
+        Bounds3D  b3d = null;
         try {
             b3d = new Bounds3D ((XYZPolyline) null);
         }
         catch (IllegalArgumentException ex) {
-            return;
+            if (b3d == null) return;
         }
         Assert.fail();
     }

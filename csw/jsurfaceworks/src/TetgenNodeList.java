@@ -64,12 +64,10 @@ public class TetgenNodeList {
       }
     }
 
-    int    ntot, idum, nattrib, markflag;
+    int    ntot, markflag;
 
     StringTokenizer tokenizer = new StringTokenizer(text);
     ntot = Integer.parseInt (tokenizer.nextToken());
-    idum = Integer.parseInt (tokenizer.nextToken());
-    nattrib = Integer.parseInt (tokenizer.nextToken());
     markflag = Integer.parseInt (tokenizer.nextToken());
 
     if (ntot < 4) {
@@ -128,7 +126,6 @@ public class TetgenNodeList {
       text = alist.get (i);
 
       tokenizer = new StringTokenizer(text);
-      idum = Integer.parseInt (tokenizer.nextToken());
       xt = Double.parseDouble (tokenizer.nextToken());
       yt = Double.parseDouble (tokenizer.nextToken());
       zt = Double.parseDouble (tokenizer.nextToken());

@@ -40,12 +40,11 @@ class SplitTest2D extends JFrame
 
 	private static final long      serialVersionUID = 1L;
 
-    private String                 fileName;
+    //private String                 fileName;
     private JDisplayList           dl;
 
-    private double[]               xBorder,
-                                   yBorder;
-    private int                    nBorder;
+    //private double[]               xBorder;
+    //private int                    nBorder;
 
     public SplitTest2D ()
     {

@@ -32,7 +32,7 @@ import java.awt.event.WindowListener;
 import java.awt.geom.Rectangle2D;
 
 import java.util.ArrayList;
-import java.util.Date;
+//import java.util.Date;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -40,7 +40,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.MouseInputAdapter;
 
-import org.apache.logging.log4j.LogManager;
+//import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import csw.jutils.src.CSWLogger;

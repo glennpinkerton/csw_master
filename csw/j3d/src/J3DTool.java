@@ -4,7 +4,7 @@ package csw.j3d.src;
 
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
-import java.util.Date;
+//import java.util.Date;
 
 /**
  * J3DPanel tool for selection, digitizing, and editing.
@@ -61,8 +61,6 @@ public abstract class J3DTool {
 
     int[] names = new int[100];
     int n;
-
-    boolean target = false;
 
     for (int i = 0; i < 3; i++) {
 
@@ -147,8 +145,8 @@ public abstract class J3DTool {
   }
 
   private void drawSelect() {
-    Date date = new Date();
-    long t1 = date.getTime();
+    //Date date = new Date();
+    //long t1 = date.getTime();
 
     jgl.ClearDepthBuffer();
     //jgl.ClearColorAndDepthBuffers ();
@@ -167,10 +165,10 @@ public abstract class J3DTool {
       panel.drawZoomTargets();
     }
 
-    date = new Date();
-    long t2 = date.getTime();
+    //date = new Date();
+    //long t2 = date.getTime();
 
-    t2 -= t1;
+    //t2 -= t1;
 
     //System.out.println ("picking time in milliseconds = "+t2);
   }
@@ -274,7 +272,7 @@ public abstract class J3DTool {
 
   protected void callRightClickListeners() {
 
-    int ix, iy, ix2, iy2;
+    int ix, iy;
 
     int size = panel.rightClickListenerList.size();
     if (size < 1) {

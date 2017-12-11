@@ -11,7 +11,7 @@
 package csw.j3d.src;
 
 import java.awt.Dimension;
-import java.awt.Frame;
+//import java.awt.Frame;
 
 import javax.swing.JComboBox;
 import javax.swing.JToolBar;
@@ -30,9 +30,9 @@ class J3DAtToolBar extends JToolBar {
 
     private J3DPanel      panel;
     private JComboBox<AttributeDef>     atCombo;
-    private JToolBar      propToolBar;
+    //private JToolBar      propToolBar;
 
-    private Frame         parentFrame;
+    //private Frame         parentFrame;
 
     public static final long  serialVersionUID = 630998833;
 

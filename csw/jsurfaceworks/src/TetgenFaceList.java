@@ -117,14 +117,11 @@ public class TetgenFaceList {
       marks = null;
     }
 
-    int   idum;
-
     for (int i=0; i<nlines; i++) {
 
       text = alist.get (i);
 
       tokenizer = new StringTokenizer(text);
-      idum = Integer.parseInt (tokenizer.nextToken());
       n1[i] = Integer.parseInt (tokenizer.nextToken());
       n2[i] = Integer.parseInt (tokenizer.nextToken());
       n3[i] = Integer.parseInt (tokenizer.nextToken());

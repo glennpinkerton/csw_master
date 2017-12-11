@@ -279,7 +279,7 @@ public class JDisplayList extends JDisplayListBase {
     static private synchronized void cleanupFinalizedDisplayList ()
     {
 
-        int      i, size, id;
+        int      i, size;
         int[]    ilist = new int [1];
 
         Integer  iobj;
@@ -905,7 +905,7 @@ public class JDisplayList extends JDisplayListBase {
           Ddata
         );
 
-        return 1;
+        return status;
     }
 
 /*-------------------------------------------------------------*/
@@ -2702,8 +2702,6 @@ of Font.BOLD|Font.ITALIC.
                 fontName,
                 fontStyle);
         }
-
-        Font font = deriveFontForIndex (index, 1.0);
 
         currentFont = index + 1000;
 
@@ -4527,8 +4525,7 @@ of Font.BOLD|Font.ITALIC.
                            DLSurfaceProperties p)
     {
 
-        int i, j, n, npts, nl, ntot;
-        double[] x, y, z;
+        int i, ntot;
 
         if (name == null  ||
             tmesh == null) {

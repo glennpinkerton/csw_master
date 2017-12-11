@@ -247,12 +247,15 @@ public class TestBounds2D {
         for (int i=0; i<5; i++) {
             ya[i] = 2.0;
         } 
-        Bounds2D  b2d;
+        
+        Bounds2D  b2d = null;
         try {
             b2d = new Bounds2D (xa, ya);
         }
         catch (IllegalArgumentException ex) {
-            return;
+        	if (b2d == null) {
+                return;
+        	}
         }
         Assert.fail();
     }
@@ -260,12 +263,12 @@ public class TestBounds2D {
 // Test when constructed from null arrays
     @Test
     public void testB2DNullArrays() {
-        Bounds2D  b2d;
+        Bounds2D  b2d = null;
         try {
             b2d = new Bounds2D (null, null);
         }
         catch (IllegalArgumentException ex) {
-            return;
+            if (b2d == null) return;
         }
         Assert.fail();
     }
@@ -381,12 +384,12 @@ public class TestBounds2D {
 // Test when constructed from null polyline
     @Test
     public void testB2DNullPolyline() {
-        Bounds2D  b2d;
+        Bounds2D  b2d = null;
         try {
             b2d = new Bounds2D ((XYZPolyline) null);
         }
         catch (IllegalArgumentException ex) {
-            return;
+            if (b2d == null) return;
         }
         Assert.fail();
     }

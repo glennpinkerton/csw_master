@@ -200,7 +200,7 @@ public abstract class J3DLineTool extends J3DTool {
   protected JPoint3D findEditPoint(double x, double y, double z,
       int toleranceFactor) {
     int i, n;
-    double dx, dy, dz, d1, d2;
+    double dx, dy, dz, d1;
     double dmin, dt;
     int imin;
     JPoint3D p;

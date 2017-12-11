@@ -10,11 +10,11 @@
 
 package csw.jsurfaceworks.src;
 
-import java.lang.Thread;
+//import java.lang.Thread;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
+//import java.util.Iterator;
 
 import javax.swing.SwingUtilities;
 
@@ -183,6 +183,8 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
 
 /*-------------------------------------------------------------*/
 
+    //private static boolean isPaused;
+    
     static public long openLogFile (String fileName)
     {
 
@@ -205,14 +207,13 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
                      null,
                      null,
                      null);
-        isPaused = false;
+        //isPaused = false;
 
         //jsw.endThread ();
 
         return status;
     }
 
-    private static boolean isPaused;
 
     public void pauseLogging ()
     {
@@ -225,7 +226,7 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
                      null,
                      null,
                      null);
-        isPaused = true;
+       // isPaused = true;
         return;
     }
 
@@ -240,7 +241,7 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
                      null,
                      null,
                      null);
-        isPaused = false;
+        //isPaused = false;
         return;
     }
 
@@ -1734,11 +1735,11 @@ or set to false if the trimesh will be used for anything else.
         if (n < 3) {
             ArrayList<XYZNode> na = new ArrayList<XYZNode> (n + 2 * nl);
             if (n > 0  &&  nodes != null) {
-                XYZNode  xyzn1, xyzn2;
+                //XYZNode  xyzn2;
                 for (i=0; i<n; i++) {
-                    xyzn1 = na.get(i);
-                    xyzn2 = nodes.get(i);
-                    xyzn1 = xyzn2;
+                    //xyzn1 = na.get(i);
+                    //xyzn2 = nodes.get(i);
+                    //xyzn1 = xyzn2;
                 }
             }
             XYZNode  xyzn;
@@ -4278,11 +4279,11 @@ or set to false if the trimesh will be used for anything else.
         if (n < 3) {
             ArrayList<XYZNode> na = new ArrayList<XYZNode> (n + 2 * nl);
             if (n > 0  &&  nodes != null) {
-                XYZNode xyzn1, xyzn2;
+                //XYZNode xyzn1;
                 for (i=0; i<n; i++) {
-                    xyzn1 = nodes.get(i);
-                    xyzn2 = na.get(i);
-                    xyzn2 = xyzn1;
+                    //xyzn1 = nodes.get(i);
+                    //xyzn2 = na.get(i);
+                    //xyzn2 = xyzn1;
                 }
             }
             XYZNode  xyzn;
@@ -6351,7 +6352,7 @@ or set to false if the trimesh will be used for anything else.
 /*-------------------------------------------------------------------------*/
 
     private String[]        atNameArray = new String[100];
-    private int             numAtNameArray;
+    //private int             numAtNameArray;
 
 /**
 Start the definition of an attribute trimesh.  An attribute trimesh is
@@ -6471,7 +6472,7 @@ xyz trimesh topology.
                                Ddata);
 
         atNameArray[0] = null;
-        numAtNameArray = 1;
+        //numAtNameArray = 1;
 
     }
 
@@ -6576,6 +6577,7 @@ xyz trimesh topology.
 /*-------------------------------------------------------------------------*/
 
 
+    /*
     private int addToAtNameArray (String name)
     {
         int        i, same, id;
@@ -6606,6 +6608,7 @@ xyz trimesh topology.
         return id;
 
     }
+    */
 
 /*-------------------------------------------------------------------------*/
 

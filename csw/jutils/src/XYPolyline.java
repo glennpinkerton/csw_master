@@ -10,10 +10,10 @@
 
 package csw.jutils.src;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+//import java.io.FileNotFoundException;
+//import java.io.IOException;
 
-import org.w3c.dom.Element;
+//import org.w3c.dom.Element;
 
 /**
  * Stores x, y nodes for a 2-D polyline.

@@ -114,7 +114,7 @@ public class TriangleArray {
         return copy;
     }
 
-    private void dump() 
+    //private void dump() 
 	{
         System.out.println("TriangleArray:");
         for (int index=0; index<getSize(); index++) {

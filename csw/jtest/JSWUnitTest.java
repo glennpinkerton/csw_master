@@ -437,7 +437,7 @@ class TFileFrame extends JFrame
 
 	private static final long serialVersionUID = 1L;
 
-    private String                 fileName;
+    //private String                 fileName;
     private JTextField             tField, tField2, tField3;
 
     private JDisplayList           dl;
@@ -552,10 +552,9 @@ class TFileFrame extends JFrame
         double[] xa;
         double[] ya;
         double[] za;
-        int      npts, i, n, vflag;
-        double   xmid, ymid;
+        int      npts, i, n;
 
-        vflag = dblist.vflag;
+        //vflag = dblist.vflag;
 
         dl.setFrameClip (1);
         dl.createFrame ("debug trimesh file frame",
@@ -781,14 +780,12 @@ class TFileFrame extends JFrame
 
         int[] en1 = tmesh.getEdgeNode0Array ();
         int[] en2 = tmesh.getEdgeNode1Array ();
-        int[] et1 = tmesh.getEdgeTriangle0Array ();
         int[] et2 = tmesh.getEdgeTriangle1Array ();
         int numEdges = tmesh.getNumEdges ();
 
-        int[] te1 = tmesh.getTriangleEdge0Array ();
-        int[] te2 = tmesh.getTriangleEdge1Array ();
-        int[] te3 = tmesh.getTriangleEdge2Array ();
-        int numTriangles = tmesh.getNumTriangles ();
+        //int[] te1 = tmesh.getTriangleEdge0Array ();
+        //int[] te2 = tmesh.getTriangleEdge1Array ();
+        //int[] te3 = tmesh.getTriangleEdge2Array ();
 
       /*
        * Draw the node locations as labeled x marks.
@@ -812,7 +809,7 @@ class TFileFrame extends JFrame
        */
         double[] xline = new double[2];
         double[] yline = new double[2];
-        int    n1, n2, n3;
+        int    n1, n2;
 
         double   xt, yt;
 
@@ -883,7 +880,7 @@ class FileioFrame extends JFrame
 
 	private static final long serialVersionUID = 1L;
 
-    private String                 fileName;
+    //private String                 fileName;
     private JTextField             tField;
 
     private JDisplayList           dl;
@@ -1153,7 +1150,7 @@ class PFileFrame extends JFrame
 
 	private static final long serialVersionUID = 1L;
 
-    private String                 fileName;
+    //private String                 fileName;
     private JTextField             tField, tField2;
 
     private JDisplayList           dl;
@@ -1675,7 +1672,7 @@ class DivideFrame extends JFrame
 
 	private static final long serialVersionUID = 1L;
 
-    private String                 fileName;
+   // private String                 fileName;
     private JTextField             tField, tField2, tField3;
     private JButton                flipButton;
     private JButton                flipButton2;
@@ -1809,8 +1806,7 @@ class DivideFrame extends JFrame
         double[] znodes = dblist.z;
         int np = dblist.npts;
 
-        int      npts, i, j, k, n;
-        double   xmid, ymid;
+        int      i;
 
         dl.setFrameClip (1);
 
@@ -1876,8 +1872,7 @@ class DivideFrame extends JFrame
         double[] xline;
         double[] yline;
 
-        int      npts, i, j, k, n;
-        double   xmid, ymid;
+        int      i, j;
 
         dl.setFrameClip (1);
 
@@ -2025,14 +2020,12 @@ class DivideFrame extends JFrame
 
         int[] en1 = tmesh.getEdgeNode0Array ();
         int[] en2 = tmesh.getEdgeNode1Array ();
-        int[] et1 = tmesh.getEdgeTriangle0Array ();
         int[] et2 = tmesh.getEdgeTriangle1Array ();
         int[] efa = tmesh.getEdgeFlagArray ();
         int numEdges = tmesh.getNumEdges ();
 
         int[] te1 = tmesh.getTriangleEdge0Array ();
         int[] te2 = tmesh.getTriangleEdge1Array ();
-        int[] te3 = tmesh.getTriangleEdge2Array ();
         int numTriangles = tmesh.getNumTriangles ();
 
       /*
@@ -2062,7 +2055,7 @@ class DivideFrame extends JFrame
        */
         double[] xline = new double[2];
         double[] yline = new double[2];
-        int    n1, n2, n3;
+        int    n1, n2;
 
         double   xt, yt, xdiv;
 
@@ -2139,34 +2132,34 @@ class DivideFrame extends JFrame
        * draw a blue * at the center of each triangle.
        */
         dl.setSymbolColor (Color.blue);
-        double     xcenter, ycenter, xmid, ymid;
+        //double     xmid;
         for (i=0; i<numTriangles; i++) {
             int e1 = te1[i];
             int e2 = te2[i];
             n1 = en1[e1];
             n2 = en2[e1];
             if (en1[e2] != n1  &&  en1[e2] != n2) {
-                n3 = en1[e2];
+                //n3 = en1[e2];
             }
             else {
-                n3 = en2[e2];
+                //n3 = en2[e2];
             }
-            xcenter = 0.0;
-            ycenter = 0.0;
-            xmid = (xnodes[n1] + xnodes[n2]) / 2.0;
-            ymid = (ynodes[n1] + ynodes[n2]) / 2.0;
-            xcenter += xmid;
-            ycenter += ymid;
-            xmid = (xnodes[n1] + xnodes[n3]) / 2.0;
-            ymid = (ynodes[n1] + ynodes[n3]) / 2.0;
-            xcenter += xmid;
-            ycenter += ymid;
-            xmid = (xnodes[n3] + xnodes[n2]) / 2.0;
-            ymid = (ynodes[n3] + ynodes[n2]) / 2.0;
-            xcenter += xmid;
-            ycenter += ymid;
-            xcenter /= 3.0;
-            ycenter /= 3.0;
+            //xcenter = 0.0;
+            //ycenter = 0.0;
+            //xmid = (xnodes[n1] + xnodes[n2]) / 2.0;
+            //ymid = (ynodes[n1] + ynodes[n2]) / 2.0;
+            //xcenter += xmid;
+            //ycenter += ymid;
+            //xmid = (xnodes[n1] + xnodes[n3]) / 2.0;
+            //ymid = (ynodes[n1] + ynodes[n3]) / 2.0;
+            //xcenter += xmid;
+            //ycenter += ymid;
+            //xmid = (xnodes[n3] + xnodes[n2]) / 2.0;
+            //ymid = (ynodes[n3] + ynodes[n2]) / 2.0;
+            //xcenter += xmid;
+            //ycenter += ymid;
+            //xcenter /= 3.0;
+            //ycenter /= 3.0;
             //dl.addSymbol (xcenter, ycenter, 0.05, 0.0, 19);
         }
 
@@ -2196,7 +2189,7 @@ class GridFileFrame extends JFrame
 
 	private static final long serialVersionUID = 1L;
 
-    private String                 fileName;
+    //private String                 fileName;
     private JTextField             tField;
     private JTextField             tField2;
     private JCheckBox              checkBox;
@@ -2548,7 +2541,6 @@ class ResampleFrame extends JFrame
 
     void updateLines ()
     {
-        TriMesh    tmesh;
 
         fileName = tField.getText ();
         fileName2 = tField2.getText ();
