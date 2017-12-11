@@ -210,7 +210,6 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
         //jsw.endThread ();
 
         // Bypass warning.
-        if (false && isPaused) return(status);
 
         return status;
     }
