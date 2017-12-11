@@ -1,4 +1,3 @@
-
 /*
          ************************************************
          *                                              *
@@ -1392,6 +1391,7 @@ public class J3DPanel extends JPanel implements GLEventListener
     private double            zUnits = 1.0;
 
     //private boolean listDrawFlag = false;
+
     boolean opaqueFlag = false;
 
 /*-------------------------------------------------------------------------*/
