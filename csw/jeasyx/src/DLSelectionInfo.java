@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -11,6 +11,10 @@
 package csw.jeasyx.src;
 
 import java.util.ArrayList;
+
+import org.apache.logging.log4j.Logger;
+import csw.jutils.src.CSWLogger;
+
 
 /**
  An instance of this class provides the information associated with a
@@ -23,6 +27,8 @@ import java.util.ArrayList;
 */
 public class DLSelectionInfo
 {
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
 /*
  * members have package scope so they can be directly
@@ -44,14 +50,23 @@ public class DLSelectionInfo
  */
     public void dump ()
     {
+        System.out.println ();
         System.out.println ("xPick = "+xPick);
         System.out.println ("yPick = "+yPick);
         System.out.println ("zPick = "+zPick);
         System.out.println ("xScreen = "+xScreen);
         System.out.println ("yScreen = "+yScreen);
 
+        logger.info ("Item selection info");
+        logger.info ("    xPick = "+xPick);
+        logger.info ("    yPick = "+yPick);
+        logger.info ("    zPick = "+zPick);
+        logger.info ("    xScreen = "+xScreen);
+        logger.info ("    yScreen = "+yScreen);
+
         if (selectableList == null) {
             System.out.println ("Number of Selected Items = 0");
+            logger.info ("  Number of Selected Items = 0");
             return;
         }
 
@@ -68,7 +83,7 @@ public class DLSelectionInfo
             }
         }
 
-        System.out.println ("Number of Selected Items = "+n);
+        System.out.println ("Number of Selected Items = " + n);
         if (n > 0) {
             n = 0;
             for (i=0; i<size; i++) {
@@ -80,7 +95,8 @@ public class DLSelectionInfo
                     else {
                         str = dls.applicationData.toString();
                     }
-                    System.out.println ("Item "+n+": "+str);
+                    System.out.println ("Item " + n + ": " + str);
+                    logger.info ("    Item " + n + ": " + str);
                     n++;
                 }
             }

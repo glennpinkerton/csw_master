@@ -4946,21 +4946,23 @@ of Font.BOLD|Font.ITALIC.
     }
 
     public void pickNewPointGeometry(DLEditListener fb, JLineEditor jle) {
-    if (fb == null) {
-      throw new IllegalArgumentException(
-          "Calling pickNewLineGeometry with a null feedback listener.");
+        if (fb == null) {
+          throw new IllegalArgumentException(
+              "Calling pickNewLineGeometry with a null feedback listener.");
+        }
+
+        JLineEditor jl;
+        if (jle == null) {
+            jl = new JLineEditor(this, dlPanel, fb, -1, JLineEditor.POINT_PICKING);
+        } else {
+            jl = jle;
+        }
+
+        setEditor(jl);
+
     }
 
-    JLineEditor jl;
-    if (jle == null) {
-        jl = new JLineEditor(this, dlPanel, fb, -1, JLineEditor.POINT_PICKING);
-    } else {
-        jl = jle;
-    }
 
-    setEditor(jl);
-
-  }
 
     public void pickNewFunction(DLEditListener fb) {
         if (fb == null) {

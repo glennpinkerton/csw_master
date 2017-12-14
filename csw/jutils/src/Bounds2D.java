@@ -175,6 +175,7 @@ public class Bounds2D {
               ("Bounds2D XYZPolyline has less than 2 points");
         }
 
+        reset ();
         minX = Math.min(minX, polyline.getMinX());
         maxX = Math.max(maxX, polyline.getMaxX());
         minY = Math.min(minY, polyline.getMinY());

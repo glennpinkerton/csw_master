@@ -7,6 +7,8 @@ done
 
 gcc -o lib_csw_all.so -shared *.o -lm -lc -lstdc++
 
+cp -f lib_csw_all.so $ECLIPSE_PARENT/csw/lib
+
 mv shr_lib_link.o shr_lib_link.z
 rm -f *.o
 mv shr_lib_link.z shr_lib_link.o

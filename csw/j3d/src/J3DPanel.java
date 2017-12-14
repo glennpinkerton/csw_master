@@ -1,7 +1,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -16,36 +16,27 @@ package csw.j3d.src;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-//import java.awt.Component;
-//import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-//import java.awt.Graphics2D;
 import java.awt.GridLayout;
-//import java.awt.Image;
 import java.awt.Point;
 import java.awt.Robot;
-//import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-//import java.awt.image.BufferedImage;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-//import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-//import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
-//import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -54,40 +45,42 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-//import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.MouseInputAdapter;
 
-//import javax.media.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLAutoDrawable;
 
 
 import com.jogamp.opengl.GL;
-//import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.GLCapabilities;
-//import com.jogamp.opengl.GLDrawable;
-//import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.glu.GLU;
 
-/*
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLCanvas;
-import net.java.games.jogl.GLCapabilities;
-import net.java.games.jogl.GLDrawable;
-import net.java.games.jogl.GLDrawableFactory;
-import net.java.games.jogl.GLEventListener;
-import net.java.games.jogl.GLU;
-*/
-
-//import images.jtoolbar.general.JIconsGeneral;
 
 import csw.jsurfaceworks.src.*;
-
 import csw.jutils.src.*;
+
+
+// imports marked as unused by eclipse.
+
+//import java.awt.Graphics2D;
+//import java.awt.Image;
+//import java.awt.Toolkit;
+//import java.awt.image.BufferedImage;
+//import java.util.Date;
+//import javax.swing.Box;
+//import javax.swing.JButton;
+//import javax.swing.SwingConstants;
+//import javax.media.opengl.GLAutoDrawable;
+//import com.jogamp.opengl.GL4;
+//import com.jogamp.opengl.GLDrawable;
+//import com.jogamp.opengl.GLDrawableFactory;
+//import java.awt.Component;
+//import java.awt.Cursor;
+//import images.jtoolbar.general.JIconsGeneral;
 
 /**
  * The J3DPanel class is used to draw to and interact with 3D
@@ -111,11 +104,9 @@ public class J3DPanel extends JPanel implements GLEventListener
 
     private final static double REASONABLE_Z_VALUE_LIMIT = 1e20;
     
-    //private boolean isTesting = false;
 
     private boolean isPropertyApply = false;
 
-    //private static J3DPanel currentPanel = null;
 
     private View3DProperties  view3DProperties;
 
@@ -137,15 +128,20 @@ public class J3DPanel extends JPanel implements GLEventListener
     J3DToolBar           toolBar;
     private JPanel       toolBarBox;
 
-    private J3DTool      tool;
+    private J3DTool      j3dtool;
 
     private AtColorLookup   colorLookup;
 
     private AttributeDefList  atDefList = new AttributeDefList ();
 
+
+    // class variables marked as unused by eclipse
+
+    //private boolean isTesting = false;
+    //private static J3DPanel currentPanel = null;
     //private double pickTolerance = 0.0;
 
-    /*------------------------------------------------------------------------*/
+
     /**
      * Default constructor.  Requires a successive call to setView3DProperties().
      */
@@ -297,7 +293,7 @@ public class J3DPanel extends JPanel implements GLEventListener
         nextWireListID = 1001;
 
         //currentPanel = this;
-        tool = new J3DSelectionTool(this, jgl);
+        j3dtool = new J3DSelectionTool(this, jgl);
 
         //pickTolerance = 0.0;
     }
@@ -1188,7 +1184,7 @@ public class J3DPanel extends JPanel implements GLEventListener
 
         if (pickScheduled  &&  pickMouseEvent != null) {
           double aspectRatio = (double)iwidth / (double)iheight;
-            doDraw = tool.pickObject (pickMouseEvent, aspectRatio);
+            doDraw = j3dtool.pickObject (pickMouseEvent, aspectRatio);
             if (doDraw) {
                 if (targetZoomFlag) {
                     setupTargetZoom (pickMouseEvent);
@@ -2632,11 +2628,11 @@ public class J3DPanel extends JPanel implements GLEventListener
     private void drawEditPoints ()
     {
 
-        if (!(tool instanceof J3DLineTool)) {
+        if (!(j3dtool instanceof J3DLineTool)) {
           return;
         }
 
-        J3DLineTool lineTool = (J3DLineTool) tool;
+        J3DLineTool lineTool = (J3DLineTool)j3dtool;
         int         npoint, i, j;
 
         initNames();
@@ -2667,8 +2663,7 @@ public class J3DPanel extends JPanel implements GLEventListener
         XYZPolyline     la;
 
         if (
-            (tool instanceof J3DLineTool) &&
-            ((J3DLineTool) tool).isLineMode() &&
+            lineTool.isLineMode() &&
             npoint > 1
         ) {
 
@@ -2712,11 +2707,8 @@ public class J3DPanel extends JPanel implements GLEventListener
         jgl.SetDrawPointSize (7.0);
         for (i=0; i<npoint; i++) {
             p = lineTool.editPointList.get(i);
-            if (
-              tool instanceof J3DLineEditTool &&
-              ((J3DLineEditTool) tool).isLineMode()
-            ) {
-              if (tool.pickedPoint != null && p == tool.pickedPoint) {
+            if (lineTool.isLineMode()) {
+              if (lineTool.pickedPoint != null && p == lineTool.pickedPoint) {
                 jgl.DGNodeColor(selectedPointColor);
               } else {
                 jgl.DGNodeColor(pointColor);
@@ -3548,7 +3540,7 @@ public class J3DPanel extends JPanel implements GLEventListener
     /*
      * Scale the current picked point to the unit cube.
      */
-        JPoint3D p = scaler.scalePoint (tool.pickedX, tool.pickedY, tool.pickedZ);
+        JPoint3D p = scaler.scalePoint (j3dtool.pickedX, j3dtool.pickedY, j3dtool.pickedZ);
 
     /*
      * The initial translation is based on the location of the
@@ -3705,8 +3697,8 @@ public class J3DPanel extends JPanel implements GLEventListener
         public void mouseDragged(MouseEvent e) {
 
           boolean isDone = false;
-          if (tool instanceof J3DLineEditTool) {
-            J3DLineEditTool lineEditTool = (J3DLineEditTool) tool;
+          if (j3dtool instanceof J3DLineEditTool) {
+            J3DLineEditTool lineEditTool = (J3DLineEditTool) j3dtool;
             if (lineEditTool.dragPointMode) {
                 lineEditTool.processPointDrag (e);
                 isDone = true;
@@ -3724,16 +3716,16 @@ public class J3DPanel extends JPanel implements GLEventListener
                   rotateScene (e);
               }
           }
-          if (tool instanceof J3DLineTool) {
-              ((J3DLineTool) tool).callMotionListeners ();
+          if (j3dtool instanceof J3DLineTool) {
+              ((J3DLineTool) j3dtool).callMotionListeners ();
           }
           e.consume ();
         }
 
         public void mouseMoved(MouseEvent e) {
           boolean isDone = false;
-          if (tool instanceof J3DLineEditTool) {
-            J3DLineEditTool lineEditTool = (J3DLineEditTool) tool;
+          if (j3dtool instanceof J3DLineEditTool) {
+            J3DLineEditTool lineEditTool = (J3DLineEditTool) j3dtool;
             if (lineEditTool.dragPointMode) {
               lineEditTool.processPointDrag (e);
               isDone = true;
@@ -3751,8 +3743,8 @@ public class J3DPanel extends JPanel implements GLEventListener
                   rotateScene (e);
               }
           }
-          if (tool instanceof J3DLineTool) {
-            ((J3DLineTool) tool).callMotionListeners ();
+          if (j3dtool instanceof J3DLineTool) {
+            ((J3DLineTool)j3dtool).callMotionListeners ();
           }
           e.consume ();
         }
@@ -3764,8 +3756,8 @@ public class J3DPanel extends JPanel implements GLEventListener
             if (button_1 != 0) {
                 b1X = e.getX();
                 b1Y = e.getY();
-                if (tool instanceof J3DLineEditTool) {
-                  J3DLineEditTool lineEditTool = (J3DLineEditTool) tool;
+                if (j3dtool instanceof J3DLineEditTool) {
+                  J3DLineEditTool lineEditTool = (J3DLineEditTool) j3dtool;
                   lineEditTool.startDragPickMode();
                   if (lineEditTool.dragPickScheduled)
                     scheduleObjectPick(e);
@@ -3805,8 +3797,8 @@ public class J3DPanel extends JPanel implements GLEventListener
                 dy = b1Y - e.getY();
                 b1X = -1;
                 b1Y = -1;
-                if (tool instanceof J3DLineEditTool) {
-                  J3DLineEditTool lineEditTool = (J3DLineEditTool) tool;
+                if (j3dtool instanceof J3DLineEditTool) {
+                  J3DLineEditTool lineEditTool = (J3DLineEditTool) j3dtool;
                   if (lineEditTool.isDragMode()) {
                       if (!(Math.abs(dx) < 5 && Math.abs(dy) < 5) ) {
                         scheduleObjectPick(e);
@@ -3836,7 +3828,7 @@ public class J3DPanel extends JPanel implements GLEventListener
 
             if (dx < 5  &&  dy < 5) {
                 if (isUnselectEditPoint) {
-                  tool.clearPickInfo();
+                  j3dtool.clearPickInfo();
                   localRepaint();
                 } else {
                   localClick (e);
@@ -3966,7 +3958,7 @@ public class J3DPanel extends JPanel implements GLEventListener
      * Set the picking mode for the 3d display to selection mode.
      */
      public void setSelectionMode () {
-       tool = new J3DSelectionTool(this, jgl);
+       j3dtool = new J3DSelectionTool(this, jgl);
        setCursor(null);
        setPickModeMessage (null);
        this.redrawAll();
@@ -4054,12 +4046,12 @@ public class J3DPanel extends JPanel implements GLEventListener
         J3DSelectionChangedInfo info =
             new J3DSelectionChangedInfo ();
 
-        info.xPick = tool.pickedX;
-        info.yPick = tool.pickedY;
-        info.zPick = tool.pickedZ;
+        info.xPick = j3dtool.pickedX;
+        info.yPick = j3dtool.pickedY;
+        info.zPick = j3dtool.pickedZ;
 
-        info.xScreen = tool.pickedScreenX;
-        info.yScreen = tool.pickedScreenY;
+        info.xScreen = j3dtool.pickedScreenX;
+        info.yScreen = j3dtool.pickedScreenY;
 
         info.selectedFaults = flist;
         info.selectedHorizons = hlist;

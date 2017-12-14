@@ -32,7 +32,6 @@ import java.awt.event.WindowListener;
 import java.awt.geom.Rectangle2D;
 
 import java.util.ArrayList;
-//import java.util.Date;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -40,10 +39,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.MouseInputAdapter;
 
-//import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import csw.jutils.src.CSWLogger;
+
+//import java.util.Date;
+//import org.apache.logging.log4j.LogManager;
+
 
 /**
  This class provides a swing component that can be drawn to using
@@ -51,12 +53,6 @@ import csw.jutils.src.CSWLogger;
  JDisplayList object, which you can retrieve and use for drawing to
  the panel.
 <p>
- The application should use this class if it wants to draw with minimal or
- no interaction.  There will be no zoom/pan or redraw available for this
- panel.  By default, graphics drawn into this panel are not selectable.
- You can make them selectable by calling the {@link #setSelectionAllowed}
- method. If you want a fully interactive drawing, you need to use the
- {@link SingleGraphicsPanel} class.
 */
 public class JDisplayListPanel extends JPanel
 {
@@ -689,6 +685,7 @@ public class JDisplayListPanel extends JPanel
         private void localClick (MouseEvent e)
         {
             setButtonID (e);
+
           /*
            * If in zoom rectangle mode, it is possible
            * to start or end the zoom mode on a click.
@@ -882,10 +879,14 @@ public class JDisplayListPanel extends JPanel
 
         }
 
+
         public void mouseEntered(MouseEvent e) {
         }
+
+
         public void mouseExited(MouseEvent e) {
         }
+
     };
 
 
@@ -959,11 +960,14 @@ public class JDisplayListPanel extends JPanel
 
         // Button 1
         if (button_1 != 0) {
+System.out.println ();
+System.out.println ("In selectObject  ix = " + ix + "  iy = " + iy);
             if (!e.isControlDown()) {
                 dlist.unselectAll();
                 dlist.pickFrameObject (ix, iy);
             } else {
                 int index = dlist.getSelectableIndex(ix, iy);
+System.out.println ("index for ctrl pick = " + index);
                 if (index < 0) {
                     return;
                 }
@@ -999,10 +1003,7 @@ public class JDisplayListPanel extends JPanel
   /**
   Make the graphics in the panel selectable or not selectable.  By default,
   when a {@link JDisplayListPanel} is created, the graphics are not
-  selectable.  When a {@link SingleGraphicsPanel} is created, it's constructor
-  calls this method to make itself selectable.  If you want selectable graphics,
-  you should probably use a SingleGraphicsPanel rather than directly use a
-  JDisplayListPanel.
+  selectable.  
   */
     public void setSelectionAllowed (boolean b)
     {

@@ -14,6 +14,8 @@ JAVA_SRC=\
  J3DDrawingAttributes.java\
  J3DElement.java\
  J3DFault.java\
+ J3DFrame.java\
+ J3DLightData.java\
  J3DLineEditAdapter.java \
  J3DLineEditListener.java \
  J3DHorizonPatch.java\
@@ -39,6 +41,7 @@ JAVA_SRC=\
  LineDraw3D.java\
  Math3D.java\
  Scaler.java\
+ SurfSplitFrame.java\
  TextPositionFilter.java\
  TriMeshDraw3D.java\
  View3DLightingOptionsPanel.java\
@@ -56,6 +59,8 @@ JAVA_CLASSES=\
  J3DDrawingAttributes.class\
  J3DElement.class\
  J3DFault.class\
+ J3DFrame.class\
+ J3DLightData.class\
  J3DLineEditAdapter.class \
  J3DLineEditListener.class \
  J3DHorizonPatch.class\
@@ -81,6 +86,7 @@ JAVA_CLASSES=\
  LineDraw3D.class\
  Math3D.class\
  Scaler.class\
+ SurfSplitFrame.class\
  TextPositionFilter.class\
  TriMeshDraw3D.class\
  View3DLightingOptionsPanel.class\

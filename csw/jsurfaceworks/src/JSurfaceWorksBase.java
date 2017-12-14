@@ -958,28 +958,28 @@ public class JSurfaceWorksBase {
 
 /*--------------------------------------------------------------------------*/
 
-    ArrayList<XYZPolyline> getCorrectedCenterlineList ()
+    public ArrayList<XYZPolyline> getCorrectedCenterlineList ()
     {
         return correctedCenterlineList;
     }
 
 /*--------------------------------------------------------------------------*/
 
-    ArrayList<XYZPolyline> getExtendedCenterlineList ()
+    public ArrayList<XYZPolyline> getExtendedCenterlineList ()
     {
         return extendedCenterlineList;
     }
 
 /*--------------------------------------------------------------------------*/
 
-    ArrayList<XYZPolyline> getWorkPolyList ()
+    public ArrayList<XYZPolyline> getWorkPolyList ()
     {
         return workPolyList;
     }
 
 /*--------------------------------------------------------------------------*/
 
-    ArrayList<DBPoint> getPolyLabelList ()
+    public ArrayList<DBPoint> getPolyLabelList ()
     {
         return polyLabelList;
     }
@@ -987,21 +987,21 @@ public class JSurfaceWorksBase {
 
 /*--------------------------------------------------------------------------*/
 
-    ArrayList<TriMesh> getPolyTmeshList ()
+    public ArrayList<TriMesh> getPolyTmeshList ()
     {
         return polyTmeshList;
     }
 
 /*--------------------------------------------------------------------------*/
 
-    ArrayList<TriMesh> getEfaultTmeshList ()
+    public ArrayList<TriMesh> getEfaultTmeshList ()
     {
         return efaultTmeshList;
     }
 
 /*--------------------------------------------------------------------------*/
 
-    ArrayList<DBDrapeLine> getDrapeLineList ()
+    public ArrayList<DBDrapeLine> getDrapeLineList ()
     {
         return drapeLineList;
     }

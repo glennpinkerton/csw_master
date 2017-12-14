@@ -501,5 +501,100 @@ public class TestBounds3D {
         assertEquals(d2, d, 0.01);
     }
 
+
+
+// Test expand to polyline extents
+    @Test
+    public void testB3DPolyline5() {
+        double[] xa, ya, za;
+        xa = new double[5];
+        ya = new double[5];
+        za = new double[5];
+        for (int i=0; i<5; i++) {
+            xa[i] = (double) (i);
+            ya[i] = (double) (i);
+            za[i] = (double) (i);
+        } 
+        XYZPolyline  xyzp = new XYZPolyline (xa, ya, za);
+
+        Bounds3D  b3d;
+        try {
+            b3d = new Bounds3D (0.0, 0.0, 0.0, 10.0, 8.0, 8.0);
+        }
+        catch (IllegalArgumentException ex) {
+            Assert.fail(ex.toString());
+            return;
+        }
+        try {
+            b3d.expandTo (xyzp);
+        }
+        catch (IllegalArgumentException ex) {
+            Assert.fail(ex.toString());
+            return;
+        }
+        double  w, h, w2, h2;
+        w2 = 4.0;
+        h2 = 4.0;
+        w = b3d.getWidth();
+        h = b3d.getHeight();
+        assertEquals(w2, w, 0.001);
+        assertEquals(h2, h, 0.001);
+    }
+
+
+// Test expand to null polyline extents
+    @Test
+    public void testB3DPolyline6() {
+
+        Bounds3D  b3d;
+        try {
+            b3d = new Bounds3D (0.0, 0.0, 0.0, 10.0, 8.0, 8.0);
+        }
+        catch (IllegalArgumentException ex) {
+            Assert.fail(ex.toString());
+            return;
+        }
+        try {
+            b3d.expandTo (null);
+        }
+        catch (IllegalArgumentException ex) {
+            return;
+        }
+        Assert.fail("null polyline pointer not caught");
+    }
+
+
+// Test expand to less than 2 point polyline extents
+    @Test
+    public void testB3DPolyline7() {
+
+        double[] xa, ya, za;
+        xa = new double[1];
+        ya = new double[1];
+        za = new double[1];
+        for (int i=0; i<1; i++) {
+            xa[i] = (double) (i);
+            ya[i] = (double) (i);
+            za[i] = (double) (i);
+        } 
+        XYZPolyline  xyzp = new XYZPolyline (xa, ya, za);
+
+        Bounds3D  b3d;
+        try {
+            b3d = new Bounds3D (0.0, 0.0, 0.0, 10.0, 8.0, 8.0);
+        }
+        catch (IllegalArgumentException ex) {
+            Assert.fail(ex.toString());
+            return;
+        }
+        try {
+            b3d.expandTo (null);
+        }
+        catch (IllegalArgumentException ex) {
+            return;
+        }
+        Assert.fail("Less than 2 point polyline not caught");
+    }
+
 }
 
