@@ -12,6 +12,10 @@ package csw.jeasyx.src;
 
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.Logger;
+import csw.jutils.src.CSWLogger;
+
+
 /**
  An instance of this class provides the information associated with a
  {@link DLRightClickListener} object.  Information includes the object
@@ -23,6 +27,8 @@ import java.util.ArrayList;
 */
 public class DLRightClickInfo
 {
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
 /*
  * members have package scope so they can be directly
@@ -44,14 +50,23 @@ public class DLRightClickInfo
  */
     public void dump ()
     {
+        System.out.println ();
         System.out.println ("xPick = "+xPick);
         System.out.println ("yPick = "+yPick);
         System.out.println ("zPick = "+zPick);
         System.out.println ("xScreen = "+xScreen);
         System.out.println ("yScreen = "+yScreen);
 
+        logger.info ("Right Click Info");
+        logger.info ("    xPick = " + xPick);
+        logger.info ("    yPick = " + yPick);
+        logger.info ("    zPick = " + zPick);
+        logger.info ("    xScreen = " + xScreen);
+        logger.info ("    yScreen = " + yScreen);
+
         if (selectableList == null) {
             System.out.println ("Number of Selected Items = 0");
+            logger.info ("  Number of Selected Items = 0");
             return;
         }
 
@@ -80,7 +95,8 @@ public class DLRightClickInfo
                     else {
                         str = dls.applicationData.toString();
                     }
-                    System.out.println ("Item "+n+": "+str);
+                    System.out.println ("Item " + n + ": " + str);
+                    logger.info ("  Item " + n + ": " + str);
                     n++;
                 }
             }

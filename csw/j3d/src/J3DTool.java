@@ -36,7 +36,6 @@ public abstract class J3DTool {
     super();
     this.panel = panel;
     this.jgl = jgl;
-    // TODO Auto-generated constructor stub
   }
 
   protected void clearPickInfo() {

@@ -2700,6 +2700,9 @@ class JDisplayListBase extends DLConst {
       return (jdlEditor != null);
     }
 
+
+
+
     public boolean
     processMouseEvent (MouseEvent e,
                        int type,

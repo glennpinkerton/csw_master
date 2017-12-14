@@ -5,6 +5,7 @@ include $(CSW_PARENT)/build/system.mk
 JAVA_SRC=\
  JDisplayListBase.java\
  AxisProperties.java\
+ CLine.java\
  DLArc.java\
  DLConst.java\
  DLContour.java\
@@ -41,6 +42,7 @@ JAVA_SRC=\
 JAVA_CLASSES=\
  JDisplayListBase.class\
  AxisProperties.class\
+ CLine.class\
  DLArc.class\
  DLConst.class\
  DLContour.class\

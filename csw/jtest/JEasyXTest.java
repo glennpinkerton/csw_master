@@ -32,8 +32,8 @@ import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-//import java.util.Date;
 import java.util.Random;
+//import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -90,13 +90,10 @@ public class JEasyXTest {
 
         logger.info ("    Running main method in JEasyXTest\n\n");
 
-//Thread t = Thread.currentThread ();
-//System.out.println ("at start of runMainMethod, thread = "+t);
-
         try {
           UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch(Exception e) {
-          System.out.println("Error setting native LAF: " + e);
+          logger.error ("error setting native Look and Feel");
         }
 
         String  cpar = System.getenv ("CSW_PARENT");
@@ -525,7 +522,7 @@ class SymbolFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
-    //private static Logger  logger = CSWLogger.getMyLogger ();
+    private static Logger  logger = CSWLogger.getMyLogger ();
     
     public SymbolFrame ()
     {
@@ -560,6 +557,7 @@ class SymbolFrame extends JFrame
             dl.addNumber (xsym, ysym, .10, 0.0, (double)(i+1), 0, 0);
         }
 
+        logger.info ("    Symbols with a freme finished    ");
     }
 };
 
@@ -567,7 +565,7 @@ class TextTableFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
-    //private static Logger  logger = CSWLogger.getMyLogger ();
+    private static Logger  logger = CSWLogger.getMyLogger ();
     
     public TextTableFrame ()
     {
@@ -677,6 +675,7 @@ class TextTableFrame extends JFrame
         dl.setFont (19);
         dl.addText (7.0, 1.0, 0.3, 0.0, "Font 19:  ABCdef");
 
+        logger.info ("    Text Table in a frame finished    ");
     }
 };
 
@@ -684,6 +683,8 @@ class Text2TableFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
+    private static Logger  logger = CSWLogger.getMyLogger ();
+    
     public Text2TableFrame ()
     {
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
@@ -752,6 +753,7 @@ class Text2TableFrame extends JFrame
         dl.setFont (107);
         dl.addText (0.0, 1.0, 0.12, 0.0, "Font 107:  ABCdef 01234");
 
+        logger.info ("    Text Fonts 101 - 107 in a frame finished    ");
     }
 };
 
@@ -759,6 +761,8 @@ class Text3TableFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
+    private static Logger  logger = CSWLogger.getMyLogger ();
+    
     public Text3TableFrame ()
     {
         double dy, upi;
@@ -844,6 +848,7 @@ class Text3TableFrame extends JFrame
         dy += .8 * upi;
         dl.addText (0.0, 12.0 - dy, 0.50, 0.0, "0.50 inches:  ABCdef 01234");
 
+        logger.info ("    Default Font in a frame finished    ");
     }
 };
 
@@ -873,16 +878,12 @@ class Frame1Frame
 
     public boolean processRightClick (DLRightClickInfo info)
     {
-//System.out.println ();
-//System.out.println ("right click listener called");
         info.dump ();
         return true;
     }
 
     public void selectionChanged (DLSelectionInfo info)
     {
-//System.out.println ();
-//System.out.println ("selection listener called");
         info.dump ();
         return;
     }
@@ -932,8 +933,6 @@ catch (Exception e) {
         dl.beginPlot ("random frame 1 test",
                       0.0, 0.0, 200.0, 200.0);
         dl.setColor (5, 5, 5);
-
-        dl.addLogComment ("Creating the main frame");
 
         dl.setFrameClip (1);
         dl.createFrame ("frame1 test",
@@ -1142,7 +1141,7 @@ class Frame2Frame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
-    //private static Logger  logger = CSWLogger.getMyLogger ();
+    private static Logger  logger = CSWLogger.getMyLogger ();
     
     public Frame2Frame ()
     {
@@ -1203,6 +1202,8 @@ class Frame2Frame extends JFrame
             dl.addNumber (xsym, ysym, .10, 0.0, (double)(i+1), 0, 0);
         }
 
+        logger.info ("    Symbol Examples in Frame finished");
+
     }
 
 };
@@ -1210,6 +1211,8 @@ class Frame2Frame extends JFrame
 class TextFrameTest extends JFrame
 {
     private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
     public TextFrameTest ()
     {
@@ -1269,6 +1272,7 @@ class TextFrameTest extends JFrame
         dl.addText (5.0, 20.0, 0.40, 0.0, "0.40 inches:  ABCdef 01234");
         dl.addText (5.0, 10.0, 0.50, 0.0, "0.50 inches:  ABCdef 01234");
 
+        logger.info ("    Text Frame Test finished");
     }
 
 };
@@ -1276,6 +1280,8 @@ class TextFrameTest extends JFrame
 class FrameLayoutTest extends JFrame
 {
     private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
     public FrameLayoutTest ()
     {
@@ -1437,40 +1443,7 @@ class FrameLayoutTest extends JFrame
         dl.setTextAnchor (DLConst.TEXT_BOTTOM_LEFT);
         dl.setTextBackground (DLConst.TEXT_BG_CURVE_FILLED_BORDER);
 
-/*
-        dl.createAttachedFrame ("attached 2",
-                                 3.0,
-                                 3.0,
-                                 "attached 1",
-                                 DLConst.FRAME_ATTACH_TOP_MIN,
-                                 1,
-                                 0.0,
-                                 0.0,
-                                 DLConst.PAGE_UNITS,
-                                 DLConst.PAGE_UNITS,
-                                 DLConst.PAGE_UNITS,
-                                 DLConst.PAGE_UNITS
-                               );
-
-        dl.addText (0.1, 0.3, 0.20, 0.0, "ATTACH 2 FRAME");
-
-        dl.createAttachedFrame ("attached 3",
-                                 12.0,
-                                 3.0,
-                                 "base frame",
-                                 DLConst.FRAME_ATTACH_TOP_MIN,
-                                 1,
-                                 0.0,
-                                 0.0,
-                                 DLConst.PAGE_UNITS,
-                                 DLConst.PAGE_UNITS,
-                                 DLConst.PAGE_UNITS,
-                                 DLConst.PAGE_UNITS
-                               );
-
-        dl.addText (0.5, 0.5, 0.20, 0.0, "ATTACH 3 FRAME ABOVE BASE FRAME");
-*/
-
+        logger.info ("    Frame Layout Test Finished");
     }
 
 };
@@ -1479,6 +1452,8 @@ class FrameLayoutTest extends JFrame
 class ReversePrimFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
     public ReversePrimFrame ()
     {
@@ -1606,6 +1581,8 @@ class ReversePrimFrame extends JFrame
 
         dl.unsetFrame ();
 
+        logger.info ("    Reverse Axes Test Finished");
+
     }
 
 };
@@ -1613,6 +1590,8 @@ class ReversePrimFrame extends JFrame
 class DashedLineFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
     public DashedLineFrame ()
     {
@@ -1655,12 +1634,16 @@ class DashedLineFrame extends JFrame
             dl.addText (x[0], y[0], 0.12, 0.0, str);
         }
 
+        logger.info ("   Dashed Line Examples scale 1.0 finished"); 
+
     }
 };
 
 class Dashed2LineFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
     public Dashed2LineFrame ()
     {
@@ -1703,12 +1686,16 @@ class Dashed2LineFrame extends JFrame
             dl.addText (x[0], y[0], 0.12, 0.0, str);
         }
 
+        logger.info ("   Dashed Line Examples scale 1.0 finished"); 
+
     }
 };
 
 class GridTest extends JFrame
 {
     private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
     public GridTest ()
     {
@@ -1792,6 +1779,8 @@ class GridTest extends JFrame
                     grid,
                     dlp);
 
+        logger.info ("    GridTest Finished");
+
     }
 };
 
@@ -1799,6 +1788,8 @@ class GridTest extends JFrame
 class HugeFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
     public HugeFrame ()
     {
@@ -1819,9 +1810,7 @@ class HugeFrame extends JFrame
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
         ndo = 10000;
-        //ndo = 200;
         xymax = 10000.0;
-        //xymax = 5000.0;
         setTitle ("Huge Random Frame Test * " + ndo);
         setSize (700, 700);
         setResizable (true);
@@ -2085,6 +2074,8 @@ class HugeFrame extends JFrame
 
         dl.unsetFrame ();
 
+        logger.info ("    Huge Random Frame Test Finished");
+
     }
 
 };
@@ -2094,6 +2085,8 @@ class HugeFrame extends JFrame
 class LithFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
     public LithFrame ()
     {
@@ -2223,6 +2216,8 @@ class LithFrame extends JFrame
                 cr, 0.0);
         }
 
+        logger.info ("    Lith Pattern Examples Finished");
+
     }
 };
 
@@ -2231,6 +2226,8 @@ class LithFrame extends JFrame
 class FontFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
+
+    private static Logger logger = CSWLogger.getMyLogger ();
 
     public FontFrame ()
     {
@@ -2244,12 +2241,16 @@ class FontFrame extends JFrame
         Container contentPane = getContentPane ();
         contentPane.add (panel);
 
+        logger.info ("    Java Font Test Finished");
+
     }
 
     private static class LocalPanel extends JPanel
     {
 
         private static final long serialVersionUID = 1L;
+
+        private static Logger  logger = CSWLogger.getMyLogger ();
 
         public void paintComponent(Graphics gin)
         {
@@ -2264,8 +2265,6 @@ class FontFrame extends JFrame
             int dpi = tk.getScreenResolution ();
 
             int size = dpi / 10 + 1;
-
-//System.out.println ("dpi = " + dpi);
 
             String str = "test";
             String str2 = "Flipped test";
@@ -2295,8 +2294,6 @@ class FontFrame extends JFrame
 
             int height = (int)(bounds.getHeight() + .5);
             int width = (int)(bounds.getWidth() + .5);
-
-//System.out.println ("height = " + height + "ascent = " + ascent);
 
     /*
      * Create a buffered image the size of the string bounds
@@ -2345,6 +2342,7 @@ class FontFrame extends JFrame
 
             g2d.drawImage (bi, null, 100, 300);
 
+            logger.info ("    LocalPanel paint component finished");
         }
 
     }  // end of private LocalPanel class
@@ -2353,6 +2351,8 @@ class FontFrame extends JFrame
 class SymbolPartsFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
     private JTextField    tField;
     private PreviewPanel  pPanel;
@@ -2406,6 +2406,8 @@ catch (Exception e) {
 
         contentPane.add (jp, BorderLayout.NORTH);
 
+        logger.info ("    Symbol Parts Frame constructed");
+
     }
 
     private void setSymbolNumber (String str)
@@ -2443,6 +2445,8 @@ catch (Exception e) {
 class FrameSyncTest extends JFrame
 {
     private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
 
     public FrameSyncTest ()
     {
@@ -2659,6 +2663,8 @@ class FrameSyncTest extends JFrame
         dl.addSymbol (80.0, 80.0, 3.0, 0.0, 7);
 
         dl.setTextAnchor (DLConst.TEXT_BOTTOM_LEFT);
+
+        logger.info ("    Synchronized frames constructed");
     }
 };
 
@@ -2667,18 +2673,16 @@ class NoAspectFrame extends JFrame implements DLRightClickListener, DLSelectList
 {
     private static final long serialVersionUID = 1L;
 
+    private static Logger  logger = CSWLogger.getMyLogger ();
+
     public boolean processRightClick (DLRightClickInfo info)
     {
-//System.out.println ();
-//System.out.println ("right click listener called");
         info.dump ();
         return true;
     }
 
     public void selectionChanged (DLSelectionInfo info)
     {
-//System.out.println ();
-//System.out.println ("selection listener called");
         info.dump ();
         return;
     }
@@ -2697,7 +2701,7 @@ class NoAspectFrame extends JFrame implements DLRightClickListener, DLSelectList
 
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
-        setTitle ("Random Frame Test");
+        setTitle ("No Aspect Frame Test");
         setSize (700, 700);
         setResizable (true);
 
@@ -2912,6 +2916,7 @@ class NoAspectFrame extends JFrame implements DLRightClickListener, DLSelectList
 
         dl.unsetFrame ();
 
+        logger.info ("    No Aspect Frame Constructed");
     }
 
 };
@@ -2922,6 +2927,8 @@ class OverlapTest extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
+    private static Logger  logger = CSWLogger.getMyLogger ();
+
     public OverlapTest ()
     {
         double[] gdata;
@@ -2930,7 +2937,7 @@ class OverlapTest extends JFrame
 
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
-        setTitle ("Overlap Test");
+        setTitle ("Grid Overlap Test");
         setSize (900, 700);
         setResizable (true);
         JEasyXGraphicsPanel panel =
@@ -3045,6 +3052,8 @@ class OverlapTest extends JFrame
         dl.addGrid ("test grid 12",
                    grid,
                    dlp);
+
+        logger.info ("    Grid Overlap Test Constructed");
 
     }
 };
