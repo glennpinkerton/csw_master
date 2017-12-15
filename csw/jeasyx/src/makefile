@@ -135,7 +135,6 @@ lib: $(ALL_LIB_OBJS) $(JAVA_CLASSES)
 	$(LIB_COPY)
 
 shared_lib: lib
-	$(CP) $(SHL_BOOT) $(CSW_PARENT)/csw/lib
 
 executable: $(EXE_OBJS) $(EXE_OBJS2)
 	$(LINK_CMD)

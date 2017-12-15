@@ -421,6 +421,10 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
 
 #endif
 
+    if (command_id == GTX_GET_PRIM_NUM) {
+        if (ilist[0] >= 0) status = ilist[0];
+    }
+
   #if DEBUG_JNI_FILE
     sprintf (fileline, "Completed process command\n");
     if (dbfile) {

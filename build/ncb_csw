@@ -58,7 +58,6 @@ echo
 echo   ==== building archive jeasyx and shared lib
 echo
 cd $CSW_PARENT/csw/jeasyx/src;make shared_lib;
-
 cd $CSW_PARENT/csw/lib;./build_shared_lib;
 
 

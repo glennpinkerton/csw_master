@@ -243,6 +243,22 @@ public class J3DSurfacePatch extends J3DElement {
     }
 
     /**
+    Return the tm3d object used for the patch.  If no tm3d has been set,
+    null is returned.
+     */
+    public TriMeshDraw3D getTm3d() {
+        return tm3d;
+    }
+
+    /**
+    Set the tm3d object used by the patch.
+     */
+    public void setTm3d (TriMeshDraw3D t3) {
+        tm3d = t3;
+    }
+
+
+    /**
     Return true if the patch outlines triangles.  Return false if no triangle outline
     is to be done for the patch.
      */

@@ -82,6 +82,8 @@ import csw.jutils.src.*;
 //import java.awt.Cursor;
 //import images.jtoolbar.general.JIconsGeneral;
 
+
+
 /**
  * The J3DPanel class is used to draw to and interact with 3D
  * graphical views.  The class supports trimesh surfaces, lines,
@@ -1183,7 +1185,7 @@ public class J3DPanel extends JPanel implements GLEventListener
         boolean doDraw = true;
 
         if (pickScheduled  &&  pickMouseEvent != null) {
-          double aspectRatio = (double)iwidth / (double)iheight;
+            double aspectRatio = (double)iwidth / (double)iheight;
             doDraw = j3dtool.pickObject (pickMouseEvent, aspectRatio);
             if (doDraw) {
                 if (targetZoomFlag) {

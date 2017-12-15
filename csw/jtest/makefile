@@ -5,6 +5,7 @@ include $(CSW_PARENT)/build/system.mk
 JAVA_SRC=\
  JEasyXTest.java\
  JSWUnitTest.java\
+ J3DUnitTest.java\
  SplitTest2D.java\
  TestFont.java
 # SplitTest.java\
@@ -13,6 +14,7 @@ JAVA_SRC=\
 JAVA_CLASSES=\
  JEasyXTest.class\
  JSWUnitTest.class\
+ J3DUnitTest.class\
  SplitTest2D.class\
  TestFont.class
 # SplitTest.class\
