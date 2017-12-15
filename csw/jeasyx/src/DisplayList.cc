@@ -213,6 +213,7 @@ CDisplayList::CDisplayList()
     text_prim_list = NULL;
     num_text_prim_list = 0;
     max_text_prim_list = 0;
+    num_selectable_text = 0;
 
     shape_prim_list = NULL;
     num_shape_prim_list = 0;
@@ -3923,6 +3924,7 @@ int CDisplayList::AddText (double x, double y, double size, double angle,
         if (text_prim_list == NULL) {
             max_text_prim_list = 0;
             num_text_prim_list = 0;
+            num_selectable_text = 0;
         }
         if (num_text_prim_list >= max_text_prim_list-2) {
             ilast = max_text_prim_list;
@@ -3999,9 +4001,6 @@ int CDisplayList::AddText (double x, double y, double size, double angle,
     text[nchar] = '\0';
     txt = text;
 
-/*
- * make a master copy of the frame prim if a scaleable frame is active.
- */
     if (from_graph) {
         local_frame_num = current_frame_num;
     }
@@ -4015,7 +4014,7 @@ int CDisplayList::AddText (double x, double y, double size, double angle,
     }
 
 /*
- * Populate the master text prim structure.
+ * Populate a text prim structure.
  */
     nc = nchar + 1;
     if (nc > 500) nc = 500;
@@ -4070,6 +4069,9 @@ int CDisplayList::AddText (double x, double y, double size, double angle,
 
     tptr->editable_flag = (char)current_editable_flag;
     tptr->selectable_flag = (char)current_selectable_flag;
+    if (current_selectable_flag) {
+        num_selectable_text++;
+    }
 
     tptr->visible_flag = 1;
     tptr->draw_flag = 1;
@@ -8253,6 +8255,7 @@ void CDisplayList::free_texts (void)
     text_prim_list = NULL;
     num_text_prim_list = 0;
     max_text_prim_list = 0;
+    num_selectable_text = 0;
 
     return;
 }
@@ -14466,7 +14469,7 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
 */
 
 int CDisplayList::PopulateTextPatches (double x1, double y1p,
-                                   double x2, double y2)
+                                       double x2, double y2)
 
 {
     int                  *icell, nlist, prim_num;
@@ -14594,7 +14597,7 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
     }
 
 /*
-    redraw the text primitives in the region
+    Add the text primitives in the region to the patch.
 */
     for (j=row1; j<=row2; j++) {
         offset = j*nc;
@@ -14618,6 +14621,7 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
                     tptr->visible_flag == 0) {
                     continue;
                 }
+
                 add_text_patch_prim (prim_num);
                 tptr->draw_flag = 0;
             }
@@ -15588,8 +15592,8 @@ int CDisplayList::ConvertToFrame (int frame_num,
 
 
 int CDisplayList::GetSelectableIndex (int frame_num,
-                                    CSW_F x,
-                                    CSW_F y)
+                                      CSW_F x,
+                                      CSW_F y)
 {
     int               isel, index, type, istat;
     LInePrim          *lptr;
@@ -15725,10 +15729,10 @@ int CDisplayList::ClosestPickPrim (int fnum,
     patch_save = patch_draw_flag;
     patch_draw_flag = 1;
 
-    Pickx1 = (CSW_F)(x - frptr->xspace * 1.5f);
-    Picky1 = (CSW_F)(y - frptr->yspace * 1.5f);
-    Pickx2 = (CSW_F)(x + frptr->xspace * 1.5f);
-    Picky2 = (CSW_F)(y + frptr->yspace * 1.5f);
+    Pickx1 = (CSW_F)(x - frptr->xspace * 1.5);
+    Picky1 = (CSW_F)(y - frptr->yspace * 1.5);
+    Pickx2 = (CSW_F)(x + frptr->xspace * 1.5);
+    Picky2 = (CSW_F)(y + frptr->yspace * 1.5);
 
 /*
  * find the type and index of the closest frame scaleable primitive
@@ -16144,11 +16148,42 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
         return;
     }
 
-    istat = PopulateTextPatches (Pickx1, Picky1, Pickx2, Picky2);
+//  Using patches to search for "local" text is a bit tricky.
+//  Since text is drawn to be close to the same size on the screen
+//  regardless of drawing scaling or zoom, then a piece of text 
+//  can be outside of the pick aperture.  If there are a small
+//  number of text primitives relative to the number of spatial
+//  index grid cells, I don't bother with the patch stuff.
 
+    bool bpatch = false;
+    int patch_text_min = index_ncol * index_nrow / 2;
     nprim = num_text_prim_list;
-    if (istat == 1) {
-        nprim = num_text_patch_list;
+
+    int  nst = num_selectable_text;
+    if (nst > num_text_prim_list) {
+        nst = num_text_prim_list;
+    }
+
+    if (nst > patch_text_min) {
+        double   px1, py1, px2, py2;
+        double   pw = (Pickx2 - Pickx1);
+        double   ph = (Picky2 - Picky1);
+        pw = (pw + ph) / 2.0;
+
+        if (pw < index_xspace) pw = index_xspace;
+        if (pw < index_yspace) pw = index_yspace;
+
+        px1 = Pickx1 - pw * 2.0;
+        px2 = Pickx2 + pw * 2.0;
+        py1 = Picky1 - pw * 2.0;
+        py2 = Picky2 + pw * 2.0;
+
+        istat = PopulateTextPatches (px1, py1, px2, py2);
+        if (istat == 1  &&  num_text_patch_list > 0  &&
+            text_patch_list != NULL  &&  patch_draw_flag == 1) {
+            nprim = num_text_patch_list;
+            bpatch = true;
+        }
     }
 
     dmin = *pdistout;
@@ -16157,8 +16192,7 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
     for (ido=0; ido<nprim; ido++) {
 
         i = ido;
-        if (num_text_patch_list > 0  &&  text_patch_list != NULL  &&
-            patch_draw_flag == 1) {
+        if (bpatch) {
             i = text_patch_list[ido];
         }
 
@@ -16291,7 +16325,10 @@ void CDisplayList::closest_frame_symb (int fnum, CSW_F xin, CSW_F yin,
         yt = sptr->y;
         convert_frame_point (&xt, &yt);
         gpf_calcdistance1 (xin, yin, xt, yt, &dist);
-        if (dist < dmin) {
+        if (dist <= sptr->size) {
+            index = i;
+        }
+        else if (dist < dmin) {
             dmin = dist;
             index = i;
         }
@@ -18626,9 +18663,14 @@ void CDisplayList::delete_frame_axis_texts (int fnum)
         csw_Free (tptr->chardata);
         tptr->chardata = NULL;
         tptr->deleted_flag = 1;
+        if (tptr->selectable_object_num >= 0) {
+            num_selectable_text--;
+        }
         add_available_text (i);
 
     }
+
+    if (num_selectable_text < 0) num_selectable_text = 0;
 
     return;
 

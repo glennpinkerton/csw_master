@@ -1,6 +1,10 @@
+#!/bin/bash  -v
+
 export classpath=$CSW_PARENT
+lpath=/usr/java/jdk1.8.0_152/jre/lib/amd64
 echo
 echo $classpath
 echo
 cd $CSW_PARENT
-java -Xmx500m -Djava.library.path=$CSW_PARENT/csw/lib csw.jtest.$1
+#java -Xmx500m -Djava.library.path=$CSW_PARENT/csw/lib:/usr/java/jdk1.8.0_152/jre/lib/amd64 csw.jtest.$1
+java -Xmx500m -Djava.library.path=$CSW_PARENT/csw/lib  csw.jtest.$1

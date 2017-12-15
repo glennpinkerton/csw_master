@@ -1094,6 +1094,7 @@ private:
     TExtPrim        *text_prim_list = NULL;
     int             num_text_prim_list,
                     max_text_prim_list;
+    int             num_selectable_text;
 
     SHapePrim       *shape_prim_list = NULL;
     int             num_shape_prim_list,

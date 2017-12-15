@@ -33,7 +33,6 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.util.Random;
-//import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -44,7 +43,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
-//import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import csw.jeasyx.src.*;
@@ -54,6 +52,13 @@ import csw.jutils.src.ColorPalette;
 import csw.jsurfaceworks.src.Grid;
 
 import csw.jutils.src.CSWLogger;
+
+
+// imports flagged as unused by eclipse
+
+//import java.util.Date;
+//import org.apache.logging.log4j.LogManager;
+
 
 
 /**

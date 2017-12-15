@@ -77,6 +77,7 @@ int ezx_process_command (
 
     int           istat = 0;
     int           native_dlist_id = 0;
+    int           primnum = -1;
 
     int itype;
     int ncol;
@@ -248,6 +249,9 @@ int ezx_process_command (
 //if (true) {
 //return 1;
 //}
+
+
+    primnum = -1;
 
 /*
  * This giant switch statement processes each command.
@@ -2196,7 +2200,7 @@ int ezx_process_command (
      * Pick the closest primitive to the cursor position in the specified
      * frame and return the results to the java side.
      *
-     * ilist[0] has the frame number
+     * ilist[0] has the frame number on input and the prim num on output
      * ilist[1] has the screen x
      * ilist[2] has the screen y
      */
@@ -2218,6 +2222,8 @@ int ezx_process_command (
             dlist->GetFrameObject (ilist[0],
                                    ilist[1],
                                    ilist[2]);
+
+            primnum = istat;
 
             break;
 
@@ -2349,6 +2355,10 @@ int ezx_process_command (
 
     if (istat >= 0  &&  native_dlist_id >= 0) {
         istat = native_dlist_id;
+    }
+
+    if (primnum >= 0) {
+        ilist[0] = primnum;
     }
 
     return istat;
