@@ -577,7 +577,6 @@ public class TestBounds3D {
             ya[i] = (double) (i);
             za[i] = (double) (i);
         } 
-        XYZPolyline  xyzp = new XYZPolyline (xa, ya, za);
 
         Bounds3D  b3d;
         try {

@@ -13,26 +13,26 @@ package csw.j3d.src;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
-import java.awt.Insets;
+//import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
+//import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import csw.jutils.src.XYZPolyline;
-import csw.jutils.src.LightData;
+//import csw.jutils.src.LightData;
 import csw.jutils.src.View3DProperties;
 
-import csw.jsurfaceworks.src.GridGeometry;
+//import csw.jsurfaceworks.src.GridGeometry;
 import csw.jsurfaceworks.src.JSurfaceWorks;
 import csw.jsurfaceworks.src.TriMesh;
 
-import csw.j3d.src.DigitizingType;
+//import csw.j3d.src.DigitizingType;
 import csw.j3d.src.J3DFault;
 import csw.j3d.src.J3DHorizonPatch;
 import csw.j3d.src.J3DLine;
@@ -42,7 +42,7 @@ import csw.j3d.src.J3DRightClickInfo;
 import csw.j3d.src.J3DRightClickListener;
 import csw.j3d.src.J3DSelectListener;
 import csw.j3d.src.J3DSelectionChangedInfo;
-import csw.j3d.src.JPoint3D;
+//import csw.j3d.src.JPoint3D;
 
 
 /**
@@ -214,9 +214,9 @@ class SimplestFrame extends JFrame
         sname = "bottom surface";
         createSurface (-50.0, Color.green, false);
 
-        xsurf = -20.0;
-        ysurf = -20.0;
-        zsurf = -12.00;
+        //xsurf = -20.0;
+        //ysurf = -20.0;
+        //zsurf = -12.00;
 
         panel.redrawAll ();
 
@@ -307,8 +307,8 @@ class SimplestFrame extends JFrame
 
         JSurfaceWorks sw = new JSurfaceWorks ();
 
-        GridGeometry geom =
-        new GridGeometry (100, 100, xmin, ymin, xmax, ymax);
+        //GridGeometry geom =
+        //new GridGeometry (100, 100, xmin, ymin, xmax, ymax);
 
         TriMesh tmesh = sw.calcTriMesh
         (
@@ -343,17 +343,17 @@ class SimplestFrame extends JFrame
 
     }
 
-    private double xsurf, ysurf, zsurf;
+    //private double xsurf, ysurf, zsurf;
 
 /*----------------------------------------------------------------------------------*/
 
     private J3DFault newFault = null;
     private boolean editActive = false;
 
-    private boolean linePickFlag = true;
+    //private boolean linePickFlag = true;
 
-    private static final int NEW_FAULT_PATCH_MODE = 1;
-    private static final int NEW_HORIZON_PATCH_MODE = 2;
+    //private static final int NEW_FAULT_PATCH_MODE = 1;
+    //private static final int NEW_HORIZON_PATCH_MODE = 2;
 
 /*----------------------------------------------------------------------------------*/
 
@@ -382,8 +382,8 @@ class SimplestFrame extends JFrame
     public void endSurfaceEdit ()
     {
 
-        J3DFault     fp;
-        J3DHorizonPatch   hp;
+        //J3DFault     fp;
+        //J3DHorizonPatch   hp;
 
         showEditSurface (false);
         panel.addFault (newFault);
@@ -399,6 +399,7 @@ class SimplestFrame extends JFrame
         return;
     }
 
+    /*
     private void cancelSurfaceEdit ()
     {
 
@@ -413,6 +414,8 @@ class SimplestFrame extends JFrame
         return;
     }
 
+*/
+ /*   
     private void resetSurfaceEdit ()
     {
 
@@ -428,9 +431,9 @@ class SimplestFrame extends JFrame
 
         return;
     }
-
+*/
     private ArrayList<J3DLine>  constraintLineList = null;
-
+/*
     private void eraseEditLines ()
     {
         int        i, size;
@@ -448,21 +451,16 @@ class SimplestFrame extends JFrame
         }
 
     }
-
+*/
 /*--------------------------------------------------------------------------*/
 
     public void showEditSurface (boolean draw)
     {
-        int               i, n;
-        double[]          xa;
-        double[]          ya;
-        double[]          za;
+        int               i;
 
         if (newFault == null) {
             newFault = new J3DFault ();
         }
-
-        JPoint3D        p;
 
         ArrayList<J3DLine> selectedLines = panel.getSelectedLines ();
         if (selectedLines == null) {
@@ -529,10 +527,6 @@ class SimplestFrame extends JFrame
 
     public void hideEditSurface ()
     {
-        int               i, n;
-        double[]          xa;
-        double[]          ya;
-        double[]          za;
 
         if (newFault == null) {
             newFault = new J3DFault ();
@@ -560,7 +554,7 @@ class SimplestFrame extends JFrame
     }
 
 /*-------------------------------------------------------------------------------*/
-
+/*
     private JButton makeJButton (String txt)
     {
         JButton       jb;
@@ -578,7 +572,7 @@ class SimplestFrame extends JFrame
         jb.setMargin (new Insets (3, 0, 3, 0));
         return jb;
     }
-
+*/
 /*--------------------------------------------------------------------------------*/
 
 /*
