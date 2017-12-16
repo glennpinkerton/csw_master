@@ -29,7 +29,7 @@ import csw.jutils.src.XYZPolyline;
 import csw.jeasyx.src.DLConst;
 import csw.jeasyx.src.DLEditAdapter;
 import csw.jeasyx.src.DLLine;
-import csw.jeasyx.src.CLine;
+//import csw.jeasyx.src.CLine;
 import csw.jeasyx.src.DLSelectable;
 import csw.jeasyx.src.JDisplayList;
 import csw.jeasyx.src.JEasyXGraphicsPanel;
@@ -54,7 +54,7 @@ class SurfSplitFrame extends JFrame
 
     private static final long serialVersionUID = 77366973L;
 
-    private String                 fileName;
+    //private String                 fileName;
     private JDisplayList           dl;
 
     private double[]               xBorder,
@@ -539,7 +539,7 @@ class SurfSplitFrame extends JFrame
     private void drawContactLines (ArrayList<DBContactLine> alist)
     {
         DBContactLine dbl;
-        double[]     xp, yp, zp;
+        double[]     xp, yp;
         int          np;
 
         int size = alist.size ();

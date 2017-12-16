@@ -506,7 +506,6 @@ public class TestBounds2D {
             ya[i] = (double) (i);
             za[i] = (double) (i);
         }
-        XYZPolyline  xyzp = new XYZPolyline (xa, ya, za);
 
         Bounds2D  b2d;
         try {
