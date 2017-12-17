@@ -640,7 +640,10 @@ int CSWGrdCalc::grd_calc_grid
         csw_Free (newmask);
         FreeMem ();
     };
+
+
     CSWScopeGuard func_scope_guard (fscope);
+
 
 
 /*
@@ -1527,10 +1530,12 @@ MSL
             AnisotropyFlag = 0;
             PreferredStrike = -1000.0f;
         }
-        if (PreferredStrike < 0.0f)
+        if (PreferredStrike < 0.0f) {
             AnisotropyFlag = 0;
-        if (PreferredStrike >= 0.0  &&  StrikePower > 3)
+        }
+        if (PreferredStrike >= 0.0  &&  StrikePower > 3) {
             AnisotropyFlag = 0;
+        }
     }
     if (AnisotropyRatio < 1.0f) AnisotropyRatio = 1.0f;
 
@@ -1638,7 +1643,7 @@ MSL
  * strike direction, redo the data table and distance table
  * without these points.
  */
-    if (num_pre_pass1 != Ndata) {
+   if (num_pre_pass1 != Ndata) {
         Ndata = num_pre_pass1;
         istat = SetupDataTable (0, 0);
         if (istat == -1) {
@@ -1917,7 +1922,7 @@ MSL
         ncol = orig_ncol;
         nrow = orig_nrow;
         csw_Free (local_grid);
-        if (local_mask) csw_Free (local_mask);
+        csw_Free (local_mask);
         local_grid = NULL;
         local_mask = NULL;
     }
@@ -1958,6 +1963,7 @@ MSL
             }
         }
         csw_Free (ClippingGrid);
+        ClippingGrid = NULL;
     }
 
 /*
@@ -1990,6 +1996,7 @@ MSL
             }
         }
         csw_Free (ClippingGrid);
+        ClippingGrid = NULL;
     }
 
 /*
@@ -3058,6 +3065,7 @@ int CSWGrdCalc::CollectLocalPoints
     If anisotropy is enabled, filter the local points to
     use only those relatively nearest the strike direction.
 */
+//StrikeSearch = 0;
     if (astat == 1  &&  StrikeSearch == 1) {
         FilterPointsForStrike (list, nt, listout, nlist, nmax, *nquad,
                                i, j, x1, y1, x2, y2);
@@ -8691,7 +8699,7 @@ int CSWGrdCalc::CalcStrikeLine
 
   ****************************************************************
 
-    Return the relatively closest points to the specified strike
+  Return the relatively closest points to the specified strike
   line from the local data set.
 
 */
@@ -8715,7 +8723,7 @@ int CSWGrdCalc::FilterPointsForStrike
 */
     memset ((char *)zdist, 0, MAX_LOCAL * sizeof(CSW_F));
     memset ((char *)pdist, 0, MAX_LOCAL * sizeof(CSW_F));
-    memset ((char *)bin, 0, MAX_LOCAL * sizeof(CSW_F));
+    memset ((char *)bin, 0, MAX_LOCAL * sizeof(int));
 
 /*
     Calculate the coordinates at the grid node.
@@ -8742,6 +8750,8 @@ int CSWGrdCalc::FilterPointsForStrike
         maxm2 = 5;
     }
 
+    if (maxm2 > Ndata) maxm2 = Ndata;
+
 /*
     Allow more points output if the strike strength is lower.
     This rather complicated sequence is a result of much
@@ -8757,6 +8767,8 @@ int CSWGrdCalc::FilterPointsForStrike
         i = (int)dt;
         maxm2 += i;
     }
+
+    if (maxm2 > Ndata) maxm2 = Ndata;
 
     if (FaultedFlag == 0) {
         nmax /= 2;
@@ -8858,6 +8870,7 @@ int CSWGrdCalc::FilterPointsForStrike
     z2 = -1.e30f;
 
     maxloc = maxm2 * 2;
+    if (maxloc > Ndata) maxloc = Ndata;
 
     kk = 0;
     for (k=0; k<_NBINS; k++) {

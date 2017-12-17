@@ -103,11 +103,11 @@ public class JEasyXTest {
 
         String  cpar = System.getenv ("CSW_PARENT");
         if (cpar == null) {
-            cpar = "/home/gpinkerton/gitcsw";
+            cpar = "/home/git_glenn/csw_master";
         }
         else {
             if (cpar.isEmpty ()) {
-                cpar = "/home/gpinkerton/gitcsw";
+                cpar = "/home/git_glenn/csw_master";
             }
         }
 
