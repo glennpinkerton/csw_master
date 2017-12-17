@@ -17431,9 +17431,10 @@ void CDisplayList::reclip_and_draw_selected_fills (DLSelectable *dls)
                          fptr->patscale,
                          fptr->linepatt,
                          fptr->dashscale,
-                         0.0f, 0.0f, 0.0f, 0.0f   /* do not use bounding box data */
+                         0.0f, 0.0f, 0.0f, 0.0f
                          );
-
+        csw_Free (xyp);
+        xyp = NULL;
     }
 
     return;
