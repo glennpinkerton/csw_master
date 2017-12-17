@@ -6,16 +6,13 @@ package csw.jtest;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-//import java.awt.Frame;
 import java.awt.GridLayout;
-//import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.JButton;
-//import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -33,8 +30,6 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLDrawable;
 import com.jogamp.opengl.GLDrawableFactory;
 */
-//import com.jogamp.opengl.GLEventListener;
-//import com.jogamp.opengl.GLU;
 
 /*
 import net.java.games.jogl.GL;
@@ -54,11 +49,23 @@ import csw.jutils.src.View3DProperties;
 
 import csw.jsurfaceworks.src.DBLineList;
 import csw.jsurfaceworks.src.DBPointList;
-//import csw.jsurfaceworks.src.GridGeometry;
 import csw.jsurfaceworks.src.JSurfaceWorks;
 import csw.jsurfaceworks.src.TriMesh;
 
+import org.apache.logging.log4j.Logger;
+import csw.jutils.src.CSWLogger;
+
 import csw.j3d.src.*;
+
+
+// imprts deemed unused by eclipse
+
+//import java.awt.Frame;
+//import java.awt.Insets;
+//import javax.swing.JCheckBox;
+//import com.jogamp.opengl.GLEventListener;
+//import com.jogamp.opengl.GLU;
+//import csw.jsurfaceworks.src.GridGeometry;
 
 
 /**
@@ -70,30 +77,16 @@ import csw.j3d.src.*;
 */
 public class J3DUnitTest {
 
+    private static Logger  logger = CSWLogger.getMyLogger ();
+
     static {
-//System.out.println ("    ********    loading awt");
-System.out.flush ();
 //        System.loadLibrary ("awt");
-System.out.println ("    ********    loading csw");
-System.out.flush ();
         System.loadLibrary ("_csw_all");
-System.out.println ("    ********    loading glue");
-System.out.flush ();
         System.loadLibrary ("gluegen-rt");
-System.out.println ("    ********    loading desktop");
-System.out.flush ();
         System.loadLibrary ("jogl_desktop");
-System.out.println ("    ********    loading mobile");
-System.out.flush ();
         System.loadLibrary ("jogl_mobile");
-//System.out.println ("    ********    loading native awt");
-System.out.flush ();
 //        System.loadLibrary ("nativewindow_awt");
-//System.out.println ("    ********    loading native x11");
-System.out.flush ();
 //        System.loadLibrary ("nativewindow_x11");
-System.out.println ("    ********    loading newt");
-System.out.flush ();
         System.loadLibrary ("newt");
     }
 
@@ -114,7 +107,20 @@ System.out.flush ();
     public static void runMainMethod ()
     {
 
-        JSurfaceWorks.openLogFile ("j3d_sw.txt");
+
+        String  cpar = System.getenv ("CSW_PARENT");
+        if (cpar == null) {
+            cpar = "/home/git_glenn/csw_master";
+        }
+        else {
+            if (cpar.isEmpty ()) {
+                cpar = "/home/git_glenn/csw_master";
+            }
+        }
+
+        String  playback_file_name = cpar + "/csw/jtest/utest.j3d";
+
+        JSurfaceWorks.openLogFile (playback_file_name);
 
         UnitTestFrame frame = new UnitTestFrame ();
         frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
@@ -143,8 +149,8 @@ class UnitTestFrame extends JFrame
 
     public UnitTestFrame ()
     {
-    	
-/*
+
+/*    	
 try {
 int idum = System.in.read();
 }
@@ -162,6 +168,7 @@ catch (Exception e)
         setResizable (false);
         Container contentPane = getContentPane ();
         contentPane.setLayout (new GridLayout(15,1));
+
 
         JButton clear_button = new JButton ("Clear and Redraw");
         clear_button.addActionListener(new ActionListener() {
@@ -416,19 +423,21 @@ class SimplestFrame extends JFrame
         z0 *= 2.0;
         dz *= 2.0;
 
-        double[] x = new double[10];
-        double[] y = new double[10];
-        double[] z = new double[10];
+        double[] x = new double[200];
+        double[] y = new double[200];
+        double[] z = new double[200];
 
         Random random = new Random();
-        random.setSeed (1234567);
+        long  ctw = System.currentTimeMillis ();
+        random.setSeed (ctw);
 
         double xmin = 1.e30;
         double ymin = 1.e30;
         double xmax = -1.e30;
         double ymax = -1.e30;
 
-        for (i=0; i<10; i++) {
+        int  np = random.nextInt (100);
+        for (i=0; i<np; i++) {
             x[i] = random.nextDouble () * dx + x0;
             y[i] = random.nextDouble () * dy + y0;
             z[i] = random.nextDouble () * dz + z0;

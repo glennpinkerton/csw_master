@@ -1,5 +1,5 @@
 /*
- * This class tests some of the jutils package using junit.
+ * This class tests the jutils Bounds2D class using junit.
  * The results of the tests are logged using log4j2.  The
  * tests are admittedly very trivial.  The primary purpose
  * for writing these simple tests is to learn a bit of junit

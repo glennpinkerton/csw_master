@@ -249,7 +249,12 @@ class TriMesh10Frame extends JFrame
         double[]           x, y, z;
         int                i;
 
-        setTitle ("TriMesh 100 Test");
+        random = new Random();
+        long  ctw = System.currentTimeMillis ();
+        random.setSeed (ctw);
+        int np = random.nextInt (1000) + 100;
+
+        setTitle ("TriMesh Test " + np);
         setSize (900, 700);
         setResizable (true);
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
@@ -262,13 +267,11 @@ class TriMesh10Frame extends JFrame
         JDisplayList dl = gpanel.getDisplayList ();
         sw = new JSurfaceWorks ();
 
-        x = new double[100];
-        y = new double[100];
-        z = new double[100];
+        x = new double[2000];
+        y = new double[2000];
+        z = new double[2000];
 
-        random = new Random();
-
-        for (i=0; i<100; i++) {
+        for (i=0; i<np; i++) {
             x[i] = random.nextDouble () * 100.0;
             y[i] = random.nextDouble () * 100.0;
             z[i] = random.nextDouble () * 50.0;
@@ -282,7 +285,7 @@ class TriMesh10Frame extends JFrame
             x,
             y,
             z,
-            100,
+            np,
             null,
             0,
             null,
@@ -291,14 +294,14 @@ class TriMesh10Frame extends JFrame
             null
         );
 
-        sw.writeTextTriMeshFile (tmesh, "contour.tri");
+        //sw.writeTextTriMeshFile (tmesh, "contour.tri");
 
         dl.beginPlot ("trimesh test",
                       0.0, 0.0, 100.0, 100.0);
         dl.setColor (5, 5, 5);
 
         dl.setFrameClip (1);
-        dl.createFrame ("trimesh 10 test frame",
+        dl.createFrame ("trimesh " + np + " test frame",
                        0.0,
                        0.0,
                        100.0,
@@ -332,7 +335,7 @@ class TriMesh10Frame extends JFrame
         double ztiny = (zmax - zmin) / 100.0;
         dl.setImageColors (cpal, zmin-ztiny, zmax+ztiny);
 
-        dl.addTriMesh ("test trimesh 10",
+        dl.addTriMesh ("test trimesh " + np,
                        tmesh,
                        dlp);
 
@@ -352,7 +355,12 @@ class Grid10Frame extends JFrame
         double[]           x, y, z;
         int                i;
 
-        setTitle ("Grid 100 Test");
+        random = new Random();
+        long  ctw = System.currentTimeMillis ();
+        random.setSeed (ctw);
+        int np = random.nextInt (1000) + 100;
+
+        setTitle ("Grid Test " + np);
         setSize (900, 700);
         setResizable (true);
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
@@ -364,13 +372,11 @@ class Grid10Frame extends JFrame
         JDisplayList dl = gpanel.getDisplayList ();
         sw = new JSurfaceWorks ();
 
-        x = new double[100];
-        y = new double[100];
-        z = new double[100];
+        x = new double[2000];
+        y = new double[2000];
+        z = new double[2000];
 
-        random = new Random();
-
-        for (i=0; i<100; i++) {
+        for (i=0; i<np; i++) {
             x[i] = random.nextDouble () * 200.0;
             y[i] = random.nextDouble () * 100.0;
             z[i] = random.nextDouble () * 100.0;
@@ -381,19 +387,19 @@ class Grid10Frame extends JFrame
             x,
             y,
             z,
-            100,
+            np,
             null,
             null,
             null,
             null
         );
 
-        dl.beginPlot ("grid test",
+        dl.beginPlot ("grid test" + np,
                       0.0, 0.0, 200.0, 100.0);
         dl.setColor (5, 5, 5);
 
         dl.setFrameClip (1);
-        dl.createFrame ("grid 10 test frame",
+        dl.createFrame ("grid test frame" + np,
                        0.0,
                        0.0,
                        200.0,

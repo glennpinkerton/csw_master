@@ -130,10 +130,11 @@ CSW_LIBS = $(CSW_PARENT)/csw/hlevutils/src/hlutil.a \
 #
 CSW_CLASS_PATH = $(CSW_PARENT):$(CSW_PARENT)/csw/jar/jogl-all.jar:$(CSW_PARENT)/csw/jar/gluegen-rt.jar:
 JUCP=$(JUNIT_HOME)/junit.jar:$(JUNIT_HOME)/hamcrest/core.jar:
-JLCP=$(CSW_PARENT)/csw/jar/log4j/log4j-api-2.10.0.jar:$(CSW_PARENT)/csw/jar/log4j/log4j-core-2.10.0.jar
+JLCP=$(CSW_PARENT)/csw/jar/log4j/log4j-api-2.10.0.jar:$(CSW_PARENT)/csw/jar/log4j/log4j-core-2.10.0.jar:
+JDBCP=$(CSW_PARENT)/csw/jar/mysql.jar
 
 JAVA_C = javac
-JAVA_C_OPTIONS  = -classpath $(CSW_CLASS_PATH)$(JUCP)$(JLCP)  -implicit:class -Xlint 
+JAVA_C_OPTIONS  = -classpath $(CSW_CLASS_PATH)$(JUCP)$(JLCP)$(JDBCP)  -implicit:class -Xlint 
 
 #
 # create a new list of suffixes

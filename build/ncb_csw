@@ -67,6 +67,11 @@ echo
 cd $CSW_PARENT/csw/jtest;make;
 
 echo
+echo   ==== building mysql/jtest
+echo
+cd $CSW_PARENT/csw/mysql/jtest/src;make;
+
+echo
 echo   ==== building executable jeasyx
 echo
 cd $CSW_PARENT/csw/jeasyx/src;make executable;
