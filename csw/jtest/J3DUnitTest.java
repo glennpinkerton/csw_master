@@ -52,8 +52,8 @@ import csw.jsurfaceworks.src.DBPointList;
 import csw.jsurfaceworks.src.JSurfaceWorks;
 import csw.jsurfaceworks.src.TriMesh;
 
-import org.apache.logging.log4j.Logger;
-import csw.jutils.src.CSWLogger;
+//import org.apache.logging.log4j.Logger;
+//import csw.jutils.src.CSWLogger;
 
 import csw.j3d.src.*;
 
@@ -77,7 +77,7 @@ import csw.j3d.src.*;
 */
 public class J3DUnitTest {
 
-    private static Logger  logger = CSWLogger.getMyLogger ();
+    //private static Logger  logger = CSWLogger.getMyLogger ();
 
     static {
 //        System.loadLibrary ("awt");
