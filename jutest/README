@@ -1,0 +1,10 @@
+This is where I will put various junit test runnig classes.
+
+Currently the only runner class is RunJutilTests.  The RunAllTests
+class is just a thin wrap to execute any other test runner classes
+located here.
+
+Log4jTestWatcher is a class to get testing output written into the
+logger files (located in the csw_master directory, one level above
+this jutest directory.
+

@@ -31,7 +31,12 @@ The two directories here are:
 
     csw       This has all the code, makefiles, some data, etc.
 
-There are README files in build and csw with more information.
+    jutest    This has files for building and running junit testgs.  There
+              are very few tests.  I made these few as a start to leaning
+              the junit framework.
+
+
+There are README files in these directories with more information.
 
 
 You need to set the environment variable CSW_PARENT to the name of the

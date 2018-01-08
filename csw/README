@@ -89,3 +89,10 @@ utils
   of stuff here as well
 
 
+
+mysql  (Added 1/7/2018)
+
+  Some java code and mysql scripts to load and access a simple spatial
+  data base.  There is no real data.  I just generated random data for
+  use in learning some mysql skills.  The random data is not stored in
+  git.
