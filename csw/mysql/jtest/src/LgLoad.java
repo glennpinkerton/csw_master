@@ -1,8 +1,8 @@
 package csw.mysql.jtest.src;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+//import java.sql.DriverManager;
+//import java.sql.SQLException;
 
 // Notice, do not import com.mysql.jdbc.*
 // or you will have problems!

@@ -25,11 +25,13 @@ class DataGen {
         String sfn = "/home/gpinkerton/data/";
         if (args == null  ||  args.length == 0) {
             FakeDataGen  dg = new FakeDataGen (sfn, -1, -1);
+            dg.done();
         }
         else {
           int  alen = args.length;
           if (alen == 1   &&  args[0].equals("load")) {
             FakeDataLoad dl = new FakeDataLoad (sfn);
+            dl.done();
           }
           else if (alen == 2) {
             int n10 = Integer.parseInt (args[0]);
@@ -37,6 +39,7 @@ class DataGen {
             int np = Integer.parseInt (args[1]);
             if (np < 5) np = 5;
             FakeDataGen  dg = new FakeDataGen (sfn, n10, np);
+            dg.done();
           }
         }
       }
@@ -120,7 +123,7 @@ class FakeDataGen {
 
       nskip = n10 / 100;
 
-long start_nano = System.nanoTime ();
+//long start_nano = System.nanoTime ();
 
       String  fname = dirname + "glp_points_1.dat";
       try {
@@ -179,6 +182,12 @@ long start_nano = System.nanoTime ();
 
 
     }  // end of method
+    
+    // This dummy method is here to avois an eclipse warning.
+    // The warning is about an instance of FakeDataGen not being 
+    // used.  So, I call this dummy routine to fool eclipse into
+    // thinking the instance is actually used for something.
+    protected void done () {}
 
 
 
@@ -225,7 +234,7 @@ long start_nano = System.nanoTime ();
 
       int     xanc, yanc, size, npts, nbytes;
       int     ix, iy;
-      double  rad, ang, dang, r2, dx, dy;
+      double  rad, r2, ang, dang, dx, dy;
 
       PointLookup   plook = null;
 
@@ -233,7 +242,7 @@ long start_nano = System.nanoTime ();
       int  lid;
       int  fid = 1;
 
-      int   nskip = n10 / 8;
+      //int   nskip = n10 / 8;
       for (int i=0; i<nloop; i++) {
 
         lid = i;
@@ -282,8 +291,8 @@ long start_nano = System.nanoTime ();
           for (int j=0; j<npts; j++) {
             r2 = rad * (ran.nextDouble() + .49);
             ang = dang * j;
-            dx = rad * Math.cos (ang);
-            dy = rad * Math.sin (ang);
+            dx = r2 * Math.cos (ang);
+            dy = r2 * Math.sin (ang);
             ix = (int)dx + xanc;
             iy = (int)dy + yanc;
             dos.writeInt (ix);
@@ -313,13 +322,14 @@ long start_nano = System.nanoTime ();
 
     private void confirmFakePointDataRandomAccess ()
     {
-      int    nbytes, npts, ix, iy, idum;
 
       boolean  sout = false;
 
       int  nfound = 0;
       int  i = 0;
-
+      
+      int  idum, npts, nbytes, ix, iy;
+      
       for (int ido=0; ido<100; ido++) {
 
         i = ran.nextInt (n10loop);
@@ -408,12 +418,19 @@ class FakeDataLoad {
       OutputLoadFiles ();
 
     }  // end of FakeDataLoad constructor
+    
+    // This dummy method is here to avoid an eclipse warning.
+    // The warning is about an instance of FakeDataLoad not being 
+    // used.  So, I call this dummy routine to fool eclipse into
+    // thinking the instance is actually used for something.
+    protected void done () {}
+
 
 
 
     private void loadFakePointData ()
     {
-      int     nbytes, npts, ix, iy, idum;
+      int     npts, ix, iy;
       long    ixmin, iymin, ixmax, iymax;
       long    fpos;
 
@@ -434,6 +451,8 @@ class FakeDataLoad {
       }
 
       int  nline = 0;
+      int  nbytes = 0;
+      int  idum = 0;
 
 int  ncount = 0;
 
@@ -504,17 +523,17 @@ int  ncount = 0;
       final String lf = "\n";
       final String sf = "%.7f";
 
-      final String b = "  ";
-      final String c = ", ";
+      //final String b = "  ";
+      //final String c = ", ";
 
 
 
       TableData td;
-      String s1, s2, s3, s4;
+      String s1, s2, s3;
       
-      FileWriter fw1;
-      FileWriter fw2;
-      FileWriter fw3;
+      FileWriter fw1 = null;
+      FileWriter fw2 = null;
+      FileWriter fw3 = null;
 
       String  dirn = "/home/gpinkerton/";
 
@@ -526,6 +545,11 @@ int  ncount = 0;
       catch (IOException ex) {
         System.out.println ("Exception creating load file writers.");
         System.out.println (ex.getMessage());
+        try {
+          if (fw1 != null) fw1.close();
+          if (fw2 != null) fw2.close();
+        }
+        catch (IOException ex2) {};
         return;
       }
 
@@ -543,13 +567,19 @@ int  ncount = 0;
              String.format(sf,td.xmax) + t +
              String.format(sf,td.ymax) + lf;
         try {
-            fw1.write (s1); 
-            fw2.write (s2); 
-            fw3.write (s3); 
+            if (fw1 != null) fw1.write (s1); 
+            if (fw2 != null) fw2.write (s2); 
+            if (fw3 != null) fw3.write (s3); 
         }
         catch (IOException ex) {
           System.out.println ("Exception writing to load files.");
           System.out.println (ex.getMessage());
+          try {
+            fw1.close();
+            fw2.close();
+            fw3.close();
+          }
+          catch (IOException ex2) {};
           return;
         }
       }

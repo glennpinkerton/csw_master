@@ -165,7 +165,7 @@ public class GLPDB {
 
       final String  s1 = "insert into objects_geom values ( \n";
       final String  b = " ";
-      final String  l = "(";
+      //final String  l = "(";
       final String  r = ")";
       final String  c = ", ";
       final String  sst = "ST_PolygonFromText(";
@@ -284,6 +284,8 @@ System.out.println ("elapsed time = " + dtime);
 System.out.println ();
 
       }
+      
+      scan.close();
 
       return;
 
@@ -311,9 +313,6 @@ System.out.println ();
 
     private void getGlobalRsData (ResultSet rs)
     {
-
-      int        oid = 0;
-      double     xmin, ymin, xmax, ymax;
 
       try {
         rs.first ();
