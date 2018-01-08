@@ -5,11 +5,13 @@ include $(CSW_PARENT)/build/system.mk
 JAVA_SRC=\
   TestBounds2D.java \
   TestBounds3D.java \
+  TestXYZPolyline.java \
   TestRunner.java
   
 JAVA_CLASSES=\
   TestBounds2D.class \
   TestBounds3D.class \
+  TestXYZPolyline.class \
   TestRunner.class
 
 PACKAGE_PATH=csw/jutils/junit_tests
