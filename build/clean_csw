@@ -17,6 +17,8 @@ cd $CSW_PARENT/csw/jeasyx/src;make clean;
 cd $CSW_PARENT/csw/j3d/src;make clean;
 cd $CSW_PARENT/csw/jtest;make clean;
 
+cd $CSW_PARENT/csw/mysql/jtest/src;make clean;
+
 cd $CSW_PARENT/csw/lib;./clean_shared_lib;
 
 cd $CSW_PARENT; rm -rf *.log contour.tri build/ff.1
