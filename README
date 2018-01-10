@@ -1,10 +1,4 @@
 
-
-
-Does this line propagate to other branches?
-
-
-
 This is a collection of java and C++ code that does some graphics and
 contour mapping stuff.  The code was originally written by Glenn Pinkerton
 (glennpinkerton@comcast.net) between 1997 and 2007.  The current reincarnation
@@ -31,8 +25,8 @@ The two directories here are:
 
     csw       This has all the code, makefiles, some data, etc.
 
-    jutest    This has files for building and running junit testgs.  There
-              are very few tests.  I made these few as a start to leaning
+    jutest    This has files for building and running junit tests.  There
+              are very few tests.  I made these few as a start to learning
               the junit framework.
 
 
