@@ -1,4 +1,3 @@
-
 This is a collection of java and C++ code that does some graphics and
 contour mapping stuff.  The code was originally written by Glenn Pinkerton
 (glennpinkerton@comcast.net) between 1997 and 2007.  The current reincarnation
@@ -18,7 +17,7 @@ that I make in the code.
 Any constructive comments are appreciated.
 
 
-The two directories here are:
+The three directories here are:
 
     build     Scripts to build using make.  I do not have any other build
               mechanism other than the makefiles.
