@@ -233,7 +233,7 @@ class FakeDataGen {
     {
 
       int     xanc, yanc, size, npts, nbytes;
-      int     ix, iy;
+      int     ix, iy, ix0 = 0, iy0 = 0;
       double  rad, r2, ang, dang, dx, dy;
 
       PointLookup   plook = null;
@@ -241,8 +241,10 @@ class FakeDataGen {
       int  fpos;
       int  lid;
       int  fid = 1;
+      int  ipoly = 0;
+      boolean  bpoly;
+      int  ip = 0;
 
-      //int   nskip = n10 / 8;
       for (int i=0; i<nloop; i++) {
 
         lid = i;
@@ -264,6 +266,14 @@ class FakeDataGen {
             size = range;
         }
 
+        ipoly = ran.nextInt (10);
+        bpoly = false;
+        ip = 0;
+        if (ipoly < 4) {
+          bpoly = true;
+          ip = 1;
+        }
+
     // make sure the generated shape is all inside the "universe"
         int  size15 = (int)(size * 1.5);
         if (nloop == 1)  size15 = 0;
@@ -274,6 +284,7 @@ class FakeDataGen {
 
         npts = ran.nextInt (np10);
         npts += 5;
+        if (bpoly) npts++;
         nbytes = npts * 8 + 12;
         rad = (double)size / 2.0;
 
@@ -286,7 +297,7 @@ class FakeDataGen {
           dos.writeInt (nbytes);
           dos.writeInt (1);
           dos.writeInt (npts);
-          dang = Math.PI / (double)npts;
+          dang = Math.PI / (double)(npts-ip);
           dang *= 2.0;
           for (int j=0; j<npts; j++) {
             r2 = rad * (ran.nextDouble() + .49);
@@ -295,6 +306,16 @@ class FakeDataGen {
             dy = r2 * Math.sin (ang);
             ix = (int)dx + xanc;
             iy = (int)dy + yanc;
+            if (bpoly) {
+              if (j == 0) {
+                ix0 = ix;
+                iy0 = iy;
+              }
+              else if (j == npts - 1) {
+                ix = ix0;
+                iy = iy0;
+              }
+            }
             dos.writeInt (ix);
             dos.writeInt (iy);
           }
@@ -522,11 +543,6 @@ int  ncount = 0;
       final String l = "1";
       final String lf = "\n";
       final String sf = "%.7f";
-
-      //final String b = "  ";
-      //final String c = ", ";
-
-
 
       TableData td;
       String s1, s2, s3;
