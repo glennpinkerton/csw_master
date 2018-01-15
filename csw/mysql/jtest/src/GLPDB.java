@@ -22,11 +22,10 @@ import java.util.ArrayList;
 
 public class GLPDB {
 
-    String   g_dirname;
-    double   g_xmin, g_ymin, g_xmax, g_ymax;
-    int      g_ixmin, g_iymin, g_ixmax, g_iymax;
+    String   g_dirname = null;
+    double   g_xmin, g_ymin, g_xmax, g_ymax, g_xscal, g_yscal;
+    long     g_ixmin, g_iymin, g_ixmax, g_iymax;
     Statement stmt = null;
-    long     spi_min = 0, spi_max = 0;
 
 // I have tried several things to get mysql to accept multiple
 // rows (with spatial data in each row) in the same insert.  I
@@ -165,7 +164,6 @@ public class GLPDB {
 
       final String  s1 = "insert into objects_geom values ( \n";
       final String  b = " ";
-      //final String  l = "(";
       final String  r = ")";
       final String  c = ", ";
       final String  sst = "ST_PolygonFromText(";
@@ -207,6 +205,8 @@ public class GLPDB {
 
       sq = sq + r + ";";
 
+      System.out.println (sq);
+
     }
 
 
@@ -240,8 +240,34 @@ public class GLPDB {
       double x1, y1, x2, y2;
       Scanner scan = new Scanner( System.in );
 
+      FileWriter  fw = null;
+      RandomAccessFile fp = null;
+
+      try {
+          fw = new FileWriter ("j_bbox_sel.out");
+      }
+      catch (IOException ex) {
+          System.out.println ();
+          System.out.println ("Cannot open j_bbox_sel.out.");
+          System.out.println (ex.getMessage());
+          System.out.println ();
+      }
+
+      try {
+          fp = new RandomAccessFile (g_dirname + "/glp_points_1.dat", "r");
+      }
+      catch (IOException ex) {
+          System.out.println ();
+          System.out.println ("Cannot open points file.");
+          System.out.println (ex.getMessage());
+          System.out.println ();
+      }
+
 long  stime, etime;
 double  dtime;
+
+      Scanner  lscan = null;
+      String   sline = null;
  
       while (true) 
       {
@@ -250,11 +276,15 @@ double  dtime;
         System.out.print ("Enter bbox: ");
 
         try {
-          if (scan.hasNextDouble() == false) break;
-          x1 = scan.nextDouble();
-          y1 = scan.nextDouble();
-          x2 = scan.nextDouble();
-          y2 = scan.nextDouble();
+          sline = scan.nextLine ();
+          if (sline == null) break;
+          if (sline.isEmpty()) break;
+          lscan = new Scanner (sline);
+          if (lscan.hasNextDouble() == false) break;
+          x1 = lscan.nextDouble();
+          y1 = lscan.nextDouble();
+          x2 = lscan.nextDouble();
+          y2 = lscan.nextDouble();
         }
         catch (Throwable ex) {
           break;
@@ -266,8 +296,18 @@ stime = System.nanoTime ();
 
         sq = createSelectQuery (bbs);
 
+//System.out.println ();
+//System.out.println (sq);
+//System.out.println ();
+
         do_query (sq);
-        getRsData (rs);
+
+        try {
+          fw.write ("\n==== new search bbox =  " + sline + "  ====\n");
+        }
+        catch (IOException ex) {};
+
+        getRsData (rs, fw, fp);
         try {
           rs.close ();
           rs = null;
@@ -286,6 +326,16 @@ System.out.println ();
       }
       
       scan.close();
+
+      try {
+        fp.close();
+      }
+      catch (IOException ex) { }
+
+      try {
+        fw.close();
+      }
+      catch (IOException ex) { }
 
       return;
 
@@ -324,10 +374,12 @@ System.out.println ();
         g_ymin = rs.getDouble ("ymin");
         g_xmax = rs.getDouble ("xmax");
         g_ymax = rs.getDouble ("ymax");
-        g_ixmin = rs.getInt ("ixmin");
-        g_iymin = rs.getInt ("iymin");
-        g_ixmax = rs.getInt ("ixmax");
-        g_iymax = rs.getInt ("iymax");
+        g_ixmin = (long)rs.getInt ("ixmin");
+        g_iymin = (long)rs.getInt ("iymin");
+        g_ixmax = (long)rs.getInt ("ixmax");
+        g_iymax = (long)rs.getInt ("iymax");
+        g_xscal = (g_xmax - g_xmin) / (double)(g_ixmax - g_ixmin);
+        g_yscal = (g_ymax - g_ymin) / (double)(g_iymax - g_iymin);
 
       }
       catch (SQLException ex) { }
@@ -337,34 +389,36 @@ System.out.println ();
 
 
 
-    private void getRsData (ResultSet rs)
+    private void getRsData (ResultSet rs,
+                            FileWriter fw,
+                            RandomAccessFile fp)
     {
 
       long       obid = 0;
       int        line_id, file_id, file_pos;
-
       try {
-        rs.first ();
-
-    // Do the first line before nexting the row cursor
-
-        obid = rs.getLong ("object_id");
-        line_id = rs.getInt ("line_id");
-        file_id = rs.getInt ("file_id");
-        file_pos = rs.getInt ("file_pos");
-        processObj (obid, line_id, file_id, file_pos);
-
-    // Do the rest of the result set.
-
+        rs.last();
+        int nr = rs.getRow();
+        try {
+          fw.write ("     number of rows found = " + nr + "\n");
+        }
+        catch (IOException ex) {};
+        rs.beforeFirst ();
         while (rs.next ()) {
           obid = rs.getLong ("object_id");
           line_id = rs.getInt ("line_id");
           file_id = rs.getInt ("file_id");
           file_pos = rs.getInt ("file_pos");
-          processObj (obid, line_id, file_id, file_pos);
+          processObj (fw, fp,
+                      obid, line_id, file_id, file_pos);
         }
       }
-      catch (SQLException ex) { }
+      catch (SQLException ex) {
+        System.out.println ();
+        System.out.println ("SQLException from getRsData");
+        System.out.println (ex.getMessage());
+        System.out.println ();
+      }
 
       try {
         int count = 0;
@@ -375,24 +429,88 @@ System.out.println ();
 System.out.println ("Number of results = " + count);
 System.out.println ();
       }
-      catch (SQLException ex)
-      {
-      }
+      catch (SQLException ex) { }
 
     }
 
 
-    private void processObj (long obid,
+    private void processObj (FileWriter fw,
+                             RandomAccessFile fp,
+                             long obid,
                              int  line_id,
                              int  file_id,
                              int  file_pos)
     {
+
+/*
 System.out.println ();
 System.out.println ("object id: " + obid);
 System.out.println ("  line_id = " + line_id);
 System.out.println ("  file_id = " + file_id);
 System.out.println ("  file_pos = " + file_pos);
 System.out.println ();
+*/
+
+      try {
+        fw.write ("\nobject_id = " + obid + "\n");
+        fw.write ("file_id = " + file_id + "\n");
+        fw.write ("file_pos = " + file_pos + "\n");
+        outputPointsFromFile (fw, fp, file_pos);
+      }
+      catch (IOException ex) {
+        System.out.println ("Error writing results to file.");
+        System.out.println (ex.getMessage());
+      }
+      
+    }
+
+
+    private void outputPointsFromFile (FileWriter fw,
+                               RandomAccessFile fp,
+                               int file_pos)
+    {
+      int   idum = 0;
+      int   npts = 0;
+      int   ix = 0;
+      int   iy = 0;
+      UniversePoint  up = null;
+      try {
+        fp.seek ((long)file_pos);
+        idum = fp.readInt ();
+        idum = fp.readInt ();
+        npts = fp.readInt ();
+        for (int j=0; j<npts; j++) {
+          ix = fp.readInt ();
+          iy = fp.readInt ();
+          up = convertIntToUniverse (ix, iy);
+          fw.write ("  x = " + String.format("%.5f", up.x) + 
+                      "  y = " + String.format("%.5f", up.y) + "\n");
+        }
+        
+      }
+      catch (IOException ex) {
+        System.out.println ("Error reading point file data");
+      }
+        
+    }
+         
+
+    private UniversePoint convertIntToUniverse (int ix, int iy) 
+    {
+      double  dx, dy;  
+      dx = (double)((long)ix - g_ixmin) * g_xscal + g_xmin;
+      dy = (double)((long)iy - g_iymin) * g_yscal + g_ymin;
+      UniversePoint up = new UniversePoint (dx, dy);
+      return up;
+    }
+
+
+    private class UniversePoint {
+      double   x = 0.0,  y = 0.0;
+      UniversePoint (double xin, double yin) {
+        x = xin;
+        y = yin;
+      }
     }
 
 
@@ -444,7 +562,9 @@ System.out.println ();
           "  and \n" +
           "(pline_id_lookup.object_id = objects.object_id) \n" +
           "  and \n" +
-          "(pline_points_lookup.line_id = pline_id_lookup.line_id);";
+          "(pline_points_lookup.line_id = pline_id_lookup.line_id) \n" +
+          "order by pline_points_lookup.file_id, pline_points_lookup.file_pos"
+      ;
 
       return s;   
     }
