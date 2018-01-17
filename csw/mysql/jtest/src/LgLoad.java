@@ -7,11 +7,16 @@ public class LgLoad {
     public static void main(String[] args) {
 
       Connection  conn = null;
+      int  fid = 1;
 
       try {
         conn = GLPDB.glpConnect ();
         GLPDB  glpdb = new GLPDB (conn);
-        glpdb.fillSpIndex ();
+        int alen = args.length;
+        if (alen > 0) {
+          fid = Integer.parseInt (args[0]);
+        }
+        glpdb.fillSpIndex (fid);
         conn.close();
         conn = null;
       }

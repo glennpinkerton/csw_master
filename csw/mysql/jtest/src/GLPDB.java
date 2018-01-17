@@ -27,12 +27,12 @@ public class GLPDB {
     long     g_ixmin, g_iymin, g_ixmax, g_iymax;
     Statement stmt = null;
 
-// I have tried several things to get mysql to accept multiple
-// rows (with spatial data in each row) in the same insert.  I
-// have given it up as a lost cause.  I write a separate insert
-// for each row in the objects load file.
+// I have tried several values for the max number of rows
+// per insert.  I think mysql can do more than 10000, but
+// this java code seems to slow to a crawl with much more
+// than 10000.
 
-    final int MAX_FOR_INSERT = 1;
+    final int MAX_FOR_INSERT = 10000;
 
     ResultSet  rs = null;
 
@@ -85,10 +85,13 @@ public class GLPDB {
 //
 // Fill the mysql spatial data values in the objects_geom table.
 //
-    public void fillSpIndex ()
+    public void fillSpIndex (int fid)
     {
 
-      String fname = "csw/mysql/jtest/src/ld2.dat";
+      final String fdname = "/home/gpinkerton/data/load";
+
+      //String fname = "csw/mysql/jtest/src/ld2.dat";
+      String fname = fdname + "/load_objects_" + fid + ".dat";
 
       FileInputStream  fis = null;
       Scanner          fscan = null;
@@ -112,6 +115,17 @@ public class GLPDB {
       int    layer_id;
       double   xmin, ymin, xmax, ymax;
 
+      FileWriter fw = null;
+
+      try {
+        fw = new FileWriter (fdname + "/jt_" + fid + ".sql");
+      }
+      catch (IOException ex) {
+        System.out.println ("Cannot open jt.sql file");
+        System.out.println (ex.getMessage());
+        return;
+      }
+
       int    n = 0;
       while (true) {
         try {
@@ -127,7 +141,7 @@ public class GLPDB {
             alist.add (sob);
             n++;
             if (n >= MAX_FOR_INSERT) {
-              putIntoTable (alist);
+              putIntoTable (alist, fw);
               alist.clear ();
               n = 0;
             }
@@ -135,7 +149,7 @@ public class GLPDB {
 
     // Should see this after end of file
         catch (NoSuchElementException ex) {
-          putIntoTable (alist);
+          putIntoTable (alist, fw);
           break;
         }
     // Any other exception is a problem
@@ -151,20 +165,27 @@ public class GLPDB {
       fscan = null;
       fis = null;
 
+      try {
+        fw.close ();
+      }
+      catch (IOException ex) {}
+
     }
 
 
 
-    private void putIntoTable (ArrayList<SpatialObj> alist)
+    private void putIntoTable (ArrayList<SpatialObj> alist,
+                               FileWriter fw)
     {
 
       if (alist.size() < 1) {
         return;
       }
 
-      final String  s1 = "insert into objects_geom values ( \n";
+      final String  s1 = "insert into objects_geom values \n";
       final String  b = " ";
       final String  r = ")";
+      final String  l = "(";
       final String  c = ", ";
       final String  sst = "ST_PolygonFromText(";
       final String  ply = "'polygon((";
@@ -175,7 +196,7 @@ public class GLPDB {
       SpatialObj  sob;
 
       String sq = new String (s1);
-      String sl, sg, spt;
+      String sln, sg, spt;
       
       int ndo = alist.size();
 
@@ -194,18 +215,38 @@ public class GLPDB {
                     ix2 + b + iy2 + c + nl +
                     ix1 + b + iy1 + b + r + r + "'" + nl;
         if (i < ndo - 1) {
-          sg = sst + spt + r + c + "\n";
+          sg = sst + spt + r + r + c + "\n";
         }
         else {
-          sg = sst + spt + r + "\n";
+          sg = sst + spt + r + r + "\n";
         }
-        sl = id + c + sg;
-        sq = sq + sl;
+        sln = l + id + c + sg;
+        sq = sq + sln;
+
+        if (i % 1000 == 0  &&  i > 0) {
+          try {
+            fw.write (sq);
+            fw.flush ();
+            sq = "";
+          }
+          catch (IOException ex) {
+            System.out.println ("Error writing to jt.sql");
+            System.out.println (ex.getMessage());
+            break;
+          }
+        }
       }
 
-      sq = sq + r + ";";
+      sq = sq + ";";
 
-      System.out.println (sq);
+      try {
+        fw.write (sq);
+        fw.flush ();
+      }
+      catch (IOException ex) {
+        System.out.println ("Error writing jt.sql");
+        System.out.println (ex.getMessage());
+      }
 
     }
 
@@ -241,24 +282,13 @@ public class GLPDB {
       Scanner scan = new Scanner( System.in );
 
       FileWriter  fw = null;
-      RandomAccessFile fp = null;
 
       try {
-          fw = new FileWriter ("j_bbox_sel.out");
+          fw = new FileWriter ("csw/mysql/jtest/src/j_bbox_sel.out");
       }
       catch (IOException ex) {
           System.out.println ();
           System.out.println ("Cannot open j_bbox_sel.out.");
-          System.out.println (ex.getMessage());
-          System.out.println ();
-      }
-
-      try {
-          fp = new RandomAccessFile (g_dirname + "/glp_points_1.dat", "r");
-      }
-      catch (IOException ex) {
-          System.out.println ();
-          System.out.println ("Cannot open points file.");
           System.out.println (ex.getMessage());
           System.out.println ();
       }
@@ -307,7 +337,7 @@ stime = System.nanoTime ();
         }
         catch (IOException ex) {};
 
-        getRsData (rs, fw, fp);
+        getRsData (rs, fw);
         try {
           rs.close ();
           rs = null;
@@ -326,11 +356,6 @@ System.out.println ();
       }
       
       scan.close();
-
-      try {
-        fp.close();
-      }
-      catch (IOException ex) { }
 
       try {
         fw.close();
@@ -388,14 +413,24 @@ System.out.println ();
 
 
 
-
+/**
+ * Loop through the result set returned for the "spatial"
+ * select operation.  The result set is orderedd by file id
+ * and then file pos.  Thus, when a new file id is encountered
+ * a new random access file object is created. Since the set
+ * is ordered primarily by file id, this should not produce
+ * an excess of file opens and file closes.
+ */
     private void getRsData (ResultSet rs,
-                            FileWriter fw,
-                            RandomAccessFile fp)
+                            FileWriter fw)
     {
 
       long       obid = 0;
       int        line_id, file_id, file_pos;
+      RandomAccessFile fp = null;
+
+      int        last_file_id = -1;
+
       try {
         rs.last();
         int nr = rs.getRow();
@@ -408,6 +443,26 @@ System.out.println ();
           obid = rs.getLong ("object_id");
           line_id = rs.getInt ("line_id");
           file_id = rs.getInt ("file_id");
+
+          if (file_id != last_file_id) {
+            try {
+              if (fp != null) {
+                fp.close();
+                fp = null;
+              }
+              fp = new RandomAccessFile (g_dirname + "/glp_points_" +
+                                         file_id + ".dat", "r");
+              last_file_id = file_id;
+            }
+            catch (IOException ex) {
+              System.out.println ();
+              System.out.println ("Cannot open random access points file.");
+              System.out.println (ex.getMessage());
+              System.out.println ();
+              break;
+            }
+          }
+
           file_pos = rs.getInt ("file_pos");
           processObj (fw, fp,
                       obid, line_id, file_id, file_pos);
@@ -418,6 +473,14 @@ System.out.println ();
         System.out.println ("SQLException from getRsData");
         System.out.println (ex.getMessage());
         System.out.println ();
+      }
+
+      if (fp != null) {
+        try {
+          fp.close();
+        }
+        catch (IOException ex) {}
+        fp = null;
       }
 
       try {
@@ -442,15 +505,6 @@ System.out.println ();
                              int  file_pos)
     {
 
-/*
-System.out.println ();
-System.out.println ("object id: " + obid);
-System.out.println ("  line_id = " + line_id);
-System.out.println ("  file_id = " + file_id);
-System.out.println ("  file_pos = " + file_pos);
-System.out.println ();
-*/
-
       try {
         fw.write ("\nobject_id = " + obid + "\n");
         fw.write ("file_id = " + file_id + "\n");
@@ -471,14 +525,16 @@ System.out.println ();
     {
       int   idum = 0;
       int   npts = 0;
+      int   nbytes = 0;
       int   ix = 0;
       int   iy = 0;
       UniversePoint  up = null;
       try {
         fp.seek ((long)file_pos);
-        idum = fp.readInt ();
+        nbytes = fp.readInt ();
         idum = fp.readInt ();
         npts = fp.readInt ();
+        fw.write ("nbytes = " + nbytes + "  npts = " + npts + "\n");
         for (int j=0; j<npts; j++) {
           ix = fp.readInt ();
           iy = fp.readInt ();
@@ -486,6 +542,7 @@ System.out.println ();
           fw.write ("  x = " + String.format("%.5f", up.x) + 
                       "  y = " + String.format("%.5f", up.y) + "\n");
         }
+        fw.flush();
         
       }
       catch (IOException ex) {

@@ -4,7 +4,7 @@ use glp;
 
 load data local infile 'load_objects.dat' into table objects;
 
-create index layer_id on objects(layer_id);
+-- create index layer_id on objects(layer_id);
 
 
 -- There is no load data that works for geometry data.
@@ -17,10 +17,10 @@ create index layer_id on objects(layer_id);
 
 source jt.sql;
 
-create spatial index bbox on objects_geom(bbox);
+-- create spatial index bbox on objects_geom(bbox);
 
 
--- The emaining tables use a straight forward simple load.
+-- The remaining tables use a straight forward simple load.
 
 load data local infile 'load_id_lookup.dat' into table pline_id_lookup;
 

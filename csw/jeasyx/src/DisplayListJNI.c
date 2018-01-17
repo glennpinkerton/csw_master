@@ -84,6 +84,7 @@ static int            FunctionSet = 0;
 static void update_zoom_pan_method (int command_id);
 static int setup_return_select_method_ids(JNIEnv *env,jobject obj);
 
+static FILE           *primfile = NULL;
 
 #if DEBUG_JNI_FILE
 static FILE           *dbfile = NULL;
@@ -91,6 +92,26 @@ static char           *cenv;
 static char           dbname[500];
 static char           fileline[1000];
 #endif
+
+
+/*
+ * The primfile is used when "recording" of the graphical
+ * results is desired.  The original reason for this is to
+ * record results of test cases for future comparisons.
+ */
+
+void jni_open_prim_file (char *fname) {
+  if (fname != NULL) {
+    primfile = fopen (fname, "w");
+  }
+}
+
+void jni_close_prim_file () {
+  if (primfile != NULL) fclose (primfile);
+  primfile = NULL;
+}
+
+
 
 /*
  * Process an easyx display list command sent from Java.
@@ -658,6 +679,43 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
 
 }
 
+static void write_fill_method_params (
+    float       *xy,
+    float       thickness,
+    float       patScale,
+    int         npts,
+    int         red,
+    int         green,
+    int         blue,
+    int         alpha,
+    int         pattern,
+    int         frame_num,
+    int         selectable)
+{
+    if (primfile == NULL) {
+        return;
+    }
+
+    fprintf (primfile, "\n");
+    fprintf (primfile, "fill prim:\n");
+    fprintf (primfile, "  thick = %.3f\n", thickness);
+    fprintf (primfile, "  scale = %.4f\n", patScale);
+    fprintf (primfile, "  npts = %d\n", npts);
+    fprintf (primfile, "  red = %d\n", red);
+    fprintf (primfile, "  green = %d\n", green);
+    fprintf (primfile, "  blue = %d\n", blue);
+    fprintf (primfile, "  alpha = %d\n", alpha);
+    fprintf (primfile, "  pattern = %d\n", pattern);
+    fprintf (primfile, "  frame_num = %d\n", frame_num);
+    fprintf (primfile, "  selectable = %d\n", selectable);
+
+    int n = 0;
+    for (int i=0; i<npts; i++)  {
+      fprintf (primfile, "    %.1f  %.1f\n", xy[n], xy[n+1]);
+      n += 2;
+    }
+}
+
 
 void jni_call_add_fill_method (
     float       *xy,
@@ -670,9 +728,24 @@ void jni_call_add_fill_method (
     int         alpha,
     int         pattern,
     int         frame_num,
-    int         selectable
-) {
+    int         selectable)
+{
     jfloatArray        jxy;
+
+    if (primfile) {
+        write_fill_method_params (
+          xy,
+          thickness,
+          patScale,
+          npts,
+          red,
+          green,
+          blue,
+          alpha,
+          pattern,
+          frame_num,
+          selectable);
+    }
 
     if (FillMethodID == NULL) {
         return;
@@ -741,6 +814,45 @@ void jni_call_add_fill_method (
 
 
 
+
+static void write_line_method_params (
+    float       *xy,
+    int         npts,
+    int         red,
+    int         green,
+    int         blue,
+    int         alpha,
+    int         pattern,
+    float       thickness,
+    int         frame_num,
+    int         image_id,
+    int         selectable)
+{
+    if (primfile == NULL) {
+        return;
+    }
+
+    fprintf (primfile, "\n");
+    fprintf (primfile, "line prim:\n");
+    fprintf (primfile, "  npts = %d\n", npts);
+    fprintf (primfile, "  red = %d\n", red);
+    fprintf (primfile, "  green = %d\n", green);
+    fprintf (primfile, "  blue = %d\n", blue);
+    fprintf (primfile, "  alpha = %d\n", alpha);
+    fprintf (primfile, "  pattern = %d\n", pattern);
+    fprintf (primfile, "  thick = %.3f\n", thickness);
+    fprintf (primfile, "  frame_num = %d\n", frame_num);
+    fprintf (primfile, "  image_id = %d\n", image_id);
+    fprintf (primfile, "  selectable = %d\n", selectable);
+
+    int n = 0;
+    for (int i=0; i<npts; i++)  {
+      fprintf (primfile, "    %.1f  %.1f\n", xy[n], xy[n+1]);
+      n += 2;
+    }
+}
+
+
 void jni_call_add_line_method (
     float       *xy,
     int         npts,
@@ -755,6 +867,21 @@ void jni_call_add_line_method (
     int         selectable
 ) {
     jfloatArray        jxy;
+
+    if (primfile) {
+        write_line_method_params (
+          xy,
+          npts,
+          red,
+          green,
+          blue,
+          alpha,
+          pattern,
+          thickness,
+          frame_num,
+          image_id,
+          selectable);
+    }
 
     if (LineMethodID == NULL) {
         return;
@@ -823,6 +950,41 @@ void jni_call_add_line_method (
 }
 
 
+static void write_text_method_params (
+    float       x,
+    float       y,
+    char        *text,
+    int         red,
+    int         green,
+    int         blue,
+    int         alpha,
+    float       angle,
+    float       size,
+    int         font,
+    int         frame_num,
+    int         image_id,
+    int         selectable)
+{
+    if (primfile == NULL) {
+        return;
+    }
+
+    fprintf (primfile, "\n");
+    fprintf (primfile, "text prim:\n");
+    fprintf (primfile, "  x = %.1f   y = %.1f\n", x, y);
+    fprintf (primfile, "  text = %s\n", text);
+    fprintf (primfile, "  red = %d\n", red);
+    fprintf (primfile, "  green = %d\n", green);
+    fprintf (primfile, "  blue = %d\n", blue);
+    fprintf (primfile, "  alpha = %d\n", alpha);
+    fprintf (primfile, "  angle = %.3f\n", angle);
+    fprintf (primfile, "  size = %.2f\n", size);
+    fprintf (primfile, "  font = %d\n", font);
+    fprintf (primfile, "  frame_num = %d\n", frame_num);
+    fprintf (primfile, "  image_id = %d\n", image_id);
+    fprintf (primfile, "  selectable = %d\n", selectable);
+
+}
 
 void jni_call_add_text_method (
     float       x,
@@ -843,6 +1005,24 @@ void jni_call_add_text_method (
 
     if (TextMethodID == NULL) {
         return;
+    }
+
+    if (primfile != NULL) {
+        write_text_method_params (
+          x,
+          y,
+          text,
+          red,
+          green,
+          blue,
+          alpha,
+          angle,
+          size,
+          font,
+          frame_num,
+          image_id,
+          selectable
+        );
     }
 
   #if DEBUG_JNI_FILE
@@ -901,6 +1081,43 @@ void jni_call_add_text_method (
 }
 
 
+static void write_arc_method_params (
+    float       x,
+    float       y,
+    float       r1,
+    float       r2,
+    float       ang1,
+    float       ang2,
+    int         closure,
+    int         red,
+    int         green,
+    int         blue,
+    int         alpha,
+    float       thickness,
+    float       angle,
+    int         frame_num,
+    int         selectable)
+{
+    if (primfile == NULL) {
+        return;
+    }
+
+    fprintf (primfile, "\n");
+    fprintf (primfile, "text prim:\n");
+    fprintf (primfile, "  x = %.1f   y = %.1f\n", x, y);
+    fprintf (primfile, "  r1 = %.1f   r2 = %.1f\n", r1, r2);
+    fprintf (primfile, "  ang1 = %.1f   ang2 = %.1f\n", ang1, ang2);
+    fprintf (primfile, "  closure = %d\n", closure);
+    fprintf (primfile, "  red = %d\n", red);
+    fprintf (primfile, "  green = %d\n", green);
+    fprintf (primfile, "  blue = %d\n", blue);
+    fprintf (primfile, "  alpha = %d\n", alpha);
+    fprintf (primfile, "  thickness = %.3f\n", thickness);
+    fprintf (primfile, "  angle = %.3f\n", angle);
+    fprintf (primfile, "  frame_num = %d\n", frame_num);
+    fprintf (primfile, "  selectable = %d\n", selectable);
+
+}
 
 void jni_call_add_arc_method (
     float       x,
@@ -922,6 +1139,26 @@ void jni_call_add_arc_method (
 
     if (ArcMethodID == NULL) {
         return;
+    }
+
+    if (primfile != NULL) {
+        write_arc_method_params (
+          x,
+          y,
+          r1,
+          r2,
+          ang1,
+          ang2,
+          closure,
+          red,
+          green,
+          blue,
+          alpha,
+          thickness,
+          angle,
+          frame_num,
+          selectable
+        );
     }
 
   #if DEBUG_JNI_FILE
@@ -962,6 +1199,48 @@ void jni_call_add_arc_method (
 
 
 
+static void write_filled_arc_method_params (
+    float       x,
+    float       y,
+    float       r1,
+    float       r2,
+    float       ang1,
+    float       ang2,
+    int         closure,
+    int         red,
+    int         green,
+    int         blue,
+    int         alpha,
+    float       thickness,
+    float       angle,
+    int         pattern,
+    int         frame_num,
+    int         selectable)
+{
+    if (primfile == NULL) {
+        return;
+    }
+
+    fprintf (primfile, "\n");
+    fprintf (primfile, "text prim:\n");
+    fprintf (primfile, "  x = %.1f   y = %.1f\n", x, y);
+    fprintf (primfile, "  r1 = %.1f   r2 = %.1f\n", r1, r2);
+    fprintf (primfile, "  ang1 = %.1f   ang2 = %.1f\n", ang1, ang2);
+    fprintf (primfile, "  closure = %d\n", closure);
+    fprintf (primfile, "  red = %d\n", red);
+    fprintf (primfile, "  green = %d\n", green);
+    fprintf (primfile, "  blue = %d\n", blue);
+    fprintf (primfile, "  alpha = %d\n", alpha);
+    fprintf (primfile, "  thickness = %.3f\n", thickness);
+    fprintf (primfile, "  angle = %.3f\n", angle);
+    fprintf (primfile, "  pattern = %d\n", pattern);
+    fprintf (primfile, "  frame_num = %d\n", frame_num);
+    fprintf (primfile, "  selectable = %d\n", selectable);
+
+}
+
+
+
 void jni_call_add_filled_arc_method (
     float       x,
     float       y,
@@ -984,6 +1263,29 @@ void jni_call_add_filled_arc_method (
     if (FilledArcMethodID == NULL) {
         return;
     }
+
+    if (primfile != NULL) {
+        write_filled_arc_method_params (
+          x,
+          y,
+          r1,
+          r2,
+          ang1,
+          ang2,
+          closure,
+          red,
+          green,
+          blue,
+          alpha,
+          thickness,
+          angle,
+          pattern,
+          frame_num,
+          selectable
+        );
+    }
+
+
 
   #if DEBUG_JNI_FILE
     sprintf (fileline, "\nEntered jni_call_add_filled_arc_method\n");

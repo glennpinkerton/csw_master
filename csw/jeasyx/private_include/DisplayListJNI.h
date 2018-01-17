@@ -446,6 +446,9 @@ extern "C" {
         double  y,
         double  z);
 
+    void jni_open_prim_file (char *fname);
+    void jni_close_prim_file ();
+
 #ifdef __cplusplus
 }
 #endif

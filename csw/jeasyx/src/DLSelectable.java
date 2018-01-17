@@ -133,7 +133,7 @@ public class DLSelectable {
 
     /**
      Set the application data object connected with this selectable.  All of the
-     graphic primitives associated with the selecftable should be createable from
+     graphic primitives associated with the selectable should be createable from
      this data object.
      * @param object Application data object.
      */

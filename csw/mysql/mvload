@@ -1,0 +1,10 @@
+#!/bin/bash
+
+rm -f jt.sql load*.dat
+
+cp $GLP_LD/*$1* .
+
+mv jt_$1.sql jt.sql
+mv load_id_lookup_$1.dat load_id_lookup.dat
+mv load_points_lookup_$1.dat load_points_lookup.dat
+mv load_objects_$1.dat load_objects.dat
