@@ -42,7 +42,7 @@ import csw.jeasyx.src.JEasyXGraphicsPanel;
 
 /**
  *
- * This class is used as a main entry for unit testing JSurfaceWorks stuff.
+ * This class is used as a main entry for testing JSurfaceWorks stuff.
  *
  *  @author Glenn Pinkerton
  *
@@ -53,7 +53,19 @@ public class JSWUnitTest {
         System.loadLibrary ("_csw_all");
     }
 
+    static int nphint = 1000;
+
     public static void main (String[] args) {
+
+        if (args != null) {
+            if (args.length == 1) {
+                try {
+                    nphint = Integer.parseInt(args[0]);
+                }
+                catch (Throwable ex) {
+                }
+            }
+        }
 
         Runnable run = new Runnable ()
         {
@@ -76,7 +88,7 @@ public class JSWUnitTest {
           System.out.println("Error setting native LAF: " + e);
         }
 
-        JSWUnitTestFrame frame = new JSWUnitTestFrame ();
+        JSWUnitTestFrame frame = new JSWUnitTestFrame (nphint);
         frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
         frame.setVisible (true);
 
@@ -87,11 +99,12 @@ public class JSWUnitTest {
 class JSWUnitTestFrame extends JFrame
 {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    private int nphint = 1000;
 
-    public JSWUnitTestFrame ()
+    public JSWUnitTestFrame (int nph)
     {
-
+        nphint = nph;
 
 /*
 try {
@@ -126,18 +139,18 @@ catch (Exception e) {
         Container contentPane = getContentPane ();
         contentPane.setLayout (new GridLayout(15,1));
 
-        JButton trimesh_10_button = new JButton ("100 Point TriMesh");
+        JButton trimesh_10_button = new JButton (nphint + " Point TriMesh");
         trimesh_10_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                TriMesh10Frame frame = new TriMesh10Frame ();
+                TriMesh10Frame frame = new TriMesh10Frame (nphint);
                 frame.setVisible (true);
           }
         });
 
-        JButton grid_10_button = new JButton ("100 Point Grid");
+        JButton grid_10_button = new JButton (nphint + " Point Grid");
         grid_10_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                Grid10Frame frame = new Grid10Frame ();
+                Grid10Frame frame = new Grid10Frame (nphint);
                 frame.setVisible (true);
           }
         });
@@ -240,9 +253,9 @@ catch (Exception e) {
 class TriMesh10Frame extends JFrame
 {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-    public TriMesh10Frame ()
+    public TriMesh10Frame (int nphint)
     {
         JSurfaceWorks      sw;
         Random             random;
@@ -252,7 +265,8 @@ class TriMesh10Frame extends JFrame
         random = new Random();
         long  ctw = System.currentTimeMillis ();
         random.setSeed (ctw);
-        int np = random.nextInt (1000) + 100;
+        int np = random.nextInt(nphint) + nphint / 2;
+        if (np < 3) np = 3;
 
         setTitle ("TriMesh Test " + np);
         setSize (900, 700);
@@ -346,9 +360,9 @@ class TriMesh10Frame extends JFrame
 class Grid10Frame extends JFrame
 {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-    public Grid10Frame ()
+    public Grid10Frame (int nphint)
     {
         JSurfaceWorks      sw;
         Random             random;
@@ -358,7 +372,8 @@ class Grid10Frame extends JFrame
         random = new Random();
         long  ctw = System.currentTimeMillis ();
         random.setSeed (ctw);
-        int np = random.nextInt (1000) + 100;
+        int np = random.nextInt(nphint) + nphint / 2;
+        if (np < 1) np = 1;
 
         setTitle ("Grid Test " + np);
         setSize (900, 700);
@@ -441,7 +456,7 @@ class Grid10Frame extends JFrame
 class TFileFrame extends JFrame
 {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     //private String                 fileName;
     private JTextField             tField, tField2, tField3;
@@ -533,10 +548,10 @@ class TFileFrame extends JFrame
 
     void setLineFileName (String fname)
     {
-		fname = fname.trim();
-		if (fname.length() < 1) {
-			return;
-		}
+        fname = fname.trim();
+        if (fname.length() < 1) {
+            return;
+        }
 
         DBLineList dblist = new DBLineList ();
 
@@ -735,12 +750,12 @@ class TFileFrame extends JFrame
         double txmax = tmesh.getXMax ();
         double tymax = tmesh.getYMax ();
 
-		System.out.println ("trimesh limits: " + 
-				             txmin +  "  " +
-							 tymin +  "  " +
-							 txmax +  "  " +
-							 tymax);
-		System.out.flush ();
+        System.out.println ("trimesh limits: " + 
+                             txmin +  "  " +
+                             tymin +  "  " +
+                             txmax +  "  " +
+                             tymax);
+        System.out.flush ();
 
         double dx = txmax - txmin + tymax - tymin;
         dx /= 40.0;
@@ -884,7 +899,7 @@ class TFileFrame extends JFrame
 class FileioFrame extends JFrame
 {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     //private String                 fileName;
     private JTextField             tField;
@@ -1154,7 +1169,7 @@ class FileioFrame extends JFrame
 class PFileFrame extends JFrame
 {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     //private String                 fileName;
     private JTextField             tField, tField2;
@@ -1240,13 +1255,13 @@ class PFileFrame extends JFrame
         dl.beginPlot ("debug points and constraints",
                       0.0, 0.0, 100.0, 100.0);
 
-		setupFrame ();
+        setupFrame ();
 
     }
 
 
-	private void setupFrame ()
-	{
+    private void setupFrame ()
+    {
 
         dl.clear ();
 
@@ -1271,16 +1286,16 @@ class PFileFrame extends JFrame
                        0.0,
                        0.0);
 
-		repaint ();
+        repaint ();
 
     }
 
     void clearDrawing ()
     {
         NumPointFile = 0;
-		nPoints = 0;
-		faultList.clear ();
-		setupFrame ();
+        nPoints = 0;
+        faultList.clear ();
+        setupFrame ();
     }
 
     private int NumPointFile;
@@ -1290,16 +1305,16 @@ class PFileFrame extends JFrame
     private double[] zPoints;
     private int      nPoints;
 
-	private ArrayList<XYZPolyline> faultList = 
-		new ArrayList<XYZPolyline> (10);
+    private ArrayList<XYZPolyline> faultList = 
+        new ArrayList<XYZPolyline> (10);
 
     void setPointFileName (String fname)
     {
 
-		fname = fname.trim();
-		if (fname.length() < 1) {
-			return;
-		}
+        fname = fname.trim();
+        if (fname.length() < 1) {
+            return;
+        }
 
         DBPointList dblist = new DBPointList ();
 
@@ -1354,20 +1369,20 @@ class PFileFrame extends JFrame
     void contourPoints ()
     {
         if (nPoints < 1) {
-			System.out.println ("No points defined for contour.");
+            System.out.println ("No points defined for contour.");
             return;
         }
 
         JSurfaceWorks jsw = new JSurfaceWorks ();
 
-		GridGeometry geom = new GridGeometry (50, 50, 0.0, 0.0, 100.0, 100.0);
+        GridGeometry geom = new GridGeometry (50, 50, 0.0, 0.0, 100.0, 100.0);
         CSWGrid grid = jsw.calcGrid (xPoints, yPoints, zPoints, nPoints,
                                      faultList, null, geom, null);
 
-		if (grid == null) {
-			System.out.println ("null grid returned from calcGrid");
-			return;
-		}
+        if (grid == null) {
+            System.out.println ("null grid returned from calcGrid");
+            return;
+        }
 
         dl.addGrid ("test grid", grid, null);
 
@@ -1402,7 +1417,7 @@ class PFileFrame extends JFrame
 
         dl.setTextOffset (.05, .05);
 
-		faultList.clear ();
+        faultList.clear ();
 
         n = 0;
         for (int ido=0; ido<nline; ido++) {
@@ -1425,8 +1440,8 @@ class PFileFrame extends JFrame
 
             dl.setColor (Color.black);
             dl.addLine (xa, ya, npts);
-			XYZPolyline cline = new XYZPolyline (xa, ya, za);
-			faultList.add (cline);
+            XYZPolyline cline = new XYZPolyline (xa, ya, za);
+            faultList.add (cline);
         }
 
         repaint ();
@@ -1437,7 +1452,7 @@ class PFileFrame extends JFrame
 class ContourFrame extends JFrame
 {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private String                 fileName, fileName2, fileName3;
     private JTextField             tField, tField2, tField3;
@@ -1676,7 +1691,7 @@ class ContourFrame extends JFrame
 class DivideFrame extends JFrame
 {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
    // private String                 fileName;
     private JTextField             tField, tField2, tField3;
@@ -2193,7 +2208,7 @@ class DivideFrame extends JFrame
 class GridFileFrame extends JFrame
 {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     //private String                 fileName;
     private JTextField             tField;
@@ -2459,7 +2474,7 @@ class GridFileFrame extends JFrame
 class ResampleFrame extends JFrame
 {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private String                 fileName, fileName2;
     private JTextField             tField, tField2;
