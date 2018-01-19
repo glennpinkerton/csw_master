@@ -48,6 +48,11 @@
 csw_jeasyx_src_JDisplayListBase_MAX_LIST_SIZE
 #endif
 
+/*
+ * The following static variables should be thread safe (I hope)
+ * They are set once and then read by all threads.  It should not
+ * matter which thread sets them since they will not change.
+ */
 static jmethodID      FillMethodID = NULL,
                       LineMethodID = NULL,
                       TextMethodID = NULL,
@@ -84,8 +89,6 @@ static int            FunctionSet = 0;
 static void update_zoom_pan_method (int command_id);
 static int setup_return_select_method_ids(JNIEnv *env,jobject obj);
 
-static FILE           *primfile = NULL;
-
 #if DEBUG_JNI_FILE
 static FILE           *dbfile = NULL;
 static char           *cenv;
@@ -94,19 +97,32 @@ static char           fileline[1000];
 #endif
 
 
+
+static FILE           *primfile = NULL;
+
 /*
  * The primfile is used when "recording" of the graphical
  * results is desired.  The original reason for this is to
- * record results of test cases for future comparisons.
+ * record results of test cases for future comparisons. This
+ * is not thread safe.  Only use this from the c++ only test
+ * programs (which only use single threads).
  */
 
-void jni_open_prim_file (char *fname) {
+void jni_set_prim_file_ezx (FILE *pf) {
+  primfile = pf;
+}
+
+FILE *jni_get_prim_file_ezx () {
+  return primfile;
+}
+
+void jni_open_prim_file_ezx (char *fname) {
   if (fname != NULL) {
     primfile = fopen (fname, "w");
   }
 }
 
-void jni_close_prim_file () {
+void jni_close_prim_file_ezx () {
   if (primfile != NULL) fclose (primfile);
   primfile = NULL;
 }
@@ -1103,7 +1119,7 @@ static void write_arc_method_params (
     }
 
     fprintf (primfile, "\n");
-    fprintf (primfile, "text prim:\n");
+    fprintf (primfile, "arc prim:\n");
     fprintf (primfile, "  x = %.1f   y = %.1f\n", x, y);
     fprintf (primfile, "  r1 = %.1f   r2 = %.1f\n", r1, r2);
     fprintf (primfile, "  ang1 = %.1f   ang2 = %.1f\n", ang1, ang2);
@@ -1222,7 +1238,7 @@ static void write_filled_arc_method_params (
     }
 
     fprintf (primfile, "\n");
-    fprintf (primfile, "text prim:\n");
+    fprintf (primfile, "arc prim:\n");
     fprintf (primfile, "  x = %.1f   y = %.1f\n", x, y);
     fprintf (primfile, "  r1 = %.1f   r2 = %.1f\n", r1, r2);
     fprintf (primfile, "  ang1 = %.1f   ang2 = %.1f\n", ang1, ang2);

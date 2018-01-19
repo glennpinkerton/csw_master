@@ -9,6 +9,8 @@
 #ifndef _SURFACE_WORKS_JNI_H_
 #define _SURFACE_WORKS_JNI_H_
 
+#include <stdio.h>
+
   #ifdef __cplusplus
   extern "C" {
   #endif
@@ -237,6 +239,13 @@
     void jni_call_add_fault_major_minor_method (
         int         id,
         int         major);
+
+
+    FILE *jni_get_prim_file_sw ();
+    void jni_set_prim_file_sw (FILE *pf);
+    void jni_open_prim_file_sw (char *fname);
+    void jni_close_prim_file_sw ();
+
 
   #ifdef __cplusplus
   }

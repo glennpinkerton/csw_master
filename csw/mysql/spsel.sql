@@ -2,8 +2,8 @@
 
 use glp;
 
-set @bbpoly = 'polygon ((20000000 20000000, 20000000 25000000, 25000000 25000000,
-                          25000000 20000000, 20000000 20000000))';
+set @bbpoly = 'polygon ((20000000 20000000, 20000000 40000000, 40000000 40000000,
+                          40000000 20000000, 20000000 20000000))';
 
 select objects.object_id,pline_points_lookup.*
   from objects,objects_geom,pline_id_lookup,pline_points_lookup

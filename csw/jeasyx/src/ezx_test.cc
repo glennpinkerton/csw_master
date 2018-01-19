@@ -71,14 +71,11 @@ int main (int argc, char *argv[])
 
     tfname[0] = '\0';
     if (argc > 3) {
-printf ("Argc > 3\n");
       if (strcmp (argv[2], "-test") == 0) {
-printf ("-test found\n");
         strcpy (tfname, argv[3]);
         btest_mode = true;
       }
     }
-fflush (stdout);
 
 /*
  * Rather than using standard input, open a file specified
@@ -108,10 +105,13 @@ fflush (stdout);
 
     CSWFileioUtil   csw_fileio_obj;
 
+    FILE            *prim_file = NULL;
+
     if (btest_mode) {
-printf ("\nOpen prim file: %s\n\n", tfname);
-fflush (stdout);
-        jni_open_prim_file (tfname);
+        if (jni_get_prim_file_ezx () == NULL) {
+            prim_file = fopen (tfname, "w");
+            jni_set_prim_file_ezx  (prim_file);
+        }
     }
 
     for (;;) {
@@ -270,7 +270,8 @@ fflush (stdout);
                 }
                 sscanf (
                     inbuff,
-                    "%d %d %ld %lf %lf %lf %lf",
+                    "%d %d %d %ld %lf %lf %lf %lf",
+                    &dlist_index,
                     ilist+0,
                     ilist+1,
                     longlist+0,
@@ -2241,6 +2242,8 @@ fflush (stdout);
 
         }  /* end of huge switch  */
 
+        dlist_index = 0;
+
         if (end_flag) {
             break;
         }
@@ -2248,7 +2251,7 @@ fflush (stdout);
     }  /* end of for loop reading command file */
 
     if (btest_mode) {
-        jni_close_prim_file ();
+        jni_close_prim_file_ezx ();
     }
 
     ezx_process_command (

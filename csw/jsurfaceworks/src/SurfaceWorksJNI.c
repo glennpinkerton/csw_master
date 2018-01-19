@@ -45,10 +45,11 @@
 #define MAX_LIST_ARRAY \
 csw_jsurfaceworks_src_JSurfaceWorksBase_MAX_LIST_ARRAY
 
+#define MAX_TRI_NDO  100
+
 /*
  * Set static file variables.
  */
-
 static jmethodID StoreTriMeshMethodID = NULL;
 static jmethodID AddTriMeshMethodID = NULL;
 static jmethodID AddGridMethodID = NULL;
@@ -76,6 +77,37 @@ static jmethodID AddNativeAtTriMeshMethodID = NULL;
 
 static JNIEnv         *JavaEnv = NULL;
 static jobject        JavaObj = NULL;
+
+
+/*
+ * The primfile is used when "recording" of the surface
+ * results is desired.  The original reason for this is to
+ * record results of test cases for future comparisons. This
+ * is not thread safe.  Only use this from the c++ only test
+ * programs (which only use single threads).
+ */
+
+static FILE           *primfile = NULL;
+
+void jni_set_prim_file_sw (FILE *pf) {
+  primfile = pf;
+}
+
+FILE *jni_get_prim_file_sw () {
+  return primfile;
+}
+
+void jni_open_prim_file_sw (char *fname) {
+  if (fname != NULL) {
+    primfile = fopen (fname, "w");
+  }
+}
+
+void jni_close_prim_file_sw () {
+  if (primfile != NULL) fclose (primfile);
+  primfile = NULL;
+}
+
 
 /*
  * This function is only here to make sure that the file
@@ -558,14 +590,70 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
  */
 void jni_call_set_error_message_method (
     char *message,
-    int  errnum
-)
+    int  errnum)
 {
     message = message;
     errnum = errnum;
 }
 
 /*------------------------------------------------------------------------*/
+
+static void write_store_tri_mesh (
+    double const *xnode,
+    double const *ynode,
+    double const *znode,
+    int const *nodeflags,
+    int numnode,
+    int const *n1edge,
+    int const *n2edge,
+    int const *t1edge,
+    int const *t2edge,
+    int const *edgeflags,
+    int numedge,
+    int const *e1tri,
+    int const *e2tri,
+    int const *e3tri,
+    int const *triflags,
+    int numtri)
+{
+    int    i, ndo;
+
+    ndo = numnode;
+    if (ndo > MAX_TRI_NDO) ndo = MAX_TRI_NDO;
+    fprintf (primfile, "\nStoreTriMesh method\n");
+    fprintf (primfile,
+      "  number of nodes = %d  node list (10 max) follows:\n", numnode);
+    for (i=0; i<ndo; i++) {
+      fprintf (primfile, "    x = %.5f   y = %.5f   z = %.5f\n",
+                xnode[i], ynode[i], znode[i]);
+    }
+    fprintf (primfile,
+       "  number of edges = %d  edge list (10 max) follows:\n", numedge);
+    ndo = numedge;
+    if (ndo > MAX_TRI_NDO) ndo = MAX_TRI_NDO;
+    for (i=0; i<ndo; i++) {
+      fprintf (primfile,
+         "    node1 = %d   node2 = %d    tri1 = %d   tri2 = %d\n",
+          n1edge[i], n2edge[i], t1edge[i], t2edge[i]);
+    }
+    fprintf (primfile,
+      "  number of triangles = %d  triangle list (10 max) follows:\n", numtri);
+    ndo = numtri;
+    if (ndo > MAX_TRI_NDO) ndo = MAX_TRI_NDO;
+    for (i=0; i<ndo; i++) {
+      if (triflags == NULL) {
+        fprintf (primfile, "    edge1 = %d   edge2 = %d   edge3 = %d\n",
+          e1tri[i], e2tri[i], e3tri[i]);
+      }
+      else {
+        fprintf (primfile,
+          "    edge1 = %d   edge2 = %d   edge3 = %d   flag = %d\n",
+          e1tri[i], e2tri[i], e3tri[i], triflags[i]);
+      }
+    }
+    
+}
+
 
 void jni_call_store_tri_mesh_method (
     double const *xnode,
@@ -583,8 +671,7 @@ void jni_call_store_tri_mesh_method (
     int const *e2tri,
     int const *e3tri,
     int const *triflags,
-    int numtri
-)
+    int numtri)
 {
     jint        *jnodeflags;
     jint        *jn1edge,
@@ -613,6 +700,26 @@ void jni_call_store_tri_mesh_method (
     jintArray           j_e3tri;
     jintArray           j_triflags;
     jint                j_numtri;
+
+    if (primfile != NULL) {
+        write_store_tri_mesh (
+            xnode,
+            ynode,
+            znode,
+            nodeflags,
+            numnode,
+            n1edge,
+            n2edge,
+            t1edge,
+            t2edge,
+            edgeflags,
+            numedge,
+            e1tri,
+            e2tri,
+            e3tri,
+            triflags,
+            numtri);
+    }
 
     if (StoreTriMeshMethodID == NULL) {
         return;
@@ -931,6 +1038,62 @@ void jni_call_store_tri_mesh_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_tri_mesh (
+    double      *xnode,
+    double      *ynode,
+    double      *znode,
+    int         *nodeflags,
+    int         numnode,
+    int         *n1edge,
+    int         *n2edge,
+    int         *t1edge,
+    int         *t2edge,
+    int         *edgeflags,
+    int         numedge,
+    int         *e1tri,
+    int         *e2tri,
+    int         *e3tri,
+    int         *triflags,
+    int         numtri)
+{
+    int    i, ndo;
+
+    ndo = numnode;
+    if (ndo > MAX_TRI_NDO) ndo = MAX_TRI_NDO;
+    fprintf (primfile, "\nAddTriMesh method\n");
+    fprintf (primfile,
+       "  number of nodes = %d  node list (10 max) follows:\n", numnode);
+    for (i=0; i<ndo; i++) {
+      fprintf (primfile, "    x = %.5f   y = %.5f   z = %.5f\n",
+                xnode[i], ynode[i], znode[i]);
+    }
+    fprintf (primfile,
+       "  number of edges = %d  edge list (10 max) follows:\n", numedge);
+    ndo = numedge;
+    if (ndo > MAX_TRI_NDO) ndo = MAX_TRI_NDO;
+    for (i=0; i<ndo; i++) {
+      fprintf (primfile,
+        "    node1 = %d   node2 = %d    tri1 = %d   tri2 = %d\n",
+          n1edge[i], n2edge[i], t1edge[i], t2edge[i]);
+    }
+    fprintf (primfile,
+       "  number of triangles = %d  triangle list (10 max) follows:\n", numtri);
+    ndo = numtri;
+    if (ndo > MAX_TRI_NDO) ndo = MAX_TRI_NDO;
+    for (i=0; i<ndo; i++) {
+      if (triflags == NULL) {
+        fprintf (primfile, "    edge1 = %d   edge2 = %d   edge3 = %d\n",
+          e1tri[i], e2tri[i], e3tri[i]);
+      }
+      else {
+        fprintf (primfile,
+          "    edge1 = %d   edge2 = %d   edge3 = %d   flag = %d\n",
+          e1tri[i], e2tri[i], e3tri[i], triflags[i]);
+      }
+    }
+}
+
+
 void jni_call_add_tri_mesh_method (
     double      *xnode,
     double      *ynode,
@@ -947,8 +1110,7 @@ void jni_call_add_tri_mesh_method (
     int         *e2tri,
     int         *e3tri,
     int         *triflags,
-    int         numtri
-)
+    int         numtri)
 {
     jint        *jnodeflags;
     jint        *jn1edge,
@@ -978,6 +1140,25 @@ void jni_call_add_tri_mesh_method (
     jintArray           j_triflags;
     jint                j_numtri;
 
+    if (primfile != NULL) {
+        write_add_tri_mesh (
+            xnode,
+            ynode,
+            znode,
+            nodeflags,
+            numnode,
+            n1edge,
+            n2edge,
+            t1edge,
+            t2edge,
+            edgeflags,
+            numedge,
+            e1tri,
+            e2tri,
+            e3tri,
+            triflags,
+            numtri);
+    }
 
     if (AddTriMeshMethodID == NULL) {
         return;
@@ -1299,6 +1480,44 @@ void jni_call_add_tri_mesh_method (
 
 /*------------------------------------------------------------------------*/
 
+
+static void write_add_grid (
+    double *data,
+    double *derror,
+    char *mask,
+    int ncol,
+    int nrow,
+    double xmin,
+    double ymin,
+    double xmax,
+    double ymax,
+    int npts)
+{
+    int  i, j, k, k2, iskp, iskp2, jskp, jskp2;
+
+    iskp = nrow / 20;
+    if (iskp < 1) iskp = 1;
+    iskp2 = iskp / 2;
+    jskp = ncol / 20;
+    if (jskp < 1) jskp = 1;
+    jskp2 = jskp / 2;
+
+    fprintf (primfile, "\nWrite add grid method\n");
+    fprintf (primfile, "  nrow = %d  ncol = %d  npts = %d\n",
+               nrow, ncol, npts);
+    fprintf (primfile,
+               "  xmin = %.5f  ymin = %.5f  xmax = %.5f  ymax = %.5f\n",
+               xmin, ymin, xmax, ymax);
+    for (i=iskp2; i<nrow; i+=iskp) { 
+      k2 = i * nrow;
+      for (j=jskp2; j<ncol; j+=jskp) {
+        k = k2 + j;
+        fprintf (primfile, "    row %d  col %d:  %.5f\n", i, j, derror[k]);
+      }
+    }
+}
+
+
 void jni_call_add_grid_method (
     double *data,
     double *derror,
@@ -1309,13 +1528,26 @@ void jni_call_add_grid_method (
     double ymin,
     double xmax,
     double ymax,
-    int npts
-)
+    int npts)
 {
     jdoubleArray    j_data;
     jdoubleArray    j_derror;
     jbyteArray      j_mask;
     int             ntot;
+
+    if (primfile != NULL) {
+        write_add_grid (
+            data,
+            derror,
+            mask,
+            ncol,
+            nrow,
+            xmin,
+            ymin,
+            xmax,
+            ymax,
+            npts);
+    }
 
     if (AddGridMethodID == NULL) {
         return;
@@ -1395,16 +1627,32 @@ void jni_call_add_grid_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_draped_line (
+    double *x,
+    double *y,
+    double *z,
+    int npts)
+{
+}
+
+
 void jni_call_add_draped_line_method (
     double *x,
     double *y,
     double *z,
-    int npts
-)
+    int npts)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
     jdoubleArray    j_z;
+
+    if (primfile) {
+        write_add_draped_line (
+            x,
+            y,
+            z,
+            npts);
+    }
 
     if (AddDrapedLineMethodID == NULL) {
         return;
@@ -1468,16 +1716,31 @@ void jni_call_add_draped_line_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_extended_centerline (
+    double *x,
+    double *y,
+    double *z,
+    int npts)
+{
+}
+
 void jni_call_add_extended_centerline_method (
     double *x,
     double *y,
     double *z,
-    int npts
-)
+    int npts)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
     jdoubleArray    j_z;
+
+    if (primfile != NULL) {
+        write_add_extended_centerline (
+            x,
+            y,
+            z,
+            npts);
+    }
 
     if (AddExtendedCenterlineMethodID == NULL) {
         return;
@@ -1542,16 +1805,31 @@ void jni_call_add_extended_centerline_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_work_poly (
+    double *x,
+    double *y,
+    double *z,
+    int npts)
+{
+}
+
 void jni_call_add_work_poly_method (
     double *x,
     double *y,
     double *z,
-    int npts
-)
+    int npts)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
     jdoubleArray    j_z;
+
+    if (primfile != NULL) {
+        write_add_work_poly (
+            x,
+            y,
+            z,
+            npts);
+    }
 
     if (AddWorkPolyMethodID == NULL) {
         return;
@@ -1616,12 +1894,25 @@ void jni_call_add_work_poly_method (
 
 /*------------------------------------------------------------------------*/
 
+void write_add_poly_label (
+    double x,
+    double y,
+    int label)
+{
+}
+
 void jni_call_add_poly_label_method (
     double x,
     double y,
-    int label
-)
+    int label)
 {
+
+    if (primfile != NULL) {
+        write_add_poly_label (
+            x,
+            y,
+            label);
+    }
 
     if (AddPolyLabelMethodID == NULL) {
         return;
@@ -1644,6 +1935,27 @@ void jni_call_add_poly_label_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_poly_tmesh (
+    int         pnum,
+    double      *xnode,
+    double      *ynode,
+    double      *znode,
+    int         *nodeflags,
+    int         numnode,
+    int         *n1edge,
+    int         *n2edge,
+    int         *t1edge,
+    int         *t2edge,
+    int         *edgeflags,
+    int         numedge,
+    int         *e1tri,
+    int         *e2tri,
+    int         *e3tri,
+    int         *triflags,
+    int         numtri)
+{
+}
+
 void jni_call_add_poly_tmesh_method (
     int         pnum,
     double      *xnode,
@@ -1661,8 +1973,7 @@ void jni_call_add_poly_tmesh_method (
     int         *e2tri,
     int         *e3tri,
     int         *triflags,
-    int         numtri
-)
+    int         numtri)
 {
     jint        *jnodeflags;
     jint        *jn1edge,
@@ -1692,6 +2003,26 @@ void jni_call_add_poly_tmesh_method (
     jintArray           j_triflags;
     jint                j_numtri;
 
+    if (primfile != NULL) {
+        write_add_poly_tmesh (
+            pnum,
+            xnode,
+            ynode,
+            znode,
+            nodeflags,
+            numnode,
+            n1edge,
+            n2edge,
+            t1edge,
+            t2edge,
+            edgeflags,
+            numedge,
+            e1tri,
+            e2tri,
+            e3tri,
+            triflags,
+            numtri);
+    }
 
     if (AddPolyTmeshMethodID == NULL) {
         return;
@@ -2012,6 +2343,18 @@ void jni_call_add_poly_tmesh_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_set_vert_baseline (
+    double c1,
+    double c2,
+    double c3,
+    double x0,
+    double y0,
+    double z0,
+    int flag)
+{
+}
+
+
 void jni_call_set_vert_baseline_method (
     double c1,
     double c2,
@@ -2019,9 +2362,19 @@ void jni_call_set_vert_baseline_method (
     double x0,
     double y0,
     double z0,
-    int flag
-)
+    int flag)
 {
+
+    if (primfile != NULL) {
+        write_set_vert_baseline (
+            c1,
+            c2,
+            c3,
+            x0,
+            y0,
+            z0,
+            flag);
+    }
 
     if (SetVertBaselineMethodID == NULL) {
         return;
@@ -2049,16 +2402,31 @@ void jni_call_set_vert_baseline_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_corrected_centerline (
+    double *x,
+    double *y,
+    double *z,
+    int npts)
+{
+}
+
 void jni_call_add_corrected_centerline_method (
     double *x,
     double *y,
     double *z,
-    int npts
-)
+    int npts)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
     jdoubleArray    j_z;
+
+    if (primfile != NULL) {
+        write_add_corrected_centerline (
+            x,
+            y,
+            z,
+            npts);
+    }
 
     if (AddCorrectedCenterlineMethodID == NULL) {
         return;
@@ -2122,16 +2490,31 @@ void jni_call_add_corrected_centerline_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_drape_line (
+    double *x,
+    double *y,
+    double *z,
+    int npts)
+{
+}
+
 void jni_call_add_drape_line_method (
     double *x,
     double *y,
     double *z,
-    int npts
-)
+    int npts)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
     jdoubleArray    j_z;
+
+    if (primfile != NULL) {
+        write_add_drape_line (
+            x,
+            y,
+            z,
+            npts);
+    }
 
     if (AddDrapeLineMethodID == NULL) {
         return;
@@ -2195,17 +2578,34 @@ void jni_call_add_drape_line_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_patch_points (
+    int    patchid,
+    double *x,
+    double *y,
+    double *z,
+    int npts)
+{
+}
+
 void jni_call_add_patch_points_method (
     int    patchid,
     double *x,
     double *y,
     double *z,
-    int npts
-)
+    int npts)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
     jdoubleArray    j_z;
+
+    if (primfile != NULL) {
+        write_add_patch_points (
+            patchid,
+            x,
+            y,
+            z,
+            npts);
+    }
 
     if (CopyPatchPointsMethodID == NULL) {
         return;
@@ -2270,18 +2670,37 @@ void jni_call_add_patch_points_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_border_segment (
+    double *x,
+    double *y,
+    double *z,
+    int npts,
+    int type,
+    int direction)
+{
+}
+
 void jni_call_add_border_segment_method (
     double *x,
     double *y,
     double *z,
     int npts,
     int type,
-    int direction
-)
+    int direction)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
     jdoubleArray    j_z;
+
+    if (primfile != NULL) {
+        write_add_border_segment (
+            x,
+            y,
+            z,
+            npts,
+            type,
+            direction);
+    }
 
     if (AddBorderSegmentMethodID == NULL) {
         return;
@@ -2347,8 +2766,17 @@ void jni_call_add_border_segment_method (
 
 /*------------------------------------------------------------------------*/
 
+void write_start_proto_patch (int id)
+{
+}
+
 void jni_call_start_proto_patch_method (int id)
 {
+
+    if (primfile != NULL) {
+        write_start_proto_patch (id);
+    }
+
     if (StartProtoPatchMethodID == NULL) {
         return;
     }
@@ -2364,8 +2792,16 @@ void jni_call_start_proto_patch_method (int id)
 
 /*------------------------------------------------------------------------*/
 
+static void write_end_proto_patch (int id)
+{
+}
+
 void jni_call_end_proto_patch_method (int id)
 {
+    if (primfile != NULL) {
+        write_end_proto_patch (id);
+    }
+
     if (EndProtoPatchMethodID == NULL) {
         return;
     }
@@ -2381,17 +2817,34 @@ void jni_call_end_proto_patch_method (int id)
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_patch_line (
+    double *x,
+    double *y,
+    double *z,
+    int npts,
+    int flag)
+{
+}
+
 void jni_call_add_patch_line_method (
     double *x,
     double *y,
     double *z,
     int npts,
-    int flag
-)
+    int flag)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
     jdoubleArray    j_z;
+
+    if (primfile != NULL) {
+        write_add_patch_line (
+            x,
+            y,
+            z,
+            npts,
+            flag);
+    }
 
     if (AddPatchLineMethodID == NULL) {
         return;
@@ -2456,14 +2909,27 @@ void jni_call_add_patch_line_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_set_outline (
+    double *x,
+    double *y,
+    int npts)
+{
+}
+
 int jni_call_set_outline_method (
     double *x,
     double *y,
-    int npts
-)
+    int npts)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
+
+    if (primfile != NULL) {
+        write_set_outline (
+            x,
+            y,
+            npts);
+    }
 
     if (SetOutlineMethodID == NULL) {
         return -1;
@@ -2514,16 +2980,31 @@ int jni_call_set_outline_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_set_outline3d (
+    double *x,
+    double *y,
+    double *z,
+    int npts)
+{
+}
+
 int jni_call_set_outline3d_method (
     double *x,
     double *y,
     double *z,
-    int npts
-)
+    int npts)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
     jdoubleArray    j_z;
+
+    if (primfile != NULL) {
+        write_set_outline3d (
+            x,
+            y,
+            z,
+            npts);
+    }
 
     if (SetOutline3DMethodID == NULL) {
         return -1;
@@ -2590,18 +3071,37 @@ int jni_call_set_outline3d_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_proto_patch_contact_line (
+    double *x,
+    double *y,
+    double *z,
+    int npts,
+    int patchid1,
+    int patchid2)
+{
+}
+
 void jni_call_add_proto_patch_contact_line_method (
     double *x,
     double *y,
     double *z,
     int npts,
     int patchid1,
-    int patchid2
-)
+    int patchid2)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
     jdoubleArray    j_z;
+
+    if (primfile != NULL) {
+        write_add_proto_patch_contact_line (
+            x,
+            y,
+            z,
+            npts,
+            patchid1,
+            patchid2);
+    }
 
     if (AddProtoPatchContactLineMethodID == NULL) {
         return;
@@ -2668,16 +3168,31 @@ void jni_call_add_proto_patch_contact_line_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_draped_points (
+    double *x,
+    double *y,
+    double *z,
+    int npts)
+{
+}
+
 void jni_call_add_draped_points_method (
     double *x,
     double *y,
     double *z,
-    int npts
-)
+    int npts)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
     jdoubleArray    j_z;
+
+    if (primfile != NULL) {
+        write_add_draped_points (
+            x,
+            y,
+            z,
+            npts);
+    }
 
     if (AddDrapedPointsMethodID == NULL) {
         return;
@@ -2741,6 +3256,13 @@ void jni_call_add_draped_points_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_native_tindex_result (
+    int         *tmeshid,
+    int         *trinum,
+    int         nresult)
+{
+}
+
 void jni_call_add_native_tindex_result_method (
     int         *tmeshid,
     int         *trinum,
@@ -2751,6 +3273,13 @@ void jni_call_add_native_tindex_result_method (
     jintArray           j_tmeshid;
     jintArray           j_trinum;
     jint                j_nresult;
+
+    if (primfile != NULL) {
+        write_add_native_tindex_result (
+            tmeshid,
+            trinum,
+            nresult);
+    }
 
     if (AddNativeTindexResultMethodID == NULL) {
         return;
@@ -3068,18 +3597,37 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendStaticC
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_split_line (
+    double *x,
+    double *y,
+    double *z,
+    int npts,
+    int patchid1,
+    int patchid2)
+{
+}
+
 void jni_call_add_split_line_method (
     double *x,
     double *y,
     double *z,
     int npts,
     int patchid1,
-    int patchid2
-)
+    int patchid2)
 {
     jdoubleArray    j_x;
     jdoubleArray    j_y;
     jdoubleArray    j_z;
+
+    if (primfile != NULL) {
+        write_add_split_line (
+            x,
+            y,
+            z,
+            npts,
+            patchid1,
+            patchid2);
+    }
 
     if (AddSplitLineMethodID == NULL) {
         return;
@@ -3145,12 +3693,24 @@ void jni_call_add_split_line_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_fault_major_minor (
+    int         id,
+    int         major)
+{
+}
+
 void jni_call_add_fault_major_minor_method (
     int         id,
     int         major)
 {
     jint        j_id;
     jint        j_major;
+
+    if (primfile != NULL) {
+        write_add_fault_major_minor (
+            id,
+            major);
+    }
 
     if (AddFaultMajorMinorMethodID == NULL) {
         return;
@@ -3177,6 +3737,26 @@ void jni_call_add_fault_major_minor_method (
 
 /*------------------------------------------------------------------------*/
 
+static void write_add_native_at_tri_mesh (
+    double      *xnode,
+    double      *ynode,
+    double      *znode,
+    int         *nodeflags,
+    int         numnode,
+    int         *n1edge,
+    int         *n2edge,
+    int         *t1edge,
+    int         *t2edge,
+    int         *edgeflags,
+    int         numedge,
+    int         *e1tri,
+    int         *e2tri,
+    int         *e3tri,
+    int         *triflags,
+    int         numtri)
+{
+}
+
 void jni_call_add_native_at_tri_mesh_method (
     double      *xnode,
     double      *ynode,
@@ -3193,8 +3773,7 @@ void jni_call_add_native_at_tri_mesh_method (
     int         *e2tri,
     int         *e3tri,
     int         *triflags,
-    int         numtri
-)
+    int         numtri)
 {
     jint        *jnodeflags;
     jint        *jn1edge,
@@ -3224,6 +3803,25 @@ void jni_call_add_native_at_tri_mesh_method (
     jintArray           j_triflags;
     jint                j_numtri;
 
+    if (primfile != NULL) {
+        write_add_native_at_tri_mesh (
+            xnode,
+            ynode,
+            znode,
+            nodeflags,
+            numnode,
+            n1edge,
+            n2edge,
+            t1edge,
+            t2edge,
+            edgeflags,
+            numedge,
+            e1tri,
+            e2tri,
+            e3tri,
+            triflags,
+            numtri);
+    }
 
     if (AddNativeAtTriMeshMethodID == NULL) {
         return;
