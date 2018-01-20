@@ -2,12 +2,11 @@ package csw.mysql.jtest.src;
 
 import java.lang.Math;
 import java.lang.Integer;
+import java.lang.Long;
 
 import java.util.Random;
 import java.util.ArrayList;
 
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.EOFException;
 import java.io.DataInputStream;
@@ -24,21 +23,33 @@ class DataGen {
       try {
         String sfn = "/home/gpinkerton/data/";
         if (args == null  ||  args.length == 0) {
-            FakeDataGen  dg = new FakeDataGen (sfn, -1, -1);
+            FakeDataGen  dg = new FakeDataGen (sfn, -1, -1, 1);
             dg.done();
         }
         else {
           int  alen = args.length;
-          if (alen == 1   &&  args[0].equals("load")) {
-            FakeDataLoad dl = new FakeDataLoad (sfn);
+          if (args[0].equals("load")) {
+            int  fid = 1;
+            long  obase = 0;
+            if (alen >= 2) {
+              fid = Integer.parseInt (args[1]);
+            }
+            if (alen >= 3) {
+              obase = Long.parseLong (args[2]);
+            }
+            FakeDataLoad dl = new FakeDataLoad (sfn, fid, obase);
             dl.done();
           }
-          else if (alen == 2) {
+          else if (alen >= 2) {
             int n10 = Integer.parseInt (args[0]);
             if (n10 < 1) n10 = 1;
             int np = Integer.parseInt (args[1]);
             if (np < 5) np = 5;
-            FakeDataGen  dg = new FakeDataGen (sfn, n10, np);
+            int fid = 1;
+            if (alen == 3) {
+              fid = Integer.parseInt (args[2]);
+            }
+            FakeDataGen  dg = new FakeDataGen (sfn, n10, np, fid);
             dg.done();
           }
         }
@@ -56,9 +67,9 @@ class DataGen {
 class PointLookup {
     int    lineid;
     int    fileid;
-    int    filepos;
+    long   filepos;
 
-    PointLookup (int lid, int fid, int fpos) {
+    PointLookup (int lid, int fid, long fpos) {
       lineid = lid;
       fid = fileid;
       filepos = fpos;
@@ -75,7 +86,7 @@ class TableData {
     double xmax;
     double ymax;
     int    file_id;
-    int    line_id;
+    long   line_id;
 }
 
 
@@ -87,8 +98,7 @@ class TableData {
 
 class FakeDataGen {
 
-    DataOutputStream   dos = null;
-    FileOutputStream   fos = null;
+    RandomAccessFile   genraf = null;
     String             dirname = null;
 
     Random             ran = null;
@@ -105,14 +115,15 @@ class FakeDataGen {
 
     ArrayList<PointLookup> plist = null;
 
-    FakeDataGen (String  pdirname, int nobj, int nps) throws IOException {
+    FakeDataGen (String  pdirname, int nobj,
+                 int nps, int fid) throws IOException {
 
       if (nobj > 0) n10 = nobj;
       if (nps > 0) np10 = nps;
 
       dirname = pdirname;
 
-      ran = new Random (123456);
+      ran = new Random (123456 * fid);
       try {
         plist = new ArrayList<PointLookup> (n10);
       }
@@ -125,10 +136,9 @@ class FakeDataGen {
 
 //long start_nano = System.nanoTime ();
 
-      String  fname = dirname + "glp_points_1.dat";
+      String  fname = dirname + "glp_points_" + fid + ".dat";
       try {
-        fos = new FileOutputStream (fname);
-        dos = new DataOutputStream (fos);
+        genraf = new RandomAccessFile (fname, "rw");
       }
       catch (IOException ex) {
         System.out.println ();
@@ -139,28 +149,21 @@ class FakeDataGen {
 
       generateFakePointData ();
 
-
       try {
-        dos.flush ();
-        fos.close ();
+        genraf.close();
       }
-      catch (IOException  ex) {
-        System.out.println ();
-        System.out.println ("IO exception caught in DataGen flush and close.");
-        System.out.println ();
-        throw (ex);
-      }
-      finally {
-        dos = null;
-        fos = null;
-      }
+      catch (IOException ex) {};
+
+      genraf = null;
+
 
       try {
         raf = new RandomAccessFile (fname, "r");
       }
       catch (IOException ex) {
         System.out.println ();
-        System.out.println ("IO exception caught in Random Access File creation.");
+        System.out.println 
+          ("IO exception caught in Random Access File creation.");
         System.out.println ();
         throw (ex);
       }
@@ -238,7 +241,7 @@ class FakeDataGen {
 
       PointLookup   plook = null;
 
-      int  fpos;
+      long fpos;
       int  lid;
       int  fid = 1;
       int  ipoly = 0;
@@ -293,10 +296,10 @@ class FakeDataGen {
         }
 
         try {
-          fpos = dos.size();
-          dos.writeInt (nbytes);
-          dos.writeInt (1);
-          dos.writeInt (npts);
+          fpos = genraf.getFilePointer();
+          genraf.writeInt (nbytes);
+          genraf.writeInt (1);
+          genraf.writeInt (npts);
           dang = Math.PI / (double)(npts-ip);
           dang *= 2.0;
           for (int j=0; j<npts; j++) {
@@ -316,8 +319,8 @@ class FakeDataGen {
                 iy = iy0;
               }
             }
-            dos.writeInt (ix);
-            dos.writeInt (iy);
+            genraf.writeInt (ix);
+            genraf.writeInt (iy);
           }
         }
         catch (IOException ex) {
@@ -358,7 +361,7 @@ class FakeDataGen {
         if (sout == false) continue;
 
         PointLookup pl = plist.get (i);
-        long lfp = (long)pl.filepos;
+        long lfp = pl.filepos;
 
         try {
           raf.seek (lfp);
@@ -394,21 +397,25 @@ class FakeDataLoad {
     String             dirname = null;
     RandomAccessFile   raf = null;
 
+    long               ob_id_base = 0;
+
     ArrayList<TableData> tlist = null;
 
-    FakeDataLoad (String  pdirname) throws IOException {
+    FakeDataLoad (String pdirname, int fid, long obase)
+      throws IOException
+    {
 
+      ob_id_base = obase;
       dirname = pdirname;
-      String  fname = dirname + "glp_points_1.dat";
-
-      //sp_indexer = spi;
+      String  fname = dirname + "glp_points_" + fid + ".dat";
 
       try {
         raf = new RandomAccessFile (fname, "r");
       }
       catch (IOException ex) {
         System.out.println ();
-        System.out.println ("IO exception caught in Random Access File creation.");
+        System.out.println
+          ("IO exception caught in Random Access File creation.");
         System.out.println ();
         throw (ex);
       }
@@ -421,7 +428,7 @@ class FakeDataLoad {
           ("Could not create TableData list in FakeDataLoad.");
       }
 
-      loadFakePointData ();
+      loadFakePointData (fid);
 
       try {
         raf.close ();
@@ -436,10 +443,12 @@ class FakeDataLoad {
         raf = null;
       }
 
-      OutputLoadFiles ();
+      OutputLoadFiles (fid);
 
     }  // end of FakeDataLoad constructor
     
+
+
     // This dummy method is here to avoid an eclipse warning.
     // The warning is about an instance of FakeDataLoad not being 
     // used.  So, I call this dummy routine to fool eclipse into
@@ -449,7 +458,7 @@ class FakeDataLoad {
 
 
 
-    private void loadFakePointData ()
+    private void loadFakePointData (int fid)
     {
       int     npts, ix, iy;
       long    ixmin, iymin, ixmax, iymax;
@@ -471,7 +480,7 @@ class FakeDataLoad {
         return;
       }
 
-      int  nline = 0;
+      long nline = 0;
       int  nbytes = 0;
       int  idum = 0;
 
@@ -485,9 +494,9 @@ int  ncount = 0;
           idum = raf.readInt ();
           npts = raf.readInt ();
           ixmin = 2000000000;
-          iymin = 2000000000;
+          iymin = 1000000000;
           ixmax = -2000000000;
-          iymax = -2000000000;
+          iymax = -1000000000;
           for (int j=0; j<npts; j++) {
             ix = raf.readInt ();
             iy = raf.readInt ();
@@ -499,19 +508,19 @@ int  ncount = 0;
           try {
             trow = new TableData ();
             trow.file_pos = fpos;
-            trow.file_id = 1;
+            trow.file_id = fid;
 
             dxmin = ((double)ixmin + 2000000000.) * dxscl - 180.0;
             dxmax = ((double)ixmax + 2000000000.) * dxscl - 180.0;
-            dymin = ((double)iymin + 1000000000.) * dyscl - 90.1;
-            dymax = ((double)iymax + 1000000000.) * dyscl - 90.1;
+            dymin = ((double)iymin + 1000000000.) * dyscl - 90.0;
+            dymax = ((double)iymax + 1000000000.) * dyscl - 90.0;
 
             trow.xmin = dxmin;
             trow.ymin = dymin;
             trow.xmax = dxmax;
             trow.ymax = dymax;
-            trow.line_id = nline;
-            trow.object_id = (long)nline;
+            trow.line_id = nline + ob_id_base;
+            trow.object_id = nline + ob_id_base;
 
             tlist.add (trow);
             nline++;
@@ -535,7 +544,7 @@ int  ncount = 0;
 
     // Traverse the tlist collection and write load files.
 
-    private void OutputLoadFiles ()
+    private void OutputLoadFiles (int fid)
     {
 
       final String t = "\t";
@@ -551,12 +560,12 @@ int  ncount = 0;
       FileWriter fw2 = null;
       FileWriter fw3 = null;
 
-      String  dirn = "/home/gpinkerton/";
+      String  dirn = "/home/gpinkerton/data/load/";
 
       try {
-        fw1 = new FileWriter (dirn + "load_points_lookup.dat");
-        fw2 = new FileWriter (dirn + "load_id_lookup.dat");
-        fw3 = new FileWriter (dirn + "load_objects.dat");
+        fw1 = new FileWriter (dirn + "load_points_lookup_" + fid + ".dat");
+        fw2 = new FileWriter (dirn + "load_id_lookup_" + fid + ".dat");
+        fw3 = new FileWriter (dirn + "load_objects_" + fid + ".dat");
       }
       catch (IOException ex) {
         System.out.println ("Exception creating load file writers.");

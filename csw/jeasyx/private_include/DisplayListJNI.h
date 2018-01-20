@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -12,13 +12,15 @@
 /*
  ***************************************************************************
 
-  Prototypes for jni callback to java method functions.
+  Prototypes for jni related functions.
 
  ***************************************************************************
 */
 
 #ifndef _DISPLAY_LIST_JNI_H_
 #define _DISPLAY_LIST_JNI_H_
+
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -445,6 +447,11 @@ extern "C" {
         double  x,
         double  y,
         double  z);
+
+    FILE *jni_get_prim_file_ezx ();
+    void jni_set_prim_file_ezx (FILE *pf);
+    void jni_open_prim_file_ezx (char *fname);
+    void jni_close_prim_file_ezx ();
 
 #ifdef __cplusplus
 }

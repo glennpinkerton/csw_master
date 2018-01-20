@@ -34,6 +34,7 @@
 
 #include "csw/jeasyx/private_include/EZXCommand.h"
 #include "csw/jeasyx/private_include/gtx_msgP.h"
+#include "csw/jeasyx/private_include/DisplayListJNI.h"
 #include "csw/utils/include/csw_.h"
 #include "csw/utils/private_include/csw_fileio.h"
 #include "csw/utils/private_include/TextBounds.h"
@@ -41,6 +42,7 @@
 #include "csw/hlevutils/src/ThreadGuard.h"
 
 FILE      *dfile = NULL;
+
 
 int main (int argc, char *argv[])
 {
@@ -63,6 +65,17 @@ int main (int argc, char *argv[])
 
     argc = argc;
     argv = argv;
+
+    bool  btest_mode = false;
+    char  tfname[200];
+
+    tfname[0] = '\0';
+    if (argc > 3) {
+      if (strcmp (argv[2], "-test") == 0) {
+        strcpy (tfname, argv[3]);
+        btest_mode = true;
+      }
+    }
 
 /*
  * Rather than using standard input, open a file specified
@@ -91,6 +104,15 @@ int main (int argc, char *argv[])
     int    threadid = 0;
 
     CSWFileioUtil   csw_fileio_obj;
+
+    FILE            *prim_file = NULL;
+
+    if (btest_mode) {
+        if (jni_get_prim_file_ezx () == NULL) {
+            prim_file = fopen (tfname, "w");
+            jni_set_prim_file_ezx  (prim_file);
+        }
+    }
 
     for (;;) {
 
@@ -248,7 +270,8 @@ int main (int argc, char *argv[])
                 }
                 sscanf (
                     inbuff,
-                    "%d %d %ld %lf %lf %lf %lf",
+                    "%d %d %d %ld %lf %lf %lf %lf",
+                    &dlist_index,
                     ilist+0,
                     ilist+1,
                     longlist+0,
@@ -2219,11 +2242,17 @@ int main (int argc, char *argv[])
 
         }  /* end of huge switch  */
 
+        dlist_index = 0;
+
         if (end_flag) {
             break;
         }
 
     }  /* end of for loop reading command file */
+
+    if (btest_mode) {
+        jni_close_prim_file_ezx ();
+    }
 
     ezx_process_command (
         dlist_index,

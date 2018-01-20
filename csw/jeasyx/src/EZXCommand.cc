@@ -220,9 +220,10 @@ int ezx_process_command (
 
     canvas_manager_ptr->ezx_SetActiveGraphicsCanvas (dlist_index);
 
-
     long java_num = dlist_index;
     char *name = cdata;
+
+    int  new_dlindex = -1;
 
     dlist = canvas_manager_ptr->ezx_GetActiveDisplayList ();
 
@@ -238,6 +239,7 @@ int ezx_process_command (
         if (dlist == NULL) {
             return -1;
         }
+        new_dlindex = canvas_manager_ptr->ezx_GetActiveIndex ();
     }
 
     CSWGrdAPI    *gapi = ThreadGuard::GetGrdAPI (threadid);
@@ -349,7 +351,8 @@ int ezx_process_command (
                 strcat (LogFileLine, "\n");
                 fputs (LogFileLine, LogFile);
                 sprintf (LogFileLine,
-                         "%d %d %ld %.15e %.15e %.15e %.15e\n",
+                         "%d %d %d %ld %.15e %.15e %.15e %.15e\n",
+                         new_dlindex,
                          ilist[0],
                          ilist[1],
                          llist[0],

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# arg1 is the file id
+# arg2 is the object id base
+
+./tester DataGen 10000 20 $1
+
+./tester DataGen load $1 $2
+
+./tester LgLoad $1
+

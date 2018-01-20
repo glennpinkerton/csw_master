@@ -9,9 +9,6 @@
   run this program.  If you don't the program will either not link or it
   will fail miserably.
 
-  This program reads from standard input, which will almost always be a file
-  redirected via the < operator on the command line.
-
  ***************************************************************************
 */
 
@@ -19,6 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <csw/jsurfaceworks/private_include/SurfaceWorksJNI.h>
 #include <csw/jsurfaceworks/private_include/SWCommand.h>
 #include <csw/utils/include/csw_.h>
 #include <csw/utils/private_include/csw_fileio.h>
@@ -48,7 +46,45 @@ int main (int argc, char *argv[])
     argc = argc;
     argv = argv;
 
+    bool  btest_mode = false;
+    char  tfname[200];
+
+    if (argc > 3) {
+        if (strcmp (argv[2], "-test") == 0) {
+            btest_mode = true;
+            strcpy (tfname, argv[3]);
+        }
+    }
+
+/*
+ * Rather than using standard input, open a file specified
+ * in argv[1] as the input.  This is done because valgrind
+ * needs standard input to be the terminal when it is run.
+ */
+    if (argc < 2) {
+        printf ("You must specify a log file as the first argument.\n");
+        return 0;
+    }
+
+    if (argv[1] == NULL) {
+        printf ("You must specify a log file as the first argument.\n");
+        return 0;
+    }
+
     fptr = fopen (argv[1], "rb");
+    if (fptr == NULL) {
+        printf ("Error opening the specified log file.\n");
+        return 0;
+    }
+
+    FILE  *prim_file = NULL;
+
+    if (btest_mode) {
+        if (jni_get_prim_file_sw() == NULL) {
+            prim_file = fopen (tfname, "w");
+            jni_set_prim_file_sw (prim_file);
+        }
+    }
 
     for (;;) {
 

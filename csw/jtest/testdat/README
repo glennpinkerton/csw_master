@@ -1,0 +1,14 @@
+The "playback" files for ezx_test or sw_test are here, 
+using the terms utest and swutest respectively in the
+file names.  The original output prim files are the prim
+and swprim files with .orig extensions.
+
+To make a new output file, run the utility test_new_ez filenum
+or test_new_sw filenum.  For example:
+
+    test_new_ez 1   will use utest_1.orig as input and
+                    write prim_1.new as output.
+
+    test_new_sw 1   will use swutest_1.orig as input and
+                    write swprim_1.new as output.
+    
