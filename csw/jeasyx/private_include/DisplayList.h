@@ -22,6 +22,7 @@
  * of 2d graphics.
  */
 #include <stdio.h>
+#include <vector>
 
 #include <csw/utils/private_include/gpf_calcdraw.h>
 #include <csw/utils/private_include/gpf_spline.h>
@@ -1079,9 +1080,7 @@ private:
     int             num_contour_line_prim_list,
                     max_contour_line_prim_list;
 
-    LInePrim        *line_prim_list = NULL;
-    int             num_line_prim_list,
-                    max_line_prim_list;
+    std::vector<LInePrim>   line_prim_list;
 
     FIllPrim        *fill_prim_list = NULL;
     int             num_fill_prim_list,

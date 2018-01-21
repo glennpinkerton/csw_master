@@ -97,9 +97,6 @@ static char           fileline[1000];
 #endif
 
 
-
-static FILE           *primfile = NULL;
-
 /*
  * The primfile is used when "recording" of the graphical
  * results is desired.  The original reason for this is to
@@ -107,6 +104,9 @@ static FILE           *primfile = NULL;
  * is not thread safe.  Only use this from the c++ only test
  * programs (which only use single threads).
  */
+
+static FILE           *primfile = NULL;
+
 
 void jni_set_prim_file_ezx (FILE *pf) {
   primfile = pf;

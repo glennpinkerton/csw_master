@@ -194,10 +194,6 @@ CDisplayList::CDisplayList()
 /*
  * Initialize primitive lists to NULL and empty.
  */
-    line_prim_list = NULL;
-    num_line_prim_list = 0;
-    max_line_prim_list = 0;
-
     contour_line_prim_list = NULL;
     num_contour_line_prim_list = 0;
     max_contour_line_prim_list = 0;
@@ -1392,7 +1388,7 @@ int CDisplayList::AddLine (double *xptsin, double *yptsin,
     CSW_F          *xyp = NULL;
     double         xmin, ymin, xmax, ymax;
     LInePrim       *lptr = NULL;
-    int            ilast, istat;
+    int            istat;
     CSW_F          *xypack = NULL;
     int            next_line;
 
@@ -1428,38 +1424,15 @@ int CDisplayList::AddLine (double *xptsin, double *yptsin,
     next_line = get_available_line ();
 
     if (next_line < 0) {
-    /*
-     * Grow the line prim list if needed.
-     * Make sure there is room for at least 2 more.
-     */
-        if (line_prim_list == NULL) {
-            max_line_prim_list = 0;
-            num_line_prim_list = 0;
+        try {
+            LInePrim  lpr;
+            line_prim_list.push_back (lpr);
+            next_line = (int)line_prim_list.size() - 1;
         }
-        if (num_line_prim_list >= max_line_prim_list - 2) {
-            ilast = max_line_prim_list;
-            max_line_prim_list += _BIG_CHUNK_SIZE_;
-            line_prim_list = (LInePrim *)csw_Realloc
-                (line_prim_list, max_line_prim_list * sizeof(LInePrim));
-            if (line_prim_list != NULL) {
-                memset (line_prim_list + ilast, 0,
-                        _BIG_CHUNK_SIZE_ * sizeof(LInePrim));
-            }
+        catch (...) {
+            printf ("Exception in line_prim_list pushback\n");
+            return 0;
         }
-
-    /*
-     * Return an error if the line prim list could not be grown.
-     */
-        if (line_prim_list == NULL) {
-            return -1;
-        }
-
-        next_line = num_line_prim_list;
-        num_line_prim_list++;
-    }
-
-    if (line_prim_list == NULL) {
-        return -1;
     }
 
 /*
@@ -1492,7 +1465,9 @@ int CDisplayList::AddLine (double *xptsin, double *yptsin,
  * Copy the xy coordinates as specified (without conversion to page units).
  * The lptr->frame_num tells the drawing code to convert to page units if needed.
  */
-    lptr = line_prim_list + next_line;
+    LInePrim   *lp_data = line_prim_list.data();
+
+    lptr = lp_data + next_line;
 
     xyp = (CSW_F *)csw_Malloc (2 * npts * sizeof(CSW_F));
     if (xyp == NULL) {
@@ -1544,7 +1519,7 @@ int CDisplayList::AddLine (double *xptsin, double *yptsin,
 
     lptr->prim_num = next_line;
 
-    CalcLineBounds (num_line_prim_list - 1,
+    CalcLineBounds (next_line,
                     &xmin, &ymin, &xmax, &ymax);
     lptr->xmin = (CSW_F)xmin;
     lptr->ymin = (CSW_F)ymin;
@@ -1579,14 +1554,15 @@ int CDisplayList::DrawAllLines (void)
     LInePrim       *lptr;
     bool           bpatch = false;
 
-    if (line_prim_list == NULL) {
+    if ((int)line_prim_list.size() < 1) {
         return 0;
     }
 
     jni_msg ("\nDisplay list lines being drawn\n");
 
-    nloop = num_line_prim_list;
-    if (line_patch_list != NULL  &&  patch_draw_flag == 1) {
+    nloop = (int)line_prim_list.size();
+    if (line_patch_list != NULL  &&
+        patch_draw_flag == 1) {
         nloop = num_line_patch_list;
         bpatch = true;
     }
@@ -1600,7 +1576,7 @@ int CDisplayList::DrawAllLines (void)
             i = line_patch_list[ido];
         }
 
-        lptr = line_prim_list + i;
+        lptr = line_prim_list.data() + i;
 
         if (lptr->deleted_flag == 1) {
             continue;
@@ -1751,14 +1727,14 @@ int CDisplayList::SetSpatialIndexForLine (int line_prim_num)
     double          x1, y1t, x2, y2;
     FRameStruct     *fp;
 
-    if (line_prim_list == NULL) {
+    if ((int)line_prim_list.size() < 1) {
         return 0;
     }
-    if (line_prim_num < 0  ||  line_prim_num >= num_line_prim_list) {
+    if (line_prim_num < 0  ||  line_prim_num >= (int)line_prim_list.size()) {
         return 0;
     }
 
-    lptr = line_prim_list + line_prim_num;
+    lptr = line_prim_list.data() + line_prim_num;
     if (lptr->frame_num < 0) {
         return 0;
     }
@@ -2220,14 +2196,15 @@ int CDisplayList::CalcLineBounds (int line_prim_num,
     *xmax = -1.e30;
     *ymax = -1.e30;
 
-    if (line_prim_num < 0  ||  line_prim_num >= num_line_prim_list) {
-        return -1;
-    }
-    if (line_prim_list == NULL) {
+    if ((int)line_prim_list.size() < 1) {
         return -1;
     }
 
-    lptr = line_prim_list + line_prim_num;
+    if (line_prim_num < 0  ||  line_prim_num >= (int)line_prim_list.size()) {
+        return -1;
+    }
+
+    lptr = line_prim_list.data() + line_prim_num;
 
     npts = lptr->npts;
     xypts = lptr->xypts;
@@ -2407,7 +2384,11 @@ int CDisplayList::add_available_contour_line (int prim_num) {
 
 int CDisplayList::add_available_line (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_line_prim_list  ||  line_prim_list == NULL) {
+    if ((int)line_prim_list.size() < 1) {
+        return 0;
+    }
+
+    if (prim_num < 0  ||  prim_num >= (int)line_prim_list.size()) {
         return 0;
     }
 
@@ -2772,7 +2753,11 @@ int CDisplayList::add_contour_line_patch_prim (int prim_num)
 
 int CDisplayList::add_line_patch_prim (int prim_num)
 {
-    if (prim_num < 0  ||  prim_num >= num_line_prim_list  ||  line_prim_list == NULL) {
+    if ((int)line_prim_list.size() < 1) {
+        return 0;
+    }
+
+    if (prim_num < 0  ||  prim_num >= (int)line_prim_list.size()) {
         return 0;
     }
 
@@ -3389,7 +3374,8 @@ int CDisplayList::DrawAllFills (void)
     }
 
     nloop = num_fill_prim_list;
-    if (fill_patch_list != NULL  &&  patch_draw_flag == 1) {
+    if (fill_patch_list != NULL  &&
+        patch_draw_flag == 1) {
         nloop = num_fill_patch_list;
         bpatch = true;
     }
@@ -4141,7 +4127,8 @@ int CDisplayList::DrawAllTexts (void)
     jni_msg ("\nDisplay list texts being drawn\n");
 
     nloop = num_text_prim_list;
-    if (text_patch_list != NULL  &&  patch_draw_flag == 1) {
+    if (text_patch_list != NULL  &&
+        patch_draw_flag == 1) {
         nloop = num_text_patch_list;
         bpatch = true;
     }
@@ -4747,7 +4734,8 @@ int CDisplayList::DrawAllSymbs (void)
     }
 
     nloop = num_symb_prim_list;
-    if (symb_patch_list != NULL  &&  patch_draw_flag == 1) {
+    if (symb_patch_list != NULL  &&
+        patch_draw_flag == 1) {
         nloop = num_symb_patch_list;
         bpatch = true;
     }
@@ -5382,7 +5370,8 @@ int CDisplayList::DrawAllShapes (void)
     jni_msg ("\nDisplay list shapes being drawn\n");
 
     nloop = num_shape_prim_list;
-    if (shape_patch_list != NULL  &&  patch_draw_flag == 1) {
+    if (shape_patch_list != NULL  &&
+        patch_draw_flag == 1) {
         nloop = num_shape_patch_list;
         bpatch = true;
     }
@@ -8185,12 +8174,14 @@ void CDisplayList::free_lines (void)
     int           i;
     LInePrim      *prim;
 
-    if (line_prim_list != NULL) {
-        for (i=0; i<num_line_prim_list; i++) {
-            prim = line_prim_list + i;
+    int  lp_size = (int)line_prim_list.size();
+
+    if (lp_size > 0) {
+        LInePrim  *lp_data = line_prim_list.data();
+        for (i=0; i<lp_size; i++) {
+            prim = lp_data + i;
             csw_Free (prim->xypts);
         }
-        csw_Free (line_prim_list);
     }
 
     if (contour_line_prim_list != NULL) {
@@ -8200,10 +8191,6 @@ void CDisplayList::free_lines (void)
         }
         csw_Free (contour_line_prim_list);
     }
-
-    line_prim_list = NULL;
-    num_line_prim_list = 0;
-    max_line_prim_list = 0;
 
     contour_line_prim_list = NULL;
     num_contour_line_prim_list = 0;
@@ -8658,13 +8645,16 @@ void CDisplayList::delete_frame_lines (int fnum)
     int            i, j, jprim;
     LInePrim       *lptr, *lp2;
 
-    if (line_prim_list == NULL) {
+    int            lp_size = (int)line_prim_list.size();
+    LInePrim       *lp_data = line_prim_list.data();
+
+    if (lp_size < 1  ||  lp_data == NULL) {
         return;
     }
 
-    for (i=0; i<num_line_prim_list; i++) {
+    for (i=0; i<lp_size; i++) {
 
-        lptr = line_prim_list + i;
+        lptr = lp_data + i;
 
         if (lptr->deleted_flag == 1) {
             continue;
@@ -8680,7 +8670,7 @@ void CDisplayList::delete_frame_lines (int fnum)
 
         for (j=0; j<lptr->numsub; j++) {
             jprim = lptr->sub_prims[j];
-            lp2 = line_prim_list + jprim;
+            lp2 = lp_data + jprim;
             csw_Free (lp2->xypts);
             lp2->xypts = NULL;
             lp2->npts = 0;
@@ -8751,13 +8741,16 @@ void CDisplayList::delete_frame_cell_edges (int fnum)
     int            i, j, jprim;
     LInePrim       *lptr, *lp2;
 
-    if (line_prim_list == NULL) {
+    int            lp_size = (int)line_prim_list.size();
+    LInePrim       *lp_data = line_prim_list.data();
+
+    if (lp_size < 1  ||  lp_data == NULL) {
         return;
     }
 
-    for (i=0; i<num_line_prim_list; i++) {
+    for (i=0; i<lp_size; i++) {
 
-        lptr = line_prim_list + i;
+        lptr = lp_data + i;
 
         if (lptr->deleted_flag == 1) {
             continue;
@@ -8773,7 +8766,7 @@ void CDisplayList::delete_frame_cell_edges (int fnum)
 
         for (j=0; j<lptr->numsub; j++) {
             jprim = lptr->sub_prims[j];
-            lp2 = line_prim_list + jprim;
+            lp2 = lp_data + jprim;
             csw_Free (lp2->xypts);
             lp2->xypts = NULL;
             lp2->npts = 0;
@@ -9118,7 +9111,7 @@ void CDisplayList::rescale_frame (FRameStruct *frptr)
         area1 = (frptr->xmax - frptr->xmin) * (frptr->ymax - frptr->ymin);
         area2 = (Fx2 - Fx1) * (Fy2 - Fy1);
         if (area2 < 0.0) area2 = - area2;
-        if (area2 < 0.5 * area1) {
+        if (area2 < 0.25 * area1) {
             patch_draw_flag = 1;
         }
     }
@@ -9127,8 +9120,8 @@ void CDisplayList::rescale_frame (FRameStruct *frptr)
 
 /*
  *  Create primitive patch lists for the frame and any other
- *  frame synced to it.  All the primitives of a tye (e.g. all lines) 
- *  are put into the same list.  The DrawAllmethods will use the
+ *  frame synced to it.  All the primitives of a type (e.g. all lines) 
+ *  are put into the same list.  The DrawAll methods will use the
  *  frame number member of the primitive structure to draw the
  *  primitive in the correct frame.
  */
@@ -9209,7 +9202,7 @@ bool CDisplayList::IsFrameSynced (int pick_fnum, int fnum)
 void CDisplayList::reclip_frame_lines (int fnum)
 {
 
-    if (line_prim_list == NULL) {
+    if ((int)line_prim_list.size() < 1  ||  line_prim_list.data() == NULL) {
         return;
     }
 
@@ -10405,9 +10398,12 @@ void CDisplayList::shift_frame_prims (int fnum,
         }
     }
 
-    if (line_prim_list != NULL) {
-        for (i=0; i<num_line_prim_list; i++) {
-            lptr = line_prim_list + i;
+    int        lp_size = (int)line_prim_list.size();
+    LInePrim   *lp_data = line_prim_list.data();
+
+    if (lp_data != NULL  &&  lp_size > 0) {
+        for (i=0; i<lp_size; i++) {
+            lptr = lp_data + i;
             if (lptr->frame_num != fnum) {
                 continue;
             }
@@ -10533,11 +10529,14 @@ void CDisplayList::draw_frame_border_prims (int fnum) {
         return;
     }
 
-    if (line_prim_list != NULL) {
+    int  lp_size = (int)line_prim_list.size();
+    LInePrim  *lp_data = line_prim_list.data();
 
-        for (i=0; i<num_line_prim_list; i++) {
+    if (lp_size > 0  &&  lp_data != NULL) {
 
-            lptr = line_prim_list + i;
+        for (i=0; i<lp_size; i++) {
+
+            lptr = lp_data + i;
 
             if (lptr->border_num != fnum) {
                 continue;
@@ -10738,13 +10737,16 @@ void CDisplayList::delete_frame_border_lines (int fnum)
     int            i;
     LInePrim       *lptr;
 
-    if (line_prim_list == NULL) {
+    int        lp_size = (int)line_prim_list.size();
+    LInePrim   *lp_data = line_prim_list.data();
+
+    if (lp_data == NULL  ||  lp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_line_prim_list; i++) {
+    for (i=0; i<lp_size; i++) {
 
-        lptr = line_prim_list + i;
+        lptr = lp_data + i;
 
         if (lptr->deleted_flag == 1) {
             continue;
@@ -11461,9 +11463,12 @@ void CDisplayList::find_frame_limits (int frame_num,
     xmax = *xmax_out;
     ymax = *ymax_out;
 
-    if (line_prim_list != NULL) {
-        for (i=0; i<num_line_prim_list; i++) {
-            lptr = line_prim_list + i;
+    int        lp_size = (int)line_prim_list.size();
+    LInePrim   *lp_data = line_prim_list.data();
+
+    if (lp_data != NULL  &&  lp_size > 0) {
+        for (i=0; i<lp_size; i++) {
+            lptr = lp_data + i;
             if (lptr->deleted_flag == 1  ||
                 lptr->scaleable == 0  ||
                 lptr->frame_num != frame_num) {
@@ -12165,13 +12170,16 @@ void CDisplayList::delete_grid_lines (int gridnum)
     int            i, j, jprim;
     LInePrim       *lptr, *lp2;
 
-    if (line_prim_list == NULL) {
+    int            lp_size = (int)line_prim_list.size();
+    LInePrim       *lp_data = line_prim_list.data();
+
+    if (lp_data == NULL  ||  lp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_line_prim_list; i++) {
+    for (i=0; i<lp_size; i++) {
 
-        lptr = line_prim_list + i;
+        lptr = lp_data + i;
 
         if (lptr->deleted_flag == 1) {
             continue;
@@ -12183,7 +12191,7 @@ void CDisplayList::delete_grid_lines (int gridnum)
 
         for (j=0; j<lptr->numsub; j++) {
             jprim = lptr->sub_prims[j];
-            lp2 = line_prim_list + jprim;
+            lp2 = lp_data + jprim;
             csw_Free (lp2->xypts);
             lp2->xypts = NULL;
             lp2->npts = 0;
@@ -13718,13 +13726,16 @@ void CDisplayList::reindex_lines (int fnum)
     int            i;
     LInePrim       *lptr;
 
-    if (line_prim_list == NULL) {
+    int            lp_size = (int)line_prim_list.size();
+    LInePrim       *lp_data = line_prim_list.data();
+
+    if (lp_data == NULL  ||  lp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_line_prim_list; i++) {
+    for (i=0; i<lp_size; i++) {
 
-        lptr = line_prim_list + i;
+        lptr = lp_data + i;
 
         if (lptr->deleted_flag == 1) {
             continue;
@@ -14058,7 +14069,10 @@ int CDisplayList::PopulateLinePatches (double x1, double y1p,
     double               gx1, gy1, gxs, gys, tmp, tiny;
     LInePrim             *lptr;
 
-    if (line_prim_list == NULL) {
+    int              lp_size = (int)line_prim_list.size();
+    LInePrim         *lp_data = line_prim_list.data();
+
+    if (lp_data == NULL  ||  lp_size < 1) {
         return 0;
     }
 
@@ -14167,10 +14181,10 @@ int CDisplayList::PopulateLinePatches (double x1, double y1p,
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_line_prim_list) {
+                if (prim_num < 0  ||  prim_num >= lp_size) {
                     continue;
                 }
-                lptr = line_prim_list + prim_num;
+                lptr = lp_data + prim_num;
                 lptr->draw_flag = 1;
             }
         }
@@ -14192,10 +14206,10 @@ int CDisplayList::PopulateLinePatches (double x1, double y1p,
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_line_prim_list) {
+                if (prim_num < 0  ||  prim_num >= lp_size) {
                     continue;
                 }
-                lptr = line_prim_list + prim_num;
+                lptr = lp_data + prim_num;
                 if (lptr->draw_flag == 0  ||
                     lptr->deleted_flag == 1  ||
                     lptr->visible_flag == 0) {
@@ -14212,7 +14226,7 @@ int CDisplayList::PopulateLinePatches (double x1, double y1p,
 */
     if (line_patch_list != NULL) {
         for (j=0; j<num_line_patch_list; j++) {
-            line_prim_list[line_patch_list[j]].draw_flag = 2;
+            lp_data[line_patch_list[j]].draw_flag = 2;
         }
     }
 
@@ -14223,10 +14237,10 @@ int CDisplayList::PopulateLinePatches (double x1, double y1p,
         if (nlist > 0) {
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_line_prim_list) {
+                if (prim_num < 0  ||  prim_num >= lp_size) {
                     continue;
                 }
-                lptr = line_prim_list + prim_num;
+                lptr = lp_data + prim_num;
                 if (lptr->draw_flag == 2  ||
                     lptr->deleted_flag == 1  ||
                     lptr->visible_flag == 0) {
@@ -14239,7 +14253,7 @@ int CDisplayList::PopulateLinePatches (double x1, double y1p,
 
     if (line_patch_list != NULL) {
         for (j=0; j<num_line_patch_list; j++) {
-            line_prim_list[line_patch_list[j]].draw_flag = 0;
+            lp_data[line_patch_list[j]].draw_flag = 0;
         }
     }
 
@@ -15615,8 +15629,12 @@ int CDisplayList::GetSelectableIndex (int frame_num,
     }
 
     isel = -1;
-    if (type == 1  &&  line_prim_list != NULL) {
-        lptr = line_prim_list + index;
+
+    int             lp_size = (int)line_prim_list.size();
+    LInePrim        *lp_data = line_prim_list.data();
+
+    if (type == 1  &&  lp_data != NULL  &&  lp_size > index) {
+        lptr = lp_data + index;
         isel = lptr->selectable_object_num;
     }
     else if (type == 2  &&  fill_prim_list != NULL) {
@@ -15927,12 +15945,15 @@ void CDisplayList::closest_frame_line (int fnum, CSW_F xin, CSW_F yin,
 
     *indexout = -1;
 
-    if (line_prim_list == NULL) {
+    int             lp_size = (int)line_prim_list.size();
+    LInePrim        *lp_data = line_prim_list.data();
+
+    if (lp_data == NULL  ||  lp_size < 1) {
         return;
     }
 
     istat = PopulateLinePatches (Pickx1, Picky1, Pickx2, Picky2);
-    nprim = num_line_prim_list;
+    nprim = lp_size;
     if (istat == 1) {
         nprim = num_line_patch_list;
     }
@@ -15949,7 +15970,7 @@ void CDisplayList::closest_frame_line (int fnum, CSW_F xin, CSW_F yin,
             i = line_patch_list[ido];
         }
 
-        lptr = line_prim_list + i;
+        lptr = lp_data + i;
         if (lptr == NULL) {
             continue;
         }
@@ -16717,7 +16738,10 @@ void CDisplayList::return_selected_lines (DLSelectable *dls)
                     *lname,
                     *iname;
 
-    if (line_prim_list == NULL) {
+    int             lp_size = (int)line_prim_list.size();
+    LInePrim        *lp_data = line_prim_list.data();
+
+    if (lp_data == NULL  ||  lp_size < 1) {
         return;
     }
 
@@ -16735,7 +16759,7 @@ void CDisplayList::return_selected_lines (DLSelectable *dls)
 
         i = lines[ido];
 
-        lptr = line_prim_list + i;
+        lptr = lp_data + i;
 
         if (lptr->deleted_flag == 1) {
             continue;
@@ -17224,7 +17248,10 @@ void CDisplayList::reclip_and_draw_selected_lines (DLSelectable *dls)
     int            *lines;
     CSW_F          *xy;
 
-    if (line_prim_list == NULL) {
+    int            lp_size = (int)line_prim_list.size();
+    LInePrim       *lp_data = line_prim_list.data();
+
+    if (lp_data == NULL  ||  lp_size < 1) {
         return;
     }
 
@@ -17248,7 +17275,7 @@ void CDisplayList::reclip_and_draw_selected_lines (DLSelectable *dls)
 
         i = lines[ido];
 
-        lptr = line_prim_list + i;
+        lptr = lp_data + i;
 
         if (lptr->deleted_flag == 1) {
             continue;
@@ -18158,9 +18185,12 @@ void CDisplayList::UnhideAll (void)
     AXisPrim        *aptr;
     DLContour       *cptr;
 
-    if (line_prim_list != NULL  &&  line_hidden_list != NULL) {
+    int             lp_size = (int)line_prim_list.size();
+    LInePrim        *lp_data = line_prim_list.data();
+
+    if (lp_data != NULL  &&  lp_size > 0  &&  line_hidden_list != NULL) {
         for (i=0; i<num_line_hidden_list; i++) {
-            lptr = line_prim_list + line_hidden_list[i];
+            lptr = lp_data + line_hidden_list[i];
             lptr->visible_flag = 1;
         }
     }
@@ -18561,13 +18591,16 @@ void CDisplayList::delete_frame_axis_lines (int fnum)
     int            i;
     LInePrim       *lptr;
 
-    if (line_prim_list == NULL) {
+    int            lp_size = (int)line_prim_list.size();
+    LInePrim       *lp_data = line_prim_list.data();
+
+    if (lp_data == NULL  ||  lp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_line_prim_list; i++) {
+    for (i=0; i<lp_size; i++) {
 
-        lptr = line_prim_list + i;
+        lptr = lp_data + i;
 
         if (lptr->deleted_flag == 1) {
             continue;
@@ -20039,7 +20072,10 @@ void CDisplayList::erase_selected_lines (DLSelectable *dls)
     int             ido, i, nprim, *lines;
     LInePrim        *lptr, *lp2;
 
-    if (line_prim_list == NULL) {
+    int             lp_size = (int)line_prim_list.size();
+    LInePrim        *lp_data = line_prim_list.data();
+
+    if (lp_data == NULL  ||  lp_size < 1) {
         return;
     }
 
@@ -20057,7 +20093,7 @@ void CDisplayList::erase_selected_lines (DLSelectable *dls)
 
         i = lines[ido];
 
-        lptr = line_prim_list + i;
+        lptr = lp_data + i;
 
         if (lptr->deleted_flag == 1) {
             continue;
@@ -20071,7 +20107,7 @@ void CDisplayList::erase_selected_lines (DLSelectable *dls)
             lptr->deleted_flag = 1;
             add_available_line (i);
             if (lptr->numsub > 0) {
-                lp2 = line_prim_list + lptr->sub_prims[0];
+                lp2 = lp_data + lptr->sub_prims[0];
                 csw_Free (lp2->xypts);
                 lp2->xypts = NULL;
                 lp2->npts = 0;
@@ -20085,7 +20121,7 @@ void CDisplayList::erase_selected_lines (DLSelectable *dls)
             lptr->visible_flag = 0;
             add_hidden_line (i);
             if (lptr->numsub > 0) {
-                lp2 = line_prim_list + lptr->sub_prims[0];
+                lp2 = lp_data + lptr->sub_prims[0];
                 lp2->visible_flag = 0;
                 add_hidden_line (lptr->sub_prims[0]);
             }
@@ -20498,7 +20534,10 @@ int CDisplayList::add_hidden_contour (int prim_num) {
 
 int CDisplayList::add_hidden_line (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_line_prim_list  ||  line_prim_list == NULL) {
+    int               lp_size = (int)line_prim_list.size();
+    LInePrim          *lp_data = line_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= lp_size  ||  lp_data == NULL) {
         return 0;
     }
 
