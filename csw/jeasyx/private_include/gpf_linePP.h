@@ -61,9 +61,8 @@ typedef struct {
     char           draw_flag, plot_flag;
     char           selected_flag;
     char           deleted_flag;
-    char           in_extra_flag;
+    char           in_extra_flag = 0;
     int            sub_prims[2];
-    int            numsub;
     int            image_id;
     int            scaleable;
     int            contour_index;

@@ -68,9 +68,8 @@ typedef struct {
     char           plot_flag;
     char           selected_flag;
     char           deleted_flag;
-    char           in_extra_flag;
+    char           in_extra_flag = 0;
     int            sub_prims[2];
-    int            numsub;
     int            scaleable;
     CSW_F          *x_orig = NULL,
                    *y_orig = NULL;

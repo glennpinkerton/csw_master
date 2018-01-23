@@ -59,7 +59,6 @@ typedef struct {
     char               deleted_flag;
     char               smooth_flag;
     int                sub_prims[2];
-    int                numsub;
     int                scaleable;
     int                image_id;
     int                has_lines;

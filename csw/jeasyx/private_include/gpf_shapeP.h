@@ -57,9 +57,8 @@ typedef struct {
     char           editable_flag;
     char           deleted_flag;
     char           smooth_flag;
-    char           in_extra_flag;
+    char           in_extra_flag = 0;
     int            sub_prims[2];
-    int            numsub;
     int            scaleable;
 } SHapePrim ;
 

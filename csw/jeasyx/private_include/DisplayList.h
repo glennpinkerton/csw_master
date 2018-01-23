@@ -594,6 +594,9 @@ private:
   /*
    * private functions
    */
+    template<typename T>
+    void ZeroInit (T p, int n);
+
     int AddLine (CSW_F *x, CSW_F *y, int npts, bool from_graph);
     int AddText (double x, double y, double size,
                  double angle, char *text, bool from_graph);
@@ -866,9 +869,7 @@ private:
     void reclip_frame_symbs (int fnum);
     void reclip_frame_texts (int fnum);
     void reclip_frame_shapes (int fnum);
-    void reclip_frame_images (int fnum);
     void reclip_frame_grid_images (int fnum);
-    void reclip_frame_ndp_images (int fnum);
 
     void reclip_and_draw_selected_axes (DLSelectable *dls);
     void reclip_and_draw_selected_lines (DLSelectable *dls);
@@ -1082,26 +1083,16 @@ private:
 
     std::vector<LInePrim>   line_prim_list;
 
-    FIllPrim        *fill_prim_list = NULL;
-    int             num_fill_prim_list,
-                    max_fill_prim_list;
+    std::vector<FIllPrim>   fill_prim_list;
 
-    SYmbPrim        *symb_prim_list = NULL;
-    int             num_symb_prim_list,
-                    max_symb_prim_list;
+    std::vector<SYmbPrim>   symb_prim_list;
 
-    TExtPrim        *text_prim_list = NULL;
-    int             num_text_prim_list,
-                    max_text_prim_list;
+    std::vector<TExtPrim>   text_prim_list;
     int             num_selectable_text;
 
-    SHapePrim       *shape_prim_list = NULL;
-    int             num_shape_prim_list,
-                    max_shape_prim_list;
+    std::vector<SHapePrim>  shape_prim_list;
 
-    IMagePrim       *image_prim_list = NULL;
-    int             num_image_prim_list,
-                    max_image_prim_list;
+    std::vector<IMagePrim>  image_prim_list;
 
     AXisPrim        *axis_prim_list = NULL;
     int             num_axis_prim_list,
