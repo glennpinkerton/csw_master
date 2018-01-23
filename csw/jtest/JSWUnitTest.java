@@ -281,9 +281,9 @@ class TriMesh10Frame extends JFrame
         JDisplayList dl = gpanel.getDisplayList ();
         sw = new JSurfaceWorks ();
 
-        x = new double[2000];
-        y = new double[2000];
-        z = new double[2000];
+        x = new double[2 * nphint];
+        y = new double[2 * nphint];
+        z = new double[2 * nphint];
 
         for (i=0; i<np; i++) {
             x[i] = random.nextDouble () * 100.0;
@@ -387,9 +387,9 @@ class Grid10Frame extends JFrame
         JDisplayList dl = gpanel.getDisplayList ();
         sw = new JSurfaceWorks ();
 
-        x = new double[2000];
-        y = new double[2000];
-        z = new double[2000];
+        x = new double[2 * nphint];
+        y = new double[2 * nphint];
+        z = new double[2 * nphint];
 
         for (i=0; i<np; i++) {
             x[i] = random.nextDouble () * 200.0;

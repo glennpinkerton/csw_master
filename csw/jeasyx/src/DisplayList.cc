@@ -47,6 +47,11 @@
 #define _DL_XY_TOO_BIG_         1.e15f
 #define _DL_IS_SUB_PRIM_FLAG_   -9837
 
+template<typename T>
+void CDisplayList::ZeroInit (T p, int n) {
+    memset((void *)p, 0, (size_t)n);
+}
+
 
 /*
  * Constructor
@@ -197,27 +202,6 @@ CDisplayList::CDisplayList()
     contour_line_prim_list = NULL;
     num_contour_line_prim_list = 0;
     max_contour_line_prim_list = 0;
-
-    fill_prim_list = NULL;
-    num_fill_prim_list = 0;
-    max_fill_prim_list = 0;
-
-    symb_prim_list = NULL;
-    num_symb_prim_list = 0;
-    max_symb_prim_list = 0;
-
-    text_prim_list = NULL;
-    num_text_prim_list = 0;
-    max_text_prim_list = 0;
-    num_selectable_text = 0;
-
-    shape_prim_list = NULL;
-    num_shape_prim_list = 0;
-    max_shape_prim_list = 0;
-
-    image_prim_list = NULL;
-    num_image_prim_list = 0;
-    max_image_prim_list = 0;
 
     axis_prim_list = NULL;
     num_axis_prim_list = 0;
@@ -1080,7 +1064,6 @@ void CDisplayList::Draw (void)
  * Now that everything has been rescaled and rebordered,
  * draw the primitives.
  */
-
     gtx_drawprim_obj.gtx_set_selected_flag_for_drawing (0);
     ezx_java_obj.ezx_SetAlphaValue (255);
     DrawFrameBorders ();
@@ -1426,6 +1409,7 @@ int CDisplayList::AddLine (double *xptsin, double *yptsin,
     if (next_line < 0) {
         try {
             LInePrim  lpr;
+            ZeroInit (&lpr, sizeof(lpr));
             line_prim_list.push_back (lpr);
             next_line = (int)line_prim_list.size() - 1;
         }
@@ -2431,7 +2415,10 @@ int CDisplayList::get_available_line (void) {
 
 int CDisplayList::add_available_fill (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_fill_prim_list  ||  fill_prim_list == NULL) {
+    int          fp_size = (int)fill_prim_list.size();
+    FIllPrim     *fp_data = fill_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= fp_size  ||  fp_data == NULL) {
         return 0;
     }
 
@@ -2473,7 +2460,10 @@ int CDisplayList::get_available_fill (void) {
 
 int CDisplayList::add_available_text (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_text_prim_list  ||  text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= tp_size  ||  tp_data == NULL) {
         return 0;
     }
 
@@ -2515,7 +2505,10 @@ int CDisplayList::get_available_text (void) {
 
 int CDisplayList::add_available_symb (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_symb_prim_list  ||  symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= sp_size  ||  sp_data == NULL) {
         return 0;
     }
 
@@ -2557,7 +2550,10 @@ int CDisplayList::get_available_symb (void) {
 
 int CDisplayList::add_available_shape (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_shape_prim_list  ||  shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= hp_size  ||  hp_data == NULL) {
         return 0;
     }
 
@@ -2641,7 +2637,10 @@ int CDisplayList::get_available_axis (void) {
 
 int CDisplayList::add_available_image (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_image_prim_list  ||  image_prim_list == NULL) {
+    int            ip_size = (int)image_prim_list.size();
+    IMagePrim      *ip_data = image_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= ip_size  ||  ip_data == NULL) {
         return 0;
     }
 
@@ -2783,7 +2782,10 @@ int CDisplayList::add_line_patch_prim (int prim_num)
 
 int CDisplayList::add_fill_patch_prim (int prim_num)
 {
-    if (prim_num < 0  ||  prim_num >= num_fill_prim_list  ||  fill_prim_list == NULL) {
+    int          fp_size = (int)fill_prim_list.size();
+    FIllPrim     *fp_data = fill_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= fp_size  ||  fp_data == NULL) {
         return 0;
     }
 
@@ -2810,7 +2812,10 @@ int CDisplayList::add_fill_patch_prim (int prim_num)
 
 int CDisplayList::add_text_patch_prim (int prim_num)
 {
-    if (prim_num < 0  ||  prim_num >= num_text_prim_list  ||  text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= tp_size  ||  tp_data == NULL) {
         return 0;
     }
 
@@ -2837,7 +2842,10 @@ int CDisplayList::add_text_patch_prim (int prim_num)
 
 int CDisplayList::add_symb_patch_prim (int prim_num)
 {
-    if (prim_num < 0  ||  prim_num >= num_symb_prim_list  ||  symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= sp_size  ||  sp_data == NULL) {
         return 0;
     }
 
@@ -2865,7 +2873,10 @@ int CDisplayList::add_symb_patch_prim (int prim_num)
 
 int CDisplayList::add_shape_patch_prim (int prim_num)
 {
-    if (prim_num < 0  ||  prim_num >= num_shape_prim_list  ||  shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= hp_size  ||  hp_data == NULL) {
         return 0;
     }
 
@@ -3118,7 +3129,7 @@ int CDisplayList::AddFill (double *xptsin, double *yptsin,
 {
     double         xmin = 0.0, ymin = 0.0, xmax = 0.0, ymax = 0.0;
     FIllPrim       *fptr = NULL;
-    int            ilast = 0, i = 0, npts = 0;
+    int            i = 0, npts = 0;
     int            *npts_closed = NULL, *npts_cut = NULL;
     int            ncomp = 0, istat = 0;
     CSW_F          *x_closed = NULL, *y_closed = NULL;
@@ -3172,38 +3183,16 @@ int CDisplayList::AddFill (double *xptsin, double *yptsin,
 
     next_fill = get_available_fill ();
     if (next_fill < 0) {
-    /*
-     * Grow the fill prim list if needed.
-     * Make sure there is room for at least 2 more.
-     */
-        if (fill_prim_list == NULL) {
-            max_fill_prim_list = 0;
-            num_fill_prim_list = 0;
+        try {
+            FIllPrim  fpr;
+            ZeroInit (&fpr, sizeof(fpr));
+            fill_prim_list.push_back (fpr);
+            next_fill = (int)fill_prim_list.size() - 1;
         }
-        if (num_fill_prim_list >= max_fill_prim_list-2) {
-            ilast = max_fill_prim_list;
-            max_fill_prim_list += _BIG_CHUNK_SIZE_;
-            fill_prim_list = (FIllPrim *)csw_Realloc
-                (fill_prim_list, max_fill_prim_list * sizeof(FIllPrim));
-            if (fill_prim_list != NULL) {
-                memset (fill_prim_list + ilast, 0,
-                        _BIG_CHUNK_SIZE_ * sizeof(FIllPrim));
-            }
+        catch (...) {
+            printf ("Exception in fill_prim_list pushback\n");
+            return 0;
         }
-
-    /*
-     * Return an error if the fill prim list could not be grown.
-     */
-        if (fill_prim_list == NULL) {
-            return -1;
-        }
-
-        next_fill = num_fill_prim_list;
-        num_fill_prim_list++;
-    }
-
-    if (fill_prim_list == NULL) {
-        return -1;
     }
 
 /*
@@ -3262,7 +3251,9 @@ int CDisplayList::AddFill (double *xptsin, double *yptsin,
     memcpy (y_orig, y_cut, nptot * sizeof(CSW_F));
     memcpy (npts_orig, npts_cut, ncomp * sizeof(int));
 
-    fptr = fill_prim_list + next_fill;
+    FIllPrim   *fp_data = fill_prim_list.data();
+
+    fptr = fp_data + next_fill;
     fptr->x_orig = x_orig;
     fptr->y_orig = y_orig;
     fptr->npts_orig = npts_orig;
@@ -3368,12 +3359,14 @@ int CDisplayList::DrawAllFills (void)
     };
     CSWScopeGuard func_scope_guard (fscope);
 
+    int        fp_size = (int)fill_prim_list.size();
+    FIllPrim   *fp_data = fill_prim_list.data();
 
-    if (fill_prim_list == NULL) {
+    if (fp_data == NULL  ||  fp_size < 1) {
         return 0;
     }
 
-    nloop = num_fill_prim_list;
+    nloop = fp_size;
     if (fill_patch_list != NULL  &&
         patch_draw_flag == 1) {
         nloop = num_fill_patch_list;
@@ -3393,11 +3386,11 @@ int CDisplayList::DrawAllFills (void)
             i = fill_patch_list[ido];
         }
 
-        fptr = fill_prim_list + i;
+        fptr = fp_data + i;
         if (fptr->maxpts > max_ppts) max_ppts = fptr->maxpts;
     }
 
-    max_ppts += num_fill_prim_list + 100;
+    max_ppts += (fp_size + 100);
 
     if (max_ppts < max_static_ppts) {
         xylocal = static_xy_local;
@@ -3420,7 +3413,7 @@ int CDisplayList::DrawAllFills (void)
             i = fill_patch_list[ido];
         }
 
-        fptr = fill_prim_list + i;
+        fptr = fp_data + i;
 
         if (fptr->deleted_flag == 1) {
             continue;
@@ -3511,14 +3504,17 @@ int CDisplayList::SetSpatialIndexForFill (int fill_prim_num)
     FIllPrim        *fptr;
     FRameStruct     *fp;
 
-    if (fill_prim_list == NULL) {
+    int             fp_size = (int)fill_prim_list.size();
+    FIllPrim        *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return 0;
     }
-    if (fill_prim_num < 0  ||  fill_prim_num >= num_fill_prim_list) {
+    if (fill_prim_num < 0  ||  fill_prim_num >= fp_size) {
         return 0;
     }
 
-    fptr = fill_prim_list + fill_prim_num;
+    fptr = fp_data + fill_prim_num;
 
     istat = SetupSpatialIndexForFrame (fptr->frame_num);
     if (istat == -1) {
@@ -3711,14 +3707,18 @@ int CDisplayList::CalcFillBounds (int fill_prim_num,
     *xmax = -1.e30;
     *ymax = -1.e30;
 
-    if (fill_prim_num < 0  ||  fill_prim_num >= num_fill_prim_list) {
-        return -1;
-    }
-    if (fill_prim_list == NULL) {
+    int        fp_size = (int)fill_prim_list.size();
+    FIllPrim   *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return -1;
     }
 
-    fptr = fill_prim_list + fill_prim_num;
+    if (fill_prim_num < 0  ||  fill_prim_num >= fp_size) {
+        return -1;
+    }
+
+    fptr = fp_data + fill_prim_num;
 
 /*
  * use the x_orig and y_orig arrays if the prim is rescaleable.
@@ -3871,7 +3871,6 @@ int CDisplayList::AddText (double x, double y, double size, double angle,
                            char *textinput, bool from_graph)
 {
     TExtPrim       *tptr;
-    int            ilast;
     int            nc;
     char           *cdata;
     char           text[500], *txt;
@@ -3902,41 +3901,16 @@ int CDisplayList::AddText (double x, double y, double size, double angle,
 
     next_text = get_available_text ();
     if (next_text < 0) {
-
-    /*
-     * Grow the text prim list if needed.
-     * Make sure there is room for at least 2 more.
-     */
-        if (text_prim_list == NULL) {
-            max_text_prim_list = 0;
-            num_text_prim_list = 0;
-            num_selectable_text = 0;
+        try {
+            TExtPrim  tpr;
+            ZeroInit (&tpr, sizeof(tpr));
+            text_prim_list.push_back (tpr);
+            next_text = (int)text_prim_list.size() - 1;
         }
-        if (num_text_prim_list >= max_text_prim_list-2) {
-            ilast = max_text_prim_list;
-            max_text_prim_list += _BIG_CHUNK_SIZE_;
-            text_prim_list = (TExtPrim *)csw_Realloc
-                (text_prim_list, max_text_prim_list * sizeof(TExtPrim));
-            if (text_prim_list != NULL) {
-                memset (text_prim_list + ilast, 0,
-                        _BIG_CHUNK_SIZE_ * sizeof(TExtPrim));
-            }
+        catch (...) {
+            printf ("Exception in text_prim_list pushback\n");
+            return 0;
         }
-
-    /*
-     * Return an error if the text prim list could not be grown.
-     */
-        if (text_prim_list == NULL) {
-            return -1;
-        }
-
-        next_text = num_text_prim_list;
-        num_text_prim_list++;
-
-    }
-
-    if (text_prim_list == NULL) {
-        return -1;
     }
 
     tfont = current_text_font;
@@ -4009,7 +3983,9 @@ int CDisplayList::AddText (double x, double y, double size, double angle,
         return -1;
     }
 
-    tptr = text_prim_list + next_text;
+    TExtPrim    *tp_data = text_prim_list.data();
+
+    tptr = tp_data + next_text;
 
     strncpy (cdata, txt, nc * sizeof(char));
     cdata[nc] = '\0';
@@ -4120,13 +4096,16 @@ int CDisplayList::DrawAllTexts (void)
     CSW_F          xoff, yoff;
     bool           bpatch = false;
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return 0;
     }
 
     jni_msg ("\nDisplay list texts being drawn\n");
 
-    nloop = num_text_prim_list;
+    nloop = tp_size;
     if (text_patch_list != NULL  &&
         patch_draw_flag == 1) {
         nloop = num_text_patch_list;
@@ -4137,7 +4116,7 @@ int CDisplayList::DrawAllTexts (void)
 
 // Count the number of text items to draw.  If there are
 // over 2000, only 2000 will be drawn.  Even with this, 
-// 2000 textitems are likely to be unreadable.
+// 2000 text items are likely to be unreadable.
 
     n = 0;
     for (ido=0; ido<nloop; ido++) {
@@ -4147,7 +4126,7 @@ int CDisplayList::DrawAllTexts (void)
             i = text_patch_list[ido];
         }
 
-        tptr = text_prim_list + i;
+        tptr = tp_data + i;
 
         if (tptr->deleted_flag == 1) {
             continue;
@@ -4182,7 +4161,7 @@ int CDisplayList::DrawAllTexts (void)
             i = text_patch_list[ido];
         }
 
-        tptr = text_prim_list + i;
+        tptr = tp_data + i;
 
         if (tptr->deleted_flag == 1) {
             continue;
@@ -4317,14 +4296,17 @@ int CDisplayList::SetSpatialIndexForText (int text_prim_num)
     int             istat;
     FRameStruct     *fp;
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return 0;
     }
-    if (text_prim_num < 0  ||  text_prim_num >= num_text_prim_list) {
+    if (text_prim_num < 0  ||  text_prim_num >= tp_size) {
         return 0;
     }
 
-    tptr = text_prim_list + text_prim_num;
+    tptr = tp_data + text_prim_num;
 
     istat = SetupSpatialIndexForFrame (tptr->frame_num);
     if (istat == -1) {
@@ -4513,14 +4495,18 @@ int CDisplayList::CalcTextBounds (int text_prim_num,
     *xmax = -1.e30;
     *ymax = -1.e30;
 
-    if (text_prim_num < 0  ||  text_prim_num >= num_text_prim_list) {
-        return -1;
-    }
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return -1;
     }
 
-    tptr = text_prim_list + text_prim_num;
+    if (text_prim_num < 0  ||  text_prim_num >= tp_size) {
+        return -1;
+    }
+
+    tptr = tp_data + text_prim_num;
 
 /*
  * Get the text bounds in inches.
@@ -4613,51 +4599,28 @@ int CDisplayList::AddSymb (double x, double y, double size, double angle,
                            int symb_num)
 {
     SYmbPrim       *sptr;
-    int            ilast;
     int            next_symb;
 
     next_symb = get_available_symb ();
     if (next_symb < 0) {
-    /*
-     * Grow the symb prim list if needed.
-     * Make sure there is room for at least 2 more.
-     */
-        if (symb_prim_list == NULL) {
-            max_symb_prim_list = 0;
-            num_symb_prim_list = 0;
+        try {
+            SYmbPrim  spr;
+            ZeroInit (&spr, sizeof(spr));
+            symb_prim_list.push_back (spr);
+            next_symb = (int)symb_prim_list.size() - 1;
         }
-        if (num_symb_prim_list >= max_symb_prim_list-2) {
-            ilast = max_symb_prim_list;
-            max_symb_prim_list += _BIG_CHUNK_SIZE_;
-            symb_prim_list = (SYmbPrim *)csw_Realloc
-                (symb_prim_list, max_symb_prim_list * sizeof(SYmbPrim));
-            if (symb_prim_list != NULL) {
-                memset (symb_prim_list + ilast, 0,
-                        _BIG_CHUNK_SIZE_ * sizeof(SYmbPrim));
-            }
+        catch (...) {
+            printf ("Exception in symb_prim_list pushback\n");
+            return 0;
         }
-
-    /*
-     * Return an error if the symb prim list could not be grown.
-     */
-        if (symb_prim_list == NULL) {
-            return -1;
-        }
-
-        next_symb = num_symb_prim_list;
-        num_symb_prim_list++;
-
     }
 
-    if (symb_prim_list == NULL) {
-        return -1;
-    }
-
+    SYmbPrim   *sp_data = symb_prim_list.data();
 
 /*
  * Populate the symb prim structure.
  */
-    sptr = symb_prim_list + next_symb;
+    sptr = sp_data + next_symb;
 
     sptr->x = (CSW_F)x;
     sptr->y = (CSW_F)y;
@@ -4729,11 +4692,14 @@ int CDisplayList::DrawAllSymbs (void)
     SYmbPrim       *sptr;
     bool           bpatch = false;
 
-    if (symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data == NULL  ||  sp_size < 1) {
         return 0;
     }
 
-    nloop = num_symb_prim_list;
+    nloop = sp_size;
     if (symb_patch_list != NULL  &&
         patch_draw_flag == 1) {
         nloop = num_symb_patch_list;
@@ -4748,7 +4714,7 @@ int CDisplayList::DrawAllSymbs (void)
             i = symb_patch_list[ido];
         }
 
-        sptr = symb_prim_list + i;
+        sptr = sp_data + i;
 
         if (sptr->deleted_flag == 1) {
             continue;
@@ -4775,7 +4741,7 @@ int CDisplayList::DrawAllSymbs (void)
             i = symb_patch_list[ido];
         }
 
-        sptr = symb_prim_list + i;
+        sptr = sp_data + i;
 
         if (sptr->deleted_flag == 1) {
             continue;
@@ -4851,14 +4817,18 @@ int CDisplayList::SetSpatialIndexForSymb (int symb_prim_num)
     int             istat;
     FRameStruct     *fp;
 
-    if (symb_prim_list == NULL) {
-        return 0;
-    }
-    if (symb_prim_num < 0  ||  symb_prim_num >= num_symb_prim_list) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data == NULL  ||  sp_size < 1) {
         return 0;
     }
 
-    sptr = symb_prim_list + symb_prim_num;
+    if (symb_prim_num < 0  ||  symb_prim_num >= sp_size) {
+        return 0;
+    }
+
+    sptr = sp_data + symb_prim_num;
 
     istat = SetupSpatialIndexForFrame (sptr->frame_num);
     if (istat == -1) {
@@ -5054,14 +5024,18 @@ int CDisplayList::CalcSymbBounds (int symb_prim_num,
     *xmax = -1.e30;
     *ymax = -1.e30;
 
-    if (symb_prim_num < 0  ||  symb_prim_num >= num_symb_prim_list) {
-        return -1;
-    }
-    if (symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data == NULL  ||  sp_size < 1) {
         return -1;
     }
 
-    sptr = symb_prim_list + symb_prim_num;
+    if (symb_prim_num < 0  ||  symb_prim_num >= sp_size) {
+        return -1;
+    }
+
+    sptr = sp_data + symb_prim_num;
 
 /*
  * Convert the symbol size in inches to a symbol size in
@@ -5167,7 +5141,7 @@ int CDisplayList::AddShape (int shape_type,
                             double *shape_values)
 {
     SHapePrim      *shptr;
-    int            ilast, istat;
+    int            istat;
     int            i, nvals;
     double         xmin, ymin, xmax, ymax;
     CSW_F          fvals[10];
@@ -5183,39 +5157,16 @@ int CDisplayList::AddShape (int shape_type,
 
     next_shape = get_available_shape ();
     if (next_shape < 0) {
-    /*
-     * Grow the shape prim list if needed.
-     * Make sure there is room for at least 2 more.
-     */
-        if (shape_prim_list == NULL) {
-            max_shape_prim_list = 0;
-            num_shape_prim_list = 0;
+        try {
+            SHapePrim  hpr;
+            ZeroInit (&hpr, sizeof(hpr));
+            shape_prim_list.push_back (hpr);
+            next_shape = (int)shape_prim_list.size() - 1;
         }
-        if (num_shape_prim_list >= max_shape_prim_list-2) {
-            ilast = max_shape_prim_list;
-            max_shape_prim_list += _BIG_CHUNK_SIZE_;
-            shape_prim_list = (SHapePrim *)csw_Realloc
-                (shape_prim_list, max_shape_prim_list * sizeof(SHapePrim));
-            if (shape_prim_list != NULL) {
-                memset (shape_prim_list + ilast, 0,
-                        _BIG_CHUNK_SIZE_ * sizeof(SHapePrim));
-            }
+        catch (...) {
+            printf ("Exception in shape_prim_list pushback\n");
+            return 0;
         }
-
-    /*
-     * Return an error if the shape prim list could not be grown.
-     */
-        if (shape_prim_list == NULL) {
-            return -1;
-        }
-
-        next_shape = num_shape_prim_list;
-        num_shape_prim_list++;
-
-    }
-
-    if (shape_prim_list == NULL) {
-        return -1;
     }
 
     memset (fvals, 0, 10 * sizeof(CSW_F));
@@ -5278,7 +5229,10 @@ int CDisplayList::AddShape (int shape_type,
             local_scaleable = 1;
         }
     }
-    shptr = shape_prim_list + next_shape;
+
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    shptr = hp_data + next_shape;
 
     shptr->type = shape_type;
     memset (shptr->fval, 0, 10 * sizeof(CSW_F));
@@ -5363,13 +5317,16 @@ int CDisplayList::DrawAllShapes (void)
     SHapePrim      *shptr;
     bool           bpatch = false;
 
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return 0;
     }
 
     jni_msg ("\nDisplay list shapes being drawn\n");
 
-    nloop = num_shape_prim_list;
+    nloop = hp_size;
     if (shape_patch_list != NULL  &&
         patch_draw_flag == 1) {
         nloop = num_shape_patch_list;
@@ -5385,7 +5342,7 @@ int CDisplayList::DrawAllShapes (void)
             i = shape_patch_list[ido];
         }
 
-        shptr = shape_prim_list + i;
+        shptr = hp_data + i;
 
         if (shptr->deleted_flag == 1) {
             continue;
@@ -5530,14 +5487,17 @@ int CDisplayList::SetSpatialIndexForShape (int shape_prim_num)
     int             istat;
     FRameStruct     *fp;
 
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return 0;
     }
-    if (shape_prim_num < 0  ||  shape_prim_num >= num_shape_prim_list) {
+    if (shape_prim_num < 0  ||  shape_prim_num >= hp_size) {
         return 0;
     }
 
-    shptr = shape_prim_list + shape_prim_num;
+    shptr = hp_data + shape_prim_num;
 
     istat = SetupSpatialIndexForFrame (shptr->frame_num);
     if (istat == -1) {
@@ -5735,14 +5695,18 @@ int CDisplayList::CalcShapePageBounds (int shape_prim_num,
     *xmax = -1.e30;
     *ymax = -1.e30;
 
-    if (shape_prim_num < 0  ||  shape_prim_num >= num_shape_prim_list) {
-        return -1;
-    }
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return -1;
     }
 
-    shptr = shape_prim_list + shape_prim_num;
+    if (shape_prim_num < 0  ||  shape_prim_num >= hp_size) {
+        return -1;
+    }
+
+    shptr = hp_data + shape_prim_num;
 
     xc = shptr->fval[0];
     yc = shptr->fval[1];
@@ -5901,12 +5865,27 @@ int CDisplayList::AddDataImage (double *data,
                                 double ymax)
 {
     int            istat, i, j, k, offset, ntot;
-    unsigned char  *red_ptr, *green_ptr, *blue_ptr, *trans_ptr;
+    unsigned char  *red_ptr = NULL, *green_ptr = NULL,
+                   *blue_ptr = NULL, *trans_ptr = NULL;
     int            red, green, blue, trans;
+
+    bool           bscope = true;
+
+    auto fscope = [&]()
+    {
+      if (bscope) {
+        csw_Free (red_ptr);
+        csw_Free (green_ptr);
+        csw_Free (blue_ptr);
+        csw_Free (trans_ptr);
+      }
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
+
 
     if (xmax <= xmin || ymax <= ymin ||
         data == NULL || ncol < 2  ||  nrow < 2) {
-        return 0;
+        return -1;
     }
 
 /*
@@ -5919,10 +5898,6 @@ int CDisplayList::AddDataImage (double *data,
     trans_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
     if (red_ptr == NULL  ||  green_ptr == NULL  ||  blue_ptr == NULL  ||
         trans_ptr == NULL) {
-        csw_Free (red_ptr);
-        csw_Free (green_ptr);
-        csw_Free (blue_ptr);
-        csw_Free (trans_ptr);
         return -1;
     }
 
@@ -5974,14 +5949,18 @@ int CDisplayList::DrawAllImages (void)
 {
     int            i;
     IMagePrim      *imptr;
+    double         x1, y1, x2, y2;
 
-    if (image_prim_list == NULL) {
+    int            ip_size = (int)image_prim_list.size();
+    IMagePrim      *ip_data = image_prim_list.data();
+
+    if (ip_data == NULL  ||  ip_size < 1) {
         return 0;
     }
 
-    for (i=0; i<num_image_prim_list; i++) {
+    for (i=0; i<ip_size; i++) {
 
-        imptr = image_prim_list + i;
+        imptr = ip_data + i;
 
         if (imptr->deleted_flag == 1) {
             continue;
@@ -5991,11 +5970,21 @@ int CDisplayList::DrawAllImages (void)
         }
 
     /*
-     * A primitive from a scaleable frame should have
-     * its sub prims drawn and not be drawn itself.
+     * Check the image bbox against the image frame.
      */
-        if (imptr->scaleable == 1) {
-            continue;
+        x1 = imptr->xmin;
+        y1 = imptr->ymin;
+        x2 = imptr->xmax;
+        y2 = imptr->ymax;
+        if (imptr->frame_num >= 0) {
+            bool bbchk = CheckInsideFrame (imptr->frame_num,
+                                           imptr->xmin, imptr->ymin,
+                                           imptr->xmax, imptr->ymax);
+            if (!bbchk) {
+                continue;
+            }
+            convert_frame_point (imptr->frame_num, &x1, &y1);
+            convert_frame_point (imptr->frame_num, &x2, &y2);
         }
 
         ezx_java_obj.ezx_SetFrameInJavaArea (imptr->frame_num);
@@ -6004,10 +5993,8 @@ int CDisplayList::DrawAllImages (void)
         gtx_drawprim_obj.gtx_SetImageIDForDraw (imptr->image_id);
         gtx_drawprim_obj.gtx_SetImageHasLinesForDraw (imptr->has_lines);
 
-        gtx_drawprim_obj.gtx_clip_image_prim (imptr->xmin,
-                             imptr->ymin,
-                             imptr->xmax,
-                             imptr->ymax,
+        gtx_drawprim_obj.gtx_clip_image_prim (
+                             x1, y1, x2, y2,
                              imptr->ncol,
                              imptr->nrow,
                              imptr->red_data,
@@ -8181,8 +8168,11 @@ void CDisplayList::free_lines (void)
         for (i=0; i<lp_size; i++) {
             prim = lp_data + i;
             csw_Free (prim->xypts);
+            prim->xypts = NULL;
         }
     }
+
+    line_prim_list.clear();
 
     if (contour_line_prim_list != NULL) {
         for (i=0; i<num_contour_line_prim_list; i++) {
@@ -8204,21 +8194,21 @@ void CDisplayList::free_fills (void)
     int           i;
     FIllPrim      *prim;
 
-    if (fill_prim_list == NULL) {
+    int        fp_size = (int)fill_prim_list.size();
+    FIllPrim   *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_fill_prim_list; i++) {
-        prim = fill_prim_list + i;
+    for (i=0; i<fp_size; i++) {
+        prim = fp_data + i;
         csw_Free (prim->xypts);
         csw_Free (prim->x_orig);
         csw_Free (prim->npts_orig);
     }
 
-    csw_Free (fill_prim_list);
-    fill_prim_list = NULL;
-    num_fill_prim_list = 0;
-    max_fill_prim_list = 0;
+    fill_prim_list.clear();
 
     return;
 }
@@ -8229,20 +8219,19 @@ void CDisplayList::free_texts (void)
     int           i;
     TExtPrim      *prim;
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_text_prim_list; i++) {
-        prim = text_prim_list + i;
+    for (i=0; i<tp_size; i++) {
+        prim = tp_data + i;
         csw_Free (prim->chardata);
     }
 
-    csw_Free (text_prim_list);
-    text_prim_list = NULL;
-    num_text_prim_list = 0;
-    max_text_prim_list = 0;
-    num_selectable_text = 0;
+    text_prim_list.clear();
 
     return;
 }
@@ -8250,10 +8239,8 @@ void CDisplayList::free_texts (void)
 
 void CDisplayList::free_symbs (void)
 {
-    csw_Free (symb_prim_list);
-    symb_prim_list = NULL;
-    num_symb_prim_list = 0;
-    max_symb_prim_list = 0;
+
+    symb_prim_list.clear();
 
     return;
 }
@@ -8261,11 +8248,7 @@ void CDisplayList::free_symbs (void)
 
 void CDisplayList::free_shapes (void)
 {
-    csw_Free (shape_prim_list);
-    shape_prim_list = NULL;
-    num_shape_prim_list = 0;
-    max_shape_prim_list = 0;
-
+    shape_prim_list.clear();
     return;
 }
 
@@ -8274,22 +8257,22 @@ void CDisplayList::free_images (void)
     int           i;
     IMagePrim     *prim;
 
-    if (image_prim_list == NULL) {
+    int            ip_size = (int)image_prim_list.size();
+    IMagePrim      *ip_data = image_prim_list.data();
+
+    if (ip_data == NULL  ||  ip_size < 1) {
         return;
     }
 
-    for (i=0; i<num_image_prim_list; i++) {
-        prim = image_prim_list + i;
+    for (i=0; i<ip_size; i++) {
+        prim = ip_data + i;
         csw_Free (prim->red_data);
         csw_Free (prim->green_data);
         csw_Free (prim->blue_data);
         csw_Free (prim->transparency_data);
     }
 
-    csw_Free (image_prim_list);
-    image_prim_list = NULL;
-    num_image_prim_list = 0;
-    max_image_prim_list = 0;
+    image_prim_list.clear();
 
     return;
 }
@@ -8297,8 +8280,10 @@ void CDisplayList::free_images (void)
 
 /*
   Add an image where the color values are already known.  The
-  specified red, green, blue and trans values are copied via
-  this method.  The calling function still owns these data.
+  specified red, green, blue and trans values are copied by
+  this method.  The calling function still owns the arrays
+  passed in and the calling function needs to free the memory
+  if appropriate.
 */
 int CDisplayList::AddColorImage (unsigned char *red,
                                  unsigned char *green,
@@ -8311,222 +8296,65 @@ int CDisplayList::AddColorImage (unsigned char *red,
                                  double xmax,
                                  double ymax)
 {
-    IMagePrim      *imptr, *impframe;
-    int            ilast;
+    IMagePrim      *imptr = NULL;
     int            i, j, k, k2, offset, ntot;
-    int            i1, i2, j1t, j2, nc, nr;
-    FRameStruct    *frptr;
-    CSW_F          fxmin, fymin, fxmax, fymax, pxmin, pymin;
-    CSW_F          fxspace, fyspace;
-    unsigned char  *red_ptr, *green_ptr, *blue_ptr, *trans_ptr;
-    int            scaleable_frame;
-    int            from_data_image;
+    unsigned char  *red_ptr = NULL, *green_ptr = NULL,
+                   *blue_ptr = NULL, *trans_ptr = NULL;
     int            next_image;
 
-    from_data_image = 0;
-    if (ncol < 0) {
-        from_data_image = 1;
-        ncol = -ncol;
-    }
+    bool           bscope = true;
+
+    auto fscope = [&]()
+    {
+      if (bscope) {
+        csw_Free (red_ptr);
+        csw_Free (green_ptr);
+        csw_Free (blue_ptr);
+        csw_Free (trans_ptr);
+      }
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
     if (xmax <= xmin || ymax <= ymin ||
         red == NULL   ||  green == NULL  ||  blue == NULL  ||  trans == NULL  ||
         ncol < 2  ||  nrow < 2) {
-        return 0;
+        return -1;
     }
 
     next_image = get_available_image ();
     if (next_image < 0) {
-    /*
-     * Grow the image prim list if needed.
-     * Make sure there is room for at least 2 more.
-     */
-        if (image_prim_list == NULL) {
-            max_image_prim_list = 0;
-            num_image_prim_list = 0;
+        try {
+            IMagePrim  ipr;
+            ZeroInit (&ipr, sizeof(ipr));
+            image_prim_list.push_back (ipr);
+            next_image = (int)image_prim_list.size() - 1;
         }
-        if (num_image_prim_list >= max_image_prim_list-2) {
-            ilast = max_image_prim_list;
-            max_image_prim_list += _SMALL_CHUNK_SIZE_;
-            image_prim_list = (IMagePrim *)csw_Realloc
-                (image_prim_list, max_image_prim_list * sizeof(IMagePrim));
-            if (image_prim_list != NULL) {
-                memset (image_prim_list + ilast, 0,
-                        _SMALL_CHUNK_SIZE_ * sizeof(IMagePrim));
-            }
-        }
-
-    /*
-     * Return an error if the image prim list could not be grown.
-     */
-        if (image_prim_list == NULL) {
+        catch (...) {
+            printf ("Exception in image_prim_list pushback\n");
             return -1;
-        }
-
-        next_image = num_image_prim_list;
-        num_image_prim_list++;
-
-    }
-
-    if (image_prim_list == NULL) {
-        return -1;
-    }
-
-/*
- * If the active frame is rescaleable, make a master copy in frame units.
- */
-    impframe = NULL;
-    scaleable_frame = 0;
-    if (current_frame_num >= 0  &&
-        current_frame_num < num_frame_list  &&
-        current_grid_num < 10000) {
-        if (frame_list != NULL) {
-            frptr = frame_list + current_frame_num;
-            scaleable_frame = frptr->rescaleable;
-            if (scaleable_frame == 1) {
-                imptr = image_prim_list + next_image;
-
-                strncpy (imptr->name, current_image_name, 99);
-                imptr->name[99] = '\0';
-                imptr->image_id = current_image_id;
-
-                if (from_data_image == 0) {
-                    ntot = ncol * nrow;
-                    red_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
-                    green_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
-                    blue_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
-                    trans_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
-                    if (red_ptr == NULL  ||  green_ptr == NULL  ||  blue_ptr == NULL  ||
-                        trans_ptr == NULL) {
-                        csw_Free (red_ptr);
-                        csw_Free (green_ptr);
-                        csw_Free (blue_ptr);
-                        csw_Free (trans_ptr);
-                        return -1;
-                    }
-                    memcpy (red_ptr, red, ntot * sizeof(unsigned char));
-                    memcpy (green_ptr, green, ntot * sizeof(unsigned char));
-                    memcpy (blue_ptr, blue, ntot * sizeof(unsigned char));
-                    memcpy (trans_ptr, trans, ntot * sizeof(unsigned char));
-                }
-                else {
-                    red_ptr = red;
-                    green_ptr = green;
-                    blue_ptr = blue;
-                    trans_ptr = trans;
-                }
-
-                imptr->red_data = red_ptr;
-                imptr->green_data = green_ptr;
-                imptr->blue_data = blue_ptr;
-                imptr->transparency_data = trans_ptr;
-
-                imptr->ncol = ncol;
-                imptr->nrow = nrow;
-
-                imptr->xmin = (CSW_F)xmin;
-                imptr->ymin = (CSW_F)ymin;
-                imptr->xmax = (CSW_F)xmax;
-                imptr->ymax = (CSW_F)ymax;
-
-                imptr->grid_num = current_grid_num;
-                imptr->frame_num = current_frame_num;
-                imptr->selectable_object_num = current_selectable_object_num;
-                imptr->graph_num = current_graph_num;
-                imptr->xaxis_num = current_xaxis_num;
-                imptr->yaxis_num = current_yaxis_num;
-
-                imptr->layer_num = current_layer_num;
-                imptr->item_num = current_item_num;
-
-                imptr->editable_flag = (char)current_editable_flag;
-                imptr->selectable_flag = (char)current_selectable_flag;
-
-                imptr->visible_flag = 1;
-                imptr->draw_flag = 1;
-                imptr->plot_flag = 1;
-                imptr->selected_flag = 0;
-                imptr->deleted_flag = 0;
-
-                imptr->scaleable = 1;
-
-                imptr->prim_num = next_image;
-                impframe = imptr;
-
-            }
-        }
-    }
-
-/*
- * convert and clip to frame if needed
- */
-    fxmin = (CSW_F)xmin;
-    fymin = (CSW_F)ymin;
-    fxmax = (CSW_F)xmax;
-    fymax = (CSW_F)ymax;
-    fxspace = (fxmax - fxmin) / (CSW_F)(ncol - 1);
-    fyspace = (fymax - fymin) / (CSW_F)(nrow - 1);
-    i1 = 0;
-    i2 = nrow;
-    j1t = 0;
-    j2 = ncol;
-    nc = ncol;
-    nr = nrow;
-
-    if (current_frame_num >= 0  &&  current_frame_num < num_frame_list) {
-        convert_frame_point (&fxmin, &fymin);
-        convert_frame_point (&fxmax, &fymax);
-        fxspace = (fxmax - fxmin) / (CSW_F)(ncol - 1);
-        fyspace = (fymax - fymin) / (CSW_F)(nrow - 1);
-        if (current_frame_clip_flag  &&  frame_list != NULL) {
-            frptr = frame_list + current_frame_num;
-            if (fxmin >= frptr->px2  ||  fxmax <= frptr->px1  ||
-                fymin >= frptr->py2  ||  fymax <= frptr->py1) {
-                return -1;
-            }
-            pxmin = fxmin;
-            pymin = fymin;
-            if (fxmin < frptr->px1) fxmin = frptr->px1;
-            if (fxmax > frptr->px2) fxmax = frptr->px2;
-            if (fymin < frptr->py1) fymin = frptr->py1;
-            if (fymax > frptr->py2) fymax = frptr->py2;
-            j1t = (int)((fxmin - pxmin) / fxspace);
-            j2 = (int)((fxmax - pxmin) / fxspace + 1.01f);
-            i1 = (int)((fymin - pymin) / fyspace);
-            i2 = (int)((fymax - pymin) / fyspace + 1.01f);
-            if (i1 < 0) i1 = 0;
-            if (i2 > nrow) i2 = nrow;
-            if (j1t < 0) j1t = 0;
-            if (j2 > ncol) j2 = ncol;
-            nc = j2 - j1t;
-            nr = i2 - i1;
         }
     }
 
 /*
  * Allocate space for color image data.
  */
-    ntot = nc * nr;
+    ntot = ncol * nrow;
     red_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
     green_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
     blue_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
     trans_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
     if (red_ptr == NULL  ||  green_ptr == NULL  ||  blue_ptr == NULL  ||
         trans_ptr == NULL) {
-        csw_Free (red_ptr);
-        csw_Free (green_ptr);
-        csw_Free (blue_ptr);
-        csw_Free (trans_ptr);
         return -1;
     }
 
 /*
- * convert to clipped color image.
+ * Copy the red, green blue and alpha to arrays owned by the display list.
  */
     k2 = 0;
-    for (i=i1; i<i2; i++) {
+    for (i=0; i<nrow; i++) {
         offset = i * ncol;
-        for (j=j1t; j<j2; j++) {
+        for (j=0; j<ncol; j++) {
             k = offset + j;
             red_ptr[k2] = red[k];
             green_ptr[k2] = green[k];
@@ -8537,58 +8365,11 @@ int CDisplayList::AddColorImage (unsigned char *red,
     }
 
 /*
- * Get another prim if the one gotten above was used.
- */
-    if (impframe != NULL) {
-        next_image = get_available_image ();
-        if (next_image < 0) {
-        /*
-         * Grow the image prim list if needed.
-         */
-            if (image_prim_list == NULL) {
-                max_image_prim_list = 0;
-                num_image_prim_list = 0;
-            }
-            if (num_image_prim_list >= max_image_prim_list-1) {
-                ilast = max_image_prim_list;
-                max_image_prim_list += _SMALL_CHUNK_SIZE_;
-                image_prim_list = (IMagePrim *)csw_Realloc
-                    (image_prim_list, max_image_prim_list * sizeof(IMagePrim));
-                if (image_prim_list != NULL) {
-                    memset (image_prim_list + ilast, 0,
-                            _SMALL_CHUNK_SIZE_ * sizeof(IMagePrim));
-                }
-            }
-
-        /*
-         * Return an error if the image prim list could not be grown.
-         */
-            if (image_prim_list == NULL) {
-                csw_Free (red_ptr);
-                csw_Free (green_ptr);
-                csw_Free (blue_ptr);
-                csw_Free (trans_ptr);
-                return -1;
-            }
-
-            next_image = num_image_prim_list;
-            num_image_prim_list++;
-
-        }
-    }
-
-    if (image_prim_list == NULL) {
-        csw_Free (red_ptr);
-        csw_Free (green_ptr);
-        csw_Free (blue_ptr);
-        csw_Free (trans_ptr);
-        return -1;
-    }
-
-/*
  * Populate the image prim structure.
  */
-    imptr = image_prim_list + next_image;
+    IMagePrim   *ip_data = image_prim_list.data();
+
+    imptr = ip_data + next_image;
 
     strncpy (imptr->name, current_image_name, 99);
     imptr->name[99] = '\0';
@@ -8599,13 +8380,13 @@ int CDisplayList::AddColorImage (unsigned char *red,
     imptr->blue_data = blue_ptr;
     imptr->transparency_data = trans_ptr;
 
-    imptr->ncol = nc;
-    imptr->nrow = nr;
+    imptr->ncol = ncol;
+    imptr->nrow = nrow;
 
-    imptr->xmin = fxmin;
-    imptr->ymin = fymin;
-    imptr->xmax = fxmax;
-    imptr->ymax = fymax;
+    imptr->xmin = xmin;
+    imptr->ymin = ymin;
+    imptr->xmax = xmax;
+    imptr->ymax = ymax;
 
     imptr->grid_num = current_grid_num;
     imptr->frame_num = current_frame_num;
@@ -8629,21 +8410,20 @@ int CDisplayList::AddColorImage (unsigned char *red,
     imptr->prim_num = next_image;
     imptr->scaleable = 0;
 
-    if (impframe) {
-        impframe->sub_prims[0] = next_image;
-        impframe->numsub = 1;
-        impframe->scaleable = 1;
-        impframe->deleted_flag = 0;
-    }
+    bscope = false;
 
     return 1;
 
 }  /*  end of function AddColorImage  */
 
+
+
+
+
 void CDisplayList::delete_frame_lines (int fnum)
 {
-    int            i, j, jprim;
-    LInePrim       *lptr, *lp2;
+    int            i;
+    LInePrim       *lptr;
 
     int            lp_size = (int)line_prim_list.size();
     LInePrim       *lp_data = line_prim_list.data();
@@ -8667,19 +8447,6 @@ void CDisplayList::delete_frame_lines (int fnum)
         if (lptr->grid_num >= 0) {
            continue;
         }
-
-        for (j=0; j<lptr->numsub; j++) {
-            jprim = lptr->sub_prims[j];
-            lp2 = lp_data + jprim;
-            csw_Free (lp2->xypts);
-            lp2->xypts = NULL;
-            lp2->npts = 0;
-            lp2->maxpts = 0;
-            lp2->deleted_flag = 1;
-            add_available_line (jprim);
-        }
-
-        lptr->numsub = 0;
 
     }
 
@@ -8724,8 +8491,6 @@ void CDisplayList::delete_surf_contour_lines (int surf_num)
         lptr->deleted_flag = 1;
         add_available_contour_line (i);
 
-        lptr->numsub = 0;
-
     }
 
     return;
@@ -8738,8 +8503,8 @@ void CDisplayList::delete_surf_contour_lines (int surf_num)
 
 void CDisplayList::delete_frame_cell_edges (int fnum)
 {
-    int            i, j, jprim;
-    LInePrim       *lptr, *lp2;
+    int            i;
+    LInePrim       *lptr;
 
     int            lp_size = (int)line_prim_list.size();
     LInePrim       *lp_data = line_prim_list.data();
@@ -8764,19 +8529,6 @@ void CDisplayList::delete_frame_cell_edges (int fnum)
            continue;
         }
 
-        for (j=0; j<lptr->numsub; j++) {
-            jprim = lptr->sub_prims[j];
-            lp2 = lp_data + jprim;
-            csw_Free (lp2->xypts);
-            lp2->xypts = NULL;
-            lp2->npts = 0;
-            lp2->maxpts = 0;
-            lp2->deleted_flag = 1;
-            add_available_line (jprim);
-        }
-
-        lptr->numsub = 0;
-
     }
 
     return;
@@ -8789,16 +8541,19 @@ void CDisplayList::delete_frame_cell_edges (int fnum)
 
 void CDisplayList::delete_frame_fills (int fnum)
 {
-    int            i, j, jprim;
-    FIllPrim       *fptr, *fp2;
+    int            i;
+    FIllPrim       *fptr;
 
-    if (fill_prim_list == NULL) {
+    int        fp_size = (int)fill_prim_list.size();
+    FIllPrim   *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_fill_prim_list; i++) {
+    for (i=0; i<fp_size; i++) {
 
-        fptr = fill_prim_list + i;
+        fptr = fp_data + i;
 
         if (fptr->deleted_flag == 1) {
             continue;
@@ -8807,19 +8562,6 @@ void CDisplayList::delete_frame_fills (int fnum)
         if (fptr->frame_num != fnum) {
             continue;
         }
-
-        for (j=0; j<fptr->numsub; j++) {
-            jprim = fptr->sub_prims[j];
-            fp2 = fill_prim_list + jprim;
-            csw_Free (fp2->xypts);
-            fp2->xypts = NULL;
-            fp2->npts = 0;
-            fp2->maxpts = 0;
-            fp2->deleted_flag = 1;
-            add_available_fill (jprim);
-        }
-
-        fptr->numsub = 0;
 
     }
 
@@ -8831,16 +8573,19 @@ void CDisplayList::delete_frame_fills (int fnum)
 
 void CDisplayList::delete_frame_texts (int fnum)
 {
-    int            i, j, jprim;
-    TExtPrim       *tptr, *tp2;
+    int            i;
+    TExtPrim       *tptr;
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_text_prim_list; i++) {
+    for (i=0; i<tp_size; i++) {
 
-        tptr = text_prim_list + i;
+        tptr = tp_data + i;
 
         if (tptr->deleted_flag == 1) {
             continue;
@@ -8849,17 +8594,6 @@ void CDisplayList::delete_frame_texts (int fnum)
         if (tptr->frame_num != fnum) {
             continue;
         }
-
-        for (j=0; j<tptr->numsub; j++) {
-            jprim = tptr->sub_prims[j];
-            tp2 = text_prim_list + jprim;
-            csw_Free (tp2->chardata);
-            tp2->chardata = NULL;
-            tp2->deleted_flag = 1;
-            add_available_text (jprim);
-        }
-
-        tptr->numsub = 0;
 
     }
 
@@ -8871,16 +8605,19 @@ void CDisplayList::delete_frame_texts (int fnum)
 
 void CDisplayList::delete_frame_symbs (int fnum)
 {
-    int            i, j, jprim;
-    SYmbPrim       *sptr, *sp2;
+    int            i;
+    SYmbPrim       *sptr;
 
-    if (symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data == NULL  ||  sp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_symb_prim_list; i++) {
+    for (i=0; i<sp_size; i++) {
 
-        sptr = symb_prim_list + i;
+        sptr = sp_data + i;
 
         if (sptr->deleted_flag == 1) {
             continue;
@@ -8889,15 +8626,6 @@ void CDisplayList::delete_frame_symbs (int fnum)
         if (sptr->frame_num != fnum) {
             continue;
         }
-
-        for (j=0; j<sptr->numsub; j++) {
-            jprim = sptr->sub_prims[j];
-            sp2 = symb_prim_list + jprim;
-            sp2->deleted_flag = 1;
-            add_available_symb (jprim);
-        }
-
-        sptr->numsub = 0;
 
     }
 
@@ -8909,16 +8637,19 @@ void CDisplayList::delete_frame_symbs (int fnum)
 
 void CDisplayList::delete_frame_shapes (int fnum)
 {
-    int            i, j, jprim;
-    SHapePrim      *shptr, *shp2;
+    int            i;
+    SHapePrim      *shptr;
 
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_shape_prim_list; i++) {
+    for (i=0; i<hp_size; i++) {
 
-        shptr = shape_prim_list + i;
+        shptr = hp_data + i;
 
         if (shptr->deleted_flag == 1) {
             continue;
@@ -8927,15 +8658,6 @@ void CDisplayList::delete_frame_shapes (int fnum)
         if (shptr->frame_num != fnum) {
             continue;
         }
-
-        for (j=0; j<shptr->numsub; j++) {
-            jprim = shptr->sub_prims[j];
-            shp2 = shape_prim_list + jprim;
-            shp2->deleted_flag = 1;
-            add_available_shape (jprim);
-        }
-
-        shptr->numsub = 0;
 
     }
 
@@ -8947,16 +8669,19 @@ void CDisplayList::delete_frame_shapes (int fnum)
 
 void CDisplayList::delete_frame_images (int fnum)
 {
-    int            i, j, jprim;
-    IMagePrim      *imptr, *imp2;
+    int            i;
+    IMagePrim      *imptr;
 
-    if (image_prim_list == NULL) {
+    int            ip_size = (int)image_prim_list.size();
+    IMagePrim      *ip_data = image_prim_list.data();
+
+    if (ip_data == NULL  ||  ip_size < 1) {
         return;
     }
 
-    for (i=0; i<num_image_prim_list; i++) {
+    for (i=0; i<ip_size; i++) {
 
-        imptr = image_prim_list + i;
+        imptr = ip_data + i;
 
         if (imptr->deleted_flag == 1) {
             continue;
@@ -8965,23 +8690,6 @@ void CDisplayList::delete_frame_images (int fnum)
         if (imptr->frame_num != fnum) {
             continue;
         }
-
-        for (j=0; j<imptr->numsub; j++) {
-            jprim = imptr->sub_prims[j];
-            imp2 = image_prim_list + jprim;
-            imp2->deleted_flag = 1;
-            csw_Free (imp2->red_data);
-            csw_Free (imp2->green_data);
-            csw_Free (imp2->blue_data);
-            csw_Free (imp2->transparency_data);
-            imp2->red_data = NULL;
-            imp2->green_data = NULL;
-            imp2->blue_data = NULL;
-            imp2->transparency_data = NULL;
-            add_available_image (jprim);
-        }
-
-        imptr->numsub = 0;
 
     }
 
@@ -8997,16 +8705,19 @@ void CDisplayList::delete_frame_grid_images (int fnum)
     int            i;
     IMagePrim      *imptr, *imp2;
 
-    if (image_prim_list == NULL) {
+    int            ip_size = (int)image_prim_list.size();
+    IMagePrim      *ip_data = image_prim_list.data();
+
+    if (ip_data == NULL  ||  ip_size < 1) {
         return;
     }
     if (surf_list == NULL) {
         return;
     }
 
-    for (i=0; i<num_image_prim_list; i++) {
+    for (i=0; i<ip_size; i++) {
 
-        imptr = image_prim_list + i;
+        imptr = ip_data + i;
 
         if (imptr->deleted_flag == 1) {
             continue;
@@ -9037,8 +8748,6 @@ void CDisplayList::delete_frame_grid_images (int fnum)
         imp2->blue_data = NULL;
         imp2->transparency_data = NULL;
         add_available_image (i);
-
-        imptr->numsub = 0;
 
     }
 
@@ -9148,7 +8857,6 @@ void CDisplayList::rescale_frame (FRameStruct *frptr)
         }
     }
 
-    reclip_frame_images (fnum);
     reclip_frame_grid_images (fnum);
 
     current_frame_num = save_fnum;
@@ -9223,7 +8931,10 @@ void CDisplayList::reclip_frame_lines (int fnum)
 void CDisplayList::reclip_frame_fills (int fnum)
 {
 
-    if (fill_prim_list == NULL) {
+    int        fp_size = (int)fill_prim_list.size();
+    FIllPrim   *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return;
     }
 
@@ -9238,7 +8949,10 @@ void CDisplayList::reclip_frame_fills (int fnum)
 void CDisplayList::reclip_frame_texts (int fnum)
 {
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return;
     }
 
@@ -9253,7 +8967,10 @@ void CDisplayList::reclip_frame_texts (int fnum)
 void CDisplayList::reclip_frame_symbs (int fnum)
 {
 
-    if (symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data == NULL  ||  sp_size < 1) {
         return;
     }
 
@@ -9268,7 +8985,10 @@ void CDisplayList::reclip_frame_symbs (int fnum)
 void CDisplayList::reclip_frame_shapes (int fnum)
 {
 
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return;
     }
 
@@ -9278,173 +8998,6 @@ void CDisplayList::reclip_frame_shapes (int fnum)
 
 }  /*  end of function reclip_frame_shapes */
 
-
-
-void CDisplayList::reclip_frame_images (int fnum)
-{
-    int            ido, i, j, k, next_image, ilast, nprim;
-    CSW_F          fxmin, fymin, fxmax, fymax, fxspace, fyspace;
-    CSW_F          pxmin, pymin;
-    int            i1, i2, j1t, j2, nc, nr, ntot, k2, offset;
-    unsigned char  *red_ptr,
-                   *green_ptr,
-                   *blue_ptr,
-                   *trans_ptr;
-    IMagePrim      *imptr, *imp2;
-
-    if (image_prim_list == NULL) {
-        return;
-    }
-
-    nprim = num_image_prim_list;
-    for (ido=0; ido<nprim; ido++) {
-
-        imptr = image_prim_list + ido;
-
-        if (imptr->deleted_flag == 1) {
-            continue;
-        }
-
-        if (imptr->frame_num != fnum) {
-            continue;
-        }
-
-        if (imptr->scaleable != 1) {
-            continue;
-        }
-
-        fxmin = imptr->xmin;
-        fymin = imptr->ymin;
-        fxmax = imptr->xmax;
-        fymax = imptr->ymax;
-
-        convert_frame_point (&fxmin, &fymin);
-        convert_frame_point (&fxmax, &fymax);
-
-        fxspace = (fxmax - fxmin) / (CSW_F)(imptr->ncol - 1);
-        fyspace = (fymax - fymin) / (CSW_F)(imptr->nrow - 1);
-        i1 = 0;
-        i2 = imptr->nrow;
-        j1t = 0;
-        j2 = imptr->ncol;
-        nc = imptr->ncol;
-        nr = imptr->nrow;
-
-        if (fxmin >= Px2  ||  fxmax <= Px1  ||
-            fymin >= Py2  ||  fymax <= Py1) {
-            continue;
-        }
-        pxmin = fxmin;
-        pymin = fymin;
-        if (fxmin < Px1) fxmin = Px1;
-        if (fxmax > Px2) fxmax = Px2;
-        if (fymin < Py1) fymin = Py1;
-        if (fymax > Py2) fymax = Py2;
-        i1 = (int)((fxmin - pxmin) / fxspace + .5f);
-        i2 = (int)((fxmax - pxmin) / fxspace + .5f);
-        j1t = (int)((fymin - pymin) / fyspace + .5f);
-        j2 = (int)((fymax - pymin) / fyspace + .5f);
-        if (i1 < 0) i1 = 0;
-        if (i2 > imptr->nrow) i2 = imptr->nrow;
-        if (j1t < 0) j1t = 0;
-        if (j2 > imptr->ncol) j2 = imptr->ncol;
-        nc = j2 - j1t;
-        nr = i2 - i1;
-
-    /*
-     * Allocate space for clipped color image data.
-     */
-        ntot = nc * nr;
-        red_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
-        green_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
-        blue_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
-        trans_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
-        if (red_ptr == NULL  ||  green_ptr == NULL  ||  blue_ptr == NULL  ||
-            trans_ptr == NULL) {
-            csw_Free (red_ptr);
-            csw_Free (green_ptr);
-            csw_Free (blue_ptr);
-            csw_Free (trans_ptr);
-            continue;
-        }
-    /*
-     * convert to clipped color image.
-     */
-        k2 = 0;
-        for (i=i1; i<i2; i++) {
-            offset = i * imptr->ncol;
-            for (j=j1t; j<j2; j++) {
-                k = offset + j;
-                red_ptr[k2] = imptr->red_data[k];
-                green_ptr[k2] = imptr->green_data[k];
-                blue_ptr[k2] = imptr->blue_data[k];
-                trans_ptr[k2] = imptr->transparency_data[k];
-                k2++;
-            }
-        }
-
-   /*
-    * Put the clipped image into the next available
-    * image prim location.
-    */
-        next_image = get_available_image ();
-        if (next_image < 0) {
-            if (num_image_prim_list >= max_image_prim_list) {
-                ilast = max_image_prim_list;
-                max_image_prim_list += _BIG_CHUNK_SIZE_;
-                image_prim_list = (IMagePrim *)csw_Realloc
-                    (image_prim_list, max_image_prim_list * sizeof(IMagePrim));
-                if (image_prim_list != NULL) {
-                    memset (image_prim_list + ilast, 0,
-                            _BIG_CHUNK_SIZE_ * sizeof(IMagePrim));
-                }
-            }
-
-            if (image_prim_list == NULL) {
-                csw_Free (red_ptr);
-                csw_Free (green_ptr);
-                csw_Free (blue_ptr);
-                csw_Free (trans_ptr);
-                return;
-            }
-
-            next_image = num_image_prim_list;
-            num_image_prim_list++;
-        }
-
-    /*
-     * Populate the clipped image prim structure.
-     */
-        imptr = image_prim_list + ido;
-        imp2 = image_prim_list + next_image;
-        memcpy (imp2, imptr, sizeof(IMagePrim));
-        imp2->scaleable = 0;
-        imp2->sub_prims[0] = _DL_IS_SUB_PRIM_FLAG_;
-        imp2->numsub = 0;
-
-        imp2->prim_num = next_image;
-
-        imptr->sub_prims[0] = next_image;
-        imptr->numsub = 1;
-
-        imp2->red_data = red_ptr;
-        imp2->green_data = green_ptr;
-        imp2->blue_data = blue_ptr;
-        imp2->transparency_data = trans_ptr;
-
-        imp2->ncol = nc;
-        imp2->nrow = nr;
-
-        imp2->xmin = fxmin;
-        imp2->ymin = fymin;
-        imp2->xmax = fxmax;
-        imp2->ymax = fymax;
-
-    }
-
-    return;
-
-}  /*  end of function reclip_frame_images */
 
 
 
@@ -10379,9 +9932,12 @@ void CDisplayList::shift_frame_prims (int fnum,
     SHapePrim      *shptr;
     IMagePrim      *imptr;
 
-    if (fill_prim_list != NULL) {
-        for (i=0; i<num_fill_prim_list; i++) {
-            fptr = fill_prim_list + i;
+    int            fp_size = (int)fill_prim_list.size();
+    FIllPrim       *fp_data = fill_prim_list.data();
+
+    if (fp_data != NULL  &&  fp_size > 0) {
+        for (i=0; i<fp_size; i++) {
+            fptr = fp_data + i;
             if (fptr->frame_num != fnum) {
                 continue;
             }
@@ -10420,9 +9976,12 @@ void CDisplayList::shift_frame_prims (int fnum,
         }
     }
 
-    if (text_prim_list != NULL) {
-        for (i=0; i<num_text_prim_list; i++) {
-            tptr = text_prim_list + i;
+    int        tp_size = (int)text_prim_list.size();
+    TExtPrim   *tp_data = text_prim_list.data();
+
+    if (tp_data != NULL  &&  tp_size > 0) {
+        for (i=0; i<tp_size; i++) {
+            tptr = tp_data + i;
             if (tptr->frame_num != fnum) {
                 continue;
             }
@@ -10440,9 +9999,12 @@ void CDisplayList::shift_frame_prims (int fnum,
         }
     }
 
-    if (symb_prim_list != NULL) {
-        for (i=0; i<num_symb_prim_list; i++) {
-            sptr = symb_prim_list + i;
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data != NULL  &&  sp_size > 0) {
+        for (i=0; i<sp_size; i++) {
+            sptr = sp_data + i;
             if (sptr->frame_num != fnum) {
                 continue;
             }
@@ -10460,9 +10022,12 @@ void CDisplayList::shift_frame_prims (int fnum,
         }
     }
 
-    if (shape_prim_list != NULL) {
-        for (i=0; i<num_shape_prim_list; i++) {
-            shptr = shape_prim_list + i;
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data != NULL  &&  hp_size > 0) {
+        for (i=0; i<hp_size; i++) {
+            shptr = hp_data + i;
             if (shptr->frame_num != fnum) {
                 continue;
             }
@@ -10480,9 +10045,12 @@ void CDisplayList::shift_frame_prims (int fnum,
         }
     }
 
-    if (image_prim_list != NULL) {
-        for (i=0; i<num_image_prim_list; i++) {
-            imptr = image_prim_list + i;
+    int           ip_size = (int)image_prim_list.size();
+    IMagePrim     *ip_data = image_prim_list.data();
+
+    if (ip_data != NULL  &&  ip_size > 0) {
+        for (i=0; i<ip_size; i++) {
+            imptr = ip_data + i;
             if (imptr->frame_num != fnum) {
                 continue;
             }
@@ -10567,12 +10135,14 @@ void CDisplayList::draw_frame_border_prims (int fnum) {
         }
     }
 
+    int  fp_size = (int)fill_prim_list.size();
+    FIllPrim  *fp_data = fill_prim_list.data();
 
-    if (fill_prim_list != NULL) {
+    if (fp_data != NULL  &&  fp_size > 0) {
 
-        for (i=0; i<num_fill_prim_list; i++) {
+        for (i=0; i<fp_size; i++) {
 
-            fptr = fill_prim_list + i;
+            fptr = fp_data + i;
 
             if (fptr->border_num != fnum) {
                 continue;
@@ -10610,12 +10180,14 @@ void CDisplayList::draw_frame_border_prims (int fnum) {
         }
     }
 
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
 
-    if (text_prim_list != NULL) {
+    if (tp_data != NULL  &&  tp_size > 0) {
 
-        for (i=0; i<num_text_prim_list; i++) {
+        for (i=0; i<tp_size; i++) {
 
-            tptr = text_prim_list + i;
+            tptr = tp_data + i;
 
             if (tptr->border_num != fnum) {
                 continue;
@@ -10776,13 +10348,16 @@ void CDisplayList::delete_frame_border_fills (int fnum)
     int            i;
     FIllPrim       *fptr;
 
-    if (fill_prim_list == NULL) {
+    int        fp_size = (int)fill_prim_list.size();
+    FIllPrim   *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_fill_prim_list; i++) {
+    for (i=0; i<fp_size; i++) {
 
-        fptr = fill_prim_list + i;
+        fptr = fp_data + i;
 
         if (fptr->deleted_flag == 1) {
             continue;
@@ -10812,13 +10387,16 @@ void CDisplayList::delete_frame_border_texts (int fnum)
     int            i;
     TExtPrim       *tptr;
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_text_prim_list; i++) {
+    for (i=0; i<tp_size; i++) {
 
-        tptr = text_prim_list + i;
+        tptr = tp_data + i;
 
         if (tptr->deleted_flag == 1) {
             continue;
@@ -11482,9 +11060,12 @@ void CDisplayList::find_frame_limits (int frame_num,
         }
     }
 
-    if (fill_prim_list != NULL) {
-        for (i=0; i<num_fill_prim_list; i++) {
-            fptr = fill_prim_list + i;
+    int        fp_size = (int)fill_prim_list.size();
+    FIllPrim   *fp_data = fill_prim_list.data();
+
+    if (fp_data != NULL  &&  fp_size > 0) {
+        for (i=0; i<fp_size; i++) {
+            fptr = fp_data + i;
             if (fptr->deleted_flag == 1  ||
                 fptr->scaleable == 0  ||
                 fptr->frame_num != frame_num) {
@@ -11498,9 +11079,12 @@ void CDisplayList::find_frame_limits (int frame_num,
         }
     }
 
-    if (text_prim_list != NULL) {
-        for (i=0; i<num_text_prim_list; i++) {
-            tptr = text_prim_list + i;
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data != NULL  &&  tp_size > 0) {
+        for (i=0; i<tp_size; i++) {
+            tptr = tp_data + i;
             if (tptr->deleted_flag == 1  ||
                 tptr->scaleable == 0  ||
                 tptr->frame_num != frame_num) {
@@ -11514,10 +11098,12 @@ void CDisplayList::find_frame_limits (int frame_num,
         }
     }
 
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
 
-    if (symb_prim_list != NULL) {
-        for (i=0; i<num_symb_prim_list; i++) {
-            sptr = symb_prim_list + i;
+    if (sp_data != NULL  &&  sp_size > 0) {
+        for (i=0; i<sp_size; i++) {
+            sptr = sp_data + i;
             if (sptr->deleted_flag == 1  ||
                 sptr->scaleable == 0  ||
                 sptr->frame_num != frame_num) {
@@ -11531,9 +11117,12 @@ void CDisplayList::find_frame_limits (int frame_num,
         }
     }
 
-    if (shape_prim_list != NULL) {
-        for (i=0; i<num_shape_prim_list; i++) {
-            shptr = shape_prim_list + i;
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data != NULL  &&  hp_size > 0) {
+        for (i=0; i<hp_size; i++) {
+            shptr = hp_data + i;
             if (shptr->deleted_flag == 1  ||
                 shptr->scaleable == 0  ||
                 shptr->frame_num != frame_num) {
@@ -11547,9 +11136,12 @@ void CDisplayList::find_frame_limits (int frame_num,
         }
     }
 
-    if (image_prim_list != NULL) {
-        for (i=0; i<num_image_prim_list; i++) {
-            imptr = image_prim_list + i;
+    int           ip_size = (int)image_prim_list.size();
+    IMagePrim     *ip_data = image_prim_list.data();
+
+    if (ip_data != NULL  &&  ip_size > 0) {
+        for (i=0; i<ip_size; i++) {
+            imptr = ip_data + i;
             if (imptr->deleted_flag == 1  ||
                 imptr->scaleable == 0  ||
                 imptr->frame_num != frame_num) {
@@ -12167,8 +11759,8 @@ void CDisplayList::delete_grid_contours (int gridnum)
 
 void CDisplayList::delete_grid_lines (int gridnum)
 {
-    int            i, j, jprim;
-    LInePrim       *lptr, *lp2;
+    int            i;
+    LInePrim       *lptr;
 
     int            lp_size = (int)line_prim_list.size();
     LInePrim       *lp_data = line_prim_list.data();
@@ -12189,19 +11781,6 @@ void CDisplayList::delete_grid_lines (int gridnum)
             continue;
         }
 
-        for (j=0; j<lptr->numsub; j++) {
-            jprim = lptr->sub_prims[j];
-            lp2 = lp_data + jprim;
-            csw_Free (lp2->xypts);
-            lp2->xypts = NULL;
-            lp2->npts = 0;
-            lp2->maxpts = 0;
-            lp2->deleted_flag = 1;
-            add_available_line (jprim);
-        }
-
-        lptr->numsub = 0;
-
     }
 
     return;
@@ -12212,16 +11791,19 @@ void CDisplayList::delete_grid_lines (int gridnum)
 
 void CDisplayList::delete_grid_texts (int gridnum)
 {
-    int            i, j, jprim;
-    TExtPrim       *tptr, *tp2;
+    int            i;
+    TExtPrim       *tptr;
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_text_prim_list; i++) {
+    for (i=0; i<tp_size; i++) {
 
-        tptr = text_prim_list + i;
+        tptr = tp_data + i;
 
         if (tptr->deleted_flag == 1) {
             continue;
@@ -12230,17 +11812,6 @@ void CDisplayList::delete_grid_texts (int gridnum)
         if (tptr->grid_num != gridnum) {
             continue;
         }
-
-        for (j=0; j<tptr->numsub; j++) {
-            jprim = tptr->sub_prims[j];
-            tp2 = text_prim_list + jprim;
-            csw_Free (tp2->chardata);
-            tp2->chardata = NULL;
-            tp2->deleted_flag = 1;
-            add_available_text (jprim);
-        }
-
-        tptr->numsub = 0;
 
     }
 
@@ -12252,16 +11823,19 @@ void CDisplayList::delete_grid_texts (int gridnum)
 
 void CDisplayList::delete_grid_symbs (int gridnum)
 {
-    int            i, j, jprim;
-    SYmbPrim       *sptr, *sp2;
+    int            i;
+    SYmbPrim       *sptr;
 
-    if (symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data == NULL  ||  sp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_symb_prim_list; i++) {
+    for (i=0; i<sp_size; i++) {
 
-        sptr = symb_prim_list + i;
+        sptr = sp_data + i;
 
         if (sptr->deleted_flag == 1) {
             continue;
@@ -12270,15 +11844,6 @@ void CDisplayList::delete_grid_symbs (int gridnum)
         if (sptr->grid_num != gridnum) {
             continue;
         }
-
-        for (j=0; j<sptr->numsub; j++) {
-            jprim = sptr->sub_prims[j];
-            sp2 = symb_prim_list + jprim;
-            sp2->deleted_flag = 1;
-            add_available_symb (jprim);
-        }
-
-        sptr->numsub = 0;
 
     }
 
@@ -12290,16 +11855,19 @@ void CDisplayList::delete_grid_symbs (int gridnum)
 
 void CDisplayList::delete_grid_images (int gridnum)
 {
-    int            i, j, jprim;
-    IMagePrim      *imptr, *imp2;
+    int            i;
+    IMagePrim      *imptr;
 
-    if (image_prim_list == NULL) {
+    int            ip_size = (int)image_prim_list.size();
+    IMagePrim      *ip_data = image_prim_list.data();
+
+    if (ip_data == NULL  ||  ip_size < 1) {
         return;
     }
 
-    for (i=0; i<num_image_prim_list; i++) {
+    for (i=0; i<ip_size; i++) {
 
-        imptr = image_prim_list + i;
+        imptr = ip_data + i;
 
         if (imptr->deleted_flag == 1) {
             continue;
@@ -12307,21 +11875,6 @@ void CDisplayList::delete_grid_images (int gridnum)
 
         if (imptr->grid_num != gridnum) {
             continue;
-        }
-
-        for (j=0; j<imptr->numsub; j++) {
-            jprim = imptr->sub_prims[j];
-            imp2 = image_prim_list + jprim;
-            imp2->deleted_flag = 1;
-            csw_Free (imp2->red_data);
-            csw_Free (imp2->green_data);
-            csw_Free (imp2->blue_data);
-            csw_Free (imp2->transparency_data);
-            imp2->red_data = NULL;
-            imp2->green_data = NULL;
-            imp2->blue_data = NULL;
-            imp2->transparency_data = NULL;
-            add_available_image (jprim);
         }
 
         imptr->deleted_flag = 1;
@@ -12874,6 +12427,15 @@ int CDisplayList::AddGridImage (int fnum,
     unsigned char  *red_ptr, *green_ptr, *blue_ptr, *trans_ptr;
     int            red, green, blue, trans;
 
+    auto fscope = [&]()
+    {
+        csw_Free (red_ptr);
+        csw_Free (green_ptr);
+        csw_Free (blue_ptr);
+        csw_Free (trans_ptr);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
+
     if (xmax <= xmin || ymax <= ymin ||
         data == NULL || ncol < 2  ||  nrow < 2) {
         return 0;
@@ -12889,10 +12451,6 @@ int CDisplayList::AddGridImage (int fnum,
     trans_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
     if (red_ptr == NULL  ||  green_ptr == NULL  ||  blue_ptr == NULL  ||
         trans_ptr == NULL) {
-        csw_Free (red_ptr);
-        csw_Free (green_ptr);
-        csw_Free (blue_ptr);
-        csw_Free (trans_ptr);
         return -1;
     }
 
@@ -12974,123 +12532,67 @@ int CDisplayList::AddGridColorImage (int fnum,
                                  double xmax,
                                  double ymax)
 {
-    IMagePrim      *imptr;
-    int            ilast;
+    IMagePrim      *imptr = NULL;
     int            i, j, k, k2, offset;
-    int            i1, i2, j1t, j2, nc, nr;
-    FRameStruct    *frptr;
-    CSW_F          fxmin, fymin, fxmax, fymax, pxmin, pymin;
-    CSW_F          fxspace, fyspace;
-    unsigned char  *red_ptr, *green_ptr, *blue_ptr, *trans_ptr;
-    int            next_image, fsave;
+    unsigned char  *red_ptr = NULL, *green_ptr = NULL,
+                   *blue_ptr = NULL, *trans_ptr = NULL;
+    int            next_image;
+
+    bool           bsuccess = false;
+
+    auto fscope = [&]()
+    {
+        if (bsuccess == false) {
+            csw_Free (red_ptr);
+            csw_Free (green_ptr);
+            csw_Free (blue_ptr);
+            csw_Free (trans_ptr);
+        }
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
+
 
     if (xmax <= xmin || ymax <= ymin ||
         red == NULL   ||  green == NULL  ||  blue == NULL  ||  trans == NULL  ||
         ncol < 2  ||  nrow < 2) {
-        return 0;
+        return -1;
     }
 
     next_image = get_available_image ();
     if (next_image < 0) {
-    /*
-     * Grow the image prim list if needed.
-     */
-        if (image_prim_list == NULL) {
-            max_image_prim_list = 0;
-            num_image_prim_list = 0;
+        try {
+            IMagePrim  ipr;
+            ZeroInit (&ipr, sizeof(ipr));
+            image_prim_list.push_back (ipr);
+            next_image = (int)image_prim_list.size() - 1;
         }
-        if (num_image_prim_list >= max_image_prim_list-2) {
-            ilast = max_image_prim_list;
-            max_image_prim_list += _SMALL_CHUNK_SIZE_;
-            image_prim_list = (IMagePrim *)csw_Realloc
-                (image_prim_list, max_image_prim_list * sizeof(IMagePrim));
-            if (image_prim_list != NULL) {
-                memset (image_prim_list + ilast, 0,
-                        _SMALL_CHUNK_SIZE_ * sizeof(IMagePrim));
-            }
-        }
-
-    /*
-     * Return an error if the image prim list could not be grown.
-     */
-        if (image_prim_list == NULL) {
+        catch (...) {
+            printf ("Exception in image_prim_list pushback\n");
             return -1;
         }
-
-        next_image = num_image_prim_list;
-        num_image_prim_list++;
-
     }
 
-    if (image_prim_list == NULL) {
+/*
+ * Allocate space for color image data in the display list.
+ */
+    int  ntot = ncol * nrow;
+
+    red_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
+    green_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
+    blue_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
+    trans_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
+    if (red_ptr == NULL  ||  green_ptr == NULL  ||
+        blue_ptr == NULL  ||  trans_ptr == NULL) {
         return -1;
     }
-
-    fsave = current_frame_num;
-    current_frame_num = fnum;
-    update_frame_limits ();
-
-/*
- * convert and clip to frame if needed
- */
-    fxmin = (CSW_F)xmin;
-    fymin = (CSW_F)ymin;
-    fxmax = (CSW_F)xmax;
-    fymax = (CSW_F)ymax;
-    fxspace = (fxmax - fxmin) / (CSW_F)(ncol - 1);
-    fyspace = (fymax - fymin) / (CSW_F)(nrow - 1);
-    i1 = 0;
-    i2 = nrow;
-    j1t = 0;
-    j2 = ncol;
-    nc = ncol;
-    nr = nrow;
-
-    if (current_frame_num >= 0  &&  current_frame_num < num_frame_list) {
-        convert_frame_point (&fxmin, &fymin);
-        convert_frame_point (&fxmax, &fymax);
-        fxspace = (fxmax - fxmin) / (CSW_F)(ncol - 1);
-        fyspace = (fymax - fymin) / (CSW_F)(nrow - 1);
-        if (current_frame_clip_flag  &&  frame_list != NULL) {
-            frptr = frame_list + current_frame_num;
-            if (fxmin >= frptr->px2  ||  fxmax <= frptr->px1  ||
-                fymin >= frptr->py2  ||  fymax <= frptr->py1) {
-                return -1;
-            }
-            pxmin = fxmin;
-            pymin = fymin;
-            if (fxmin < frptr->px1) fxmin = frptr->px1;
-            if (fxmax > frptr->px2) fxmax = frptr->px2;
-            if (fymin < frptr->py1) fymin = frptr->py1;
-            if (fymax > frptr->py2) fymax = frptr->py2;
-            j1t = (int)((fxmin - pxmin) / fxspace);
-            j2 = (int)((fxmax - pxmin) / fxspace + 1.01f);
-            i1 = (int)((fymin - pymin) / fyspace);
-            i2 = (int)((fymax - pymin) / fyspace + 1.01f);
-            if (i1 < 0) i1 = 0;
-            if (i2 > nrow) i2 = nrow;
-            if (j1t < 0) j1t = 0;
-            if (j2 > ncol) j2 = ncol;
-            nc = j2 - j1t;
-            nr = i2 - i1;
-        }
-    }
-
-/*
- * Allocate space for color image data.
- */
-    red_ptr = red;
-    green_ptr = green;
-    blue_ptr = blue;
-    trans_ptr = trans;
 
 /*
  * convert to clipped color image.
  */
     k2 = 0;
-    for (i=i1; i<i2; i++) {
+    for (i=0; i<nrow; i++) {
         offset = i * ncol;
-        for (j=j1t; j<j2; j++) {
+        for (j=0; j<ncol; j++) {
             k = offset + j;
             red_ptr[k2] = red[k];
             green_ptr[k2] = green[k];
@@ -13103,7 +12605,9 @@ int CDisplayList::AddGridColorImage (int fnum,
 /*
  * Populate the image prim structure.
  */
-    imptr = image_prim_list + next_image;
+    IMagePrim      *ip_data = image_prim_list.data();
+
+    imptr = ip_data + next_image;
 
     strncpy (imptr->name, current_image_name, 99);
     imptr->name[99] = '\0';
@@ -13114,13 +12618,13 @@ int CDisplayList::AddGridColorImage (int fnum,
     imptr->blue_data = blue_ptr;
     imptr->transparency_data = trans_ptr;
 
-    imptr->ncol = nc;
-    imptr->nrow = nr;
+    imptr->ncol = ncol;
+    imptr->nrow = nrow;
 
-    imptr->xmin = fxmin;
-    imptr->ymin = fymin;
-    imptr->xmax = fxmax;
-    imptr->ymax = fymax;
+    imptr->xmin = xmin;
+    imptr->ymin = ymin;
+    imptr->xmax = xmax;
+    imptr->ymax = ymax;
 
     imptr->frame_num = current_frame_num;
     imptr->selectable_object_num = current_selectable_object_num;
@@ -13147,8 +12651,9 @@ int CDisplayList::AddGridColorImage (int fnum,
     imptr->has_lines = 0;
     if (image_id >= 0) imptr->has_lines = 1;
 
-    current_frame_num = fsave;
     update_frame_limits ();
+
+    bsuccess = true;
 
     return 1;
 
@@ -13762,13 +13267,16 @@ void CDisplayList::reindex_fills (int fnum)
     int            i;
     FIllPrim       *fptr;
 
-    if (fill_prim_list == NULL) {
+    int            fp_size = (int)fill_prim_list.size();
+    FIllPrim       *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_fill_prim_list; i++) {
+    for (i=0; i<fp_size; i++) {
 
-        fptr = fill_prim_list + i;
+        fptr = fp_data + i;
 
         if (fptr->deleted_flag == 1) {
             continue;
@@ -13794,13 +13302,16 @@ void CDisplayList::reindex_texts (int fnum)
     int            i;
     TExtPrim       *tptr;
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_text_prim_list; i++) {
+    for (i=0; i<tp_size; i++) {
 
-        tptr = text_prim_list + i;
+        tptr = tp_data + i;
 
         if (tptr->deleted_flag == 1) {
             continue;
@@ -13827,13 +13338,16 @@ void CDisplayList::reindex_symbs (int fnum)
     int            i;
     SYmbPrim       *sptr;
 
-    if (symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data == NULL  ||  sp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_symb_prim_list; i++) {
+    for (i=0; i<sp_size; i++) {
 
-        sptr = symb_prim_list + i;
+        sptr = sp_data + i;
 
         if (sptr->deleted_flag == 1) {
             continue;
@@ -13858,13 +13372,16 @@ void CDisplayList::reindex_shapes (int fnum)
     int            i;
     SHapePrim      *shptr;
 
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_shape_prim_list; i++) {
+    for (i=0; i<hp_size; i++) {
 
-        shptr = shape_prim_list + i;
+        shptr = hp_data + i;
 
         if (shptr->deleted_flag == 1) {
             continue;
@@ -14282,7 +13799,10 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
     double               gx1, gy1, gxs, gys, tmp, tiny;
     FIllPrim             *fptr;
 
-    if (fill_prim_list == NULL) {
+    int            fp_size = (int)fill_prim_list.size();
+    FIllPrim       *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return 0;
     }
 
@@ -14391,10 +13911,10 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_fill_prim_list) {
+                if (prim_num < 0  ||  prim_num >= fp_size) {
                     continue;
                 }
-                fptr = fill_prim_list + prim_num;
+                fptr = fp_data + prim_num;
                 fptr->draw_flag = 1;
             }
         }
@@ -14416,10 +13936,10 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_fill_prim_list) {
+                if (prim_num < 0  ||  prim_num >= fp_size) {
                     continue;
                 }
-                fptr = fill_prim_list + prim_num;
+                fptr = fp_data + prim_num;
                 if (fptr->draw_flag == 0  ||
                     fptr->deleted_flag == 1  ||
                     fptr->visible_flag == 0) {
@@ -14436,7 +13956,7 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
 */
     if (fill_patch_list != NULL) {
         for (j=0; j<num_fill_patch_list; j++) {
-            fill_prim_list[fill_patch_list[j]].draw_flag = 2;
+            fp_data[fill_patch_list[j]].draw_flag = 2;
         }
     }
 
@@ -14447,10 +13967,10 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
         if (nlist > 0) {
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_fill_prim_list) {
+                if (prim_num < 0  ||  prim_num >= fp_size) {
                     continue;
                 }
-                fptr = fill_prim_list + prim_num;
+                fptr = fp_data + prim_num;
                 if (fptr->draw_flag == 2  ||
                     fptr->deleted_flag == 1  ||
                     fptr->visible_flag == 0) {
@@ -14463,7 +13983,7 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
 
     if (fill_patch_list != NULL) {
         for (j=0; j<num_fill_patch_list; j++) {
-            fill_prim_list[fill_patch_list[j]].draw_flag = 0;
+            fp_data[fill_patch_list[j]].draw_flag = 0;
         }
     }
 
@@ -14492,7 +14012,10 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
     double               gx1, gy1, gxs, gys, tmp, tiny;
     TExtPrim             *tptr;
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return 0;
     }
 
@@ -14601,10 +14124,10 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_text_prim_list) {
+                if (prim_num < 0  ||  prim_num >= tp_size) {
                     continue;
                 }
-                tptr = text_prim_list + prim_num;
+                tptr = tp_data + prim_num;
                 tptr->draw_flag = 1;
             }
         }
@@ -14626,10 +14149,10 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_text_prim_list) {
+                if (prim_num < 0  ||  prim_num >= tp_size) {
                     continue;
                 }
-                tptr = text_prim_list + prim_num;
+                tptr = tp_data + prim_num;
                 if (tptr->draw_flag == 0  ||
                     tptr->deleted_flag == 1  ||
                     tptr->visible_flag == 0) {
@@ -14647,7 +14170,7 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
 */
     if (text_patch_list != NULL) {
         for (j=0; j<num_text_patch_list; j++) {
-            text_prim_list[text_patch_list[j]].draw_flag = 2;
+            tp_data[text_patch_list[j]].draw_flag = 2;
         }
     }
 
@@ -14658,10 +14181,10 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
         if (nlist > 0) {
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_text_prim_list) {
+                if (prim_num < 0  ||  prim_num >= tp_size) {
                     continue;
                 }
-                tptr = text_prim_list + prim_num;
+                tptr = tp_data + prim_num;
                 if (tptr->draw_flag == 2  ||
                     tptr->deleted_flag == 1  ||
                     tptr->visible_flag == 0) {
@@ -14674,7 +14197,7 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
 
     if (text_patch_list != NULL) {
         for (j=0; j<num_text_patch_list; j++) {
-            text_prim_list[text_patch_list[j]].draw_flag = 0;
+            tp_data[text_patch_list[j]].draw_flag = 0;
         }
     }
 
@@ -14705,7 +14228,10 @@ int CDisplayList::PopulateSymbPatches (double x1, double y1p,
     double               gx1, gy1, gxs, gys, tmp, tiny;
     SYmbPrim             *sptr;
 
-    if (symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data == NULL  ||  sp_size < 1) {
         return 0;
     }
 
@@ -14814,10 +14340,10 @@ int CDisplayList::PopulateSymbPatches (double x1, double y1p,
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_symb_prim_list) {
+                if (prim_num < 0  ||  prim_num >= sp_size) {
                     continue;
                 }
-                sptr = symb_prim_list + prim_num;
+                sptr = sp_data + prim_num;
                 sptr->draw_flag = 1;
             }
         }
@@ -14839,10 +14365,10 @@ int CDisplayList::PopulateSymbPatches (double x1, double y1p,
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_symb_prim_list) {
+                if (prim_num < 0  ||  prim_num >= sp_size) {
                     continue;
                 }
-                sptr = symb_prim_list + prim_num;
+                sptr = sp_data + prim_num;
                 if (sptr->draw_flag == 0  ||
                     sptr->deleted_flag == 1  ||
                     sptr->visible_flag == 0) {
@@ -14864,18 +14390,18 @@ int CDisplayList::PopulateSymbPatches (double x1, double y1p,
         if (nlist > 0) {
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_symb_prim_list) {
+                if (prim_num < 0  ||  prim_num >= sp_size) {
                     continue;
                 }
-                sptr = symb_prim_list + prim_num;
+                sptr = sp_data + prim_num;
                 sptr->draw_flag = 1;
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_symb_prim_list) {
+                if (prim_num < 0  ||  prim_num >= sp_size) {
                     continue;
                 }
-                sptr = symb_prim_list + prim_num;
+                sptr = sp_data + prim_num;
                 if (sptr->draw_flag == 0  ||
                     sptr->deleted_flag == 1  ||
                     sptr->visible_flag == 0) {
@@ -14913,7 +14439,10 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
     double               gx1, gy1, gxs, gys, tmp, tiny;
     SHapePrim            *shptr;
 
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return 0;
     }
 
@@ -15022,10 +14551,10 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_shape_prim_list) {
+                if (prim_num < 0  ||  prim_num >= hp_size) {
                     continue;
                 }
-                shptr = shape_prim_list + prim_num;
+                shptr = hp_data + prim_num;
                 shptr->draw_flag = 1;
             }
         }
@@ -15047,10 +14576,10 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_shape_prim_list) {
+                if (prim_num < 0  ||  prim_num >= hp_size) {
                     continue;
                 }
-                shptr = shape_prim_list + prim_num;
+                shptr = hp_data + prim_num;
                 if (shptr->draw_flag == 0  ||
                     shptr->deleted_flag == 1  ||
                     shptr->visible_flag == 0) {
@@ -15067,7 +14596,7 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
 */
     if (shape_patch_list != NULL) {
         for (j=0; j<num_shape_patch_list; j++) {
-            shape_prim_list[shape_patch_list[j]].draw_flag = 2;
+            hp_data[shape_patch_list[j]].draw_flag = 2;
         }
     }
 
@@ -15078,10 +14607,10 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
         if (nlist > 0) {
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_shape_prim_list) {
+                if (prim_num < 0  ||  prim_num >= hp_size) {
                     continue;
                 }
-                shptr = shape_prim_list + prim_num;
+                shptr = hp_data + prim_num;
                 if (shptr->draw_flag == 2  ||
                     shptr->deleted_flag == 1  ||
                     shptr->visible_flag == 0) {
@@ -15094,7 +14623,7 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
 
     if (shape_patch_list != NULL) {
         for (j=0; j<num_shape_patch_list; j++) {
-            shape_prim_list[shape_patch_list[j]].draw_flag = 0;
+            hp_data[shape_patch_list[j]].draw_flag = 0;
         }
     }
 
@@ -15342,14 +14871,17 @@ int CDisplayList::CalcShapeBounds (int shape_prim_num,
     *xmax = -1.e30;
     *ymax = -1.e30;
 
-    if (shape_prim_num < 0  ||  shape_prim_num >= num_shape_prim_list) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (shape_prim_num < 0  ||  shape_prim_num >= hp_size) {
         return -1;
     }
-    if (shape_prim_list == NULL) {
+    if (hp_data == NULL  ||  hp_size < 1) {
         return -1;
     }
 
-    shptr = shape_prim_list + shape_prim_num;
+    shptr = hp_data + shape_prim_num;
 
     xc = shptr->fval[0];
     yc = shptr->fval[1];
@@ -15424,10 +14956,14 @@ int CDisplayList::CalcTextOutline (int text_prim_num,
     *xmax = -1.e30;
     *ymax = -1.e30;
 
-    if (text_prim_num < 0  ||  text_prim_num >= num_text_prim_list) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return -1;
     }
-    if (text_prim_list == NULL) {
+
+    if (text_prim_num < 0  ||  text_prim_num >= tp_size) {
         return -1;
     }
 
@@ -15435,7 +14971,7 @@ int CDisplayList::CalcTextOutline (int text_prim_num,
         return -1;
     }
 
-    tptr = text_prim_list + text_prim_num;
+    tptr = tp_data + text_prim_num;
 
 /*
  * Convert the text size in inches to a text size in
@@ -15633,24 +15169,36 @@ int CDisplayList::GetSelectableIndex (int frame_num,
     int             lp_size = (int)line_prim_list.size();
     LInePrim        *lp_data = line_prim_list.data();
 
+    int             fp_size = (int)fill_prim_list.size();
+    FIllPrim        *fp_data = fill_prim_list.data();
+
+    int             sp_size = (int)symb_prim_list.size();
+    SYmbPrim        *sp_data = symb_prim_list.data();
+
+    int             tp_size = (int)text_prim_list.size();
+    TExtPrim        *tp_data = text_prim_list.data();
+
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
     if (type == 1  &&  lp_data != NULL  &&  lp_size > index) {
         lptr = lp_data + index;
         isel = lptr->selectable_object_num;
     }
-    else if (type == 2  &&  fill_prim_list != NULL) {
-        fptr = fill_prim_list + index;
+    else if (type == 2  &&  fp_data != NULL  &&  fp_size > index) {
+        fptr = fp_data + index;
         isel = fptr->selectable_object_num;
     }
-    else if (type == 3  &&  text_prim_list != NULL) {
-        tptr = text_prim_list + index;
+    else if (type == 3  &&  tp_data != NULL  &&  tp_size > 0) {
+        tptr = tp_data + index;
         isel = tptr->selectable_object_num;
     }
-    else if (type == 4  &&  symb_prim_list != NULL) {
-        sptr = symb_prim_list + index;
+    else if (type == 4  &&  sp_data != NULL  &&  sp_size > 0) {
+        sptr = sp_data + index;
         isel = sptr->selectable_object_num;
     }
-    else if (type == 5  &&  shape_prim_list != NULL) {
-        shptr = shape_prim_list + index;
+    else if (type == 5  &&  hp_data != NULL  &&  hp_size > 0) {
+        shptr = hp_data + index;
         isel = shptr->selectable_object_num;
     }
     else if (type == 6  &&  contour_list != NULL) {
@@ -16051,13 +15599,16 @@ void CDisplayList::closest_frame_fill_border (int fnum, CSW_F xin, CSW_F yin,
     FIllPrim       *fptr;
     CSW_F          **xpc, **ypc;
 
-    if (fill_prim_list == NULL) {
+    int            fp_size = (int)fill_prim_list.size();
+    FIllPrim       *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return;
     }
 
     istat = PopulateFillPatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    nprim = num_fill_prim_list;
+    nprim = fp_size;
     if (istat == 1) {
         nprim = num_fill_patch_list;
     }
@@ -16073,7 +15624,7 @@ void CDisplayList::closest_frame_fill_border (int fnum, CSW_F xin, CSW_F yin,
             i = fill_patch_list[ido];
         }
 
-        fptr = fill_prim_list + i;
+        fptr = fp_data + i;
 
         if (fptr->selectable_object_num < 0) {
             continue;
@@ -16165,7 +15716,10 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
     CSW_F          cx[5], cy[5], dist, dmin;
     CSW_F          bounds[10];
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return;
     }
 
@@ -16178,11 +15732,11 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
 
     bool bpatch = false;
     int patch_text_min = index_ncol * index_nrow / 2;
-    nprim = num_text_prim_list;
+    nprim = tp_size;
 
     int  nst = num_selectable_text;
-    if (nst > num_text_prim_list) {
-        nst = num_text_prim_list;
+    if (nst > tp_size) {
+        nst = tp_size;
     }
 
     if (nst > patch_text_min) {
@@ -16217,7 +15771,7 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
             i = text_patch_list[ido];
         }
 
-        tptr = text_prim_list + i;
+        tptr = tp_data + i;
 
         if (tptr->selectable_object_num < 0) {
             continue;
@@ -16302,13 +15856,16 @@ void CDisplayList::closest_frame_symb (int fnum, CSW_F xin, CSW_F yin,
     CSW_F          dist, dmin, xt, yt;;
     SYmbPrim       *sptr;
 
-    if (symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data == NULL  ||  sp_size < 1) {
         return;
     }
 
     istat = PopulateSymbPatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    nprim = num_symb_prim_list;
+    nprim = sp_size;
     if (istat == 1) {
         nprim = num_symb_patch_list;
     }
@@ -16324,7 +15881,7 @@ void CDisplayList::closest_frame_symb (int fnum, CSW_F xin, CSW_F yin,
             i = symb_patch_list[ido];
         }
 
-        sptr = symb_prim_list + i;
+        sptr = sp_data + i;
 
         if (sptr->selectable_object_num < 0) {
             continue;
@@ -16375,13 +15932,16 @@ void CDisplayList::closest_frame_shape_border (int fnum, CSW_F xin, CSW_F yin,
     CSW_F          cx[5], cy[5], dist, dmin;
     SHapePrim      *shptr;
 
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return;
     }
 
     istat = PopulateShapePatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    nprim = num_shape_prim_list;
+    nprim = hp_size;
     if (istat == 1) {
         nprim = num_shape_patch_list;
     }
@@ -16397,7 +15957,7 @@ void CDisplayList::closest_frame_shape_border (int fnum, CSW_F xin, CSW_F yin,
             i = shape_patch_list[ido];
         }
 
-        shptr = shape_prim_list + i;
+        shptr = hp_data + i;
 
         if (shptr->selectable_object_num < 0) {
             continue;
@@ -16468,13 +16028,16 @@ void CDisplayList::closest_frame_fill (int fnum, CSW_F xin, CSW_F yin,
     FIllPrim       *fptr;
     CSW_F          **xpc, **ypc;
 
-    if (fill_prim_list == NULL) {
+    int            fp_size = (int)fill_prim_list.size();
+    FIllPrim       *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return;
     }
 
     istat = PopulateFillPatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    nprim = num_fill_prim_list;
+    nprim = fp_size;
     if (istat == 1) {
         nprim = num_fill_patch_list;
     }
@@ -16489,7 +16052,7 @@ void CDisplayList::closest_frame_fill (int fnum, CSW_F xin, CSW_F yin,
             i = fill_patch_list[ido];
         }
 
-        fptr = fill_prim_list + i;
+        fptr = fp_data + i;
 
         if (fptr->selectable_object_num < 0) {
             continue;
@@ -16585,13 +16148,16 @@ void CDisplayList::closest_frame_shape (int fnum, CSW_F xin, CSW_F yin,
     CSW_F          cx[5], cy[5];
     SHapePrim      *shptr;
 
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return;
     }
 
     istat = PopulateShapePatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    nprim = num_shape_prim_list;
+    nprim = hp_size;
     if (istat == 1) {
         nprim = num_shape_patch_list;
     }
@@ -16606,7 +16172,7 @@ void CDisplayList::closest_frame_shape (int fnum, CSW_F xin, CSW_F yin,
             i = shape_patch_list[ido];
         }
 
-        shptr = shape_prim_list + i;
+        shptr = hp_data + i;
 
         if (shptr->selectable_object_num < 0) {
             continue;
@@ -16801,7 +16367,10 @@ void CDisplayList::return_selected_fills (DLSelectable *dls)
                     *lname,
                     *iname;
 
-    if (fill_prim_list == NULL) {
+    int             fp_size = fill_prim_list.size();
+    FIllPrim        *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return;
     }
 
@@ -16819,7 +16388,7 @@ void CDisplayList::return_selected_fills (DLSelectable *dls)
 
         i = fills[ido];
 
-        fptr = fill_prim_list + i;
+        fptr = fp_data + i;
 
         if (fptr->deleted_flag == 1) {
             continue;
@@ -16862,7 +16431,10 @@ void CDisplayList::return_selected_texts (DLSelectable *dls)
                     *lname,
                     *iname;
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return;
     }
 
@@ -16880,7 +16452,7 @@ void CDisplayList::return_selected_texts (DLSelectable *dls)
 
         i = texts[ido];
 
-        tptr = text_prim_list + i;
+        tptr = tp_data + i;
 
         if (tptr->deleted_flag == 1) {
             continue;
@@ -16924,7 +16496,10 @@ void CDisplayList::return_selected_symbs (DLSelectable *dls)
                     *iname;
     char            *sname;
 
-    if (symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data == NULL  ||  sp_size < 1) {
         return;
     }
 
@@ -16942,7 +16517,7 @@ void CDisplayList::return_selected_symbs (DLSelectable *dls)
 
         i = symbs[ido];
 
-        sptr = symb_prim_list + i;
+        sptr = sp_data + i;
 
         if (sptr->deleted_flag == 1) {
             continue;
@@ -16991,7 +16566,10 @@ void CDisplayList::return_selected_rectangles (DLSelectable *dls)
                     *lname,
                     *iname;
 
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return;
     }
 
@@ -17009,7 +16587,7 @@ void CDisplayList::return_selected_rectangles (DLSelectable *dls)
 
         i = arcs[ido];
 
-        rptr = shape_prim_list + i;
+        rptr = hp_data + i;
 
         if (rptr->deleted_flag == 1) {
             continue;
@@ -17055,7 +16633,10 @@ void CDisplayList::return_selected_arcs (DLSelectable *dls)
                     *lname,
                     *iname;
 
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return;
     }
 
@@ -17073,7 +16654,7 @@ void CDisplayList::return_selected_arcs (DLSelectable *dls)
 
         i = arcs[ido];
 
-        aptr = shape_prim_list + i;
+        aptr = hp_data + i;
 
         if (aptr->deleted_flag == 1) {
             continue;
@@ -17349,7 +16930,10 @@ void CDisplayList::reclip_and_draw_selected_fills (DLSelectable *dls)
 
     CSWErrNum      err_obj;
 
-    if (fill_prim_list == NULL) {
+    int            fp_size = (int)fill_prim_list.size();
+    FIllPrim       *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return;
     }
 
@@ -17368,7 +16952,7 @@ void CDisplayList::reclip_and_draw_selected_fills (DLSelectable *dls)
 
         i = fills[ido];
 
-        fptr = fill_prim_list + i;
+        fptr = fp_data + i;
 
         if (fptr->deleted_flag == 1) {
             continue;
@@ -17481,7 +17065,10 @@ void CDisplayList::reclip_and_draw_selected_texts (DLSelectable *dls)
     CSW_F          fx1, fy1, fx2, fy2;
     CSW_F          xoff, yoff;
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return;
     }
     if (dls == NULL) {
@@ -17494,7 +17081,7 @@ void CDisplayList::reclip_and_draw_selected_texts (DLSelectable *dls)
     for (ido=0; ido<nprim; ido++) {
 
         i = texts[ido];
-        tptr = text_prim_list + i;
+        tptr = tp_data + i;
 
         if (tptr->deleted_flag == 1) {
             continue;
@@ -17625,7 +17212,10 @@ void CDisplayList::reclip_and_draw_selected_symbs (DLSelectable *dls)
     SYmbPrim       *sptr;
     CSW_F          xzero, yzero, fsize, fzero;
 
-    if (symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data == NULL  ||  sp_size < 1) {
         return;
     }
     if (dls == NULL) {
@@ -17641,7 +17231,7 @@ void CDisplayList::reclip_and_draw_selected_symbs (DLSelectable *dls)
     for (ido=0; ido<nprim; ido++) {
 
         i = symbs[ido];
-        sptr = symb_prim_list + i;
+        sptr = sp_data + i;
 
         if (sptr->deleted_flag == 1) {
             continue;
@@ -17721,7 +17311,10 @@ void CDisplayList::reclip_and_draw_selected_shapes (DLSelectable *dls)
     CSW_F          corner_ratio, xc, yc, xt, yt;
     CSW_F          fvals[10], shape_values[10];
 
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return;
     }
     if (dls == NULL) {
@@ -17737,7 +17330,7 @@ void CDisplayList::reclip_and_draw_selected_shapes (DLSelectable *dls)
     for (ido=0; ido<nprim; ido++) {
 
         i = shapes[ido];
-        shptr = shape_prim_list + i;
+        shptr = hp_data + i;
 
         if (shptr->deleted_flag == 1) {
             continue;
@@ -18195,30 +17788,42 @@ void CDisplayList::UnhideAll (void)
         }
     }
 
-    if (fill_prim_list != NULL  &&  fill_hidden_list != NULL) {
+    int             fp_size = (int)fill_prim_list.size();
+    FIllPrim        *fp_data = fill_prim_list.data();
+
+    if (fp_data != NULL  &&  fp_size > 0  &&  fill_hidden_list != NULL) {
         for (i=0; i<num_fill_hidden_list; i++) {
-            fptr = fill_prim_list + fill_hidden_list[i];
+            fptr = fp_data + fill_hidden_list[i];
             fptr->visible_flag = 1;
         }
     }
 
-    if (text_prim_list != NULL  &&  text_hidden_list != NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data != NULL  &&  tp_size > 0  &&  text_hidden_list != NULL) {
         for (i=0; i<num_text_hidden_list; i++) {
-            tptr = text_prim_list + text_hidden_list[i];
+            tptr = tp_data + text_hidden_list[i];
             tptr->visible_flag = 1;
         }
     }
 
-    if (symb_prim_list != NULL  &&  symb_hidden_list != NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data != NULL  &&  sp_size > 0  &&  symb_hidden_list != NULL) {
         for (i=0; i<num_symb_hidden_list; i++) {
-            sptr = symb_prim_list + symb_hidden_list[i];
+            sptr = sp_data + symb_hidden_list[i];
             sptr->visible_flag = 1;
         }
     }
 
-    if (shape_prim_list != NULL  &&  shape_hidden_list != NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data != NULL  &&  hp_size > 0  &&  shape_hidden_list != NULL) {
         for (i=0; i<num_shape_hidden_list; i++) {
-            rptr = shape_prim_list + shape_hidden_list[i];
+            rptr = hp_data + shape_hidden_list[i];
             rptr->visible_flag = 1;
         }
     }
@@ -18634,13 +18239,16 @@ void CDisplayList::delete_frame_axis_fills (int fnum)
     int            i;
     FIllPrim       *fptr;
 
-    if (fill_prim_list == NULL) {
+    int            fp_size = (int)fill_prim_list.size();
+    FIllPrim       *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_fill_prim_list; i++) {
+    for (i=0; i<fp_size; i++) {
 
-        fptr = fill_prim_list + i;
+        fptr = fp_data + i;
 
         if (fptr->deleted_flag == 1) {
             continue;
@@ -18674,13 +18282,16 @@ void CDisplayList::delete_frame_axis_texts (int fnum)
     int            i;
     TExtPrim       *tptr;
 
-    if (text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_text_prim_list; i++) {
+    for (i=0; i<tp_size; i++) {
 
-        tptr = text_prim_list + i;
+        tptr = tp_data + i;
 
         if (tptr->deleted_flag == 1) {
             continue;
@@ -20070,7 +19681,7 @@ int CDisplayList::ReadSelectableObject (int ival)
 void CDisplayList::erase_selected_lines (DLSelectable *dls)
 {
     int             ido, i, nprim, *lines;
-    LInePrim        *lptr, *lp2;
+    LInePrim        *lptr;
 
     int             lp_size = (int)line_prim_list.size();
     LInePrim        *lp_data = line_prim_list.data();
@@ -20106,25 +19717,10 @@ void CDisplayList::erase_selected_lines (DLSelectable *dls)
             lptr->maxpts = 0;
             lptr->deleted_flag = 1;
             add_available_line (i);
-            if (lptr->numsub > 0) {
-                lp2 = lp_data + lptr->sub_prims[0];
-                csw_Free (lp2->xypts);
-                lp2->xypts = NULL;
-                lp2->npts = 0;
-                lp2->maxpts = 0;
-                lp2->deleted_flag = 1;
-                add_available_line (lptr->sub_prims[0]);
-            }
-            lptr->numsub = 0;
         }
         else {
             lptr->visible_flag = 0;
             add_hidden_line (i);
-            if (lptr->numsub > 0) {
-                lp2 = lp_data + lptr->sub_prims[0];
-                lp2->visible_flag = 0;
-                add_hidden_line (lptr->sub_prims[0]);
-            }
         }
 
     }
@@ -20135,9 +19731,12 @@ void CDisplayList::erase_selected_lines (DLSelectable *dls)
 void CDisplayList::erase_selected_fills (DLSelectable *dls)
 {
     int             ido, i, nprim, *fills;
-    FIllPrim        *fptr, *fp2;
+    FIllPrim        *fptr;
 
-    if (fill_prim_list == NULL) {
+    int            fp_size = (int)fill_prim_list.size();
+    FIllPrim       *fp_data = fill_prim_list.data();
+
+    if (fp_data == NULL  ||  fp_size < 1) {
         return;
     }
 
@@ -20155,7 +19754,7 @@ void CDisplayList::erase_selected_fills (DLSelectable *dls)
 
         i = fills[ido];
 
-        fptr = fill_prim_list + i;
+        fptr = fp_data + i;
 
         if (fptr->deleted_flag == 1) {
             continue;
@@ -20168,25 +19767,10 @@ void CDisplayList::erase_selected_fills (DLSelectable *dls)
             fptr->maxpts = 0;
             fptr->deleted_flag = 1;
             add_available_fill (i);
-            if (fptr->numsub > 0) {
-                fp2 = fill_prim_list + fptr->sub_prims[0];
-                csw_Free (fp2->xypts);
-                fp2->xypts = NULL;
-                fp2->npts = 0;
-                fp2->maxpts = 0;
-                fp2->deleted_flag = 1;
-                add_available_fill (fptr->sub_prims[0]);
-            }
-            fptr->numsub = 0;
         }
         else {
             fptr->visible_flag = 0;
             add_hidden_fill (i);
-            if (fptr->numsub > 0) {
-                fp2 = fill_prim_list + fptr->sub_prims[0];
-                fp2->visible_flag = 0;
-                add_hidden_fill (fptr->sub_prims[0]);
-            }
         }
 
     }
@@ -20198,9 +19782,12 @@ void CDisplayList::erase_selected_texts (DLSelectable *dls)
 {
 
     int             ido, i, nprim, *texts;
-    TExtPrim        *tptr, *tp2;
+    TExtPrim        *tptr;
 
-    if (text_prim_list == NULL) {
+    int             tp_size = (int)text_prim_list.size();
+    TExtPrim        *tp_data = text_prim_list.data();
+
+    if (tp_data == NULL  ||  tp_size < 1) {
         return;
     }
 
@@ -20218,7 +19805,7 @@ void CDisplayList::erase_selected_texts (DLSelectable *dls)
 
         i = texts[ido];
 
-        tptr = text_prim_list + i;
+        tptr = tp_data + i;
 
         if (tptr->deleted_flag == 1) {
             continue;
@@ -20229,23 +19816,10 @@ void CDisplayList::erase_selected_texts (DLSelectable *dls)
             tptr->chardata = NULL;
             tptr->deleted_flag = 1;
             add_available_text (i);
-            if (tptr->numsub > 0) {
-                tp2 = text_prim_list + tptr->sub_prims[0];
-                csw_Free (tp2->chardata);
-                tp2->chardata = NULL;
-                tp2->deleted_flag = 1;
-                add_available_text (tptr->sub_prims[0]);
-            }
-            tptr->numsub = 0;
         }
         else {
             tptr->visible_flag = 0;
             add_hidden_text (i);
-            if (tptr->numsub > 0) {
-                tp2 = text_prim_list + tptr->sub_prims[0];
-                tp2->visible_flag = 0;
-                add_hidden_text (tptr->sub_prims[0]);
-            }
         }
 
     }
@@ -20256,9 +19830,12 @@ void CDisplayList::erase_selected_texts (DLSelectable *dls)
 void CDisplayList::erase_selected_symbs (DLSelectable *dls)
 {
     int             ido, i, nprim, *symbs;
-    SYmbPrim        *sptr, *sp2;
+    SYmbPrim        *sptr;
 
-    if (symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (sp_data == NULL  ||  sp_size < 1) {
         return;
     }
 
@@ -20276,7 +19853,7 @@ void CDisplayList::erase_selected_symbs (DLSelectable *dls)
 
         i = symbs[ido];
 
-        sptr = symb_prim_list + i;
+        sptr = sp_data + i;
 
         if (sptr->deleted_flag == 1) {
             continue;
@@ -20285,21 +19862,10 @@ void CDisplayList::erase_selected_symbs (DLSelectable *dls)
         if (HideFlag == 0) {
             sptr->deleted_flag = 1;
             add_available_symb (i);
-            if (sptr->numsub > 0) {
-                sp2 = symb_prim_list + sptr->sub_prims[0];
-                sp2->deleted_flag = 1;
-                add_available_symb (sptr->sub_prims[0]);
-            }
-            sptr->numsub = 0;
         }
         else {
             sptr->visible_flag = 0;
             add_hidden_symb (i);
-            if (sptr->numsub > 0) {
-                sp2 = symb_prim_list + sptr->sub_prims[0];
-                sp2->visible_flag = 0;
-                add_hidden_symb (sptr->sub_prims[0]);
-            }
         }
 
     }
@@ -20310,9 +19876,12 @@ void CDisplayList::erase_selected_symbs (DLSelectable *dls)
 void CDisplayList::erase_selected_shapes (DLSelectable *dls)
 {
     int             ido, i, nprim, *arcs;
-    SHapePrim       *rptr, *rp2;
+    SHapePrim       *rptr;
 
-    if (shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (hp_data == NULL  ||  hp_size < 1) {
         return;
     }
 
@@ -20330,7 +19899,7 @@ void CDisplayList::erase_selected_shapes (DLSelectable *dls)
 
         i = arcs[ido];
 
-        rptr = shape_prim_list + i;
+        rptr = hp_data + i;
 
         if (rptr->deleted_flag == 1) {
             continue;
@@ -20339,21 +19908,10 @@ void CDisplayList::erase_selected_shapes (DLSelectable *dls)
         if (HideFlag == 0) {
             rptr->deleted_flag = 1;
             add_available_shape (i);
-            if (rptr->numsub > 0) {
-                rp2 = shape_prim_list + rptr->sub_prims[0];
-                rp2->deleted_flag = 1;
-                add_available_shape (rptr->sub_prims[0]);
-            }
-            rptr->numsub = 0;
         }
         else {
             rptr->visible_flag = 0;
             add_hidden_shape (i);
-            if (rptr->numsub > 0) {
-                rp2 = shape_prim_list + rptr->sub_prims[0];
-                rp2->visible_flag = 0;
-                add_hidden_shape (rptr->sub_prims[0]);
-            }
         }
 
     }
@@ -20565,7 +20123,10 @@ int CDisplayList::add_hidden_line (int prim_num) {
 
 int CDisplayList::add_hidden_fill (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_fill_prim_list  ||  fill_prim_list == NULL) {
+    int            fp_size = (int)fill_prim_list.size();
+    FIllPrim       *fp_data = fill_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= fp_size  ||  fp_data == NULL) {
         return 0;
     }
 
@@ -20593,7 +20154,10 @@ int CDisplayList::add_hidden_fill (int prim_num) {
 
 int CDisplayList::add_hidden_text (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_text_prim_list  ||  text_prim_list == NULL) {
+    int           tp_size = (int)text_prim_list.size();
+    TExtPrim      *tp_data = text_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= tp_size  ||  tp_data == NULL) {
         return 0;
     }
 
@@ -20621,7 +20185,10 @@ int CDisplayList::add_hidden_text (int prim_num) {
 
 int CDisplayList::add_hidden_symb (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_symb_prim_list  ||  symb_prim_list == NULL) {
+    int        sp_size = (int)symb_prim_list.size();
+    SYmbPrim   *sp_data = symb_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= sp_size  ||  sp_data == NULL) {
         return 0;
     }
 
@@ -20649,7 +20216,10 @@ int CDisplayList::add_hidden_symb (int prim_num) {
 
 int CDisplayList::add_hidden_shape (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_shape_prim_list  ||  shape_prim_list == NULL) {
+    int           hp_size = (int)shape_prim_list.size();
+    SHapePrim     *hp_data = shape_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= hp_size  ||  hp_data == NULL) {
         return 0;
     }
 
@@ -21188,8 +20758,18 @@ int CDisplayList::AddGridImage (int fnum,
                                 double ymax)
 {
     int            istat, i, j, k, offset, ntot;
-    unsigned char  *red_ptr, *green_ptr, *blue_ptr, *trans_ptr;
+    unsigned char  *red_ptr = NULL, *green_ptr = NULL,
+                   *blue_ptr = NULL, *trans_ptr = NULL;
     int            red, green, blue, trans;
+
+    auto fscope = [&]()
+    {
+        csw_Free (red_ptr);
+        csw_Free (green_ptr);
+        csw_Free (blue_ptr);
+        csw_Free (trans_ptr);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
     if (xmax <= xmin || ymax <= ymin ||
         data == NULL || ncol < 2  ||  nrow < 2) {
@@ -21206,10 +20786,6 @@ int CDisplayList::AddGridImage (int fnum,
     trans_ptr = (unsigned char *)csw_Calloc (ntot * sizeof(unsigned char));
     if (red_ptr == NULL  ||  green_ptr == NULL  ||  blue_ptr == NULL  ||
         trans_ptr == NULL) {
-        csw_Free (red_ptr);
-        csw_Free (green_ptr);
-        csw_Free (blue_ptr);
-        csw_Free (trans_ptr);
         return -1;
     }
 
