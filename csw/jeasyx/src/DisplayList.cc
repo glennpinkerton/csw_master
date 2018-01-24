@@ -203,10 +203,6 @@ CDisplayList::CDisplayList()
     num_contour_line_prim_list = 0;
     max_contour_line_prim_list = 0;
 
-    axis_prim_list = NULL;
-    num_axis_prim_list = 0;
-    max_axis_prim_list = 0;
-
 /*
  * Grid, contour and trimesh lists.
  */
@@ -2595,7 +2591,10 @@ int CDisplayList::get_available_shape (void) {
 
 int CDisplayList::add_available_axis (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_axis_prim_list  ||  axis_prim_list == NULL) {
+    int          ap_size = (int)axis_prim_list.size();
+    AXisPrim     *ap_data = axis_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= ap_size  ||  ap_data == NULL) {
         return 0;
     }
 
@@ -8139,19 +8138,19 @@ void CDisplayList::free_axes (void)
     int           i;
     AXisPrim      *prim;
 
-    if (axis_prim_list == NULL) {
+    int          ap_size = (int)axis_prim_list.size();
+    AXisPrim     *ap_data = axis_prim_list.data();
+
+    if (ap_data == NULL  ||  ap_size < 1) {
         return;
     }
 
-    for (i=0; i<num_axis_prim_list; i++) {
-        prim = axis_prim_list + i;
+    for (i=0; i<ap_size; i++) {
+        prim = ap_data + i;
         csw_Free (prim->ap);
     }
 
-    csw_Free (axis_prim_list);
-    axis_prim_list = NULL;
-    num_axis_prim_list = 0;
-    max_axis_prim_list = 0;
+    axis_prim_list.clear();
 
     return;
 }
@@ -11154,9 +11153,12 @@ void CDisplayList::find_frame_limits (int frame_num,
         }
     }
 
-    if (axis_prim_list != NULL) {
-        for (i=0; i<num_axis_prim_list; i++) {
-            aptr = axis_prim_list + i;
+    int           ap_size = (int)axis_prim_list.size();
+    AXisPrim      *ap_data = axis_prim_list.data();
+
+    if (ap_data != NULL  &&  ap_size > 0) {
+        for (i=0; i<ap_size; i++) {
+            aptr = ap_data + i;
             if (aptr->frame_num != frame_num) {
                 continue;
             }
@@ -15181,6 +15183,9 @@ int CDisplayList::GetSelectableIndex (int frame_num,
     int           hp_size = (int)shape_prim_list.size();
     SHapePrim     *hp_data = shape_prim_list.data();
 
+    int          ap_size = (int)axis_prim_list.size();
+    AXisPrim     *ap_data = axis_prim_list.data();
+
     if (type == 1  &&  lp_data != NULL  &&  lp_size > index) {
         lptr = lp_data + index;
         isel = lptr->selectable_object_num;
@@ -15205,8 +15210,8 @@ int CDisplayList::GetSelectableIndex (int frame_num,
         cptr = contour_list[index];
         isel = cptr->selectable_object_num;
     }
-    else if (type == 7  &&  axis_prim_list != NULL) {
-        aptr = axis_prim_list + index;
+    else if (type == 7  &&  ap_data != NULL  &&  ap_size > 0) {
+        aptr = ap_data + index;
         isel = aptr->selectable_object_num;
     }
 
@@ -16627,7 +16632,7 @@ void CDisplayList::return_selected_rectangles (DLSelectable *dls)
 void CDisplayList::return_selected_arcs (DLSelectable *dls)
 {
     int             ido, i, nprim, *arcs;
-    SHapePrim       *aptr;
+    SHapePrim       *shptr;
     FRameStruct     *frptr;
     char            *fname,
                     *lname,
@@ -16654,35 +16659,35 @@ void CDisplayList::return_selected_arcs (DLSelectable *dls)
 
         i = arcs[ido];
 
-        aptr = hp_data + i;
+        shptr = hp_data + i;
 
-        if (aptr->deleted_flag == 1) {
+        if (shptr->deleted_flag == 1) {
             continue;
         }
 
-        if (aptr->type != 2) {
+        if (shptr->type != 2) {
             continue;
         }
 
         if (frame_list == NULL  ||
-            aptr->frame_num < 0) {
+            shptr->frame_num < 0) {
             continue;
         }
 
-        frptr = frame_list + aptr->frame_num;
+        frptr = frame_list + shptr->frame_num;
         fname = frptr->name;
 
         lname = NULL;
-        if (aptr->layer_num >= 0  &&  layer_list != NULL) {
-            lname = layer_list[aptr->layer_num].name;
+        if (shptr->layer_num >= 0  &&  layer_list != NULL) {
+            lname = layer_list[shptr->layer_num].name;
         }
 
         iname = NULL;
-        if (aptr->item_num >= 0  &&  item_list != NULL) {
-            iname = item_list[aptr->item_num].name;
+        if (shptr->item_num >= 0  &&  item_list != NULL) {
+            iname = item_list[shptr->item_num].name;
         }
 
-        ezx_java_obj.ezx_AppendSelectedArcToJavaArea (aptr,
+        ezx_java_obj.ezx_AppendSelectedArcToJavaArea (shptr,
                                          fname,
                                          lname,
                                          iname);
@@ -17828,9 +17833,12 @@ void CDisplayList::UnhideAll (void)
         }
     }
 
-    if (axis_prim_list != NULL  &&  axis_hidden_list != NULL) {
+    int          ap_size = (int)axis_prim_list.size();
+    AXisPrim     *ap_data = axis_prim_list.data();
+
+    if (ap_data != NULL  &&  ap_size > 0  &&  axis_hidden_list != NULL) {
         for (i=0; i<num_axis_hidden_list; i++) {
-            aptr = axis_prim_list + axis_hidden_list[i];
+            aptr = ap_data + axis_hidden_list[i];
             aptr->visible_flag = 1;
         }
     }
@@ -17886,7 +17894,7 @@ int CDisplayList::AddAxis (
     AXisPrim          *aptr;
     FRameAxisStruct   *fap = NULL;
     char              caption[200];
-    int               ilast, next_axis;
+    int               next_axis;
 
     bool    bsuccess = false;
 
@@ -17933,36 +17941,21 @@ int CDisplayList::AddAxis (
 
     next_axis = get_available_axis ();
     if (next_axis < 0) {
-
-    /*
-     * Grow the axis prim list if needed.
-     */
-        if (axis_prim_list == NULL) {
-            max_axis_prim_list = 0;
-            num_axis_prim_list = 0;
+        try {
+            AXisPrim  apr;
+            ZeroInit (&apr, sizeof(apr));
+            axis_prim_list.push_back (apr);
+            next_axis = (int)axis_prim_list.size() - 1;
         }
-        if (num_axis_prim_list >= max_axis_prim_list) {
-            ilast = max_axis_prim_list;
-            max_axis_prim_list += _SMALL_CHUNK_SIZE_;
-            axis_prim_list = (AXisPrim *)csw_Realloc
-                (axis_prim_list, max_axis_prim_list * sizeof(AXisPrim));
-            if (axis_prim_list != NULL) {
-                memset (axis_prim_list + ilast, 0,
-                        _SMALL_CHUNK_SIZE_ * sizeof(AXisPrim));
-            }
+        catch (...) {
+            printf ("Exception in axis_prim_list pushback\n");
+            return 0;
         }
-        next_axis = num_axis_prim_list;
-        num_axis_prim_list++;
     }
 
-/*
- * Return an error if the axis prim list could not be grown.
- */
-    if (axis_prim_list == NULL) {
-        return -1;
-    }
+    AXisPrim    *ap_data = axis_prim_list.data();
 
-    aptr = axis_prim_list + next_axis;
+    aptr = ap_data + next_axis;
     aptr->ap = fap;
     fap = NULL;
     aptr->fx1 = (CSW_F)x1;
@@ -17992,9 +17985,16 @@ int CDisplayList::AddAxis (
 }
 
 /*
- * Remove any existing line, fill and text primitives that are associated
- * with an axis in this frame and add new primitives reflecting the frame's
- * current setup.
+ *  Break down axes into lines, text, etc and add these
+ *  primitives to the display list as axis primitives.
+ *  Since scale to screen drawing is done at draw time
+ *  (rather than at add to display list time) then the
+ *  lines, fills, etc. only need to be "calculated" one
+ *  time rather than with all zoom and pan and other 
+ *  things on the display list.
+ *
+ *  Note that this affects axes inside a frame, not the axes
+ *  that are a part of a frame border.
  */
 void CDisplayList::reaxis_frame (FRameStruct *frptr)
 {
@@ -18021,26 +18021,21 @@ void CDisplayList::reaxis_frame (FRameStruct *frptr)
         return;
     }
 
-    if (axis_prim_list == NULL  ||
-        num_axis_prim_list < 1) {
+    int          ap_size = (int)axis_prim_list.size();
+    AXisPrim     *ap_data = axis_prim_list.data();
+
+    if (ap_data == NULL  ||  ap_size < 1) {
         return;
     }
-
-/*
- * Delete all the sub prims of all frame prims.
- */
-    //delete_frame_axis_lines (fnum);
-    //delete_frame_axis_fills (fnum);
-    //delete_frame_axis_texts (fnum);
 
     fsave = current_frame_num;
     current_frame_num = fnum;
     current_border_num = -1;
     current_axis_num = 1;
 
-    for (i=0; i<num_axis_prim_list; i++) {
+    for (i=0; i<ap_size; i++) {
 
-        aptr = axis_prim_list + i;
+        aptr = ap_data + i;
         if (aptr->frame_num != fnum) {
             continue;
         }
@@ -18590,11 +18585,14 @@ void CDisplayList::closest_frame_axis (int fnum, CSW_F xin, CSW_F yin,
 
     *indexout = -1;
 
-    if (axis_prim_list == NULL) {
+    int          ap_size = (int)axis_prim_list.size();
+    AXisPrim     *ap_data = axis_prim_list.data();
+
+    if (ap_data == NULL  ||  ap_size < 1) {
         return;
     }
 
-    nprim = num_axis_prim_list;
+    nprim = ap_size;
 
     dmin = *pdistout;
     index = -1;
@@ -18603,7 +18601,7 @@ void CDisplayList::closest_frame_axis (int fnum, CSW_F xin, CSW_F yin,
 
         i = ido;
 
-        aptr = axis_prim_list + i;
+        aptr = ap_data + i;
 
         if (aptr->frame_num != fnum) {
             continue;
@@ -19091,8 +19089,10 @@ void CDisplayList::reclip_and_draw_selected_axes (DLSelectable *dls)
     CSW_F         aax1, aay1, aax2, aay2;
     double        ang, cang, sang;
 
-    if (axis_prim_list == NULL  ||
-        num_axis_prim_list < 1) {
+    int          ap_size = (int)axis_prim_list.size();
+    AXisPrim     *ap_data = axis_prim_list.data();
+
+    if (ap_data == NULL  ||  ap_size < 1) {
         return;
     }
 
@@ -19114,7 +19114,7 @@ void CDisplayList::reclip_and_draw_selected_axes (DLSelectable *dls)
 
     for (i=0; i<nlist; i++) {
 
-        aptr = axis_prim_list + ilist[i];
+        aptr = ap_data + ilist[i];
         if (aptr->ap == NULL) {
             continue;
         }
@@ -19583,8 +19583,10 @@ void CDisplayList::return_selected_axes (DLSelectable *dls)
     FRameStruct   *frptr;
     AXisPrim      *aptr;
 
-    if (axis_prim_list == NULL  ||
-        num_axis_prim_list < 1) {
+    int          ap_size = (int)axis_prim_list.size();
+    AXisPrim     *ap_data = axis_prim_list.data();
+
+    if (ap_data == NULL  ||  ap_size < 1) {
         return;
     }
 
@@ -19604,8 +19606,7 @@ void CDisplayList::return_selected_axes (DLSelectable *dls)
 
     for (i=0; i<nlist; i++) {
 
-
-        aptr = axis_prim_list + ilist[i];
+        aptr = ap_data + ilist[i];
         if (aptr->ap == NULL) {
             continue;
         }
@@ -19972,8 +19973,10 @@ void CDisplayList::erase_selected_axes (DLSelectable *dls)
     int           i;
     AXisPrim      *aptr;
 
-    if (axis_prim_list == NULL  ||
-        num_axis_prim_list < 1) {
+    int          ap_size = (int)axis_prim_list.size();
+    AXisPrim     *ap_data = axis_prim_list.data();
+
+    if (ap_data == NULL  ||  ap_size < 1) {
         return;
     }
 
@@ -19993,7 +19996,7 @@ void CDisplayList::erase_selected_axes (DLSelectable *dls)
 
     for (i=0; i<nlist; i++) {
 
-        aptr = axis_prim_list + ilist[i];
+        aptr = ap_data + ilist[i];
         if (aptr->ap == NULL) {
             continue;
         }
@@ -20247,7 +20250,10 @@ int CDisplayList::add_hidden_shape (int prim_num) {
 
 int CDisplayList::add_hidden_axis (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_axis_prim_list  ||  axis_prim_list == NULL) {
+    int          ap_size = (int)axis_prim_list.size();
+    AXisPrim     *ap_data = axis_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= ap_size  ||  ap_data == NULL) {
         return 0;
     }
 
