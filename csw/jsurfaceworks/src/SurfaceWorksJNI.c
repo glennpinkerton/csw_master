@@ -1512,7 +1512,7 @@ static void write_add_grid (
       k2 = i * nrow;
       for (j=jskp2; j<ncol; j+=jskp) {
         k = k2 + j;
-        fprintf (primfile, "    row %d  col %d:  %.5f\n", i, j, derror[k]);
+        fprintf (primfile, "    row %d  col %d:  %.5f\n", i, j, data[k]);
       }
     }
 }

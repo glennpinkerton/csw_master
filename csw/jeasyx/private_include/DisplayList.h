@@ -1088,15 +1088,13 @@ private:
     std::vector<SYmbPrim>   symb_prim_list;
 
     std::vector<TExtPrim>   text_prim_list;
-    int             num_selectable_text;
+    int                     num_selectable_text = 0;
 
     std::vector<SHapePrim>  shape_prim_list;
 
     std::vector<IMagePrim>  image_prim_list;
 
-    AXisPrim        *axis_prim_list = NULL;
-    int             num_axis_prim_list,
-                    max_axis_prim_list;
+    std::vector<AXisPrim>   axis_prim_list;
 
   /*
    * lists with indexes of available primitives

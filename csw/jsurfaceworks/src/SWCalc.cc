@@ -1514,32 +1514,6 @@ int SWCalc::sw_SetDrapeTriMeshCache (
     }
     numDrapeTriangles = num_tri;
 
-/*
-    grdapi_ptr->grd_GetTriangleIndex (
-        &vindex,
-        &txmin,
-        &tymin,
-        &txmax,
-        &tymax,
-        &tncol,
-        &tnrow,
-        &txspace,
-        &tyspace);
-
-    grdapi_ptr->grd_FreeTriangleIndex (vindex, tncol * tnrow);
-
-    grdapi_ptr->grd_SetTriangleIndex (
-        NULL,
-        1.e30,
-        1.e30,
-        -1.e30,
-        -1.e30,
-        0,
-        0,
-        1.e30,
-        1.e30);
-*/
-
     return 1;
 
 }
