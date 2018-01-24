@@ -281,17 +281,15 @@ class TriMesh10Frame extends JFrame
         JDisplayList dl = gpanel.getDisplayList ();
         sw = new JSurfaceWorks ();
 
-        x = new double[2 * nphint];
-        y = new double[2 * nphint];
-        z = new double[2 * nphint];
+        x = new double[np];
+        y = new double[np];
+        z = new double[np];
 
         for (i=0; i<np; i++) {
             x[i] = random.nextDouble () * 100.0;
             y[i] = random.nextDouble () * 100.0;
             z[i] = random.nextDouble () * 50.0;
         }
-        x[0] = 0.0;
-        y[1] = 0.0;
 
         sw.setBadBoundaryAction (2);
         TriMesh tmesh = sw.calcTriMesh
@@ -387,9 +385,9 @@ class Grid10Frame extends JFrame
         JDisplayList dl = gpanel.getDisplayList ();
         sw = new JSurfaceWorks ();
 
-        x = new double[2 * nphint];
-        y = new double[2 * nphint];
-        z = new double[2 * nphint];
+        x = new double[np];
+        y = new double[np];
+        z = new double[np];
 
         for (i=0; i<np; i++) {
             x[i] = random.nextDouble () * 200.0;

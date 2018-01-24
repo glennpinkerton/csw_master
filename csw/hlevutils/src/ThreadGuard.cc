@@ -141,7 +141,7 @@ GRDVert *ThreadGuard::GetGRDVert (int threadid)
         tgd.gvert = new GRDVert ();
     }
     catch (...) {
-        return gv;
+        return NULL;
     }
 
     try {
@@ -246,7 +246,7 @@ SWCalc  *ThreadGuard::GetSWCalc (int threadid)
                 it->second.swcalc = swc;
             }
             catch (...) {
-                return swc;
+                return NULL;
             }
         }
         return swc;
@@ -256,7 +256,7 @@ SWCalc  *ThreadGuard::GetSWCalc (int threadid)
         tgd.swcalc = new SWCalc ();
     }
     catch (...) {
-        return swc;
+        return NULL;
     }
 
     try {
@@ -435,7 +435,7 @@ CanvasManager *ThreadGuard::GetCanvasManager (int threadid)
                 it->second.canvas_manager = cm;
             }
             catch (...) {
-                return cm;
+                return NULL;
             }
         }
         return cm;
@@ -445,7 +445,7 @@ CanvasManager *ThreadGuard::GetCanvasManager (int threadid)
         tgd.canvas_manager = new CanvasManager ();
     }
     catch (...) {
-        return cm;
+        return NULL;
     }
 
     try {

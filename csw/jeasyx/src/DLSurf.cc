@@ -787,11 +787,11 @@ int DLSurf::CalcContours (void *vptr)
 
 int DLSurf::CalcImage (void *vptr)
 {
-    CDisplayList        *dlist;
+    CDisplayList        *dlist = NULL;
     double              xspace, yspace, x1, y1t, x2, y2;
     double              units;
     int                 i, istat, nc, nr;
-    CSW_F               *newgrid;
+    CSW_F               *newgrid = NULL;
 
     if (conprop.showColorFills == 0) {
         image_id = -1;
