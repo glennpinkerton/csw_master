@@ -4010,7 +4010,12 @@ int PATCHSplit::ps_StartSealedModelDefinition (int marginPct)
         SModel = NULL;
     }
 
-    SModel = new SealedModel ();
+    try {
+        SModel = new SealedModel ();
+    }
+    catch (...) {
+        SModel = NULL;
+    }
     if (SModel == NULL) {
         return -1;
     }
@@ -6216,7 +6221,13 @@ int PATCHSplit:: ps_StartFaultConnect (double avspace)
         FConnect = NULL;
     }
 
-    FConnect = new FaultConnect ();
+    try {
+        FConnect = new FaultConnect ();
+    }
+    catch (...) {
+        FConnect = NULL;
+        return 1;
+    }
     FConnect->setAverageSpacing (avspace);
 
     return 1;

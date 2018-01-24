@@ -2631,9 +2631,16 @@ int SealedModel::CreateInput3DTriangleIndex (void)
         InputTriangle3DIndex = NULL;
     }
 
-    InputTriangle3DIndex = new Spatial3DTriangleIndex (
-        modelXmin, modelYmin, modelZmin,
-        modelXmax, modelYmax, modelZmax);
+    try {
+        InputTriangle3DIndex = new Spatial3DTriangleIndex (
+                modelXmin, modelYmin, modelZmin,
+                modelXmax, modelYmax, modelZmax);
+    }
+    catch (...) {
+        InputTriangle3DIndex = NULL;
+        return 0;
+    }
+
     if (averageSpacing > 0.0) {
         InputTriangle3DIndex->SetGeometry (
         modelXmin, modelYmin, modelZmin,
@@ -4418,9 +4425,16 @@ int SealedModel::CreatePadded3DTriangleIndex (void)
         PaddedTriangle3DIndex = NULL;
     }
 
-    PaddedTriangle3DIndex = new Spatial3DTriangleIndex (
-        padXmin, padYmin, padZmin,
-        padXmax, padYmax, padZmax);
+    try {
+        PaddedTriangle3DIndex = new Spatial3DTriangleIndex (
+                padXmin, padYmin, padZmin,
+                padXmax, padYmax, padZmax);
+    }
+    catch (...) {
+        PaddedTriangle3DIndex = NULL;
+        return 0;
+    }
+
     if (averageSpacing > 0.0) {
         PaddedTriangle3DIndex->SetGeometry (
         padXmin, padYmin, padZmin,
@@ -16460,9 +16474,16 @@ int SealedModel::CreateDetachment3DTriangleIndex (void)
         PaddedTriangle3DIndex = NULL;
     }
 
-    PaddedTriangle3DIndex = new Spatial3DTriangleIndex (
-        padXmin, padYmin, padZmin,
-        padXmax, padYmax, padZmax);
+    try {
+        PaddedTriangle3DIndex = new Spatial3DTriangleIndex (
+                padXmin, padYmin, padZmin,
+                padXmax, padYmax, padZmax);
+    }
+    catch (...) {
+        PaddedTriangle3DIndex = NULL;
+        return 0;
+    }
+
     if (averageSpacing > 0.0) {
         PaddedTriangle3DIndex->SetGeometry (
         padXmin, padYmin, padZmin,

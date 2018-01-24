@@ -83,7 +83,7 @@ extern "C" {
     double *z0_out)
   {
     int              istat;
-    SurfaceGroupPlane  *sgp;
+    SurfaceGroupPlane  *sgp = NULL;
 
     CSWGrdFileio     grd_fileio_obj;
 
@@ -104,7 +104,13 @@ extern "C" {
     *y0_out = 1.e30;
     *z0_out = 1.e30;
 
-    sgp = new SurfaceGroupPlane ();
+    try {
+        sgp = new SurfaceGroupPlane ();
+    }
+    catch (...) {
+        sgp = NULL;
+    }
+
     if (sgp == NULL) {
         return -1;
     }

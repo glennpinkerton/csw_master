@@ -197,13 +197,6 @@ CDisplayList::CDisplayList()
     Picky2 = -1.e30f;
 
 /*
- * Initialize primitive lists to NULL and empty.
- */
-    contour_line_prim_list = NULL;
-    num_contour_line_prim_list = 0;
-    max_contour_line_prim_list = 0;
-
-/*
  * Grid, contour and trimesh lists.
  */
     contour_list = NULL;
@@ -2334,8 +2327,10 @@ int CDisplayList::get_available_contour_line (void) {
 
 int CDisplayList::add_available_contour_line (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_contour_line_prim_list ||
-        contour_line_prim_list == NULL) {
+    int            cp_size = (int)contour_line_prim_list.size();
+    LInePrim       *cp_data = contour_line_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= cp_size ||  cp_data == NULL) {
         return 0;
     }
 
@@ -2722,8 +2717,10 @@ void CDisplayList::free_patch_lists (void)
 
 int CDisplayList::add_contour_line_patch_prim (int prim_num)
 {
-    if (prim_num < 0  ||  prim_num >= num_contour_line_prim_list  ||
-          contour_line_prim_list == NULL) {
+    int            cp_size = (int)contour_line_prim_list.size();
+    LInePrim       *cp_data = contour_line_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= cp_size  ||  cp_data == NULL) {
         return 0;
     }
 
@@ -5868,16 +5865,12 @@ int CDisplayList::AddDataImage (double *data,
                    *blue_ptr = NULL, *trans_ptr = NULL;
     int            red, green, blue, trans;
 
-    bool           bscope = true;
-
     auto fscope = [&]()
     {
-      if (bscope) {
         csw_Free (red_ptr);
         csw_Free (green_ptr);
         csw_Free (blue_ptr);
         csw_Free (trans_ptr);
-      }
     };
     CSWScopeGuard  func_scope_guard (fscope);
 
@@ -8161,29 +8154,30 @@ void CDisplayList::free_lines (void)
     LInePrim      *prim;
 
     int  lp_size = (int)line_prim_list.size();
-
     if (lp_size > 0) {
         LInePrim  *lp_data = line_prim_list.data();
-        for (i=0; i<lp_size; i++) {
-            prim = lp_data + i;
-            csw_Free (prim->xypts);
-            prim->xypts = NULL;
+        if (lp_data != NULL) {
+            for (i=0; i<lp_size; i++) {
+                prim = lp_data + i;
+                csw_Free (prim->xypts);
+                prim->xypts = NULL;
+            }
         }
     }
-
     line_prim_list.clear();
 
-    if (contour_line_prim_list != NULL) {
-        for (i=0; i<num_contour_line_prim_list; i++) {
-            prim = contour_line_prim_list + i;
-            csw_Free (prim->xypts);
+    int  cp_size = (int)contour_line_prim_list.size();
+    if (cp_size > 0) {
+        LInePrim  *cp_data = contour_line_prim_list.data();
+        if (cp_data != NULL) {
+            for (i=0; i<cp_size; i++) {
+                prim = cp_data + i;
+                csw_Free (prim->xypts);
+                prim->xypts = NULL;
+            }
         }
-        csw_Free (contour_line_prim_list);
     }
-
-    contour_line_prim_list = NULL;
-    num_contour_line_prim_list = 0;
-    max_contour_line_prim_list = 0;
+    contour_line_prim_list.clear();
 
     return;
 }
@@ -8301,11 +8295,11 @@ int CDisplayList::AddColorImage (unsigned char *red,
                    *blue_ptr = NULL, *trans_ptr = NULL;
     int            next_image;
 
-    bool           bscope = true;
+    bool           bsuccess = false;
 
     auto fscope = [&]()
     {
-      if (bscope) {
+      if (!bsuccess) {
         csw_Free (red_ptr);
         csw_Free (green_ptr);
         csw_Free (blue_ptr);
@@ -8409,7 +8403,7 @@ int CDisplayList::AddColorImage (unsigned char *red,
     imptr->prim_num = next_image;
     imptr->scaleable = 0;
 
-    bscope = false;
+    bsuccess = true;
 
     return 1;
 
@@ -8463,13 +8457,16 @@ void CDisplayList::delete_surf_contour_lines (int surf_num)
     int            i;
     LInePrim       *lptr;
 
-    if (contour_line_prim_list == NULL) {
+    int            cp_size = (int)contour_line_prim_list.size();
+    LInePrim       *cp_data = contour_line_prim_list.data();
+
+    if (cp_data == NULL  ||  cp_size < 1) {
         return;
     }
 
-    for (i=0; i<num_contour_line_prim_list; i++) {
+    for (i=0; i<cp_size; i++) {
 
-        lptr = contour_line_prim_list + i;
+        lptr = cp_data + i;
 
         if (lptr->deleted_flag == 1) {
             continue;
@@ -11309,6 +11306,7 @@ int CDisplayList::AddContour (
         dlc = new DLContour ();
     }
     catch (...) {
+        dlc = NULL;
         return -1;
     }
 
@@ -11416,6 +11414,7 @@ int CDisplayList::AddGrid (
         dlg = new DLSurf ();
     }
     catch (...) {
+        dlg = NULL;
         return -1;
     }
 
@@ -12029,6 +12028,7 @@ void CDisplayList::reclip_frame_contours (int fnum)
             page_con = new DLContour ();
         }
         catch (...) {
+            page_con = NULL;
             continue;
         }
 
@@ -12179,9 +12179,19 @@ void CDisplayList::reclip_frame_contours (int fnum)
 int CDisplayList::AddContourLine (CSW_F *xpts_in, CSW_F *ypts_in, int npts)
 {
     LInePrim       *lptr = NULL;
-    int            ilast, istat;
+    int            istat;
     CSW_F          *xypack = NULL;
     int            next_line;
+
+    bool           bsuccess = false;
+
+    auto fscope = [&]()
+    {
+        if (!bsuccess) {
+            csw_Free (xypack);
+        }
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
 /*
  * check obvious errors in parameters.
@@ -12198,37 +12208,16 @@ int CDisplayList::AddContourLine (CSW_F *xpts_in, CSW_F *ypts_in, int npts)
     next_line = get_available_contour_line ();
 
     if (next_line < 0) {
-    /*
-     * Grow the contour line prim list if needed.
-     */
-        if (contour_line_prim_list == NULL) {
-            max_contour_line_prim_list = 0;
-            num_contour_line_prim_list = 0;
+        try {
+            LInePrim  cpr;
+            ZeroInit (&cpr, sizeof(cpr));
+            contour_line_prim_list.push_back (cpr);
+            next_line = (int)contour_line_prim_list.size() - 1;
         }
-        if (num_contour_line_prim_list >= max_contour_line_prim_list - 1) {
-            ilast = max_contour_line_prim_list;
-            max_contour_line_prim_list += _BIG_CHUNK_SIZE_;
-            contour_line_prim_list = (LInePrim *)csw_Realloc
-                (contour_line_prim_list, max_contour_line_prim_list * sizeof(LInePrim));
-            if (contour_line_prim_list != NULL) {
-                memset (contour_line_prim_list + ilast, 0,
-                        _BIG_CHUNK_SIZE_ * sizeof(LInePrim));
-            }
-        }
-
-    /*
-     * Return an error if the line prim list could not be grown.
-     */
-        if (contour_line_prim_list == NULL) {
+        catch (...) {
+            printf ("Exception in contour_line_prim_list pushback\n");
             return -1;
         }
-
-        next_line = num_contour_line_prim_list;
-        num_contour_line_prim_list++;
-    }
-
-    if (contour_line_prim_list == NULL) {
-        return -1;
     }
 
 /*
@@ -12247,7 +12236,9 @@ int CDisplayList::AddContourLine (CSW_F *xpts_in, CSW_F *ypts_in, int npts)
 /*
  * Populate the line prim structure.
  */
-    lptr = contour_line_prim_list + next_line;
+    LInePrim      *cp_data = contour_line_prim_list.data();
+
+    lptr = cp_data + next_line;
 
     lptr->xypts = xypack;
     xypack = NULL;
@@ -12294,6 +12285,8 @@ int CDisplayList::AddContourLine (CSW_F *xpts_in, CSW_F *ypts_in, int npts)
     lptr->contour_index = current_contour_index;
 
     CalcLineBounds (lptr);
+
+    bsuccess = true;
 
     return 1;
 
@@ -12771,6 +12764,7 @@ int CDisplayList::AddTriMesh (
         dlg = new DLSurf ();
     }
     catch (...) {
+        dlg = NULL;
         return -1;
     }
 
@@ -17566,6 +17560,7 @@ void CDisplayList::reclip_and_draw_selected_contours (DLSelectable *dls)
             page_con = new DLContour ();
         }
         catch (...) {
+            page_con = NULL;
             continue;
         }
 
@@ -21095,13 +21090,16 @@ int CDisplayList::DrawAllContourLines (void)
     LInePrim       *lptr;
     bool           bpatch = false;
 
-    if (contour_line_prim_list == NULL) {
+    int            cp_size = (int)contour_line_prim_list.size();
+    LInePrim       *cp_data = contour_line_prim_list.data();
+
+    if (cp_data == NULL  ||  cp_size < 1) {
         return 0;
     }
 
     jni_msg ("\nDisplay list contour lines being drawn\n");
 
-    nloop = num_contour_line_prim_list;
+    nloop = cp_size;
     if (contour_line_patch_list != NULL  &&  patch_draw_flag == 1) {
         nloop = num_contour_line_patch_list;
         bpatch = true;
@@ -21116,7 +21114,7 @@ int CDisplayList::DrawAllContourLines (void)
             i = contour_line_patch_list[ido];
         }
 
-        lptr = contour_line_prim_list + i;
+        lptr = cp_data + i;
 
         if (lptr->deleted_flag == 1) {
             continue;

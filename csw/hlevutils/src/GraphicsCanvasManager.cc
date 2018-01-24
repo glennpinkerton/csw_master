@@ -55,7 +55,7 @@ CanvasManager::~CanvasManager ()
 int CanvasManager::ezx_AddGraphicsCanvasToManager (char *name,
                                     long java_num)
 {
-    GRaphicsCanvasStruct    *cptr;
+    GRaphicsCanvasStruct    *cptr = NULL;
     int                     i, cval;
     char                    lname1[200], lname2[200];
 
@@ -88,7 +88,13 @@ int CanvasManager::ezx_AddGraphicsCanvasToManager (char *name,
     for (i=0; i<NumCanvasList; i++) {
         cptr = CanvasList + i;
         if (cptr->dlist == NULL) {
-            cptr->dlist = new CDisplayList;
+            try {
+                cptr->dlist = new CDisplayList;
+            }
+            catch (...) {
+                cptr->dlist = NULL;
+                break;
+            }
             cptr->java_num = java_num;
             strncpy (cptr->name, name, 99);
             cptr->name[99] = '\0';
@@ -115,7 +121,9 @@ int CanvasManager::ezx_AddGraphicsCanvasToManager (char *name,
             MaxCanvasList += gchunk;
             CanvasList = static_cast <GRaphicsCanvasStruct *>
                           (csw_Realloc(CanvasList, MaxCanvasList * gcsize));
-            memset ((void *)(CanvasList + oldmax), 0, gchunk * gcsize);
+            if (CanvasList != NULL) {
+                memset ((void *)(CanvasList + oldmax), 0, gchunk * gcsize);
+            }
         }  
     }
 

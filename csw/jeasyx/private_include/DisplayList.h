@@ -1077,9 +1077,7 @@ private:
   /*
    * members with various lists of primitives
    */
-    LInePrim        *contour_line_prim_list = NULL;
-    int             num_contour_line_prim_list,
-                    max_contour_line_prim_list;
+    std::vector<LInePrim>   contour_line_prim_list;
 
     std::vector<LInePrim>   line_prim_list;
 

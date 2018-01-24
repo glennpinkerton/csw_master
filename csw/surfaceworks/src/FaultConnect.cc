@@ -1648,6 +1648,7 @@ int FaultConnect::connectFaults (void)
         smodel = new SealedModel ();
     }
     catch (...) {
+        smodel = NULL;
         return -1;
     }
 
@@ -1806,7 +1807,17 @@ int FaultConnect::connectFaults (void)
         fseal->num_tris = nt;
 
         if (fpad->sgp != NULL) {
-            fseal->sgp = new SurfaceGroupPlane (fpad->sgp);
+            try {
+                if (fseal->sgp != NULL) {
+                    delete fseal->sgp;
+                    fseal->sgp = NULL;
+                }
+                fseal->sgp = new SurfaceGroupPlane (fpad->sgp);
+            }
+            catch (...) {
+                fseal->sgp = NULL;
+                return -1;
+            }
         }
         fseal->id = fpad->id;
 
@@ -2129,7 +2140,6 @@ int FaultConnect::PadFault (int index)
 
     double          *xa, *ya, *za;
     double          tx[3], ty[3], tz[3];
-    //double          xt, yt, zt;
     int             n1, n2, n3, ntot, i, n;
     int             istat, npts;
     TRiangleStruct  *tptr;
@@ -2302,7 +2312,12 @@ int FaultConnect::PadFault (int index)
  */
     sgp = sptr->sgp;
     if (sgp == NULL) {
-        sgp = new SurfaceGroupPlane ();
+        try {
+            sgp = new SurfaceGroupPlane ();
+        }
+        catch (...) {
+            sgp = NULL;
+        }
         if (sgp == NULL) {
             return -1;
         }
@@ -2435,7 +2450,16 @@ int FaultConnect::PadFault (int index)
     pptr->num_edges = n_edges;
     pptr->num_tris = n_tris;
     pptr->id = sptr->id;
-    pptr->sgp = new SurfaceGroupPlane (sgp);
+    try {
+        if (pptr->sgp != NULL) {
+            delete pptr->sgp;
+            pptr->sgp = NULL;
+        }
+        pptr->sgp = new SurfaceGroupPlane (sgp);
+    }
+    catch (...) {
+        pptr->sgp = NULL;
+    }
 
     return 1;
 
@@ -2513,7 +2537,13 @@ int FaultConnect::setFault (
     fptr->id = id;
 
     if (sgpflag) {
-        SurfaceGroupPlane    *sgp = new SurfaceGroupPlane ();
+        SurfaceGroupPlane    *sgp = NULL;
+        try {
+            sgp = new SurfaceGroupPlane ();
+        }
+        catch (...) {
+            sgp = NULL;
+        }
         if (sgp != NULL) {
             sgp->setPlaneCoefs (sgpdata);
             sgp->setOrigin (sgpdata[3],
@@ -3175,13 +3205,18 @@ int FaultConnect::calcDetachment (double lower_age, double upper_age, double age
     detach_calc_surf->tris = trisout;
     detach_calc_surf->num_tris = nt;
 
-    SurfaceGroupPlane  *sgp;
-    sgp = new SurfaceGroupPlane ();
-    sgp->addTriMeshForFit (nodesout, nn,
-                           edgesout, ne,
-                           trisout, nt);
-    sgp->calcPlaneCoefs ();
-    sgp->freeFitPoints ();
+    SurfaceGroupPlane  *sgp = NULL;
+    try {
+        sgp = new SurfaceGroupPlane ();
+        sgp->addTriMeshForFit (nodesout, nn,
+                               edgesout, ne,
+                               trisout, nt);
+        sgp->calcPlaneCoefs ();
+        sgp->freeFitPoints ();
+    }
+    catch (...) {
+        sgp = NULL;
+    }
     detach_calc_surf->sgp = sgp;
 
     return 1;
