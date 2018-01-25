@@ -26,6 +26,8 @@
 /*
  * General csw includes.
  */
+#include <csw/hlevutils/src/simulate_new.h>
+
 #include <csw/utils/include/csw_.h>
 #include <csw/utils/private_include/csw_scope.h>
 
@@ -842,9 +844,11 @@ int SealedModel::padModel (
         CSWScopeGuard loc_scope_guard (lscope);
 
         try {
+            SNF;
             sgp = new SurfaceGroupPlane ();
         }
         catch (...) {
+            printf ("\n***** Exception from new *****\n\n");
             sgp = NULL;
             return -1;
         }
@@ -2632,11 +2636,13 @@ int SealedModel::CreateInput3DTriangleIndex (void)
     }
 
     try {
+        SNF;
         InputTriangle3DIndex = new Spatial3DTriangleIndex (
                 modelXmin, modelYmin, modelZmin,
                 modelXmax, modelYmax, modelZmax);
     }
     catch (...) {
+        printf ("\n***** Exception from new *****\n\n");
         InputTriangle3DIndex = NULL;
         return 0;
     }
@@ -4426,11 +4432,13 @@ int SealedModel::CreatePadded3DTriangleIndex (void)
     }
 
     try {
+        SNF;
         PaddedTriangle3DIndex = new Spatial3DTriangleIndex (
                 padXmin, padYmin, padZmin,
                 padXmax, padYmax, padZmax);
     }
     catch (...) {
+        printf ("\n***** Exception from new *****\n\n");
         PaddedTriangle3DIndex = NULL;
         return 0;
     }
@@ -16475,11 +16483,13 @@ int SealedModel::CreateDetachment3DTriangleIndex (void)
     }
 
     try {
+        SNF;
         PaddedTriangle3DIndex = new Spatial3DTriangleIndex (
                 padXmin, padYmin, padZmin,
                 padXmax, padYmax, padZmax);
     }
     catch (...) {
+        printf ("\n***** Exception from new *****\n\n");
         PaddedTriangle3DIndex = NULL;
         return 0;
     }
@@ -17122,9 +17132,11 @@ int SealedModel::padFaultsForSplitLines (void)
         CSWScopeGuard loc_scope_guard (lscope);
 
         try {
+            SNF;
             sgp = new SurfaceGroupPlane ();
         }
         catch (...) {
+            printf ("\n***** Exception from new *****\n\n");
             sgp = NULL;
             return -1;
         }

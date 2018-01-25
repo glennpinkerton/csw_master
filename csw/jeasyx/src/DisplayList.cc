@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "csw/hlevutils/src/simulate_new.h"
+
 #include "csw/jeasyx/private_include/DisplayList.h"
 #include "csw/jeasyx/private_include/DisplayListJNI.h"
 #include "csw/jeasyx/private_include/EZXJavaArea.h"
@@ -1397,6 +1399,7 @@ int CDisplayList::AddLine (double *xptsin, double *yptsin,
 
     if (next_line < 0) {
         try {
+            SNF;
             LInePrim  lpr;
             ZeroInit (&lpr, sizeof(lpr));
             line_prim_list.push_back (lpr);
@@ -3180,6 +3183,7 @@ int CDisplayList::AddFill (double *xptsin, double *yptsin,
     next_fill = get_available_fill ();
     if (next_fill < 0) {
         try {
+            SNF;
             FIllPrim  fpr;
             ZeroInit (&fpr, sizeof(fpr));
             fill_prim_list.push_back (fpr);
@@ -3898,6 +3902,7 @@ int CDisplayList::AddText (double x, double y, double size, double angle,
     next_text = get_available_text ();
     if (next_text < 0) {
         try {
+            SNF;
             TExtPrim  tpr;
             ZeroInit (&tpr, sizeof(tpr));
             text_prim_list.push_back (tpr);
@@ -4600,6 +4605,7 @@ int CDisplayList::AddSymb (double x, double y, double size, double angle,
     next_symb = get_available_symb ();
     if (next_symb < 0) {
         try {
+            SNF;
             SYmbPrim  spr;
             ZeroInit (&spr, sizeof(spr));
             symb_prim_list.push_back (spr);
@@ -5154,6 +5160,7 @@ int CDisplayList::AddShape (int shape_type,
     next_shape = get_available_shape ();
     if (next_shape < 0) {
         try {
+            SNF;
             SHapePrim  hpr;
             ZeroInit (&hpr, sizeof(hpr));
             shape_prim_list.push_back (hpr);
@@ -7580,6 +7587,7 @@ void CDisplayList::AddSelectableObject (int object_index)
     }
 
     try {
+        SNF;
         dls = new DLSelectable ();
     }
     catch (...) {
@@ -8317,6 +8325,7 @@ int CDisplayList::AddColorImage (unsigned char *red,
     next_image = get_available_image ();
     if (next_image < 0) {
         try {
+            SNF;
             IMagePrim  ipr;
             ZeroInit (&ipr, sizeof(ipr));
             image_prim_list.push_back (ipr);
@@ -11303,6 +11312,7 @@ int CDisplayList::AddContour (
     }
 
     try {
+        SNF;
         dlc = new DLContour ();
     }
     catch (...) {
@@ -11411,6 +11421,7 @@ int CDisplayList::AddGrid (
     }
 
     try {
+        SNF;
         dlg = new DLSurf ();
     }
     catch (...) {
@@ -12025,6 +12036,7 @@ void CDisplayList::reclip_frame_contours (int fnum)
         }
 
         try {
+            SNF;
             page_con = new DLContour ();
         }
         catch (...) {
@@ -12209,6 +12221,7 @@ int CDisplayList::AddContourLine (CSW_F *xpts_in, CSW_F *ypts_in, int npts)
 
     if (next_line < 0) {
         try {
+            SNF;
             LInePrim  cpr;
             ZeroInit (&cpr, sizeof(cpr));
             contour_line_prim_list.push_back (cpr);
@@ -12556,6 +12569,7 @@ int CDisplayList::AddGridColorImage (int fnum,
     next_image = get_available_image ();
     if (next_image < 0) {
         try {
+            SNF;
             IMagePrim  ipr;
             ZeroInit (&ipr, sizeof(ipr));
             image_prim_list.push_back (ipr);
@@ -12761,6 +12775,7 @@ int CDisplayList::AddTriMesh (
     }
 
     try {
+        SNF;
         dlg = new DLSurf ();
     }
     catch (...) {
@@ -17557,6 +17572,7 @@ void CDisplayList::reclip_and_draw_selected_contours (DLSelectable *dls)
         }
 
         try {
+            SNF;
             page_con = new DLContour ();
         }
         catch (...) {
@@ -17937,6 +17953,7 @@ int CDisplayList::AddAxis (
     next_axis = get_available_axis ();
     if (next_axis < 0) {
         try {
+            SNF;
             AXisPrim  apr;
             ZeroInit (&apr, sizeof(apr));
             axis_prim_list.push_back (apr);
