@@ -82,7 +82,7 @@
 #endif
 
 /*
-    union for packing a short int into a
+    union for packing a 2 byte int into a
     2 byte character string
 */
 typedef union {
@@ -100,7 +100,7 @@ typedef union {
 }  R4Equiv;
 
 /*
-    union for long int value.
+    union for 4 byte int value.
 */
 typedef union {
     int                i4;

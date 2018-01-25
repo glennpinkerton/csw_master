@@ -26,6 +26,9 @@
 /*
  * Include general csw headers.
  */
+
+#include <csw/hlevutils/src/simulate_new.h>
+
 #include <csw/utils/include/csw_.h>
 
 #include <csw/utils/private_include/csw_scope.h>
@@ -1645,9 +1648,11 @@ int FaultConnect::connectFaults (void)
     }
 
     try {
+        SNF;
         smodel = new SealedModel ();
     }
     catch (...) {
+        printf ("\n***** Exception from new *****\n\n");
         smodel = NULL;
         return -1;
     }
@@ -1812,9 +1817,11 @@ int FaultConnect::connectFaults (void)
                     delete fseal->sgp;
                     fseal->sgp = NULL;
                 }
+                SNF;
                 fseal->sgp = new SurfaceGroupPlane (fpad->sgp);
             }
             catch (...) {
+                printf ("\n***** Exception from new *****\n\n");
                 fseal->sgp = NULL;
                 return -1;
             }
@@ -2313,9 +2320,11 @@ int FaultConnect::PadFault (int index)
     sgp = sptr->sgp;
     if (sgp == NULL) {
         try {
+            SNF;
             sgp = new SurfaceGroupPlane ();
         }
         catch (...) {
+            printf ("\n***** Exception from new *****\n\n");
             sgp = NULL;
         }
         if (sgp == NULL) {
@@ -2455,9 +2464,11 @@ int FaultConnect::PadFault (int index)
             delete pptr->sgp;
             pptr->sgp = NULL;
         }
+        SNF;
         pptr->sgp = new SurfaceGroupPlane (sgp);
     }
     catch (...) {
+        printf ("\n***** Exception from new *****\n\n");
         pptr->sgp = NULL;
     }
 
@@ -2539,9 +2550,11 @@ int FaultConnect::setFault (
     if (sgpflag) {
         SurfaceGroupPlane    *sgp = NULL;
         try {
+            SNF;
             sgp = new SurfaceGroupPlane ();
         }
         catch (...) {
+            printf ("\n***** Exception from new *****\n\n");
             sgp = NULL;
         }
         if (sgp != NULL) {
@@ -3207,6 +3220,7 @@ int FaultConnect::calcDetachment (double lower_age, double upper_age, double age
 
     SurfaceGroupPlane  *sgp = NULL;
     try {
+        SNF;
         sgp = new SurfaceGroupPlane ();
         sgp->addTriMeshForFit (nodesout, nn,
                                edgesout, ne,
@@ -3215,6 +3229,7 @@ int FaultConnect::calcDetachment (double lower_age, double upper_age, double age
         sgp->freeFitPoints ();
     }
     catch (...) {
+        printf ("\n***** Exception from new *****\n\n");
         sgp = NULL;
     }
     detach_calc_surf->sgp = sgp;

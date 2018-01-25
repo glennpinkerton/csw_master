@@ -16,6 +16,7 @@
 #define PRIVATE_HEADERS_OK
 #endif
 
+#include <csw/hlevutils/src/simulate_new.h>
 
 #include <csw/jsurfaceworks/private_include/PatchSplit.h>
 #include <csw/jsurfaceworks/private_include/SWCalc.h>
@@ -4011,9 +4012,11 @@ int PATCHSplit::ps_StartSealedModelDefinition (int marginPct)
     }
 
     try {
+        SNF;
         SModel = new SealedModel ();
     }
     catch (...) {
+        printf ("\n***** Exception from new *****\n\n");
         SModel = NULL;
     }
     if (SModel == NULL) {
@@ -6222,9 +6225,11 @@ int PATCHSplit:: ps_StartFaultConnect (double avspace)
     }
 
     try {
+        SNF;
         FConnect = new FaultConnect ();
     }
     catch (...) {
+        printf ("\n***** Exception from new *****\n\n");
         FConnect = NULL;
         return 1;
     }

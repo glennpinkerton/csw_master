@@ -110,6 +110,9 @@ int ezx_process_command (
 
     CanvasManager    *canvas_manager_ptr = ThreadGuard::GetCanvasManager (threadid);
 
+    if (canvas_manager_ptr == NULL) {
+        return -1;
+    }
 
     /*
      * Commands to open and close log files.

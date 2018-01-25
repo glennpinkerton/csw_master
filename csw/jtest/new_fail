@@ -1,0 +1,23 @@
+#!/bin/bash
+
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;
+./ezx_test utest.ezx;

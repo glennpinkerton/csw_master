@@ -22,7 +22,10 @@
  ***************************************************************************
 */
 
+#include <exception>
+
 #include <csw/utils/include/csw_.h>
+#include <csw/hlevutils/src/simulate_new.h>
 
 #include <csw/hlevutils/src/GraphicsCanvasManager.h>
 #include <csw/jeasyx/private_include/gtx_drawprim.h>
@@ -89,9 +92,12 @@ int CanvasManager::ezx_AddGraphicsCanvasToManager (char *name,
         cptr = CanvasList + i;
         if (cptr->dlist == NULL) {
             try {
+                SNF
                 cptr->dlist = new CDisplayList;
             }
             catch (...) {
+                printf ("\n*****  caught new exception on display list  *****\n\n");
+                fflush (stdout);
                 cptr->dlist = NULL;
                 break;
             }
@@ -137,9 +143,12 @@ int CanvasManager::ezx_AddGraphicsCanvasToManager (char *name,
     cptr = CanvasList + NumCanvasList;
 
     try {
+        SNF
         cptr->dlist = new CDisplayList;
     }
     catch (...) {
+        printf ("\n*****  caught new exception on display list  *****\n\n");
+        fflush (stdout);
         cptr->dlist = NULL;
     }
     cptr->java_num = java_num;

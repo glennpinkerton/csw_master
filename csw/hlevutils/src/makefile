@@ -3,10 +3,12 @@
 include $(CSW_PARENT)/build/system.mk
 
 LIB_SRC_CC=\
+ simulate_new.cc\
  ThreadGuard.cc\
  GraphicsCanvasManager.cc
 
 LIB_OBJS_CC=\
+ simulate_new.o\
  ThreadGuard$(OBJ_SUFFIX)\
  GraphicsCanvasManager$(OBJ_SUFFIX)
 

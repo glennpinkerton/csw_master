@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 #include  "csw/hlevutils/src/ThreadGuard.h"
+#include  "csw/hlevutils/src/simulate_new.h"
 
 #include  "csw/utils/private_include/csw_scope.h"
 
@@ -48,9 +49,11 @@ PATCHSplit *ThreadGuard::GetPatchSplit (int threadid)
         ps = it->second.psplit;
         if (ps == NULL) {
             try {
+                SNF;
                 ps = new PATCHSplit ();
             }
             catch (...) {
+                printf ("\n***** Exception from new in GetPatchSplit *****\n\n");
                 return NULL;
             }
             it->second.psplit = ps;
@@ -59,9 +62,11 @@ PATCHSplit *ThreadGuard::GetPatchSplit (int threadid)
     }
 
     try {
+        SNF;
         tgd.psplit = new PATCHSplit ();
     }
     catch (...) {
+        printf ("\n***** Exception from new in GetPatchSplit *****\n\n");
         return NULL;
     }
 
@@ -127,9 +132,11 @@ GRDVert *ThreadGuard::GetGRDVert (int threadid)
         gv = it->second.gvert;
         if (gv == NULL) {
             try {
+                SNF;
                 gv = new GRDVert ();
             }
             catch (...) {
+                printf ("\n***** Exception from new in GetGrdVert *****\n\n");
                 return NULL;
             }
             it->second.gvert = gv;
@@ -138,9 +145,11 @@ GRDVert *ThreadGuard::GetGRDVert (int threadid)
     }
 
     try {
+        SNF;
         tgd.gvert = new GRDVert ();
     }
     catch (...) {
+        printf ("\n***** Exception from new in GetGrdVert *****\n\n");
         return NULL;
     }
 
@@ -184,10 +193,12 @@ CSWGrdAPI *ThreadGuard::GetGrdAPI (int threadid)
         gapi = it->second.grdapi;
         if (gapi == NULL) {
             try {
+                SNF;
                 gapi = new CSWGrdAPI ();
                 it->second.grdapi = gapi;
             }
             catch (...) {
+                printf ("\n***** Exception from new in GetGrdAPI *****\n\n");
                 return gapi;
             }
         }
@@ -195,9 +206,11 @@ CSWGrdAPI *ThreadGuard::GetGrdAPI (int threadid)
     }
 
     try {
+        SNF;
         tgd.grdapi = new CSWGrdAPI ();
     }
     catch (...) {
+        printf ("\n***** Exception from new in GetGrdAPI *****\n\n");
         return gapi;
     }
 
@@ -242,10 +255,12 @@ SWCalc  *ThreadGuard::GetSWCalc (int threadid)
         swc = it->second.swcalc;
         if (swc == NULL) {
             try {
+                SNF;
                 swc = new SWCalc ();
                 it->second.swcalc = swc;
             }
             catch (...) {
+                printf ("\n***** Exception from new in GetSWCalc *****\n\n");
                 return NULL;
             }
         }
@@ -253,9 +268,11 @@ SWCalc  *ThreadGuard::GetSWCalc (int threadid)
     }
 
     try {
+        SNF;
         tgd.swcalc = new SWCalc ();
     }
     catch (...) {
+        printf ("\n***** Exception from new in GetSWCalc *****\n\n");
         return NULL;
     }
 
@@ -431,10 +448,12 @@ CanvasManager *ThreadGuard::GetCanvasManager (int threadid)
         cm = it->second.canvas_manager;
         if (cm == NULL) {
             try {
+                //SNF;
                 cm = new CanvasManager ();
                 it->second.canvas_manager = cm;
             }
             catch (...) {
+                printf ("\n***** Exception from new in GetCanvasManager *****\n\n");
                 return NULL;
             }
         }
@@ -442,9 +461,11 @@ CanvasManager *ThreadGuard::GetCanvasManager (int threadid)
     }
 
     try {
+        //SNF;
         tgd.canvas_manager = new CanvasManager ();
     }
     catch (...) {
+        printf ("\n***** Exception from new in GetCanvasManager *****\n\n");
         return NULL;
     }
 
