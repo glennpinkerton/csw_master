@@ -287,10 +287,18 @@ catch (Exception e) {
           }
         });
 
+        JButton medium_button = new JButton ("Medium Random");
+        medium_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                HugeFrame frame = new HugeFrame (20);
+                frame.setVisible(true);
+          }
+        });
+
         JButton big_button = new JButton ("Huge Random");
         big_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                HugeFrame frame = new HugeFrame ();
+                HugeFrame frame = new HugeFrame (-1);
                 frame.setVisible(true);
           }
         });
@@ -376,6 +384,7 @@ catch (Exception e) {
         contentPane.add (text3_button);
         contentPane.add (random_button);
         contentPane.add (frame1_button);
+        contentPane.add (medium_button);
         contentPane.add (big_button);
         contentPane.add (reverse_button);
         contentPane.add (frame2_button);
@@ -512,8 +521,7 @@ class RandomPrimFrame extends JFrame
         dl.addArc (80.0, 22.0, 10.0, 7.0, 45.0, 300.0, 90.0, 1);
 
         dl.setTextColor (0, 0, 0);
-        //dl.setFont ("arial", Font.PLAIN);
-        //dl.setFont (104);
+        dl.setFont ("arial", Font.PLAIN);
         dl.addNumber (15.0, 150.0, .15, 0.0, 1.23, 2, 0);
         dl.addNumber (15.0, 170.0, .15, 0.0, 1.23456e15, 5, 0);
         dl.addNumber (15.0, 190.0, .15, 0.0, 123456789, 0, 1);
@@ -1796,7 +1804,7 @@ class HugeFrame extends JFrame
 
     private static Logger  logger = CSWLogger.getMyLogger ();
 
-    public HugeFrame ()
+    public HugeFrame (int num_hint)
     {
 
         double[] xline, yline;
@@ -1806,7 +1814,15 @@ class HugeFrame extends JFrame
         int      ndo;
         double   xymax;
 
-        DLSelectable dls;
+/*
+try {
+int idum = System.in.read();
+}
+catch (Exception e) {
+}
+*/
+
+        DLSelectable dls = null;
 
         xline = new double[10];
         yline = new double[10];
@@ -1814,9 +1830,16 @@ class HugeFrame extends JFrame
 
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
-        ndo = 10000;
-        xymax = 10000.0;
-        setTitle ("Huge Random Frame Test * " + ndo);
+        if (num_hint <= 0) {
+          ndo = 10000;
+          xymax = 10000.0;
+          setTitle ("Huge Random Frame Test * " + ndo);
+        }
+        else {
+          ndo = num_hint;
+          xymax = 2000.0;
+          setTitle ("Medium Random Frame Test * " + ndo);
+        }
         setSize (700, 700);
         setResizable (true);
 
@@ -1881,10 +1904,10 @@ class HugeFrame extends JFrame
         if (ndo > 50) tfact = .5;
         if (ndo > 100) tfact = .25;
 
-        double shfact = .4;
-        if (ndo > 20) shfact = .2;
-        if (ndo > 50) shfact = .1;
-        if (ndo > 100) shfact = .05;
+        double shfact = 4;
+        if (ndo > 20) shfact = 2;
+        if (ndo > 50) shfact = 1;
+        if (ndo > 100) shfact = .5;
 
         for (int ido=0; ido<ndo; ido++) {
 
@@ -2046,7 +2069,6 @@ class HugeFrame extends JFrame
 
             dl.setTextColor (0, 0, 0);
             dl.setFont ("arial", Font.ITALIC);
-            //dl.setFont (104);
             dl.addNumber (15.0 + xr, 150.0 + yr, .15 * tfact, 0.0, 1.23, 2, 0);
             dl.addNumber (15.0 + xr, 170.0 + yr, .15 * tfact, 0.0, 1.23456e15, 5, 0);
             dl.addNumber (15.0 + xr, 190.0 + yr, .15 * tfact, 0.0, 123456789, 0, 1);

@@ -2588,7 +2588,9 @@ int GTXDrawPrim::gtx_cliparcprim
 /*
     decide how many points for the arc at the current scale
 */
-    tiny = ARCRESOLUTION  / scalx;
+    double _scalx = scalx;
+    if (_scalx < 0.0) _scalx = -_scalx;
+    tiny = ARCRESOLUTION  / _scalx;
     npts = (int)((r1 + r2) * 3.14159f / tiny);
     npts += 10;
     if (npts < 20) npts = 20;

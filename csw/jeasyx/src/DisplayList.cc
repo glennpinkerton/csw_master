@@ -198,115 +198,7 @@ CDisplayList::CDisplayList()
     Pickx2 = -1.e30f;
     Picky2 = -1.e30f;
 
-/*
- * Grid, contour and trimesh lists.
- */
-    contour_list = NULL;
-    num_contour_list = 0;
-    max_contour_list = 0;
-
-    surf_list = NULL;
-    num_surf_list = 0;
-    max_surf_list = 0;
-
-/*
- * available primitive lists;
- */
-    contour_line_available_list = NULL;
-    num_contour_line_available_list = 0;
-    max_contour_line_available_list = 0;
-
-    line_available_list = NULL;
-    num_line_available_list = 0;
-    max_line_available_list = 0;
-
-    fill_available_list = NULL;
-    num_fill_available_list = 0;
-    max_fill_available_list = 0;
-
-    text_available_list = NULL;
-    num_text_available_list = 0;
-    max_text_available_list = 0;
-
-    symb_available_list = NULL;
-    num_symb_available_list = 0;
-    max_symb_available_list = 0;
-
-    image_available_list = NULL;
-    num_image_available_list = 0;
-    max_image_available_list = 0;
-
-    shape_available_list = NULL;
-    num_shape_available_list = 0;
-    max_shape_available_list = 0;
-
-    axis_available_list = NULL;
-    num_axis_available_list = 0;
-    max_axis_available_list = 0;
-
-    contour_available_list = NULL;
-    num_contour_available_list = 0;
-    max_contour_available_list = 0;
-
-/*
- * hidden primitive lists;
- */
-    line_hidden_list = NULL;
-    num_line_hidden_list = 0;
-    max_line_hidden_list = 0;
-
-    fill_hidden_list = NULL;
-    num_fill_hidden_list = 0;
-    max_fill_hidden_list = 0;
-
-    text_hidden_list = NULL;
-    num_text_hidden_list = 0;
-    max_text_hidden_list = 0;
-
-    symb_hidden_list = NULL;
-    num_symb_hidden_list = 0;
-    max_symb_hidden_list = 0;
-
-    shape_hidden_list = NULL;
-    num_shape_hidden_list = 0;
-    max_shape_hidden_list = 0;
-
-    axis_hidden_list = NULL;
-    num_axis_hidden_list = 0;
-    max_axis_hidden_list = 0;
-
-    contour_hidden_list = NULL;
-    num_contour_hidden_list = 0;
-    max_contour_hidden_list = 0;
-
     HideFlag = 0;
-
-/*
- * Patch primitive lists;
- */
-    contour_line_patch_list = NULL;
-    num_contour_line_patch_list = 0;
-    max_contour_line_patch_list = 0;
-
-    line_patch_list = NULL;
-    num_line_patch_list = 0;
-    max_line_patch_list = 0;
-
-    fill_patch_list = NULL;
-    num_fill_patch_list = 0;
-    max_fill_patch_list = 0;
-
-    text_patch_list = NULL;
-    num_text_patch_list = 0;
-    max_text_patch_list = 0;
-
-    symb_patch_list = NULL;
-    num_symb_patch_list = 0;
-    max_symb_patch_list = 0;
-
-    shape_patch_list = NULL;
-    num_shape_patch_list = 0;
-    max_shape_patch_list = 0;
 
     patch_draw_flag = 0;
 
@@ -565,7 +457,6 @@ CDisplayList :: CDisplayList (const CDisplayList &old)
 
     assert (0);
 //    CopyFromOld (old);
-    /*lint -e1401 -e715*/
 }
 
 
@@ -579,7 +470,6 @@ CDisplayList &CDisplayList :: operator=(const CDisplayList &old)
 //    CopyFromOld (old);
 
     return (*this);
-    /*lint -e1539*/
 }
 
 
@@ -593,39 +483,12 @@ CDisplayList::~CDisplayList()
     csw_Free (xywork2);
     csw_Free (iwork);
 
-    csw_Free (line_patch_list);
-    csw_Free (fill_patch_list);
-    csw_Free (text_patch_list);
-    csw_Free (symb_patch_list);
-    csw_Free (shape_patch_list);
-    csw_Free (contour_line_patch_list);
-
-    csw_Free (contour_line_available_list);
-    csw_Free (line_available_list);
-    csw_Free (fill_available_list);
-    csw_Free (text_available_list);
-    csw_Free (symb_available_list);
-    csw_Free (shape_available_list);
-    csw_Free (axis_available_list);
-    csw_Free (image_available_list);
-    csw_Free (contour_available_list);
-
-    csw_Free (line_hidden_list);
-    csw_Free (fill_hidden_list);
-    csw_Free (text_hidden_list);
-    csw_Free (symb_hidden_list);
-    csw_Free (shape_hidden_list);
-    csw_Free (axis_hidden_list);
-    csw_Free (contour_hidden_list);
-
     clean_frame_list ();
 
     csw_Free (frame_list);
     csw_Free (graph_list);
     csw_Free (layer_list);
     csw_Free (item_list);
-
-    frame_list = NULL;
 
     free_lines ();
     free_fills ();
@@ -652,34 +515,36 @@ CDisplayList::~CDisplayList()
         max_selectable_object_list = 0;
     }
 
-    if (surf_list != NULL) {
-        for (i=0; i<num_surf_list; i++) {
-            if (surf_list[i] != NULL) {
-                delete (surf_list[i]);
+    int        sf_size = surf_list.size();
+    DLSurf     **sf_data = surf_list.data();
+
+    if (sf_data != NULL  &&  sf_size > 0) {
+        for (i=0; i<sf_size; i++) {
+            if (sf_data[i] != NULL) {
+                delete (sf_data[i]);
             }
-            surf_list[i] = NULL;
+            sf_data[i] = NULL;
         }
-        csw_Free (surf_list);
-        surf_list = NULL;
-        max_surf_list = 0;
-        num_surf_list = 0;
+        surf_list.clear();
     }
 
-    if (contour_list != NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+    
+    if (cl_data != NULL  &&  cl_size > 0) {
         DLContour     *dlc;
-        for (i=0; i<num_contour_list; i++) {
-            dlc = contour_list[i];
+        for (i=0; i<cl_size; i++) {
+            dlc = cl_data[i];
             if (dlc != NULL) {
                 delete (dlc);
             }
         }
-        csw_Free (contour_list);
     }
+    contour_list.clear();
 
     csw_Free (ImageXFault);
     csw_Free (ImageNFaultPoints);
 
-    /*lint -e1740*/
 }
 
 
@@ -776,11 +641,17 @@ void CDisplayList::clean_frame_list (void)
         }
 
         csw_Free (frptr->line_index);
+        frptr->line_index = NULL;
         csw_Free (frptr->fill_index);
+        frptr->fill_index = NULL;
         csw_Free (frptr->text_index);
+        frptr->text_index = NULL;
         csw_Free (frptr->symb_index);
+        frptr->symb_index = NULL;
         csw_Free (frptr->shape_index);
+        frptr->shape_index = NULL;
         csw_Free (frptr->contour_index);
+        frptr->contour_index = NULL;
 
     }
 
@@ -1426,6 +1297,7 @@ int CDisplayList::AddLine (double *xptsin, double *yptsin,
 
     if (from_graph) {
         local_frame_num = current_frame_num;
+        local_scaleable = 1;
     }
     else {
         if (current_frame_num >= 0  &&
@@ -1536,10 +1408,13 @@ int CDisplayList::DrawAllLines (void)
 
     jni_msg ("\nDisplay list lines being drawn\n");
 
+    int       pt_size = (int)line_patch_list.size();
+    int       *pt_data = line_patch_list.data();
+
     nloop = (int)line_prim_list.size();
-    if (line_patch_list != NULL  &&
+    if (pt_data != NULL  &&  pt_size > 0  &&
         patch_draw_flag == 1) {
-        nloop = num_line_patch_list;
+        nloop = pt_size;
         bpatch = true;
     }
 
@@ -1549,7 +1424,7 @@ int CDisplayList::DrawAllLines (void)
 
         i = ido;
         if (bpatch) {
-            i = line_patch_list[ido];
+            i = pt_data[ido];
         }
 
         lptr = line_prim_list.data() + i;
@@ -1640,14 +1515,17 @@ int CDisplayList::SetSpatialIndexForContour (int contour_num)
     double          x1, y1t, x2, y2;
     FRameStruct     *fp;
 
-    if (contour_list == NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (cl_data == NULL  ||  cl_size < 1) {
         return 0;
     }
-    if (contour_num < 0  ||  contour_num >= num_contour_list) {
+    if (contour_num < 0  ||  contour_num >= cl_size) {
         return 0;
     }
 
-    cptr = contour_list[contour_num];
+    cptr = cl_data[contour_num];
     if (cptr == NULL) {
         return 0;
     }
@@ -2221,50 +2099,15 @@ int CDisplayList::CalcLineBounds (int line_prim_num,
  */
 void CDisplayList::free_available_lists (void)
 {
-    csw_Free (contour_line_available_list);
-    num_contour_line_available_list = 0;
-    max_contour_line_available_list = 0;
-    contour_line_available_list = NULL;
-
-    csw_Free (line_available_list);
-    num_line_available_list = 0;
-    max_line_available_list = 0;
-    line_available_list = NULL;
-
-    csw_Free (fill_available_list);
-    num_fill_available_list = 0;
-    max_fill_available_list = 0;
-    fill_available_list = NULL;
-
-    csw_Free (text_available_list);
-    num_text_available_list = 0;
-    max_text_available_list = 0;
-    text_available_list = NULL;
-
-    csw_Free (symb_available_list);
-    num_symb_available_list = 0;
-    max_symb_available_list = 0;
-    symb_available_list = NULL;
-
-    csw_Free (image_available_list);
-    num_image_available_list = 0;
-    max_image_available_list = 0;
-    image_available_list = NULL;
-
-    csw_Free (shape_available_list);
-    num_shape_available_list = 0;
-    max_shape_available_list = 0;
-    shape_available_list = NULL;
-
-    csw_Free (axis_available_list);
-    num_axis_available_list = 0;
-    max_axis_available_list = 0;
-    axis_available_list = NULL;
-
-    csw_Free (contour_available_list);
-    num_contour_available_list = 0;
-    max_contour_available_list = 0;
-    contour_available_list = NULL;
+    contour_available_list.clear();
+    contour_line_available_list.clear();
+    line_available_list.clear();
+    text_available_list.clear();
+    fill_available_list.clear();
+    symb_available_list.clear();
+    image_available_list.clear();
+    shape_available_list.clear();
+    axis_available_list.clear();
 
     return;
 
@@ -2273,41 +2116,36 @@ void CDisplayList::free_available_lists (void)
 
 int CDisplayList::get_available_contour (void) {
 
-    if (contour_available_list == NULL  ||
-        num_contour_available_list <= 0) {
+    int        cv_size = contour_available_list.size();
+    int        *cv_data = contour_available_list.data();
+
+    if (cv_data == NULL  ||  cv_size < 1) {
         return -1;
     }
 
-    num_contour_available_list--;
+    int ival = contour_available_list.back();
+    contour_available_list.pop_back();
 
-    return contour_available_list[num_contour_available_list];
+    return ival;
 
 }
 
 
 int CDisplayList::add_available_contour (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_contour_list  ||  contour_list == NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (prim_num < 0  ||  prim_num >= cl_size  ||  cl_data == NULL) {
         return 0;
     }
 
-    if (contour_available_list == NULL) {
-        num_contour_available_list = 0;
-        max_contour_available_list = 0;
+    try {
+        contour_available_list.push_back (prim_num);
     }
-
-    if (num_contour_available_list >= max_contour_available_list) {
-        max_contour_available_list += _BIG_CHUNK_SIZE_;
-        contour_available_list =
-        (int *)csw_Realloc
-        (contour_available_list, max_contour_available_list * sizeof(int));
-    }
-    if (contour_available_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    contour_available_list[num_contour_available_list] = prim_num;
-    num_contour_available_list++;
 
     return 1;
 }
@@ -2315,18 +2153,19 @@ int CDisplayList::add_available_contour (int prim_num) {
 
 int CDisplayList::get_available_contour_line (void) {
 
-    if (contour_line_available_list == NULL  ||
-        num_contour_line_available_list <= 0) {
+    int        cv_size = contour_line_available_list.size();
+    int        *cv_data = contour_line_available_list.data();
+
+    if (cv_data == NULL  ||  cv_size < 1) {
         return -1;
     }
 
-    num_contour_line_available_list--;
+    int ival = contour_line_available_list.back();
+    contour_line_available_list.pop_back();
 
-    return contour_line_available_list[num_contour_line_available_list];
+    return ival;
 
 }
-
-
 
 int CDisplayList::add_available_contour_line (int prim_num) {
 
@@ -2337,23 +2176,12 @@ int CDisplayList::add_available_contour_line (int prim_num) {
         return 0;
     }
 
-    if (contour_line_available_list == NULL) {
-        num_contour_line_available_list = 0;
-        max_contour_line_available_list = 0;
+    try {
+        contour_line_available_list.push_back (prim_num);
     }
-
-    if (num_contour_line_available_list >= max_contour_line_available_list) {
-        max_contour_line_available_list += _BIG_CHUNK_SIZE_;
-        contour_line_available_list =
-        (int *)csw_Realloc
-        (contour_line_available_list, max_contour_line_available_list * sizeof(int));
-    }
-    if (contour_line_available_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    contour_line_available_list[num_contour_line_available_list] = prim_num;
-    num_contour_line_available_list++;
 
     return 1;
 }
@@ -2362,47 +2190,41 @@ int CDisplayList::add_available_contour_line (int prim_num) {
 
 int CDisplayList::add_available_line (int prim_num) {
 
-    if ((int)line_prim_list.size() < 1) {
+    int        lp_size = (int)line_prim_list.size();
+    LInePrim   *lp_data = line_prim_list.data();
+
+    if (lp_data == NULL  ||  lp_size < 1) {
         return 0;
     }
 
-    if (prim_num < 0  ||  prim_num >= (int)line_prim_list.size()) {
+    if (prim_num < 0  ||  prim_num >= lp_size) {
         return 0;
     }
 
-    if (line_available_list == NULL) {
-        num_line_available_list = 0;
-        max_line_available_list = 0;
+    try {
+        line_available_list.push_back (prim_num);
     }
-
-    if (num_line_available_list >= max_line_available_list) {
-        max_line_available_list += _BIG_CHUNK_SIZE_;
-        line_available_list =
-        (int *)csw_Realloc
-        (line_available_list, max_line_available_list * sizeof(int));
-    }
-    if (line_available_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    line_available_list[num_line_available_list] = prim_num;
-    num_line_available_list++;
 
     return 1;
 }
 
 
-
 int CDisplayList::get_available_line (void) {
 
-    if (line_available_list == NULL  ||
-        num_line_available_list <= 0) {
+    int        cv_size = line_available_list.size();
+    int        *cv_data = line_available_list.data();
+
+    if (cv_data == NULL  ||  cv_size < 1) {
         return -1;
     }
 
-    num_line_available_list--;
+    int ival = line_available_list.back();
+    line_available_list.pop_back();
 
-    return line_available_list[num_line_available_list];
+    return ival;
 
 }
 
@@ -2416,23 +2238,12 @@ int CDisplayList::add_available_fill (int prim_num) {
         return 0;
     }
 
-    if (fill_available_list == NULL) {
-        num_fill_available_list = 0;
-        max_fill_available_list = 0;
+    try {
+        fill_available_list.push_back (prim_num);
     }
-
-    if (num_fill_available_list >= max_fill_available_list) {
-        max_fill_available_list += _BIG_CHUNK_SIZE_;
-        fill_available_list =
-        (int *)csw_Realloc
-        (fill_available_list, max_fill_available_list * sizeof(int));
-    }
-    if (fill_available_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    fill_available_list[num_fill_available_list] = prim_num;
-    num_fill_available_list++;
 
     return 1;
 }
@@ -2440,14 +2251,17 @@ int CDisplayList::add_available_fill (int prim_num) {
 
 int CDisplayList::get_available_fill (void) {
 
-    if (fill_available_list == NULL  ||
-        num_fill_available_list <= 0) {
+    int        cv_size = fill_available_list.size();
+    int        *cv_data = fill_available_list.data();
+
+    if (cv_data == NULL  ||  cv_size < 1) {
         return -1;
     }
 
-    num_fill_available_list--;
+    int ival = fill_available_list.back();
+    fill_available_list.pop_back();
 
-    return fill_available_list[num_fill_available_list];
+    return ival;
 
 }
 
@@ -2461,23 +2275,12 @@ int CDisplayList::add_available_text (int prim_num) {
         return 0;
     }
 
-    if (text_available_list == NULL) {
-        num_text_available_list = 0;
-        max_text_available_list = 0;
+    try {
+        text_available_list.push_back (prim_num);
     }
-
-    if (num_text_available_list >= max_text_available_list) {
-        max_text_available_list += _BIG_CHUNK_SIZE_;
-        text_available_list =
-        (int *)csw_Realloc
-        (text_available_list, max_text_available_list * sizeof(int));
-    }
-    if (text_available_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    text_available_list[num_text_available_list] = prim_num;
-    num_text_available_list++;
 
     return 1;
 }
@@ -2485,14 +2288,17 @@ int CDisplayList::add_available_text (int prim_num) {
 
 int CDisplayList::get_available_text (void) {
 
-    if (text_available_list == NULL  ||
-        num_text_available_list <= 0) {
+    int        cv_size = text_available_list.size();
+    int        *cv_data = text_available_list.data();
+
+    if (cv_data == NULL  ||  cv_size < 1) {
         return -1;
     }
 
-    num_text_available_list--;
+    int ival = text_available_list.back();
+    text_available_list.pop_back();
 
-    return text_available_list[num_text_available_list];
+    return ival;
 
 }
 
@@ -2506,23 +2312,12 @@ int CDisplayList::add_available_symb (int prim_num) {
         return 0;
     }
 
-    if (symb_available_list == NULL) {
-        num_symb_available_list = 0;
-        max_symb_available_list = 0;
+    try {
+        symb_available_list.push_back (prim_num);
     }
-
-    if (num_symb_available_list >= max_symb_available_list) {
-        max_symb_available_list += _BIG_CHUNK_SIZE_;
-        symb_available_list =
-        (int *)csw_Realloc
-        (symb_available_list, max_symb_available_list * sizeof(int));
-    }
-    if (symb_available_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    symb_available_list[num_symb_available_list] = prim_num;
-    num_symb_available_list++;
 
     return 1;
 }
@@ -2530,14 +2325,17 @@ int CDisplayList::add_available_symb (int prim_num) {
 
 int CDisplayList::get_available_symb (void) {
 
-    if (symb_available_list == NULL  ||
-        num_symb_available_list <= 0) {
+    int        cv_size = symb_available_list.size();
+    int        *cv_data = symb_available_list.data();
+
+    if (cv_data == NULL  ||  cv_size < 1) {
         return -1;
     }
 
-    num_symb_available_list--;
+    int ival = symb_available_list.back();
+    symb_available_list.pop_back();
 
-    return symb_available_list[num_symb_available_list];
+    return ival;
 
 }
 
@@ -2551,23 +2349,12 @@ int CDisplayList::add_available_shape (int prim_num) {
         return 0;
     }
 
-    if (shape_available_list == NULL) {
-        num_shape_available_list = 0;
-        max_shape_available_list = 0;
+    try {
+        shape_available_list.push_back (prim_num);
     }
-
-    if (num_shape_available_list >= max_shape_available_list) {
-        max_shape_available_list += _BIG_CHUNK_SIZE_;
-        shape_available_list =
-        (int *)csw_Realloc
-        (shape_available_list, max_shape_available_list * sizeof(int));
-    }
-    if (shape_available_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    shape_available_list[num_shape_available_list] = prim_num;
-    num_shape_available_list++;
 
     return 1;
 }
@@ -2575,14 +2362,17 @@ int CDisplayList::add_available_shape (int prim_num) {
 
 int CDisplayList::get_available_shape (void) {
 
-    if (shape_available_list == NULL  ||
-        num_shape_available_list <= 0) {
+    int        cv_size = shape_available_list.size();
+    int        *cv_data = shape_available_list.data();
+
+    if (cv_data == NULL  ||  cv_size < 1) {
         return -1;
     }
 
-    num_shape_available_list--;
+    int ival = shape_available_list.back();
+    shape_available_list.pop_back();
 
-    return shape_available_list[num_shape_available_list];
+    return ival;
 
 }
 
@@ -2596,23 +2386,12 @@ int CDisplayList::add_available_axis (int prim_num) {
         return 0;
     }
 
-    if (axis_available_list == NULL) {
-        num_axis_available_list = 0;
-        max_axis_available_list = 0;
+    try {
+        axis_available_list.push_back (prim_num);
     }
-
-    if (num_axis_available_list >= max_axis_available_list) {
-        max_axis_available_list += _SMALL_CHUNK_SIZE_;
-        axis_available_list =
-        (int *)csw_Realloc
-        (axis_available_list, max_axis_available_list * sizeof(int));
-    }
-    if (axis_available_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    axis_available_list[num_axis_available_list] = prim_num;
-    num_axis_available_list++;
 
     return 1;
 }
@@ -2620,14 +2399,17 @@ int CDisplayList::add_available_axis (int prim_num) {
 
 int CDisplayList::get_available_axis (void) {
 
-    if (axis_available_list == NULL  ||
-        num_axis_available_list <= 0) {
+    int        cv_size = axis_available_list.size();
+    int        *cv_data = axis_available_list.data();
+
+    if (cv_data == NULL  ||  cv_size < 1) {
         return -1;
     }
 
-    num_axis_available_list--;
+    int ival = axis_available_list.back();
+    axis_available_list.pop_back();
 
-    return axis_available_list[num_axis_available_list];
+    return ival;
 
 }
 
@@ -2641,23 +2423,12 @@ int CDisplayList::add_available_image (int prim_num) {
         return 0;
     }
 
-    if (image_available_list == NULL) {
-        num_image_available_list = 0;
-        max_image_available_list = 0;
+    try {
+        image_available_list.push_back (prim_num);
     }
-
-    if (num_image_available_list >= max_image_available_list) {
-        max_image_available_list += _BIG_CHUNK_SIZE_;
-        image_available_list =
-        (int *)csw_Realloc
-        (image_available_list, max_image_available_list * sizeof(int));
-    }
-    if (image_available_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    image_available_list[num_image_available_list] = prim_num;
-    num_image_available_list++;
 
     return 1;
 }
@@ -2665,14 +2436,17 @@ int CDisplayList::add_available_image (int prim_num) {
 
 int CDisplayList::get_available_image (void) {
 
-    if (image_available_list == NULL  ||
-        num_image_available_list <= 0) {
+    int        cv_size = image_available_list.size();
+    int        *cv_data = image_available_list.data();
+
+    if (cv_data == NULL  ||  cv_size < 1) {
         return -1;
     }
 
-    num_image_available_list--;
+    int ival = image_available_list.back();
+    image_available_list.pop_back();
 
-    return image_available_list[num_image_available_list];
+    return ival;
 
 }
 
@@ -2682,35 +2456,12 @@ int CDisplayList::get_available_image (void) {
  */
 void CDisplayList::free_patch_lists (void)
 {
-    csw_Free (line_patch_list);
-    num_line_patch_list = 0;
-    max_line_patch_list = 0;
-    line_patch_list = NULL;
-
-    csw_Free (fill_patch_list);
-    num_fill_patch_list = 0;
-    max_fill_patch_list = 0;
-    fill_patch_list = NULL;
-
-    csw_Free (text_patch_list);
-    num_text_patch_list = 0;
-    max_text_patch_list = 0;
-    text_patch_list = NULL;
-
-    csw_Free (symb_patch_list);
-    num_symb_patch_list = 0;
-    max_symb_patch_list = 0;
-    symb_patch_list = NULL;
-
-    csw_Free (contour_line_patch_list);
-    num_contour_line_patch_list = 0;
-    max_contour_line_patch_list = 0;
-    contour_line_patch_list = NULL;
-
-    csw_Free (shape_patch_list);
-    num_shape_patch_list = 0;
-    max_shape_patch_list = 0;
-    shape_patch_list = NULL;
+    line_patch_list.clear();
+    contour_line_patch_list.clear();
+    fill_patch_list.clear();
+    symb_patch_list.clear();
+    text_patch_list.clear();
+    shape_patch_list.clear();
 
     return;
 
@@ -2727,22 +2478,12 @@ int CDisplayList::add_contour_line_patch_prim (int prim_num)
         return 0;
     }
 
-    if (contour_line_patch_list == NULL) {
-        num_contour_line_patch_list = 0;
-        max_contour_line_patch_list = 0;
+    try {
+        contour_line_patch_list.push_back(prim_num);
     }
-
-    if (num_contour_line_patch_list >= max_contour_line_patch_list) {
-        max_contour_line_patch_list += _BIG_CHUNK_SIZE_;
-        contour_line_patch_list = (int *)csw_Realloc
-            (contour_line_patch_list, max_contour_line_patch_list * sizeof(int));
-    }
-    if (contour_line_patch_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    contour_line_patch_list[num_contour_line_patch_list] = prim_num;
-    num_contour_line_patch_list++;
 
     return 1;
 }
@@ -2751,29 +2492,19 @@ int CDisplayList::add_contour_line_patch_prim (int prim_num)
 
 int CDisplayList::add_line_patch_prim (int prim_num)
 {
-    if ((int)line_prim_list.size() < 1) {
+    int            cp_size = (int)line_prim_list.size();
+    LInePrim       *cp_data = line_prim_list.data();
+
+    if (prim_num < 0  ||  prim_num >= cp_size  ||  cp_data == NULL) {
         return 0;
     }
 
-    if (prim_num < 0  ||  prim_num >= (int)line_prim_list.size()) {
-        return 0;
+    try {
+        line_patch_list.push_back(prim_num);
     }
-
-    if (line_patch_list == NULL) {
-        num_line_patch_list = 0;
-        max_line_patch_list = 0;
-    }
-
-    if (num_line_patch_list >= max_line_patch_list) {
-        max_line_patch_list += _BIG_CHUNK_SIZE_;
-        line_patch_list = (int *)csw_Realloc (line_patch_list, max_line_patch_list * sizeof(int));
-    }
-    if (line_patch_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    line_patch_list[num_line_patch_list] = prim_num;
-    num_line_patch_list++;
 
     return 1;
 }
@@ -2788,21 +2519,12 @@ int CDisplayList::add_fill_patch_prim (int prim_num)
         return 0;
     }
 
-    if (fill_patch_list == NULL) {
-        num_fill_patch_list = 0;
-        max_fill_patch_list = 0;
+    try {
+        fill_patch_list.push_back(prim_num);
     }
-
-    if (num_fill_patch_list >= max_fill_patch_list) {
-        max_fill_patch_list += _BIG_CHUNK_SIZE_;
-        fill_patch_list = (int *)csw_Realloc (fill_patch_list, max_fill_patch_list * sizeof(int));
-    }
-    if (fill_patch_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    fill_patch_list[num_fill_patch_list] = prim_num;
-    num_fill_patch_list++;
 
     return 1;
 }
@@ -2818,21 +2540,12 @@ int CDisplayList::add_text_patch_prim (int prim_num)
         return 0;
     }
 
-    if (text_patch_list == NULL) {
-        num_text_patch_list = 0;
-        max_text_patch_list = 0;
+    try {
+        text_patch_list.push_back(prim_num);
     }
-
-    if (num_text_patch_list >= max_text_patch_list) {
-        max_text_patch_list += _BIG_CHUNK_SIZE_;
-        text_patch_list = (int *)csw_Realloc (text_patch_list, max_text_patch_list * sizeof(int));
-    }
-    if (text_patch_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    text_patch_list[num_text_patch_list] = prim_num;
-    num_text_patch_list++;
 
     return 1;
 }
@@ -2848,21 +2561,12 @@ int CDisplayList::add_symb_patch_prim (int prim_num)
         return 0;
     }
 
-    if (symb_patch_list == NULL) {
-        num_symb_patch_list = 0;
-        max_symb_patch_list = 0;
+    try {
+        symb_patch_list.push_back(prim_num);
     }
-
-    if (num_symb_patch_list >= max_symb_patch_list) {
-        max_symb_patch_list += _BIG_CHUNK_SIZE_;
-        symb_patch_list = (int *)csw_Realloc (symb_patch_list, max_symb_patch_list * sizeof(int));
-    }
-    if (symb_patch_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    symb_patch_list[num_symb_patch_list] = prim_num;
-    num_symb_patch_list++;
 
     return 1;
 }
@@ -2879,21 +2583,12 @@ int CDisplayList::add_shape_patch_prim (int prim_num)
         return 0;
     }
 
-    if (shape_patch_list == NULL) {
-        num_shape_patch_list = 0;
-        max_shape_patch_list = 0;
+    try {
+        shape_patch_list.push_back(prim_num);
     }
-
-    if (num_shape_patch_list >= max_shape_patch_list) {
-        max_shape_patch_list += _BIG_CHUNK_SIZE_;
-        shape_patch_list = (int *)csw_Realloc (shape_patch_list, max_shape_patch_list * sizeof(int));
-    }
-    if (shape_patch_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    shape_patch_list[num_shape_patch_list] = prim_num;
-    num_shape_patch_list++;
 
     return 1;
 }
@@ -3366,10 +3061,13 @@ int CDisplayList::DrawAllFills (void)
         return 0;
     }
 
+    int        pt_size = (int)fill_patch_list.size();
+    int        *pt_data = fill_patch_list.data();
+
     nloop = fp_size;
-    if (fill_patch_list != NULL  &&
+    if (pt_data != NULL  &&  pt_size > 0  &&
         patch_draw_flag == 1) {
-        nloop = num_fill_patch_list;
+        nloop = pt_size;
         bpatch = true;
     }
 
@@ -3383,7 +3081,7 @@ int CDisplayList::DrawAllFills (void)
 
         i = ido;
         if (bpatch) {
-            i = fill_patch_list[ido];
+            i = pt_data[ido];
         }
 
         fptr = fp_data + i;
@@ -3410,7 +3108,7 @@ int CDisplayList::DrawAllFills (void)
 
         i = ido;
         if (bpatch) {
-            i = fill_patch_list[ido];
+            i = pt_data[ido];
         }
 
         fptr = fp_data + i;
@@ -3964,6 +3662,7 @@ int CDisplayList::AddText (double x, double y, double size, double angle,
 
     if (from_graph) {
         local_frame_num = current_frame_num;
+        local_scaleable = 1;
     }
     else {
         if (current_frame_num >= 0  &&
@@ -4106,10 +3805,13 @@ int CDisplayList::DrawAllTexts (void)
 
     jni_msg ("\nDisplay list texts being drawn\n");
 
+    int        pt_size = (int)text_patch_list.size();
+    int        *pt_data = text_patch_list.data();
+
     nloop = tp_size;
-    if (text_patch_list != NULL  &&
+    if (pt_data != NULL  &&  pt_size > 0  &&
         patch_draw_flag == 1) {
-        nloop = num_text_patch_list;
+        nloop = pt_size;
         bpatch = true;
     }
 
@@ -4124,7 +3826,7 @@ int CDisplayList::DrawAllTexts (void)
 
         i = ido;
         if (bpatch) {
-            i = text_patch_list[ido];
+            i = pt_data[ido];
         }
 
         tptr = tp_data + i;
@@ -4159,7 +3861,7 @@ int CDisplayList::DrawAllTexts (void)
 
         i = ido;
         if (bpatch) {
-            i = text_patch_list[ido];
+            i = pt_data[ido];
         }
 
         tptr = tp_data + i;
@@ -4667,9 +4369,13 @@ int CDisplayList::AddSymb (double x, double y, double size, double angle,
     sptr->image_id = ImageID;
 
     sptr->prim_num = next_symb;
-    sptr->scaleable = 0;
+    sptr->scaleable = 1;
 
     SetSpatialIndexForSymb (next_symb);
+
+    if (current_selectable_object) {
+        current_selectable_object->AddSymb (next_symb);
+    }
 
     return 1;
 
@@ -4701,10 +4407,13 @@ int CDisplayList::DrawAllSymbs (void)
         return 0;
     }
 
+    int         pt_size = (int)symb_patch_list.size();
+    int         *pt_data = symb_patch_list.data();
+
     nloop = sp_size;
-    if (symb_patch_list != NULL  &&
+    if (pt_data != NULL  &&  pt_size > 0  &&
         patch_draw_flag == 1) {
-        nloop = num_symb_patch_list;
+        nloop = pt_size;
         bpatch = true;
     }
 
@@ -4713,7 +4422,7 @@ int CDisplayList::DrawAllSymbs (void)
 
         i = ido;
         if (bpatch) {
-            i = symb_patch_list[ido];
+            i = pt_data[ido];
         }
 
         sptr = sp_data + i;
@@ -4740,7 +4449,7 @@ int CDisplayList::DrawAllSymbs (void)
 
         i = ido;
         if (bpatch) {
-            i = symb_patch_list[ido];
+            i = pt_data[ido];
         }
 
         sptr = sp_data + i;
@@ -5329,10 +5038,13 @@ int CDisplayList::DrawAllShapes (void)
 
     jni_msg ("\nDisplay list shapes being drawn\n");
 
+    int        pt_size = (int)shape_patch_list.size();
+    int        *pt_data = shape_patch_list.data();
+
     nloop = hp_size;
-    if (shape_patch_list != NULL  &&
+    if (pt_data != NULL  &&  pt_data > 0  &&
         patch_draw_flag == 1) {
-        nloop = num_shape_patch_list;
+        nloop = pt_size;
         bpatch = true;
     }
 
@@ -5342,7 +5054,7 @@ int CDisplayList::DrawAllShapes (void)
 
         i = ido;
         if (bpatch) {
-            i = shape_patch_list[ido];
+            i = pt_data[ido];
         }
 
         shptr = hp_data + i;
@@ -5385,6 +5097,12 @@ int CDisplayList::DrawAllShapes (void)
                     convert_frame_point (shptr->frame_num,
                                          shptr->fval,
                                          shptr->fval+1);
+                  // width
+                    convert_frame_dist (shptr->frame_num,
+                                        shptr->fval+2);
+                  // height
+                    convert_frame_dist (shptr->frame_num,
+                                        shptr->fval+3);
                 }
 
                 gtx_drawprim_obj.gtx_cliprectprim
@@ -5413,6 +5131,12 @@ int CDisplayList::DrawAllShapes (void)
                     unconvert_frame_point (shptr->frame_num,
                                          shptr->fval,
                                          shptr->fval+1);
+                  // width
+                    unconvert_frame_dist (shptr->frame_num,
+                                          shptr->fval+2);
+                  // height
+                    unconvert_frame_dist (shptr->frame_num,
+                                          shptr->fval+3);
                 }
 
                 break;
@@ -5426,6 +5150,12 @@ int CDisplayList::DrawAllShapes (void)
                     convert_frame_point (shptr->frame_num,
                                          shptr->fval,
                                          shptr->fval+1);
+                  // r1
+                    convert_frame_dist (shptr->frame_num,
+                                        shptr->fval+2);
+                  // r2
+                    convert_frame_dist (shptr->frame_num,
+                                        shptr->fval+3);
                 }
 
                 gtx_drawprim_obj.gtx_cliparcprim
@@ -5456,6 +5186,12 @@ int CDisplayList::DrawAllShapes (void)
                     unconvert_frame_point (shptr->frame_num,
                                            shptr->fval,
                                            shptr->fval+1);
+                  // r1
+                    unconvert_frame_dist (shptr->frame_num,
+                                          shptr->fval+2);
+                  // r2
+                    unconvert_frame_dist (shptr->frame_num,
+                                          shptr->fval+3);
                 }
 
                 break;
@@ -7521,6 +7257,7 @@ void CDisplayList::SetGraphNum (int ival)
 
 void CDisplayList::SetSelectableNum (int ival)
 {
+
     current_selectable_object_num = ival;
     if (ival >= 0) {
         AddSelectableObject (ival);
@@ -8716,7 +8453,11 @@ void CDisplayList::delete_frame_grid_images (int fnum)
     if (ip_data == NULL  ||  ip_size < 1) {
         return;
     }
-    if (surf_list == NULL) {
+
+    int        sf_size = surf_list.size();
+    DLSurf     **sf_data = surf_list.data();
+
+    if (sf_data == NULL  ||  sf_size < 1) {
         return;
     }
 
@@ -8737,7 +8478,7 @@ void CDisplayList::delete_frame_grid_images (int fnum)
         }
 
         if (imptr->grid_num >= 0) {
-            if (surf_list[imptr->grid_num]->needs_reclip == 0) {
+            if (sf_data[imptr->grid_num]->needs_reclip == 0) {
                 continue;
             }
         }
@@ -8839,12 +8580,13 @@ void CDisplayList::rescale_frame (FRameStruct *frptr)
  *  frame number member of the primitive structure to draw the
  *  primitive in the correct frame.
  */
-    num_line_patch_list = 0;
-    num_fill_patch_list = 0;
-    num_text_patch_list = 0;
-    num_symb_patch_list = 0;
-    num_shape_patch_list = 0;
-    num_contour_line_patch_list = 0;
+    contour_line_patch_list.clear();
+    line_patch_list.clear();
+    fill_patch_list.clear();
+    symb_patch_list.clear();
+    text_patch_list.clear();
+    shape_patch_list.clear();
+
     if (patch_draw_flag == 1) {
         for (int i=0; i<num_frame_list; i++) {
             if (!IsFrameSynced (fnum, i)) {
@@ -11177,9 +10919,12 @@ void CDisplayList::find_frame_limits (int frame_num,
         }
     }
 
-    if (surf_list != NULL) {
-        for (i=0; i<num_surf_list; i++) {
-            surf = surf_list[i];
+    int        sf_size = surf_list.size();
+    DLSurf     **sf_data = surf_list.data();
+
+    if (sf_data != NULL  &&  sf_size > 0) {
+        for (i=0; i<sf_size; i++) {
+            surf = sf_data[i];
             if (surf->deleted_flag != 0  ||
                 surf->frame_num != frame_num) {
                 continue;
@@ -11191,9 +10936,12 @@ void CDisplayList::find_frame_limits (int frame_num,
         }
     }
 
-    if (contour_list != NULL) {
-        for (i=0; i<num_contour_list; i++) {
-            cont = contour_list[i];
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (cl_data != NULL  &&  cl_size > 0) {
+        for (i=0; i<cl_size; i++) {
+            cont = cl_data[i];
             if (cont->deleted_flag != 0  ||
                 cont->frame_num != frame_num) {
                 continue;
@@ -11295,7 +11043,6 @@ int CDisplayList::AddContour (
 {
     DLContour *dlc;
     DLSurf    *grid;
-    int       ifirst;
     int       nextprim;
 
     if (grid_index < 0) {
@@ -11303,10 +11050,14 @@ int CDisplayList::AddContour (
     }
 
     grid = NULL;
-    if (surf_list == NULL) {
+
+    int        sf_size = surf_list.size();
+    DLSurf     **sf_data = surf_list.data();
+
+    if (sf_data == NULL  ||  sf_size < 1) {
         return -1;
     }
-    grid = surf_list[grid_index];
+    grid = sf_data[grid_index];
     if (grid == NULL) {
         return -1;
     }
@@ -11320,32 +11071,6 @@ int CDisplayList::AddContour (
         return -1;
     }
 
-    nextprim = get_available_contour ();
-    if (nextprim < 0) {
-        if (num_contour_list >= max_contour_list) {
-            ifirst = max_contour_list;
-            max_contour_list += _BIG_CHUNK_SIZE_;
-            contour_list = (DLContour **)csw_Realloc (contour_list,
-                                                  max_contour_list * sizeof(DLContour *));
-            if (contour_list != NULL) {
-                memset (contour_list + ifirst, 0, _BIG_CHUNK_SIZE_ * sizeof(DLContour *));
-            }
-        }
-
-        if (contour_list == NULL) {
-            delete (dlc);
-            return -1;
-        }
-
-        nextprim = num_contour_list;
-        num_contour_list++;
-    }
-
-    if (contour_list == NULL) {
-        delete (dlc);
-        return -1;
-    }
-
     dlc->SetCrec (crec);
     dlc->grid_index = grid_index;
     dlc->image_id = image_id;
@@ -11354,9 +11079,23 @@ int CDisplayList::AddContour (
         dlc->layer_num = grid->layer_num;
     }
 
+    nextprim = get_available_contour ();
+    if (nextprim < 0) {
+
+        try {
+            contour_list.push_back (dlc);
+        }
+        catch (...) {
+            return -1;
+        }
+        nextprim = contour_list.size() - 1;
+    }
+    else {
+        contour_list[nextprim] = dlc;
+    }
+
     dlc->prim_num = nextprim;
 
-    contour_list[nextprim] = dlc;
     dlc = NULL;
 
     if (current_selectable_object) {
@@ -11371,14 +11110,17 @@ void CDisplayList::delete_surf_contours (int snum)
 {
     int   i;
 
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
     DLContour     *dlc;
-    for (i=0; i<num_contour_list; i++) {
-        if (contour_list[i]->grid_index == snum) {
-            dlc = contour_list[i];
+    for (i=0; i<cl_size; i++) {
+        if (cl_data[i]->grid_index == snum) {
+            dlc = cl_data[i];
             if (dlc != NULL) {
                 delete (dlc);
             }
-            contour_list[i] = NULL;
+            cl_data[i] = NULL;
             add_available_contour (i);
         }
     }
@@ -11398,25 +11140,11 @@ int CDisplayList::AddGrid (
     double angle)
 {
     DLSurf    *dlg;
-    int       ifirst, i;
+    int       i;
     double    dlow[1000], dhigh[1000];
 
     if (ncol < 2  ||  nrow < 2  ||
         width <= 0.0  ||  height <= 0.0) {
-        return -1;
-    }
-
-    if (num_surf_list >= max_surf_list) {
-        ifirst = max_surf_list;
-        max_surf_list += _SMALL_CHUNK_SIZE_;
-        surf_list = (DLSurf **)csw_Realloc (surf_list,
-                                        max_surf_list * sizeof(DLSurf *));
-        if (surf_list != NULL) {
-            memset (surf_list + ifirst, 0, _SMALL_CHUNK_SIZE_ * sizeof(DLSurf *));
-        }
-    }
-
-    if (surf_list == NULL) {
         return -1;
     }
 
@@ -11429,7 +11157,16 @@ int CDisplayList::AddGrid (
         return -1;
     }
 
-    dlg->index_num = num_surf_list;
+    try {
+        surf_list.push_back (dlg);
+    }
+    catch (...) {
+        return -1;
+    }
+
+    int        sf_size = surf_list.size();
+
+    dlg->index_num = sf_size - 1;
     strncpy (dlg->name, name, 99);
     dlg->name[99] = '\0';
     dlg->frame_num = current_frame_num;
@@ -11439,7 +11176,9 @@ int CDisplayList::AddGrid (
 
     memset (dlow, 0, 1000 * sizeof(double));
     memset (dhigh, 0, 1000 * sizeof(double));
-    for (i=0; i<current_number_image_values; i++) {
+    int  num_hi_low = current_number_image_values;
+    if (num_hi_low > 1000) num_hi_low = 1000;
+    for (i=0; i<num_hi_low; i++) {
         dlow[i] = current_image_low_values[i];
         dhigh[i] = current_image_high_values[i];
     }
@@ -11451,7 +11190,7 @@ int CDisplayList::AddGrid (
         current_image_green_values,
         current_image_blue_values,
         current_image_transparency_values,
-        current_number_image_values
+        num_hi_low
     );
 
     dlg->SetGridData (data,
@@ -11465,10 +11204,7 @@ int CDisplayList::AddGrid (
                   tmp_contour_faults,
                   num_tmp_contour_faults);
 
-    dlg->SetSurfaceID (num_surf_list);
-
-    surf_list[num_surf_list] = dlg;
-    num_surf_list++;
+    dlg->SetSurfaceID (sf_size);
 
     return 1;
 }
@@ -11688,9 +11424,12 @@ void CDisplayList::recalc_surfaces (void)
 
     save_current_graphic_attributes ();
 
-    if (surf_list != NULL) {
-        for (i=0; i<num_surf_list; i++) {
-            grid = surf_list[i];
+    int        sf_size = surf_list.size();
+    DLSurf     **sf_data = surf_list.data();
+
+    if (sf_data != NULL  &&  sf_size > 0) {
+        for (i=0; i<sf_size; i++) {
+            grid = sf_data[i];
             if (grid == NULL) {
                 continue;
             }
@@ -11742,13 +11481,16 @@ void CDisplayList::delete_grid_contours (int gridnum)
     int            i;
     DLContour      *cp1;
 
-    if (contour_list == NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (cl_data == NULL  ||  cl_size < 1) {
         return;
     }
 
-    for (i=0; i<num_contour_list; i++) {
+    for (i=0; i<cl_size; i++) {
 
-        cp1 = contour_list[i];
+        cp1 = cl_data[i];
 
         if (cp1 == NULL) {
             continue;
@@ -11759,7 +11501,7 @@ void CDisplayList::delete_grid_contours (int gridnum)
         }
 
         delete (cp1);
-        contour_list[i] = NULL;
+        cl_data[i] = NULL;
         add_available_contour (i);
 
     }
@@ -11928,7 +11670,10 @@ void CDisplayList::reclip_frame_contours (int fnum)
     int                 layer_save,
                         grid_save;
 
-    if (contour_list == NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (cl_data == NULL  ||  cl_size < 1) {
         return;
     }
 
@@ -11954,7 +11699,10 @@ void CDisplayList::reclip_frame_contours (int fnum)
     current_frame_num = fnum;
     update_frame_limits ();
 
-    nprim = num_contour_list;
+    nprim = cl_size;
+
+    int        sf_size = surf_list.size();
+    DLSurf     **sf_data = surf_list.data();
 
     for (ido=0; ido<nprim; ido++) {
 
@@ -11962,7 +11710,7 @@ void CDisplayList::reclip_frame_contours (int fnum)
 
         current_contour_index = i;
 
-        contour = contour_list[i];
+        contour = cl_data[i];
         if (contour == NULL) {
             continue;
         }
@@ -11986,15 +11734,15 @@ void CDisplayList::reclip_frame_contours (int fnum)
 
         grid_num = contour->grid_index;
 
-        if (grid_num < 0  ||  surf_list == NULL  ||
-            grid_num >= num_surf_list) {
+        if (grid_num < 0  ||  sf_data == NULL  ||  sf_size < 1  ||
+            grid_num >= sf_size) {
             continue;
         }
 
         draw_options = NULL;
         conprop = NULL;
-        if (grid_num >= 0  &&  surf_list != NULL) {
-            grid = surf_list[grid_num];
+        if (grid_num >= 0  &&  sf_data != NULL  &&  grid_num < sf_size) {
+            grid = sf_data[grid_num];
             if (grid->needs_contour_reclip != 1) {
                 continue;
             }
@@ -12157,9 +11905,9 @@ void CDisplayList::reclip_frame_contours (int fnum)
 
     }
 
-    if (surf_list != NULL) {
-        for (i=0; i<num_surf_list; i++) {
-            DLSurf  *dls = surf_list[i];
+    if (sf_data != NULL  &&  sf_size > 0) {
+        for (i=0; i<sf_size; i++) {
+            DLSurf  *dls = sf_data[i];
             if (dls->turn_off_reclip == 1) {
                 dls->needs_contour_reclip = 0;
                 dls->turn_off_reclip = 0;
@@ -12677,15 +12425,18 @@ void CDisplayList::reclip_frame_grid_images (int fnum)
     int             i;
     DLSurf          *grid;
 
-    if (surf_list == NULL) {
+    int        sf_size = surf_list.size();
+    DLSurf     **sf_data = surf_list.data();
+
+    if (sf_data == NULL  ||  sf_size < 1) {
         return;
     }
 
     save_current_graphic_attributes ();
 
-    for (i=0; i<num_surf_list; i++) {
+    for (i=0; i<sf_size; i++) {
 
-        grid = surf_list[i];
+        grid = sf_data[i];
         if (grid == NULL) {
             continue;
         }
@@ -12735,7 +12486,7 @@ int CDisplayList::AddTriMesh (
     int numtri)
 {
     DLSurf    *dlg;
-    int       ifirst, i;
+    int       i;
     double    dlow[1000], dhigh[1000];
 
 /*
@@ -12760,30 +12511,19 @@ int CDisplayList::AddTriMesh (
     }
 
 
-    if (num_surf_list >= max_surf_list) {
-        ifirst = max_surf_list;
-        max_surf_list += _SMALL_CHUNK_SIZE_;
-        surf_list = (DLSurf **)csw_Realloc (surf_list,
-                                        max_surf_list * sizeof(DLSurf *));
-        if (surf_list != NULL) {
-            memset (surf_list + ifirst, 0, _SMALL_CHUNK_SIZE_ * sizeof(DLSurf *));
-        }
-    }
-
-    if (surf_list == NULL) {
-        return -1;
-    }
-
     try {
         SNF;
         dlg = new DLSurf ();
+        surf_list.push_back (dlg);
     }
     catch (...) {
         dlg = NULL;
         return -1;
     }
 
-    dlg->index_num = num_surf_list;
+    int        sf_size = surf_list.size();
+
+    dlg->index_num = sf_size - 1;
     strncpy (dlg->name, name, 99);
     dlg->name[99] = '\0';
     dlg->frame_num = current_frame_num;
@@ -12793,7 +12533,9 @@ int CDisplayList::AddTriMesh (
 
     memset (dlow, 0, 1000 * sizeof(double));
     memset (dhigh, 0, 1000 * sizeof(double));
-    for (i=0; i<current_number_image_values; i++) {
+    int  num_hi_low = current_number_image_values;
+    if (num_hi_low > 1000) num_hi_low = 1000;
+    for (i=0; i<num_hi_low; i++) {
         dlow[i] = current_image_low_values[i];
         dhigh[i] = current_image_high_values[i];
     }
@@ -12805,7 +12547,7 @@ int CDisplayList::AddTriMesh (
         current_image_green_values,
         current_image_blue_values,
         current_image_transparency_values,
-        current_number_image_values
+        num_hi_low
     );
 
     dlg->SetTriMesh (
@@ -12826,10 +12568,7 @@ int CDisplayList::AddTriMesh (
         triflag,
         numtri);
 
-    dlg->SetSurfaceID (num_surf_list);
-
-    surf_list[num_surf_list] = dlg;
-    num_surf_list++;
+    dlg->SetSurfaceID (sf_size);
 
     return 1;
 }
@@ -13161,11 +12900,14 @@ int CDisplayList::set_in_contour_extra (int contour_num)
     int                *cell_list, num_cell, max_cell;
     DLContour          *cptr;
 
-    if (contour_list == NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (cl_data == NULL  ||  cl_size < 1) {
         return 0;
     }
 
-    cptr = contour_list[contour_num];
+    cptr = cl_data[contour_num];
     in_extra = cptr->GetInExtra ();
     if (in_extra == 1) {
         return 0;
@@ -13418,13 +13160,16 @@ void CDisplayList::reindex_contours (int fnum)
     int            i;
     DLContour      *cptr;
 
-    if (contour_list == NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (cl_data == NULL  ||  cl_size < 1) {
         return;
     }
 
-    for (i=0; i<num_contour_list; i++) {
+    for (i=0; i<cl_size; i++) {
 
-        cptr = contour_list[i];
+        cptr = cl_data[i];
         if (cptr == NULL) {
             continue;
         }
@@ -13752,9 +13497,12 @@ int CDisplayList::PopulateLinePatches (double x1, double y1p,
 /*
     draw all prims in the extra grid cell if needed
 */
-    if (line_patch_list != NULL) {
-        for (j=0; j<num_line_patch_list; j++) {
-            lp_data[line_patch_list[j]].draw_flag = 2;
+    int       pt_size = (int)line_patch_list.size();
+    int       *pt_data = line_patch_list.data();
+
+    if (pt_data != NULL  &&  pt_size > 0) {
+        for (j=0; j<pt_size; j++) {
+            lp_data[pt_data[j]].draw_flag = 2;
         }
     }
 
@@ -13779,9 +13527,12 @@ int CDisplayList::PopulateLinePatches (double x1, double y1p,
         }
     }
 
-    if (line_patch_list != NULL) {
-        for (j=0; j<num_line_patch_list; j++) {
-            lp_data[line_patch_list[j]].draw_flag = 0;
+    pt_size = (int)line_patch_list.size();
+    pt_data = line_patch_list.data();
+
+    if (pt_data != NULL  &&  pt_size > 0) {
+        for (j=0; j<pt_size; j++) {
+            lp_data[pt_data[j]].draw_flag = 0;
         }
     }
 
@@ -13965,9 +13716,12 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
 /*
     draw all prims in the extra grid cell if needed
 */
-    if (fill_patch_list != NULL) {
-        for (j=0; j<num_fill_patch_list; j++) {
-            fp_data[fill_patch_list[j]].draw_flag = 2;
+    int        pt_size = (int)fill_patch_list.size();
+    int        *pt_data = fill_patch_list.data();
+
+    if (pt_data != NULL  &&  pt_size > 0) {
+        for (j=0; j<pt_size; j++) {
+            fp_data[pt_data[j]].draw_flag = 2;
         }
     }
 
@@ -13992,9 +13746,12 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
         }
     }
 
-    if (fill_patch_list != NULL) {
-        for (j=0; j<num_fill_patch_list; j++) {
-            fp_data[fill_patch_list[j]].draw_flag = 0;
+    pt_size = (int)fill_patch_list.size();
+    pt_data = fill_patch_list.data();
+
+    if (pt_data != NULL  &&  pt_size > 0) {
+        for (j=0; j<pt_size; j++) {
+            fp_data[pt_data[j]].draw_flag = 0;
         }
     }
 
@@ -14179,9 +13936,12 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
 /*
     draw all prims in the extra grid cell if needed
 */
-    if (text_patch_list != NULL) {
-        for (j=0; j<num_text_patch_list; j++) {
-            tp_data[text_patch_list[j]].draw_flag = 2;
+    int        pt_size = (int)text_patch_list.size();
+    int        *pt_data = text_patch_list.data();
+
+    if (pt_data != NULL  &&  pt_size > 0) {
+        for (j=0; j<pt_size; j++) {
+            tp_data[pt_data[j]].draw_flag = 2;
         }
     }
 
@@ -14206,9 +13966,12 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
         }
     }
 
-    if (text_patch_list != NULL) {
-        for (j=0; j<num_text_patch_list; j++) {
-            tp_data[text_patch_list[j]].draw_flag = 0;
+    pt_size = (int)text_patch_list.size();
+    pt_data = text_patch_list.data();
+
+    if (pt_data != NULL  &&  pt_size > 0) {
+        for (j=0; j<pt_size; j++) {
+            tp_data[pt_data[j]].draw_flag = 0;
         }
     }
 
@@ -14605,9 +14368,12 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
 /*
     draw all prims in the extra grid cell if needed
 */
-    if (shape_patch_list != NULL) {
-        for (j=0; j<num_shape_patch_list; j++) {
-            hp_data[shape_patch_list[j]].draw_flag = 2;
+    int        pt_size = (int)shape_patch_list.size();
+    int        *pt_data = shape_patch_list.data();
+
+    if (pt_data != NULL  &&  pt_size > 0) {
+        for (j=0; j<pt_size; j++) {
+            hp_data[pt_data[j]].draw_flag = 2;
         }
     }
 
@@ -14632,9 +14398,12 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
         }
     }
 
-    if (shape_patch_list != NULL) {
-        for (j=0; j<num_shape_patch_list; j++) {
-            hp_data[shape_patch_list[j]].draw_flag = 0;
+    pt_size = (int)shape_patch_list.size();
+    pt_data = shape_patch_list.data();
+
+    if (pt_data != NULL  &&  pt_size > 0) {
+        for (j=0; j<pt_size; j++) {
+            hp_data[pt_data[j]].draw_flag = 0;
         }
     }
 
@@ -14665,7 +14434,10 @@ int CDisplayList::PopulateContourLinePatches (double x1, double y1p,
     double               gx1, gy1, gxs, gys, tmp, tiny;
     DLContour            *cptr;
 
-    if (contour_list == NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (cl_data == NULL  ||  cl_size < 1) {
         return 0;
     }
 
@@ -14774,10 +14546,10 @@ int CDisplayList::PopulateContourLinePatches (double x1, double y1p,
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_contour_list) {
+                if (prim_num < 0  ||  prim_num >= cl_size) {
                     continue;
                 }
-                cptr = contour_list[prim_num];
+                cptr = cl_data[prim_num];
                 cptr->draw_flag = 1;
             }
         }
@@ -14799,10 +14571,10 @@ int CDisplayList::PopulateContourLinePatches (double x1, double y1p,
             }
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_contour_list) {
+                if (prim_num < 0  ||  prim_num >= cl_size) {
                     continue;
                 }
-                cptr = contour_list[prim_num];
+                cptr = cl_data[prim_num];
                 if (cptr->draw_flag == 0  ||
                     cptr->deleted_flag == 1  ||
                     cptr->visible_flag == 0) {
@@ -14817,9 +14589,12 @@ int CDisplayList::PopulateContourLinePatches (double x1, double y1p,
 /*
     draw all prims in the extra grid cell if needed
 */
-    if (contour_line_patch_list != NULL) {
-        for (j=0; j<num_contour_line_patch_list; j++) {
-            contour_list[contour_line_patch_list[j]]->draw_flag = 2;
+    int      pt_size = (int)contour_line_patch_list.size();
+    int      *pt_data = contour_line_patch_list.data();
+
+    if (pt_data != NULL  &&  pt_size > 0) {
+        for (j=0; j<pt_size; j++) {
+            cl_data[pt_data[j]]->draw_flag = 2;
         }
     }
 
@@ -14830,10 +14605,10 @@ int CDisplayList::PopulateContourLinePatches (double x1, double y1p,
         if (nlist > 0) {
             for (kk=2; kk<=nlist+1; kk++) {
                 prim_num = icell[kk];
-                if (prim_num < 0  ||  prim_num >= num_contour_list) {
+                if (prim_num < 0  ||  prim_num >= cl_size) {
                     continue;
                 }
-                cptr = contour_list[prim_num];
+                cptr = cl_data[prim_num];
                 if (cptr->draw_flag == 2  ||
                     cptr->deleted_flag == 1  ||
                     cptr->visible_flag == 0) {
@@ -14844,9 +14619,12 @@ int CDisplayList::PopulateContourLinePatches (double x1, double y1p,
         }
     }
 
-    if (contour_line_patch_list != NULL) {
-        for (j=0; j<num_contour_line_patch_list; j++) {
-            contour_list[contour_line_patch_list[j]]->draw_flag = 0;
+    pt_size = (int)contour_line_patch_list.size();
+    pt_data = contour_line_patch_list.data();
+
+    if (pt_data != NULL  &&  pt_size > 0) {
+        for (j=0; j<pt_size; j++) {
+            cl_data[pt_data[j]]->draw_flag = 0;
         }
     }
 
@@ -15195,6 +14973,9 @@ int CDisplayList::GetSelectableIndex (int frame_num,
     int          ap_size = (int)axis_prim_list.size();
     AXisPrim     *ap_data = axis_prim_list.data();
 
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
     if (type == 1  &&  lp_data != NULL  &&  lp_size > index) {
         lptr = lp_data + index;
         isel = lptr->selectable_object_num;
@@ -15215,8 +14996,8 @@ int CDisplayList::GetSelectableIndex (int frame_num,
         shptr = hp_data + index;
         isel = shptr->selectable_object_num;
     }
-    else if (type == 6  &&  contour_list != NULL) {
-        cptr = contour_list[index];
+    else if (type == 6  &&  cl_data != NULL  &&  cl_size > 0) {
+        cptr = cl_data[index];
         isel = cptr->selectable_object_num;
     }
     else if (type == 7  &&  ap_data != NULL  &&  ap_size > 0) {
@@ -15295,7 +15076,7 @@ int CDisplayList::ClosestPickPrim (int fnum,
     dy = (frptr->y2 - frptr->y1);
     pdmax = dx * dx + dy * dy;
     pdmax = sqrt (pdmax);
-    pdmax /= 50.0;
+    pdmax /= 100.0;
 
 /*
  * temporarily switch the current frame num and
@@ -15367,6 +15148,8 @@ int CDisplayList::ClosestPickPrim (int fnum,
         *prim_type = 7;
     }
 
+    free_patch_lists();
+
     if (pdist <= pdmax) {
         patch_draw_flag = patch_save;
         current_frame_num = save_fnum;
@@ -15425,15 +15208,21 @@ void CDisplayList::closest_frame_contour (int fnum, CSW_F xin, CSW_F yin,
 
     *indexout = -1;
 
-    if (contour_list == NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (cl_data == NULL  ||  cl_size < 1) {
         return;
     }
 
     istat = PopulateContourLinePatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    nprim = num_contour_list;
+    int      pt_size = (int)contour_line_patch_list.size();
+    int      *pt_data = contour_line_patch_list.data();
+
+    nprim = cl_size;
     if (istat == 1) {
-        nprim = num_contour_line_patch_list;
+        nprim = pt_size;
     }
 
     dmin = *pdistout;
@@ -15442,13 +15231,13 @@ void CDisplayList::closest_frame_contour (int fnum, CSW_F xin, CSW_F yin,
     for (ido=0; ido<nprim; ido++) {
 
         i = ido;
-        if (num_contour_line_patch_list > 0  &&
-            contour_line_patch_list != NULL  &&
+        if (pt_size > 0  &&
+            pt_data != NULL  &&
             patch_draw_flag == 1) {
-            i = contour_line_patch_list[ido];
+            i = pt_data[ido];
         }
 
-        contour = contour_list[i];
+        contour = cl_data[i];
         if (contour == NULL) {
             continue;
         }
@@ -15515,9 +15304,13 @@ void CDisplayList::closest_frame_line (int fnum, CSW_F xin, CSW_F yin,
     }
 
     istat = PopulateLinePatches (Pickx1, Picky1, Pickx2, Picky2);
+
+    int       pt_size = (int)line_patch_list.size();
+    int       *pt_data = line_patch_list.data();
+
     nprim = lp_size;
     if (istat == 1) {
-        nprim = num_line_patch_list;
+        nprim = pt_size;
     }
 
     dmin = *pdistout;
@@ -15526,10 +15319,10 @@ void CDisplayList::closest_frame_line (int fnum, CSW_F xin, CSW_F yin,
     for (ido=0; ido<nprim; ido++) {
 
         i = ido;
-        if (num_line_patch_list > 0  &&
-            line_patch_list != NULL  &&
+        if (pt_size > 0  &&
+            pt_data != NULL  &&  pt_size > 0  &&
             patch_draw_flag == 1) {
-            i = line_patch_list[ido];
+            i = pt_data[ido];
         }
 
         lptr = lp_data + i;
@@ -15622,9 +15415,12 @@ void CDisplayList::closest_frame_fill_border (int fnum, CSW_F xin, CSW_F yin,
 
     istat = PopulateFillPatches (Pickx1, Picky1, Pickx2, Picky2);
 
+    int        pt_size = (int)fill_patch_list.size();
+    int        *pt_data = fill_patch_list.data();
+
     nprim = fp_size;
     if (istat == 1) {
-        nprim = num_fill_patch_list;
+        nprim = pt_size;
     }
 
     dmin = *pdistout;
@@ -15633,9 +15429,9 @@ void CDisplayList::closest_frame_fill_border (int fnum, CSW_F xin, CSW_F yin,
     for (ido=0; ido<nprim; ido++) {
 
         i = ido;
-        if (num_fill_patch_list > 0  &&  fill_patch_list != NULL  &&
+        if (pt_size > 0  &&  pt_data != NULL  &&
             patch_draw_flag == 1) {
-            i = fill_patch_list[ido];
+            i = pt_data[ido];
         }
 
         fptr = fp_data + i;
@@ -15753,6 +15549,9 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
         nst = tp_size;
     }
 
+    int        pt_size = 0;
+    int        *pt_data = 0;
+
     if (nst > patch_text_min) {
         double   px1, py1, px2, py2;
         double   pw = (Pickx2 - Pickx1);
@@ -15768,9 +15567,12 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
         py2 = Picky2 + pw * 2.0;
 
         istat = PopulateTextPatches (px1, py1, px2, py2);
-        if (istat == 1  &&  num_text_patch_list > 0  &&
-            text_patch_list != NULL  &&  patch_draw_flag == 1) {
-            nprim = num_text_patch_list;
+        pt_size = (int)text_patch_list.size();
+        pt_data = text_patch_list.data();
+
+        if (istat == 1  &&  pt_size > 0  &&
+            pt_data != NULL  &&  patch_draw_flag == 1) {
+            nprim = pt_size;
             bpatch = true;
         }
     }
@@ -15782,7 +15584,7 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
 
         i = ido;
         if (bpatch) {
-            i = text_patch_list[ido];
+            i = pt_data[ido];
         }
 
         tptr = tp_data + i;
@@ -15879,9 +15681,12 @@ void CDisplayList::closest_frame_symb (int fnum, CSW_F xin, CSW_F yin,
 
     istat = PopulateSymbPatches (Pickx1, Picky1, Pickx2, Picky2);
 
+    int         pt_size = (int)symb_patch_list.size();
+    int         *pt_data = symb_patch_list.data();
+
     nprim = sp_size;
     if (istat == 1) {
-        nprim = num_symb_patch_list;
+        nprim = pt_size;
     }
 
     dmin = *pdistout;
@@ -15890,9 +15695,9 @@ void CDisplayList::closest_frame_symb (int fnum, CSW_F xin, CSW_F yin,
     for (ido=0; ido<nprim; ido++) {
 
         i = ido;
-        if (num_symb_patch_list > 0  &&  symb_patch_list != NULL  &&
+        if (pt_size > 0  &&  pt_data != NULL  &&
             patch_draw_flag == 1) {
-            i = symb_patch_list[ido];
+            i = pt_data[ido];
         }
 
         sptr = sp_data + i;
@@ -15917,8 +15722,9 @@ void CDisplayList::closest_frame_symb (int fnum, CSW_F xin, CSW_F yin,
         yt = sptr->y;
         convert_frame_point (&xt, &yt);
         gpf_calcdistance1 (xin, yin, xt, yt, &dist);
-        if (dist <= sptr->size) {
+        if (dist <= sptr->size * .7) {
             index = i;
+            dmin = 0.0;
         }
         else if (dist < dmin) {
             dmin = dist;
@@ -15955,9 +15761,12 @@ void CDisplayList::closest_frame_shape_border (int fnum, CSW_F xin, CSW_F yin,
 
     istat = PopulateShapePatches (Pickx1, Picky1, Pickx2, Picky2);
 
+    int        pt_size = (int)shape_patch_list.size();
+    int        *pt_data = shape_patch_list.data();
+
     nprim = hp_size;
     if (istat == 1) {
-        nprim = num_shape_patch_list;
+        nprim = pt_size;
     }
 
     index = -1;
@@ -15966,9 +15775,9 @@ void CDisplayList::closest_frame_shape_border (int fnum, CSW_F xin, CSW_F yin,
     for (ido=0; ido<nprim; ido++) {
 
         i = ido;
-        if (num_shape_patch_list > 0  &&  shape_patch_list != NULL  &&
+        if (pt_size > 0  &&  pt_data != NULL  &&
             patch_draw_flag == 1) {
-            i = shape_patch_list[ido];
+            i = pt_data[ido];
         }
 
         shptr = hp_data + i;
@@ -16051,9 +15860,12 @@ void CDisplayList::closest_frame_fill (int fnum, CSW_F xin, CSW_F yin,
 
     istat = PopulateFillPatches (Pickx1, Picky1, Pickx2, Picky2);
 
+    int        pt_size = (int)fill_patch_list.size();
+    int        *pt_data = fill_patch_list.data();
+
     nprim = fp_size;
     if (istat == 1) {
-        nprim = num_fill_patch_list;
+        nprim = pt_size;
     }
 
     index = -1;
@@ -16061,9 +15873,9 @@ void CDisplayList::closest_frame_fill (int fnum, CSW_F xin, CSW_F yin,
     for (ido=0; ido<nprim; ido++) {
 
         i = ido;
-        if (num_fill_patch_list > 0  &&  fill_patch_list != NULL  &&
+        if (pt_size > 0  &&  pt_data != NULL  &&
             patch_draw_flag == 1) {
-            i = fill_patch_list[ido];
+            i = pt_data[ido];
         }
 
         fptr = fp_data + i;
@@ -16171,9 +15983,12 @@ void CDisplayList::closest_frame_shape (int fnum, CSW_F xin, CSW_F yin,
 
     istat = PopulateShapePatches (Pickx1, Picky1, Pickx2, Picky2);
 
+    int        pt_size = (int)shape_patch_list.size();
+    int        *pt_data = shape_patch_list.data();
+
     nprim = hp_size;
     if (istat == 1) {
-        nprim = num_shape_patch_list;
+        nprim = pt_size;
     }
 
     index = -1;
@@ -16181,9 +15996,9 @@ void CDisplayList::closest_frame_shape (int fnum, CSW_F xin, CSW_F yin,
     for (ido=0; ido<nprim; ido++) {
 
         i = ido;
-        if (num_shape_patch_list > 0  &&  shape_patch_list != NULL  &&
+        if (pt_size > 0  &&  pt_data != NULL  &&
             patch_draw_flag == 1) {
-            i = shape_patch_list[ido];
+            i = pt_data[ido];
         }
 
         shptr = hp_data + i;
@@ -16527,6 +16342,9 @@ void CDisplayList::return_selected_symbs (DLSelectable *dls)
         return;
     }
 
+    int        sf_size = surf_list.size();
+    DLSurf     **sf_data = surf_list.data();
+
     for (ido=0; ido<nprim; ido++) {
 
         i = symbs[ido];
@@ -16556,8 +16374,8 @@ void CDisplayList::return_selected_symbs (DLSelectable *dls)
         }
 
         sname = NULL;
-        if (sptr->grid_num >= 0  &&  surf_list != NULL) {
-            surf = surf_list[sptr->grid_num];
+        if (sptr->grid_num >= 0  &&  sf_data != NULL  &&  sptr->grid_num < sf_size) {
+            surf = sf_data[sptr->grid_num];
             sname = surf->name;
         }
 
@@ -16717,7 +16535,10 @@ void CDisplayList::return_selected_contours (DLSelectable *dls)
     char            *sname;
     DLContourProperties    *prop;
 
-    if (contour_list == NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (cl_data == NULL  ||  cl_size < 1) {
         return;
     }
 
@@ -16731,11 +16552,14 @@ void CDisplayList::return_selected_contours (DLSelectable *dls)
         return;
     }
 
+    int        sf_size = surf_list.size();
+    DLSurf     **sf_data = surf_list.data();
+
     for (ido=0; ido<nprim; ido++) {
 
         i = conts[ido];
 
-        cptr = contour_list[i];
+        cptr = cl_data[i];
 
         if (cptr->deleted_flag == 1) {
             continue;
@@ -16761,8 +16585,9 @@ void CDisplayList::return_selected_contours (DLSelectable *dls)
 
         sname = NULL;
         prop = NULL;
-        if (cptr->grid_index >= 0  &&  surf_list != NULL) {
-            surf = surf_list[cptr->grid_index];
+        if (cptr->grid_index >= 0  &&  sf_data != NULL  &&
+            cptr->grid_index < sf_size) {
+            surf = sf_data[cptr->grid_index];
             sname = surf->name;
             prop = (DLContourProperties *)surf->GetContourProperties ();
         }
@@ -17319,11 +17144,9 @@ void CDisplayList::reclip_and_draw_selected_symbs (DLSelectable *dls)
 
 void CDisplayList::reclip_and_draw_selected_shapes (DLSelectable *dls)
 {
-    int            ido, i, shape_type, nprim;
+    int            ido, i, nprim;
     int            *shapes;
     SHapePrim      *shptr;
-    CSW_F          corner_ratio, xc, yc, xt, yt;
-    CSW_F          fvals[10], shape_values[10];
 
     int           hp_size = (int)shape_prim_list.size();
     SHapePrim     *hp_data = shape_prim_list.data();
@@ -17341,6 +17164,7 @@ void CDisplayList::reclip_and_draw_selected_shapes (DLSelectable *dls)
         return;
     }
 
+    bool  bframe = false;
     for (ido=0; ido<nprim; ido++) {
 
         i = shapes[ido];
@@ -17356,37 +17180,8 @@ void CDisplayList::reclip_and_draw_selected_shapes (DLSelectable *dls)
         }
         current_frame_num = shptr->frame_num;
         update_frame_limits ();
-
-        shape_type = shptr->type;
-        memcpy (shape_values, shptr->fval, 10 * sizeof(CSW_F));
-
-        corner_ratio = 0.0f;
-        xc = shape_values[0];
-        yc = shape_values[1];
-        xt = shape_values[2];
-        yt = shape_values[3];
-        if (shptr->type == 1) {
-            corner_ratio = (CSW_F)(shape_values[4] / shape_values[2]);
-        }
-        xt += xc;
-        yt += yc;
-        convert_frame_point (&xc, &yc);
-        convert_frame_point (&xt, &yt);
-        xt = xt - xc;
-        yt = yt - yc;
-        if (xt < 0.0) xt = -xt;
-        if (yt < 0.0) yt = -yt;
-        fvals[0] = xc;
-        fvals[1] = yc;
-        fvals[2] = xt;
-        fvals[3] = yt;
-        fvals[4] = (CSW_F)shape_values[4];
-        if (shape_type == 1) {
-            fvals[4] = xt * corner_ratio;
-        }
-        fvals[5] = shape_values[5];
-        fvals[6] = shape_values[6];
-        fvals[7] = shape_values[7];
+        bframe = false;
+        if (current_frame_num >= 0) bframe = true;
 
         ezx_java_obj.ezx_SetFrameInJavaArea (shptr->frame_num);
 
@@ -17396,12 +17191,27 @@ void CDisplayList::reclip_and_draw_selected_shapes (DLSelectable *dls)
             rectangle
         */
             case 1:
-                gtx_drawprim_obj.gtx_cliprectprim (fvals[0],
-                                  fvals[1],
-                                  fvals[2],
-                                  fvals[3],
-                                  fvals[5],
-                                  fvals[4],
+
+                if (bframe) {
+                  // center point
+                    convert_frame_point (shptr->frame_num,
+                                         shptr->fval+0,
+                                         shptr->fval+1);
+                  // width
+                    convert_frame_dist (shptr->frame_num,
+                                        shptr->fval+2);
+                  // height
+                    convert_frame_dist (shptr->frame_num,
+                                        shptr->fval+3);
+                }
+
+                gtx_drawprim_obj.gtx_cliprectprim (
+                                  shptr->fval[0],
+                                  shptr->fval[1],
+                                  shptr->fval[2],
+                                  shptr->fval[3],
+                                  shptr->fval[5],
+                                  shptr->fval[4],
                                   shptr->fill_red,
                                   shptr->fill_green,
                                   shptr->fill_blue,
@@ -17417,20 +17227,48 @@ void CDisplayList::reclip_and_draw_selected_shapes (DLSelectable *dls)
                                   shptr->linepatt,
                                   shptr->dashscale);
 
+                if (bframe) {
+                  // center point
+                    unconvert_frame_point (shptr->frame_num,
+                                           shptr->fval+0,
+                                           shptr->fval+1);
+                  // width
+                    unconvert_frame_dist (shptr->frame_num,
+                                          shptr->fval+2);
+                  // height
+                    unconvert_frame_dist (shptr->frame_num,
+                                          shptr->fval+3);
+                }
+
                 break;
 
         /*
             arc
         */
             case 2:
-                gtx_drawprim_obj.gtx_cliparcprim (fvals[0],
-                                 fvals[1],
-                                 fvals[2],
-                                 fvals[3],
-                                 fvals[4],
-                                 fvals[5],
-                                 fvals[6],
-                                 (int)(fvals[7]+.01),
+
+                if (bframe) {
+                  // center point
+                    convert_frame_point (shptr->frame_num,
+                                         shptr->fval+0,
+                                         shptr->fval+1);
+                  // r1
+                    convert_frame_dist (shptr->frame_num,
+                                        shptr->fval+2);
+                  // r2
+                    convert_frame_dist (shptr->frame_num,
+                                        shptr->fval+3);
+                }
+
+                gtx_drawprim_obj.gtx_cliparcprim (
+                                 shptr->fval[0],
+                                 shptr->fval[1],
+                                 shptr->fval[2],
+                                 shptr->fval[3],
+                                 shptr->fval[4],
+                                 shptr->fval[5],
+                                 shptr->fval[6],
+                                 (int)(shptr->fval[7]+.01),
                                  shptr->fill_red,
                                  shptr->fill_green,
                                  shptr->fill_blue,
@@ -17445,6 +17283,19 @@ void CDisplayList::reclip_and_draw_selected_shapes (DLSelectable *dls)
                                  shptr->patscale,
                                  shptr->linepatt,
                                  shptr->dashscale);
+
+                if (bframe) {
+                  // center point
+                    unconvert_frame_point (shptr->frame_num,
+                                           shptr->fval+0,
+                                           shptr->fval+1);
+                  // r1
+                    unconvert_frame_dist (shptr->frame_num,
+                                          shptr->fval+2);
+                  // r2
+                    unconvert_frame_dist (shptr->frame_num,
+                                          shptr->fval+3);
+                }
 
                 break;
 
@@ -17477,7 +17328,10 @@ void CDisplayList::reclip_and_draw_selected_contours (DLSelectable *dls)
     CSW_F               *xpts, *ypts, *xypack, *xp;
     CSW_F               *xpts2, *ypts2;
 
-    if (contour_list == NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (cl_data == NULL  ||  cl_size < 1) {
         return;
     }
 
@@ -17490,6 +17344,9 @@ void CDisplayList::reclip_and_draw_selected_contours (DLSelectable *dls)
         iwork == NULL) {
         return;
     }
+
+    int        sf_size = surf_list.size();
+    DLSurf     **sf_data = surf_list.data();
 
 /*
  * Set the contour drawing scale.  Since everything is converted to page units,
@@ -17504,7 +17361,7 @@ void CDisplayList::reclip_and_draw_selected_contours (DLSelectable *dls)
 
         i = contours[ido];
 
-        contour = contour_list[i];
+        contour = cl_data[i];
         if (contour == NULL) {
             continue;
         }
@@ -17533,10 +17390,12 @@ void CDisplayList::reclip_and_draw_selected_contours (DLSelectable *dls)
 
         draw_options = NULL;
         conprop = NULL;
-        if (grid_num >= 0  &&  surf_list != NULL) {
-            grid = surf_list[grid_num];
-            draw_options = grid->GetDrawOptions ();
-            conprop = (DLContourProperties *)grid->GetContourProperties ();
+        if (grid_num >= 0  &&  sf_data != NULL  &&  grid_num < sf_size) {
+            grid = sf_data[grid_num];
+            if (grid != NULL) {
+                draw_options = grid->GetDrawOptions ();
+                conprop = (DLContourProperties *)grid->GetContourProperties ();
+            }
         }
 
         if (draw_options == NULL  ||  conprop == NULL) {
@@ -17794,12 +17653,18 @@ void CDisplayList::UnhideAll (void)
     AXisPrim        *aptr;
     DLContour       *cptr;
 
+    int             hsize = 0;
+    int             *hdata = NULL;
+
     int             lp_size = (int)line_prim_list.size();
     LInePrim        *lp_data = line_prim_list.data();
 
-    if (lp_data != NULL  &&  lp_size > 0  &&  line_hidden_list != NULL) {
-        for (i=0; i<num_line_hidden_list; i++) {
-            lptr = lp_data + line_hidden_list[i];
+    hsize =  (int)line_hidden_list.size();
+    hdata =  line_hidden_list.data();
+
+    if (lp_data != NULL  &&  lp_size > 0  &&  hdata != NULL  &&  hsize > 0) {
+        for (i=0; i<hsize; i++) {
+            lptr = lp_data + hdata[i];
             lptr->visible_flag = 1;
         }
     }
@@ -17807,9 +17672,12 @@ void CDisplayList::UnhideAll (void)
     int             fp_size = (int)fill_prim_list.size();
     FIllPrim        *fp_data = fill_prim_list.data();
 
-    if (fp_data != NULL  &&  fp_size > 0  &&  fill_hidden_list != NULL) {
-        for (i=0; i<num_fill_hidden_list; i++) {
-            fptr = fp_data + fill_hidden_list[i];
+    hsize =  (int)fill_hidden_list.size();
+    hdata =  fill_hidden_list.data();
+
+    if (fp_data != NULL  &&  fp_size > 0  &&  hdata != NULL  &&  hsize > 0) {
+        for (i=0; i<hsize; i++) {
+            fptr = fp_data + hdata[i];
             fptr->visible_flag = 1;
         }
     }
@@ -17817,9 +17685,12 @@ void CDisplayList::UnhideAll (void)
     int           tp_size = (int)text_prim_list.size();
     TExtPrim      *tp_data = text_prim_list.data();
 
-    if (tp_data != NULL  &&  tp_size > 0  &&  text_hidden_list != NULL) {
-        for (i=0; i<num_text_hidden_list; i++) {
-            tptr = tp_data + text_hidden_list[i];
+    hsize =  (int)text_hidden_list.size();
+    hdata =  text_hidden_list.data();
+
+    if (tp_data != NULL  &&  tp_size > 0  &&  hdata != NULL  &&  hsize > 0) {
+        for (i=0; i<hsize; i++) {
+            tptr = tp_data + hdata[i];
             tptr->visible_flag = 1;
         }
     }
@@ -17827,9 +17698,12 @@ void CDisplayList::UnhideAll (void)
     int        sp_size = (int)symb_prim_list.size();
     SYmbPrim   *sp_data = symb_prim_list.data();
 
-    if (sp_data != NULL  &&  sp_size > 0  &&  symb_hidden_list != NULL) {
-        for (i=0; i<num_symb_hidden_list; i++) {
-            sptr = sp_data + symb_hidden_list[i];
+    hsize =  (int)symb_hidden_list.size();
+    hdata =  symb_hidden_list.data();
+
+    if (sp_data != NULL  &&  sp_size > 0  &&  hdata != NULL  &&  hsize > 0) {
+        for (i=0; i<hsize; i++) {
+            sptr = sp_data + hdata[i];
             sptr->visible_flag = 1;
         }
     }
@@ -17837,9 +17711,12 @@ void CDisplayList::UnhideAll (void)
     int           hp_size = (int)shape_prim_list.size();
     SHapePrim     *hp_data = shape_prim_list.data();
 
-    if (hp_data != NULL  &&  hp_size > 0  &&  shape_hidden_list != NULL) {
-        for (i=0; i<num_shape_hidden_list; i++) {
-            rptr = hp_data + shape_hidden_list[i];
+    hsize =  (int)shape_hidden_list.size();
+    hdata =  shape_hidden_list.data();
+
+    if (hp_data != NULL  &&  hp_size > 0  &&  hdata != NULL  &&  hsize > 0) {
+        for (i=0; i<hsize; i++) {
+            rptr = hp_data + hdata[i];
             rptr->visible_flag = 1;
         }
     }
@@ -17847,27 +17724,37 @@ void CDisplayList::UnhideAll (void)
     int          ap_size = (int)axis_prim_list.size();
     AXisPrim     *ap_data = axis_prim_list.data();
 
-    if (ap_data != NULL  &&  ap_size > 0  &&  axis_hidden_list != NULL) {
-        for (i=0; i<num_axis_hidden_list; i++) {
-            aptr = ap_data + axis_hidden_list[i];
+    hsize =  (int)axis_hidden_list.size();
+    hdata =  axis_hidden_list.data();
+
+    if (ap_data != NULL  &&  ap_size > 0  &&  hdata != NULL  &&  hsize > 0) {
+        for (i=0; i<hsize; i++) {
+            aptr = ap_data + hdata[i];
             aptr->visible_flag = 1;
         }
     }
 
-    if (contour_list != NULL  &&  contour_hidden_list != NULL) {
-        for (i=0; i<num_contour_hidden_list; i++) {
-            cptr = contour_list[contour_hidden_list[i]];
+    hsize =  (int)contour_hidden_list.size();
+    hdata =  contour_hidden_list.data();
+
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (cl_data != NULL  &&  cl_size > 0  &&  
+          hdata != NULL  &&  hsize > 0) {
+        for (i=0; i<hsize; i++) {
+            cptr = contour_list[hdata[i]];
             cptr->visible_flag = 1;
         }
     }
 
-    num_line_hidden_list = 0;
-    num_fill_hidden_list = 0;
-    num_text_hidden_list = 0;
-    num_symb_hidden_list = 0;
-    num_shape_hidden_list = 0;
-    num_axis_hidden_list = 0;
-    num_contour_hidden_list = 0;
+    line_hidden_list.clear();
+    fill_hidden_list.clear();
+    text_hidden_list.clear();
+    symb_hidden_list.clear();
+    shape_hidden_list.clear();
+    axis_hidden_list.clear();
+    contour_hidden_list.clear();
 
 }
 
@@ -19938,7 +19825,10 @@ void CDisplayList::erase_selected_contours (DLSelectable *dls)
     int             ido, i, nprim, *conts;
     DLContour       *cptr;
 
-    if (contour_list == NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (cl_data == NULL  ||  cl_size < 1) {
         return;
     }
 
@@ -19956,7 +19846,7 @@ void CDisplayList::erase_selected_contours (DLSelectable *dls)
 
         i = conts[ido];
 
-        cptr = contour_list[i];
+        cptr = cl_data[i];
 
         if (cptr->deleted_flag == 1) {
             continue;
@@ -20037,69 +19927,34 @@ void CDisplayList::erase_selected_axes (DLSelectable *dls)
  */
 void CDisplayList::free_hidden_lists (void)
 {
-    csw_Free (line_hidden_list);
-    num_line_hidden_list = 0;
-    max_line_hidden_list = 0;
-    line_hidden_list = NULL;
-
-    csw_Free (fill_hidden_list);
-    num_fill_hidden_list = 0;
-    max_fill_hidden_list = 0;
-    fill_hidden_list = NULL;
-
-    csw_Free (text_hidden_list);
-    num_text_hidden_list = 0;
-    max_text_hidden_list = 0;
-    text_hidden_list = NULL;
-
-    csw_Free (symb_hidden_list);
-    num_symb_hidden_list = 0;
-    max_symb_hidden_list = 0;
-    symb_hidden_list = NULL;
-
-    csw_Free (shape_hidden_list);
-    num_shape_hidden_list = 0;
-    max_shape_hidden_list = 0;
-    shape_hidden_list = NULL;
-
-    csw_Free (axis_hidden_list);
-    num_axis_hidden_list = 0;
-    max_axis_hidden_list = 0;
-    axis_hidden_list = NULL;
-
-    csw_Free (contour_hidden_list);
-    num_contour_hidden_list = 0;
-    max_contour_hidden_list = 0;
-    contour_hidden_list = NULL;
+    line_hidden_list.clear();
+    fill_hidden_list.clear();
+    text_hidden_list.clear();
+    symb_hidden_list.clear();
+    shape_hidden_list.clear();
+    axis_hidden_list.clear();
+    contour_hidden_list.clear();
 
     return;
-
 }
 
 
 int CDisplayList::add_hidden_contour (int prim_num) {
 
-    if (prim_num < 0  ||  prim_num >= num_contour_list  ||  contour_list == NULL) {
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+
+    if (prim_num < 0  ||  prim_num >= cl_size  ||
+          cl_data == NULL  ||  cl_size < 1) {
         return 0;
     }
 
-    if (contour_hidden_list == NULL) {
-        num_contour_hidden_list = 0;
-        max_contour_hidden_list = 0;
+    try {
+        contour_hidden_list.push_back (prim_num);
     }
-
-    if (num_contour_hidden_list >= max_contour_hidden_list) {
-        max_contour_hidden_list += _BIG_CHUNK_SIZE_;
-        contour_hidden_list =
-        (int *)csw_Realloc
-        (contour_hidden_list, max_contour_hidden_list * sizeof(int));
-    }
-    if (contour_hidden_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    contour_hidden_list[num_contour_hidden_list] = prim_num;
-    num_contour_hidden_list++;
 
     return 1;
 }
@@ -20114,23 +19969,12 @@ int CDisplayList::add_hidden_line (int prim_num) {
         return 0;
     }
 
-    if (line_hidden_list == NULL) {
-        num_line_hidden_list = 0;
-        max_line_hidden_list = 0;
+    try {
+        line_hidden_list.push_back (prim_num);
     }
-
-    if (num_line_hidden_list >= max_line_hidden_list) {
-        max_line_hidden_list += _BIG_CHUNK_SIZE_;
-        line_hidden_list =
-        (int *)csw_Realloc
-        (line_hidden_list, max_line_hidden_list * sizeof(int));
-    }
-    if (line_hidden_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    line_hidden_list[num_line_hidden_list] = prim_num;
-    num_line_hidden_list++;
 
     return 1;
 }
@@ -20145,23 +19989,12 @@ int CDisplayList::add_hidden_fill (int prim_num) {
         return 0;
     }
 
-    if (fill_hidden_list == NULL) {
-        num_fill_hidden_list = 0;
-        max_fill_hidden_list = 0;
+    try {
+        fill_hidden_list.push_back (prim_num);
     }
-
-    if (num_fill_hidden_list >= max_fill_hidden_list) {
-        max_fill_hidden_list += _BIG_CHUNK_SIZE_;
-        fill_hidden_list =
-        (int *)csw_Realloc
-        (fill_hidden_list, max_fill_hidden_list * sizeof(int));
-    }
-    if (fill_hidden_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    fill_hidden_list[num_fill_hidden_list] = prim_num;
-    num_fill_hidden_list++;
 
     return 1;
 }
@@ -20176,23 +20009,12 @@ int CDisplayList::add_hidden_text (int prim_num) {
         return 0;
     }
 
-    if (text_hidden_list == NULL) {
-        num_text_hidden_list = 0;
-        max_text_hidden_list = 0;
+    try {
+        text_hidden_list.push_back (prim_num);
     }
-
-    if (num_text_hidden_list >= max_text_hidden_list) {
-        max_text_hidden_list += _BIG_CHUNK_SIZE_;
-        text_hidden_list =
-        (int *)csw_Realloc
-        (text_hidden_list, max_text_hidden_list * sizeof(int));
-    }
-    if (text_hidden_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    text_hidden_list[num_text_hidden_list] = prim_num;
-    num_text_hidden_list++;
 
     return 1;
 }
@@ -20207,23 +20029,12 @@ int CDisplayList::add_hidden_symb (int prim_num) {
         return 0;
     }
 
-    if (symb_hidden_list == NULL) {
-        num_symb_hidden_list = 0;
-        max_symb_hidden_list = 0;
+    try {
+        symb_hidden_list.push_back (prim_num);
     }
-
-    if (num_symb_hidden_list >= max_symb_hidden_list) {
-        max_symb_hidden_list += _BIG_CHUNK_SIZE_;
-        symb_hidden_list =
-        (int *)csw_Realloc
-        (symb_hidden_list, max_symb_hidden_list * sizeof(int));
-    }
-    if (symb_hidden_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    symb_hidden_list[num_symb_hidden_list] = prim_num;
-    num_symb_hidden_list++;
 
     return 1;
 }
@@ -20238,23 +20049,12 @@ int CDisplayList::add_hidden_shape (int prim_num) {
         return 0;
     }
 
-    if (shape_hidden_list == NULL) {
-        num_shape_hidden_list = 0;
-        max_shape_hidden_list = 0;
+    try {
+        shape_hidden_list.push_back (prim_num);
     }
-
-    if (num_shape_hidden_list >= max_shape_hidden_list) {
-        max_shape_hidden_list += _BIG_CHUNK_SIZE_;
-        shape_hidden_list =
-        (int *)csw_Realloc
-        (shape_hidden_list, max_shape_hidden_list * sizeof(int));
-    }
-    if (shape_hidden_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    shape_hidden_list[num_shape_hidden_list] = prim_num;
-    num_shape_hidden_list++;
 
     return 1;
 }
@@ -20269,23 +20069,12 @@ int CDisplayList::add_hidden_axis (int prim_num) {
         return 0;
     }
 
-    if (axis_hidden_list == NULL) {
-        num_axis_hidden_list = 0;
-        max_axis_hidden_list = 0;
+    try {
+        axis_hidden_list.push_back (prim_num);
     }
-
-    if (num_axis_hidden_list >= max_axis_hidden_list) {
-        max_axis_hidden_list += _SMALL_CHUNK_SIZE_;
-        axis_hidden_list =
-        (int *)csw_Realloc
-        (axis_hidden_list, max_axis_hidden_list * sizeof(int));
-    }
-    if (axis_hidden_list == NULL) {
+    catch (...) {
         return -1;
     }
-
-    axis_hidden_list[num_axis_hidden_list] = prim_num;
-    num_axis_hidden_list++;
 
     return 1;
 }
@@ -21117,8 +20906,11 @@ int CDisplayList::DrawAllContourLines (void)
     jni_msg ("\nDisplay list contour lines being drawn\n");
 
     nloop = cp_size;
-    if (contour_line_patch_list != NULL  &&  patch_draw_flag == 1) {
-        nloop = num_contour_line_patch_list;
+    int      pt_size = (int)contour_line_patch_list.size();
+    int      *pt_data = contour_line_patch_list.data();
+
+    if (pt_data != NULL  &&  pt_size > 0  &&  patch_draw_flag == 1) {
+        nloop = pt_size;
         bpatch = true;
     }
 
@@ -21128,7 +20920,7 @@ int CDisplayList::DrawAllContourLines (void)
 
         i = ido;
         if (bpatch) {
-            i = contour_line_patch_list[ido];
+            i = pt_data[ido];
         }
 
         lptr = cp_data + i;
@@ -21244,3 +21036,78 @@ int CDisplayList::CalcLineBounds (LInePrim *lptr)
     return 1;
 
 }  /*  end of function CalcLineBounds  */
+
+
+
+
+void CDisplayList::convert_frame_dist (int fnum, CSW_F *dist)
+{
+    CSW_F           sx, sy;
+    CSW_F           fx1, fy1, fx2, fy2;
+    CSW_F           px1, py1, px2, py2;
+
+    if (fnum < 0  ||  fnum >= num_frame_list  ||  frame_list == NULL) {
+        return;
+    }
+
+    FRameStruct  *frptr = frame_list + fnum;
+
+    px1 = frptr->px1;
+    py1 = frptr->py1;
+    px2 = frptr->px2;
+    py2 = frptr->py2;
+    fx1 = frptr->x1;
+    fy1 = frptr->y1;
+    fx2 = frptr->x2;
+    fy2 = frptr->y2;
+
+/*
+ * scales are in page units per frame unit
+ */
+    sx = (px2 - px1) / (fx2 - fx1);
+    sy = (py2 - py1) / (fy2 - fy1);
+
+    sx = (sx + sy) / 2.0;
+    if (sx < 0.0) sx = -sx;
+
+    *dist *= sx;
+
+    return;
+}
+
+
+
+void CDisplayList::unconvert_frame_dist (int fnum, CSW_F *dist)
+{
+    CSW_F           sx, sy;
+    CSW_F           fx1, fy1, fx2, fy2;
+    CSW_F           px1, py1, px2, py2;
+
+    if (fnum < 0  ||  fnum >= num_frame_list  ||  frame_list == NULL) {
+        return;
+    }
+
+    FRameStruct  *frptr = frame_list + fnum;
+
+    px1 = frptr->px1;
+    py1 = frptr->py1;
+    px2 = frptr->px2;
+    py2 = frptr->py2;
+    fx1 = frptr->x1;
+    fy1 = frptr->y1;
+    fx2 = frptr->x2;
+    fy2 = frptr->y2;
+
+/*
+ * scales are in Frame units per page unit
+ */
+    sx = (fx2 - fx1) / (px2 - px1);
+    sy = (fy2 - fy1) / (py2 - py1);
+    sx = (sx + sy) / 2.0;
+
+    if (sx < 0.0) sx = -sx;
+
+    *dist *= sx;
+
+    return;
+}

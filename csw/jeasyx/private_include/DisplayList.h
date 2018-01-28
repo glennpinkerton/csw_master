@@ -692,6 +692,8 @@ private:
     void unconvert_frame_point (CSW_F *x, CSW_F *y);
     void convert_frame_point (int fnum, CSW_F *x, CSW_F *y);
     void unconvert_frame_point (int fnum, CSW_F *x, CSW_F *y);
+    void convert_frame_dist (int fnum, CSW_F *dist);
+    void unconvert_frame_dist (int fnum, CSW_F *dist);
 
     int set_grid_for_vec (double x1, double y1, double x2, double y2,
                           FIllPrim *prim);
@@ -1060,13 +1062,9 @@ private:
   /*
    * lists of grids, trimeshes and contours.
    */
-    DLContour       **contour_list = NULL;
-    int             num_contour_list,
-                    max_contour_list;
+    std::vector<DLContour *>   contour_list;
 
-    DLSurf          **surf_list = NULL;
-    int             num_surf_list,
-                    max_surf_list;
+    std::vector<DLSurf *>      surf_list;
 
     DLContourProperties   tmp_contour_props;
     void            default_contour_properties (void);
@@ -1099,106 +1097,45 @@ private:
    * primitives can become available when they are
    * deleted, rescaled from a frame, etc.
    */
-    int             *line_available_list = NULL;
-    int             num_line_available_list,
-                    max_line_available_list;
-
-    int             *contour_available_list = NULL;
-    int             num_contour_available_list,
-                    max_contour_available_list;
-
-    int             *contour_line_available_list = NULL;
-    int             num_contour_line_available_list,
-                    max_contour_line_available_list;
-
-    int             *fill_available_list = NULL;
-    int             num_fill_available_list,
-                    max_fill_available_list;
-
-    int             *symb_available_list = NULL;
-    int             num_symb_available_list,
-                    max_symb_available_list;
-
-    int             *text_available_list = NULL;
-    int             num_text_available_list,
-                    max_text_available_list;
-
-    int             *shape_available_list = NULL;
-    int             num_shape_available_list,
-                    max_shape_available_list;
-
-    int             *axis_available_list = NULL;
-    int             num_axis_available_list,
-                    max_axis_available_list;
-
-    int             *image_available_list = NULL;
-    int             num_image_available_list,
-                    max_image_available_list;
+    std::vector<int>      line_available_list;
+    std::vector<int>      contour_available_list;
+    std::vector<int>      contour_line_available_list;
+    std::vector<int>      fill_available_list;
+    std::vector<int>      text_available_list;
+    std::vector<int>      symb_available_list;
+    std::vector<int>      shape_available_list;
+    std::vector<int>      axis_available_list;
+    std::vector<int>      image_available_list;
 
   /*
    * lists with indexes of hidden primitives
    * primitives can become hidden when they are
    * deleted, rescaled from a frame, etc.
    */
-    int             *line_hidden_list = NULL;
-    int             num_line_hidden_list,
-                    max_line_hidden_list;
-
-    int             *fill_hidden_list = NULL;
-    int             num_fill_hidden_list,
-                    max_fill_hidden_list;
-
-    int             *symb_hidden_list = NULL;
-    int             num_symb_hidden_list,
-                    max_symb_hidden_list;
-
-    int             *text_hidden_list = NULL;
-    int             num_text_hidden_list,
-                    max_text_hidden_list;
-
-    int             *shape_hidden_list = NULL;
-    int             num_shape_hidden_list,
-                    max_shape_hidden_list;
-
-    int             *axis_hidden_list = NULL;
-    int             num_axis_hidden_list,
-                    max_axis_hidden_list;
-
-    int             *contour_hidden_list = NULL;
-    int             num_contour_hidden_list,
-                    max_contour_hidden_list;
+    std::vector<int>    line_hidden_list;
+    std::vector<int>    fill_hidden_list;
+    std::vector<int>    symb_hidden_list;
+    std::vector<int>    text_hidden_list;
+    std::vector<int>    shape_hidden_list;
+    std::vector<int>    axis_hidden_list;
+    std::vector<int>    contour_hidden_list;
 
   /*
    * patch drawing lists.
    */
-    int             *contour_line_patch_list = NULL;
-    int             num_contour_line_patch_list,
-                    max_contour_line_patch_list;
-
-    int             *line_patch_list = NULL;
-    int             num_line_patch_list,
-                    max_line_patch_list;
-
-    int             *fill_patch_list = NULL;
-    int             num_fill_patch_list,
-                    max_fill_patch_list;
-
-    int             *symb_patch_list = NULL;
-    int             num_symb_patch_list,
-                    max_symb_patch_list;
-
-    int             *text_patch_list = NULL;
-    int             num_text_patch_list,
-                    max_text_patch_list;
-
-    int             *shape_patch_list = NULL;
-    int             num_shape_patch_list,
-                    max_shape_patch_list;
+    std::vector<int> contour_line_patch_list;
+    std::vector<int> line_patch_list;
+    std::vector<int> fill_patch_list;
+    std::vector<int> symb_patch_list;
+    std::vector<int> text_patch_list;
+    std::vector<int> shape_patch_list;
 
     int             patch_draw_flag;
 
   /*
-   * spatial indexing arrays.
+   * spatial indexing arrays.  These are kept on a per frame
+   * basis and the data from the active frame is referenced
+   * by the display list via these variables.
    */
     int             **line_spatial_index = NULL;
     int             **fill_spatial_index = NULL;
