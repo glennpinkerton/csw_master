@@ -43,7 +43,7 @@
 #define MAXFONT2 2000
 #define MAXPARTS 100
 
-#define ARCRESOLUTION           4.0f
+#define ARCRESOLUTION           2.0
 
 #ifndef HOLEFLAG
 #define HOLEFLAG   1.e19f

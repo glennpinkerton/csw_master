@@ -312,6 +312,7 @@ public class JDisplayList extends JDisplayListBase {
     fill color and fill pattern.  The outline of the arc will be colored with the
     current line color and dashed with the current line dash pattern.  Remember that
     x and y coordinates need to be specified in the appropriate frame or page units.
+    The r1 and r2 radii should be in the same units as xc and yc.
     @param xc the x coordinate of the center of the arc
     @param yc the y coordinate of the center of the arc
     @param r1 the x axis radius of the arc (before rotation)
@@ -510,9 +511,9 @@ public class JDisplayList extends JDisplayListBase {
     If the corner radius is less than or equal to zero, right angle corners are used.
     @param x X coordinate of the corner point
     @param y Y coordinate of the corner point
-    @param width Width of the rectangle, in distance units
-    @param height Height of the rectangle, in distance units
-    @param crad The radius for a curved corner, in distance units.
+    @param width Width of the rectangle, in the same units as x and y
+    @param height Height of the rectangle, in the same units as x and y
+    @param crad The radius for a curved corner, in the same units as x and y
     @param rang The rotation angle in degrees.
    */
     public int addRectangle (double x, double y,
@@ -549,9 +550,9 @@ public class JDisplayList extends JDisplayListBase {
     If the corner radius is less than or wqual to zero, right angle corners are used.
     @param x X coordinate of the corner point
     @param y Y coordinate of the corner point
-    @param width Width of the rectangle, in distance units
-    @param height Height of the rectangle, in distance units
-    @param crad The radius for a curved corner, in distance units.
+    @param width Width of the rectangle, in the same units as x and y
+    @param height Height of the rectangle, in the same units as x and y
+    @param crad The radius for a curved corner, in the same units. as x and y
     @param rang The rotation angle in degrees.
    */
     public int addCenteredRectangle (double x, double y,
@@ -592,7 +593,7 @@ public class JDisplayList extends JDisplayListBase {
     The radius must be in page or frame distance units, not in device size units.
    @param xc X coordinate of the circle center
    @param yc Y coordinate of the circle center.
-   @param radius radius of the circle, in distance units.
+   @param radius radius of the circle, in the same units as xc and yc.
    */
     public int addCircle (double xc, double yc, double radius)
     {
