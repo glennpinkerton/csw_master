@@ -78,6 +78,13 @@
 
 
 /*
+ * The functions in this file are called from the C JNI functions, so
+ * they are extern C here as well as in the header file.
+ */
+extern "C" {
+
+
+/*
  ***************************************************************************
 
     Process a command sent from the java side.  Any returned data
@@ -3160,3 +3167,27 @@ long sw_process_command (
 
     return istat;
 }
+
+
+
+
+void *sw_get_void_jenv (int threadid, void *v_jenv)
+{
+    void *vp = ThreadGuard::GetVoidJenv (threadid, v_jenv);
+    return vp;
+}
+
+
+void *sw_get_void_jobj (int threadid, void *v_jobj)
+{
+    void *vp = ThreadGuard::GetVoidJobj (threadid, v_jobj);
+    return vp;
+}
+
+
+
+/*
+ * End of extern "C" declaration
+ */
+}
+

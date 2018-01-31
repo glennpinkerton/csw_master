@@ -87,7 +87,7 @@ static jclass         JavaCls;
 static int            FunctionSet = 0;
 
 static void update_zoom_pan_method (int command_id);
-static int setup_return_select_method_ids(JNIEnv *env,jobject obj);
+static int setup_return_select_method_ids(JNIEnv *env, jclass cls);
 
 #if DEBUG_JNI_FILE
 static FILE           *dbfile = NULL;
@@ -166,6 +166,27 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
     jlong            *jllist;
     long             llist[100];
 
+
+    jint   moni_stat;
+    moni_stat = (*jnienv)->MonitorEnter(jnienv, jobj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return moni_stat;
+    }
+
+    threadid = (int)j_thread_id;
+    void *v_jenv = (void *)jnienv;
+    void *v_jobj = (void *)jobj;
+    void *vdum;
+    vdum = ezx_get_void_jenv (threadid, v_jenv);
+    vdum = ezx_get_void_jobj (threadid, v_jobj);
+    vdum = vdum;
+
+    moni_stat = (*jnienv)->MonitorExit(jnienv, jobj);
+    if (moni_stat < 0) {
+        printf ("Error exiting java monitor from line %d\n", __LINE__);
+        return moni_stat;
+    }
 
 /*
  *  This block of code can be uncommented to enable debug of
@@ -254,7 +275,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
  * directly.
  */
     command_id = (int)j_command_id;
-    threadid = (int)j_thread_id;
     dlist_index = (int)j_dlist_index;
     if (j_llist) {
         jllist = (*jnienv)->GetLongArrayElements (jnienv, j_llist, JNI_FALSE);
@@ -378,13 +398,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
  * zoom pan java method is valid.
  */
     update_zoom_pan_method (command_id);
-
-/*
- * Find the Java class methods for sending back the selected data.
- */
-    if (command_id == GTX_SET_SELECT_STATE) {
-        setup_return_select_method_ids(JavaEnv, JavaObj);
-    }
 
 /*
  * Do whatever is needed from the command.
@@ -590,6 +603,8 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
     jclass           cls;
     int              dlist_index, threadid;
 
+    static int       first_call = 1;
+
   #if DEBUG_JNI_FILE
     sprintf (fileline, "\n\nCalling nativeDraw\n");
     if (dbfile) {
@@ -601,11 +616,44 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
     dlist_index = (int)j_dlist_index;
     threadid = (int)j_threadid;
 
+    jint   moni_stat;
+    moni_stat = (*env)->MonitorEnter(env, obj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return;
+    }
+
+    void *v_jenv = (void *)env;
+    void *v_jobj = (void *)obj;
+    void *vdum;
+    vdum = ezx_get_void_jenv (threadid, v_jenv);
+    vdum = ezx_get_void_jobj (threadid, v_jobj);
+    vdum = vdum;
+
+    moni_stat = (*env)->MonitorExit(env, obj);
+    if (moni_stat < 0) {
+        printf ("Error exiting java monitor from line %d\n", __LINE__);
+        return;
+    }
+
 /*
  * Find the Java class methods for sending back graphics data.
+ * These are all class methods of the JDisplayListBase java
+ * class.  They should be thread safe cached since they are not
+ * changed after initial assignment.
  */
+ 
+  if (first_call == 1) {
+
+    first_call = 0;
 
     cls = (*env)->GetObjectClass (env, obj);
+
+    int    sel_stat = 
+    setup_return_select_method_ids(env, cls);
+    if (sel_stat == -1) {
+        return;
+    }
 
     FillMethodID = (*env)->GetMethodID (env, cls, "addNativeFill",
                                      "([FFFIIIIIIII)V");
@@ -626,13 +674,13 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
     }
 
     ArcMethodID = (*env)->GetMethodID (env, cls, "addNativeArc",
-                                    "(FFFFFFIIIIIFFII)V");
+                                "(FFFFFFIIIIIFFII)V");
     if (ArcMethodID == NULL) {
         return;
     }
 
     FilledArcMethodID = (*env)->GetMethodID (env, cls, "addNativeFilledArc",
-                                         "(FFFFFFIIIIIFFIII)V");
+                                     "(FFFFFFIIIIIFFIII)V");
     if (FilledArcMethodID == NULL) {
         return;
     }
@@ -644,10 +692,13 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
     }
 
     FrameMethodID = (*env)->GetMethodID (env, cls, "addNativeFrame",
-                                      "(FFFFDDDDIIIIILjava/lang/String;)V");
+                                  "(FFFFDDDDIIIIILjava/lang/String;)V");
     if (FrameMethodID == NULL) {
         return;
     }
+
+  } /* end of first_call block */
+
 
   #if DEBUG_JNI_FILE
     sprintf (fileline, "Finished with method id assignment\n");
@@ -1580,38 +1631,34 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
    jint j_ix,
    jint j_iy)
 {
-    jclass           cls;
     int              dlist_index;
     int              threadid;
     int              status;
     jint             ilist[10];
 
-    cls = NULL;
-    cls = cls;
-
-/*
- * If the int type is not a 32 bit signed integer, a conversion
- * from jint to int will be needed.  If the int is smaller than
- * a 32 bit signed then don't even compile since there will be
- * all kinds of problems.
- */
-#if INT_MAX != 2147483647
-    int              ilist2[1000];
-  #if INT_MAX  <  2147483647
-    #error The int data type with this compiler is less than 32 bits, ABORT.
-  #endif
-#endif
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\n\nCalling nativePick\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
+    jint   moni_stat;
+    moni_stat = (*env)->MonitorEnter(env, obj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return moni_stat;
     }
-  #endif
+
+    threadid = (int)j_threadid;
+    void *v_jenv = (void *)env;
+    void *v_jobj = (void *)obj;
+    void *vdum;
+    vdum = ezx_get_void_jenv (threadid, v_jenv);
+    vdum = ezx_get_void_jobj (threadid, v_jobj);
+    vdum = vdum;
+
+    moni_stat = (*env)->MonitorExit(env, obj);
+    if (moni_stat < 0) {
+        printf ("Error exiting java monitor from line %d\n", __LINE__);
+        return moni_stat;
+    }
+
 
     dlist_index = (int)j_dlist_index;
-    threadid = (int)j_threadid;
 
 /*
  * Fill the ilist array.
@@ -1628,12 +1675,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
     }
   #endif
 
-/*
- * Find the Java class methods for sending back the selected data.
- */
-    if (setup_return_select_method_ids(env, obj) < 0) {
-        return -1;
-    }
 
 /*
  * The java object and environment are also needed for the calls to
@@ -1704,13 +1745,14 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
 
 }
 
-static int setup_return_select_method_ids(JNIEnv *env, jobject obj) {
-    jclass           cls;
+
+
+
+static int setup_return_select_method_ids(JNIEnv  *env, jclass  cls) {
+
 /*
  * Find the Java class methods for sending back the selected data.
  */
-
-    cls = (*env)->GetObjectClass (env, obj);
 
     SelectFillMethodID = (*env)->GetMethodID (env, cls, "addSelectedFill",
     "(I[D[D[IIDDDIIIIIIIIIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;III)V");
@@ -1776,6 +1818,30 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDrawSelected
     jclass           cls;
     int              dlist_index;
     int              threadid;
+
+
+    jint   moni_stat;
+    moni_stat = (*env)->MonitorEnter(env, obj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return;
+    }
+
+    threadid = (int)j_threadid;
+    void *v_jenv = (void *)env;
+    void *v_jobj = (void *)obj;
+    void *vdum;
+    vdum = ezx_get_void_jenv (threadid, v_jenv);
+    vdum = ezx_get_void_jobj (threadid, v_jobj);
+    vdum = vdum;
+
+    moni_stat = (*env)->MonitorExit(env, obj);
+    if (moni_stat < 0) {
+        printf ("Error exiting java monitor from line %d\n", __LINE__);
+        return;
+    }
+
+
 
   #if DEBUG_JNI_FILE
     sprintf (fileline, "\n\nCalling nativeDraw\n");
@@ -3301,6 +3367,28 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
     int              status;
     jint             ilist[10];
 
+
+    jint   moni_stat;
+    moni_stat = (*env)->MonitorEnter(env, obj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return moni_stat;
+    }
+
+    threadid = (int)j_threadid;
+    void *v_jenv = (void *)env;
+    void *v_jobj = (void *)obj;
+    void *vdum;
+    vdum = ezx_get_void_jenv (threadid, v_jenv);
+    vdum = ezx_get_void_jobj (threadid, v_jobj);
+    vdum = vdum;
+
+    moni_stat = (*env)->MonitorExit(env, obj);
+    if (moni_stat < 0) {
+        printf ("Error exiting java monitor from line %d\n", __LINE__);
+        return moni_stat;
+    }
+
     cls = NULL;
     cls = cls;
 
@@ -3445,7 +3533,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
 
 /*
  * Get the parts for the specified symbol.  This is a static method
- * that does not need a display list available to work.
+ * that does not need a display list available to work.  This should 
+ * be synchronized for thread safety in the java code.
  */
 JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_getNativeSymbolParts
 (
@@ -3921,14 +4010,14 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_setFontMethods
 
 /*
  * Find the Java class methods for getting font data.
+ * The same method will be used by all threads, so the actual
+ * caching of the method id hefre is not thread critical.
+ * However, the java code which does the work should be synchronized.
  */
     cls = (*env)->GetObjectClass (env, obj);
 
     FontBoundsMethodID = (*env)->GetMethodID (env, cls, "getTextBounds",
                                      "(Ljava/lang/String;ID[D)V");
-    if (FontBoundsMethodID == NULL) {
-        return;
-    }
 
     return;
 
@@ -3970,6 +4059,28 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_convertToFrame
     jclass           cls;
     int              dlist_index, threadid;
     int              local_list[3];
+
+
+    jint   moni_stat;
+    moni_stat = (*env)->MonitorEnter(env, obj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return moni_stat;
+    }
+
+    threadid = (int)j_threadid;
+    void *v_jenv = (void *)env;
+    void *v_jobj = (void *)obj;
+    void *vdum;
+    vdum = ezx_get_void_jenv (threadid, v_jenv);
+    vdum = ezx_get_void_jobj (threadid, v_jobj);
+    vdum = vdum;
+
+    moni_stat = (*env)->MonitorExit(env, obj);
+    if (moni_stat < 0) {
+        printf ("Error exiting java monitor from line %d\n", __LINE__);
+        return moni_stat;
+    }
 
     dlist_index = (int)j_dlist_index;
     threadid = (int)j_threadid;
@@ -4115,6 +4226,34 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
     jlong            *jllist;
     long             llist[100];
 
+
+// ???? thread lock with static command ????
+
+    threadid = (int)j_thread_id;
+/*
+    jint   moni_stat;
+    moni_stat = (*jnienv)->MonitorEnter(jnienv, jobj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return moni_stat;
+    }
+
+    void *v_jenv = (void *)jnienv;
+    void *v_jobj = (void *)jobj;
+    void *vdum;
+    vdum = ezx_get_void_jenv (threadid, v_jenv);
+    vdum = ezx_get_void_jobj (threadid, v_jobj);
+    vdum = vdum;
+
+    moni_stat = (*jnienv)->MonitorExit(jnienv, jobj);
+    if (moni_stat < 0) {
+        printf ("Error exiting java monitor from line %d\n", __LINE__);
+        return moni_stat;
+    }
+*/
+
+
+
 /*
  * If the int type is not a 32 bit signed integer, a conversion
  * from jint to int will be needed.  If the int is smaller than
@@ -4149,7 +4288,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
  * directly.
  */
     command_id = (int)j_command_id;
-    threadid = (int)j_thread_id;
     dlist_index = (int)j_dlist_index;
     if (j_llist) {
         jllist = (*jnienv)->GetLongArrayElements (jnienv, j_llist, JNI_FALSE);

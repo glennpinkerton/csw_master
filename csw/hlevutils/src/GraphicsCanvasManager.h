@@ -47,7 +47,8 @@ class CanvasManager
 
   public:
 
-    int ezx_AddGraphicsCanvasToManager (char *name, long java_num);
+    int ezx_AddGraphicsCanvasToManager (char *name, long java_num,
+                                        void *v_jenv, void *v_jobj);
     int ezx_RemoveGraphicsCanvasFromManager (char *name);
     int ezx_RemoveGraphicsCanvasFromManager (int index);
     int ezx_SetActiveGraphicsCanvas (char *name);

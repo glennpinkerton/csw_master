@@ -74,8 +74,6 @@ class JDisplayListBase extends DLConst {
 
     protected JDisplayListPanel dlPanel = null;
 
-    protected boolean   draw_not_needed = false;
-
   /*
    * define some variables to keep track of the state and
    * what is needed for redraw.
@@ -1341,8 +1339,6 @@ class JDisplayListBase extends DLConst {
         visibleDraw (g2d, xorigin, yorigin);
 
 
-        draw_not_needed = true;
-
         return 0;
 
     }
@@ -1448,8 +1444,6 @@ class JDisplayListBase extends DLConst {
         ilist[1] = ix;
         ilist[2] = iy;
 
-        draw_not_needed = false;
-
         int isel = sendNativeCommand (DLConst.GTX_GET_PRIM_NUM, ilist);
 
         return isel;
@@ -1464,8 +1458,6 @@ class JDisplayListBase extends DLConst {
 
         ilist[0] = width;
         ilist[1] = height;
-
-        draw_not_needed = false;
 
         sendNativeCommand (
             DLConst.GTX_SETSCREENSIZE,
@@ -1610,8 +1602,6 @@ class JDisplayListBase extends DLConst {
         ilist[4] = ix2;
         ilist[5] = iy2;
 
-        draw_not_needed = false;
-
         sendNativeCommand (
             DLConst.GTX_ZOOMFRAME,
             ilist
@@ -1635,8 +1625,6 @@ class JDisplayListBase extends DLConst {
         ilist[3] = ix2;
         ilist[4] = iy2;
 
-        draw_not_needed = false;
-
         sendNativeCommand (
             DLConst.GTX_PANFRAME,
             ilist
@@ -1652,8 +1640,6 @@ class JDisplayListBase extends DLConst {
 
         ilist[0] = frame_num;
 
-        draw_not_needed = false;
-
         sendNativeCommand (
             DLConst.GTX_ZOOMEXTENTS,
             ilist
@@ -1668,8 +1654,6 @@ class JDisplayListBase extends DLConst {
         int[] ilist = new int[2];
 
         ilist[0] = frame_num;
-
-        draw_not_needed = false;
 
         sendNativeCommand (
             DLConst.GTX_ZOOMOUT,
@@ -1713,8 +1697,6 @@ class JDisplayListBase extends DLConst {
                 ilist[3] = iy - ih;
                 ilist[4] = ix + iw;
                 ilist[5] = iy + ih;
-
-        draw_not_needed = false;
 
                 sendNativeCommand (
                     DLConst.GTX_ZOOMFRAME,
@@ -2806,8 +2788,6 @@ class JDisplayListBase extends DLConst {
 
     protected void unselectAll ()
     {
-        draw_not_needed = false;
-
         sendNativeCommand (
             DLConst.GTX_UNSELECT_ALL
         );
@@ -2818,8 +2798,6 @@ class JDisplayListBase extends DLConst {
 
     protected void deleteSelected ()
     {
-        draw_not_needed = false;
-
         sendNativeCommand (
             DLConst.GTX_DELETE_SELECTED
         );
@@ -2830,8 +2808,6 @@ class JDisplayListBase extends DLConst {
 
     protected void hideSelected ()
     {
-        draw_not_needed = false;
-
         sendNativeCommand (
             DLConst.GTX_HIDE_SELECTED
         );
@@ -2843,8 +2819,6 @@ class JDisplayListBase extends DLConst {
 
     protected void unhideAll ()
     {
-        draw_not_needed = false;
-
         sendNativeCommand (
             DLConst.GTX_UNHIDE_ALL
         );
@@ -3847,8 +3821,6 @@ class JDisplayListBase extends DLConst {
 
         int[] ilist = new int[10];
         double[] ddata = new double[10];
-
-        draw_not_needed = false;
 
         sendNativeCommand (
             GTX_LOG_COMMENT,

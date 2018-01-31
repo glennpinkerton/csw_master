@@ -2165,6 +2165,11 @@ int main (int argc, char *argv[])
 
             case GTX_SET_SELECT_STATE:
 
+                ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
+                if (ctmp == NULL) {
+                    end_flag = 1;
+                    break;
+                }
                 sscanf (inbuff, "%d %d", ilist+0, ilist+1);
 
                 ezx_process_command (
