@@ -81,14 +81,17 @@ private:
 
 public:
 
-bool  _bbr_ = false;
-
     CDisplayList();
     CDisplayList (const CDisplayList &old);
     CDisplayList &operator=(const CDisplayList &old);
     virtual ~CDisplayList();
 
     void SetGrdAPIPtr (CSWGrdAPI *p) {grdapi_ptr = p;};
+
+    void SetVoidJavaAreaPtrs (void *v_jenv_in, void *v_jobj_in) 
+    {
+         ezx_java_obj.SetJNIPtrs (v_jenv_in, v_jobj_in);
+    }
 
 
     int gtx_SendBackSymbolParts (int symb, 
@@ -710,6 +713,7 @@ private:
     int set_in_extra (SHapePrim *prim);
 
     void free_patch_lists (void);
+    void free_pick_lists (void);
 
     int add_contour_line_patch_prim (int prim_num);
     int add_line_patch_prim (int prim_num);
@@ -1130,7 +1134,19 @@ private:
     std::vector<int> text_patch_list;
     std::vector<int> shape_patch_list;
 
-    int             patch_draw_flag;
+    int             patch_draw_flag = 0;
+
+  /*
+   * patch picking lists
+   */
+    std::vector<int> contour_line_pick_list;
+    std::vector<int> line_pick_list;
+    std::vector<int> fill_pick_list;
+    std::vector<int> symb_pick_list;
+    std::vector<int> text_pick_list;
+    std::vector<int> shape_pick_list;
+
+    int             patch_pick_flag = 0;
 
   /*
    * spatial indexing arrays.  These are kept on a per frame

@@ -270,15 +270,6 @@ catch (Exception e) {
           }
         });
 
-        JButton frame1_button = new JButton ("Random Frame");
-        frame1_button.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent ae){
-                Frame1Frame frame = new Frame1Frame ();
-                setFrame1 (frame);
-                frame.setVisible(true);
-          }
-        });
-
         JButton noaspect_button = new JButton ("No Aspect Frame");
         noaspect_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
@@ -287,16 +278,33 @@ catch (Exception e) {
           }
         });
 
-        JButton medium_button = new JButton ("Medium Random");
-        medium_button.addActionListener(new ActionListener() {
+        JButton small_button = new JButton ("Small Random Frame");
+        small_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                HugeFrame frame = new HugeFrame (20);
+                Frame1Frame frame = new Frame1Frame ();
+                setFrame1 (frame);
                 frame.setVisible(true);
           }
         });
 
-        JButton big_button = new JButton ("Huge Random");
+        JButton medium_button = new JButton ("Medium Random Frame");
+        medium_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                HugeFrame frame = new HugeFrame (50);
+                frame.setVisible(true);
+          }
+        });
+
+        JButton big_button = new JButton ("Big Random Frame");
         big_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                HugeFrame frame = new HugeFrame (1000);
+                frame.setVisible(true);
+          }
+        });
+
+        JButton huge_button = new JButton ("Huge Random Frame");
+        huge_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
                 HugeFrame frame = new HugeFrame (-1);
                 frame.setVisible(true);
@@ -383,9 +391,10 @@ catch (Exception e) {
         contentPane.add (text2_button);
         contentPane.add (text3_button);
         contentPane.add (random_button);
-        contentPane.add (frame1_button);
+        contentPane.add (small_button);
         contentPane.add (medium_button);
         contentPane.add (big_button);
+        contentPane.add (huge_button);
         contentPane.add (reverse_button);
         contentPane.add (frame2_button);
         contentPane.add (text_frame_button);
@@ -1816,6 +1825,10 @@ class HugeFrame extends JFrame
 
 /*
 try {
+System.out.println();
+System.out.println("press return after attaching gdb");
+System.out.println();
+System.out.flush();
 int idum = System.in.read();
 }
 catch (Exception e) {
@@ -1900,9 +1913,9 @@ catch (Exception e) {
         double xyrand_shift = xymax / 10.0;
 
         double tfact = 1.0;
-        if (ndo > 20) tfact = .75;
-        if (ndo > 50) tfact = .5;
-        if (ndo > 100) tfact = .25;
+        //if (ndo > 20) tfact = .75;
+        //if (ndo > 50) tfact = .5;
+        //if (ndo > 100) tfact = .25;
 
         double shfact = 4;
         if (ndo > 20) shfact = 2;

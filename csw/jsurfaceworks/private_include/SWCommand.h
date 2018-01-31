@@ -131,6 +131,9 @@ long sw_process_command (
     double            *ddata
 );
 
+void *sw_get_void_jenv (int threadid, void *v_jenv);
+void *sw_get_void_jobj (int threadid, void *v_jobj);
+
 
 /* close extern C block */
 

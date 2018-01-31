@@ -32,6 +32,9 @@ int ezx_process_command (
     FILE              *dfile
 );
 
+void *ezx_get_void_jenv (int threadid, void *v_jenv);
+void *ezx_get_void_jobj (int threadid, void *v_jobj);
+
 #ifdef __cplusplus
 }
 #endif

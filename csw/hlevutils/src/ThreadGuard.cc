@@ -481,3 +481,82 @@ CanvasManager *ThreadGuard::GetCanvasManager (int threadid)
     return cm;
 }
 
+
+
+void *ThreadGuard::GetVoidJenv (int threadid, void *vpin)
+{
+
+    ThreadGuardData  tgd;
+
+    auto fscope = [&]()
+    {
+        tgd.v_jenv = NULL;
+    };
+    CSWScopeGuard func_scope_guard (fscope);
+
+    std::map<int, ThreadGuardData>::iterator it;
+    void  *vp = NULL;
+
+    it = guard_map.find(threadid);
+
+    if (it != guard_map.end()) {
+        vp = it->second.v_jenv;
+        if (vp == NULL) {
+            vp = vpin;
+            it->second.v_jenv = vp;
+        }
+        return vp;
+    }
+
+    vp = vpin;
+    tgd.v_jenv = vp;
+
+    try {
+        guard_map[threadid] = tgd;
+    }
+    catch (...) {
+        vp = NULL;
+    }
+
+    return vp;
+}
+
+
+
+void *ThreadGuard::GetVoidJobj (int threadid, void *vpin)
+{
+
+    ThreadGuardData  tgd;
+
+    auto fscope = [&]()
+    {
+        tgd.v_jobj = NULL;
+    };
+    CSWScopeGuard func_scope_guard (fscope);
+
+    std::map<int, ThreadGuardData>::iterator it;
+    void  *vp = NULL;
+
+    it = guard_map.find(threadid);
+
+    if (it != guard_map.end()) {
+        vp = it->second.v_jobj;
+        if (vp == NULL) {
+            vp = vpin;
+            it->second.v_jobj = vp;
+        }
+        return vp;
+    }
+
+    vp = vpin;
+    tgd.v_jobj = vp;
+
+    try {
+        guard_map[threadid] = tgd;
+    }
+    catch (...) {
+        vp = NULL;
+    }
+
+    return vp;
+}

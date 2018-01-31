@@ -70,12 +70,19 @@ class EZXJavaArea
     FILE    *DebugFile = NULL;
     char    Lbuff[1000];
 
+    void    *v_jenv = NULL;
+    void    *v_jobj = NULL;
 
     float     _p_fxy[2 * MAX_FLOAT_CONVERT];
 
     int ConvertToFloat (CSW_F *xy, int npts, float **fxy);
 
   public:
+
+    void SetJNIPtrs (void *vp1, void *vp2) {
+        v_jenv = vp1;
+        v_jobj = vp2;
+    }
 
     void ezx_SetScreenDPI (int ival);
     void ezx_SetAlphaValue (int ival);

@@ -26,15 +26,19 @@
  *  collection of threadid, ThreadGuardData pairs is kept in static 
  *  variables.  Objects that may collide are put into the ThreadGuardData
  *  object and they are retrieved via the threadid.  The threadid is
- *  passed by java with every jni function call.
+ *  passed by the csw java code with every jni function call.
  *
  *  No attempt is made to make this work with any c++ threading.  The
  *  member functions which can edit the guard_map collection must be
- *  protected in the java code via synchronize techniques.
+ *  protected using the MonitorEnter and MonitorExit functions.
  *
  *  The objects that may interfere are those where the state must survive
  *  multiple jni calls.  Pointers to these objects are put into the
  *  ThreadGuardData object.
+ *
+ *  Multi threading, especially with java and jni, can be tricky stuff.
+ *  Think long and hard about implementing thread safety and subsequent
+ *  code changes to this thread guard stuff.
  */
 
 #include <csw/jsurfaceworks/private_include/PatchSplit.h>
@@ -62,6 +66,16 @@ namespace ThreadGuard
 
     CanvasManager  *canvas_manager = NULL;
 
+  /*
+   *  I have not been able to compile any file with the
+   *  java 8 jni headers using the fedora 26 g++ compiler.
+   *  Since this ThreadGuard definition needs to be
+   *  included in c++ files, I cannot use structures 
+   *  from the jni headers.  The use of void pointers
+   *  here is a work around for the header file issue.
+   */
+    void        *v_jenv = NULL;
+    void        *v_jobj = NULL;
 
     ThreadGuardData () {};
     ~ThreadGuardData ()
@@ -104,6 +118,9 @@ namespace ThreadGuard
 
   void RemoveThreadData (int threadid);
   void RemoveAllThreadData (void);
+
+  void *GetVoidJenv (int threadid, void *v_jenv);
+  void *GetVoidJobj (int threadid, void *v_jobj);
 
 }; // end of namespace
 

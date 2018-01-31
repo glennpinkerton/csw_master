@@ -52,10 +52,12 @@
 #include "csw/utils/private_include/csw_scope.h"
 
 
+
 /*
- * This function is called from the C JNI functions, so
- * it is extern C here as well as in the header file.
+ * The functions in this file are called from the C JNI functions, so
+ * they are extern C here as well as in the header file.
  */
+
 extern "C" {
 
 int ezx_process_command (
@@ -231,9 +233,11 @@ int ezx_process_command (
     dlist = canvas_manager_ptr->ezx_GetActiveDisplayList ();
 
     if (dlist == NULL) {
+        void  *v_env = ezx_get_void_jenv (threadid, NULL);
+        void  *v_obj = ezx_get_void_jobj (threadid, NULL);
         istat =
             canvas_manager_ptr->ezx_AddGraphicsCanvasToManager
-                (name, java_num);
+                (name, java_num, v_env, v_obj);
         if (istat == -1) {
             return -1;
         }
@@ -2370,6 +2374,23 @@ int ezx_process_command (
     return istat;
 
 }
+
+
+void *ezx_get_void_jenv (int threadid, void *v_jenv)
+{
+    void *vp = ThreadGuard::GetVoidJenv (threadid, v_jenv);
+    return vp;
+}
+
+
+void *ezx_get_void_jobj (int threadid, void *v_jobj)
+{
+    void *vp = ThreadGuard::GetVoidJobj (threadid, v_jobj);
+    return vp;
+}
+
+
+
 
 /*
  * End of extern "C" declaration

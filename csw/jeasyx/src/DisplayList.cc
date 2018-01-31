@@ -936,6 +936,7 @@ void CDisplayList::Draw (void)
     ezx_java_obj.ezx_SetDrawingPriority (1);
     DrawAllSymbs ();
     ezx_java_obj.ezx_SetDrawingPriority (0);
+
     DrawAllShapes ();
     DrawAllImages ();
 
@@ -2468,6 +2469,20 @@ void CDisplayList::free_patch_lists (void)
 }
 
 
+void CDisplayList::free_pick_lists (void)
+{
+    line_pick_list.clear();
+    contour_line_pick_list.clear();
+    fill_pick_list.clear();
+    symb_pick_list.clear();
+    text_pick_list.clear();
+    shape_pick_list.clear();
+
+    return;
+
+}
+
+
 
 int CDisplayList::add_contour_line_patch_prim (int prim_num)
 {
@@ -2479,7 +2494,12 @@ int CDisplayList::add_contour_line_patch_prim (int prim_num)
     }
 
     try {
-        contour_line_patch_list.push_back(prim_num);
+        if (patch_pick_flag == 1) {
+            contour_line_pick_list.push_back(prim_num);
+        }
+        else {
+            contour_line_patch_list.push_back(prim_num);
+        }
     }
     catch (...) {
         return -1;
@@ -2500,7 +2520,12 @@ int CDisplayList::add_line_patch_prim (int prim_num)
     }
 
     try {
-        line_patch_list.push_back(prim_num);
+        if (patch_pick_flag == 1) {
+            line_pick_list.push_back(prim_num);
+        }
+        else {
+            line_patch_list.push_back(prim_num);
+        }
     }
     catch (...) {
         return -1;
@@ -2520,7 +2545,12 @@ int CDisplayList::add_fill_patch_prim (int prim_num)
     }
 
     try {
-        fill_patch_list.push_back(prim_num);
+        if (patch_pick_flag == 1) {
+            fill_pick_list.push_back(prim_num);
+        }
+        else {
+            fill_patch_list.push_back(prim_num);
+        }
     }
     catch (...) {
         return -1;
@@ -2541,7 +2571,12 @@ int CDisplayList::add_text_patch_prim (int prim_num)
     }
 
     try {
-        text_patch_list.push_back(prim_num);
+        if (patch_pick_flag == 1) {
+            text_pick_list.push_back(prim_num);
+        }
+        else {
+            text_patch_list.push_back(prim_num);
+        }
     }
     catch (...) {
         return -1;
@@ -2562,7 +2597,12 @@ int CDisplayList::add_symb_patch_prim (int prim_num)
     }
 
     try {
-        symb_patch_list.push_back(prim_num);
+        if (patch_pick_flag == 1) {
+            symb_pick_list.push_back(prim_num);
+        }
+        else {
+            symb_patch_list.push_back(prim_num);
+        }
     }
     catch (...) {
         return -1;
@@ -2584,7 +2624,12 @@ int CDisplayList::add_shape_patch_prim (int prim_num)
     }
 
     try {
-        shape_patch_list.push_back(prim_num);
+        if (patch_pick_flag == 1) {
+            shape_pick_list.push_back(prim_num);
+        }
+        else {
+            shape_patch_list.push_back(prim_num);
+        }
     }
     catch (...) {
         return -1;
@@ -3874,17 +3919,12 @@ int CDisplayList::DrawAllTexts (void)
         }
 
     /*
-     * If the text is from a border or axis,
-     * do not count it here.
+     * If the text is from a border,
+     * do not draw it here.
      */
         if (tptr->border_num >= 0) {
             continue;
         }
-/*
-        if (tptr->axis_num >= 0) {
-            continue;
-        }
-*/
 
     /*
      * Check the text bbox against the text frame.
@@ -3906,9 +3946,15 @@ int CDisplayList::DrawAllTexts (void)
 
     /*
      * If there are a huge number of text items visible in the current zoom
-     * window, skip a lot of them since none will be legible anyway.
+     * window, skip a lot of them since none will be legible anyway.  All
+     * inside frame axes labels (as opposed to frame border axes labels)
+     * will be drawn.
      */
-        if (n % nmod != 0) {
+        if (n % nmod != 0  &&  tptr->axis_num < 0) {
+            if (bframe) {
+              unconvert_frame_point (tptr->frame_num,
+                                     &tptr->x, &tptr->y);
+            }
             continue;
         }
 
@@ -3949,7 +3995,7 @@ int CDisplayList::DrawAllTexts (void)
         }
 
      /*
-      * The text character fills and strokes themselves have the
+      * The text character fills and strokes have the
       * highest priority and are set to 3.
       */
         ezx_java_obj.ezx_SetDrawingPriority (3);
@@ -7257,7 +7303,6 @@ void CDisplayList::SetGraphNum (int ival)
 
 void CDisplayList::SetSelectableNum (int ival)
 {
-
     current_selectable_object_num = ival;
     if (ival >= 0) {
         AddSelectableObject (ival);
@@ -7294,7 +7339,7 @@ void CDisplayList::EraseSelectableNum (int index)
 
 void CDisplayList::AddSelectableObject (int object_index)
 {
-    int               jlast, j, imax;
+    int               jlast, j;
     DLSelectable      *dls;
 
     if (object_index < 0) {
@@ -7306,9 +7351,10 @@ void CDisplayList::AddSelectableObject (int object_index)
 
     if (object_index >= max_selectable_object_list) {
         jlast = max_selectable_object_list;
-        imax = object_index / 100;
-        imax++;
-        max_selectable_object_list = imax * 100;
+        while (object_index > max_selectable_object_list) {
+            max_selectable_object_list *= 2;
+        }
+        max_selectable_object_list += 100;
         selectable_object_list = (DLSelectable **)csw_Realloc
                                  (selectable_object_list,
                                   max_selectable_object_list * sizeof(DLSelectable *));
@@ -7350,12 +7396,12 @@ void CDisplayList::AddSelectableObject (int object_index)
 
 
     if (selectable_object_list == NULL  ||
-        num_selectable_object_list < 1
-    ) {
+        num_selectable_object_list < 1) {
         return;
     }
-    if (index >= num_selectable_object_list)
+    if (index >= num_selectable_object_list) {
         return;
+    }
     dls = selectable_object_list[index];
     if (dls == NULL)
       return;
@@ -14882,6 +14928,13 @@ int CDisplayList::SetSelectableState (int index,
         return -1;
     }
 
+    if (index >= num_selectable_object_list) {
+        printf
+          ("\n********  index of selectable is bad  ********\n\n");
+        fflush (stdout);
+        return 1;
+    }
+
     if (selectable_object_list != NULL) {
         dls = selectable_object_list[index];
         if (dls == NULL) {
@@ -15054,6 +15107,17 @@ int CDisplayList::ClosestPickPrim (int fnum,
     double        pdmax, dx, dy;
     CSW_F         pdist;
 
+    auto fscope = [&]()
+    {
+        patch_pick_flag = 0;
+        free_pick_lists ();
+        patch_draw_flag = patch_save;
+        current_frame_num = save_fnum;
+        update_frame_limits ();
+        SetupSpatialIndexForFrame (save_fnum);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
+
 /*
  * Initialize return parameters
  */
@@ -15095,6 +15159,8 @@ int CDisplayList::ClosestPickPrim (int fnum,
     Pickx2 = (CSW_F)(x + frptr->xspace * 1.5);
     Picky2 = (CSW_F)(y + frptr->yspace * 1.5);
 
+    free_pick_lists ();
+    patch_pick_flag = 1;
 /*
  * find the type and index of the closest frame scaleable primitive
  * All of the distance checking should be done using page coordinates,
@@ -15148,13 +15214,7 @@ int CDisplayList::ClosestPickPrim (int fnum,
         *prim_type = 7;
     }
 
-    free_patch_lists();
-
     if (pdist <= pdmax) {
-        patch_draw_flag = patch_save;
-        current_frame_num = save_fnum;
-        update_frame_limits ();
-        SetupSpatialIndexForFrame (save_fnum);
         return 1;
     }
 
@@ -15167,10 +15227,6 @@ int CDisplayList::ClosestPickPrim (int fnum,
     if (index >= 0) {
         *prim_index = index;
         *prim_type = 5;
-        patch_draw_flag = patch_save;
-        current_frame_num = save_fnum;
-        update_frame_limits ();
-        SetupSpatialIndexForFrame (save_fnum);
         return 1;
     }
 
@@ -15179,20 +15235,12 @@ int CDisplayList::ClosestPickPrim (int fnum,
     if (index >= 0) {
         *prim_index = index;
         *prim_type = 2;
-        patch_draw_flag = patch_save;
-        current_frame_num = save_fnum;
-        update_frame_limits ();
-        SetupSpatialIndexForFrame (save_fnum);
         return 1;
     }
 
 /*
  * The cursor is not close enough to anything to select it.
  */
-    patch_draw_flag = patch_save;
-    current_frame_num = save_fnum;
-    update_frame_limits ();
-    SetupSpatialIndexForFrame (save_fnum);
 
     return -1;
 }
@@ -15215,10 +15263,12 @@ void CDisplayList::closest_frame_contour (int fnum, CSW_F xin, CSW_F yin,
         return;
     }
 
+    contour_line_pick_list.clear();
+
     istat = PopulateContourLinePatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    int      pt_size = (int)contour_line_patch_list.size();
-    int      *pt_data = contour_line_patch_list.data();
+    int      pt_size = (int)contour_line_pick_list.size();
+    int      *pt_data = contour_line_pick_list.data();
 
     nprim = cl_size;
     if (istat == 1) {
@@ -15303,10 +15353,12 @@ void CDisplayList::closest_frame_line (int fnum, CSW_F xin, CSW_F yin,
         return;
     }
 
+    line_pick_list.clear();
+
     istat = PopulateLinePatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    int       pt_size = (int)line_patch_list.size();
-    int       *pt_data = line_patch_list.data();
+    int       pt_size = (int)line_pick_list.size();
+    int       *pt_data = line_pick_list.data();
 
     nprim = lp_size;
     if (istat == 1) {
@@ -15413,10 +15465,12 @@ void CDisplayList::closest_frame_fill_border (int fnum, CSW_F xin, CSW_F yin,
         return;
     }
 
+    fill_pick_list.clear();
+
     istat = PopulateFillPatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    int        pt_size = (int)fill_patch_list.size();
-    int        *pt_data = fill_patch_list.data();
+    int        pt_size = (int)fill_pick_list.size();
+    int        *pt_data = fill_pick_list.data();
 
     nprim = fp_size;
     if (istat == 1) {
@@ -15541,7 +15595,6 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
 //  index grid cells, I don't bother with the patch stuff.
 
     bool bpatch = false;
-    int patch_text_min = index_ncol * index_nrow / 2;
     nprim = tp_size;
 
     int  nst = num_selectable_text;
@@ -15549,35 +15602,38 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
         nst = tp_size;
     }
 
+    double    pmult = 1.5;
+
     int        pt_size = 0;
     int        *pt_data = 0;
 
-    if (nst > patch_text_min) {
-        double   px1, py1, px2, py2;
-        double   pw = (Pickx2 - Pickx1);
-        double   ph = (Picky2 - Picky1);
-        pw = (pw + ph) / 2.0;
+    double   px1, py1, px2, py2;
+    double   pw = (Pickx2 - Pickx1);
+    double   ph = (Picky2 - Picky1);
+    pw = (pw + ph) / 2.0;
 
-        if (pw < index_xspace) pw = index_xspace;
-        if (pw < index_yspace) pw = index_yspace;
+    if (pw < index_xspace) pw = index_xspace;
+    if (pw < index_yspace) pw = index_yspace;
 
-        px1 = Pickx1 - pw * 2.0;
-        px2 = Pickx2 + pw * 2.0;
-        py1 = Picky1 - pw * 2.0;
-        py2 = Picky2 + pw * 2.0;
+    px1 = Pickx1 - pw * pmult;
+    px2 = Pickx2 + pw * pmult;
+    py1 = Picky1 - pw * pmult;
+    py2 = Picky2 + pw * pmult;
 
-        istat = PopulateTextPatches (px1, py1, px2, py2);
-        pt_size = (int)text_patch_list.size();
-        pt_data = text_patch_list.data();
+    text_pick_list.clear();
 
-        if (istat == 1  &&  pt_size > 0  &&
-            pt_data != NULL  &&  patch_draw_flag == 1) {
-            nprim = pt_size;
-            bpatch = true;
-        }
+    istat = PopulateTextPatches (px1, py1, px2, py2);
+
+    pt_size = (int)text_pick_list.size();
+    pt_data = text_pick_list.data();
+
+    if (istat == 1  &&  pt_size > 0  &&
+        pt_data != NULL) {
+        nprim = pt_size;
+        bpatch = true;
     }
 
-    dmin = *pdistout;
+    dmin = 1.e30;
     index = -1;
 
     for (ido=0; ido<nprim; ido++) {
@@ -15642,7 +15698,7 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
         istat = ply_utils_obj.ply_point1 (cx, cy, 5,
                             xin, yin);
         if (istat == 1) {
-            dist /= 100.0;
+            dist /= 10.0;
         }
 
         if (dist < dmin) {
@@ -15650,6 +15706,11 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
             index = i;
         }
 
+    }
+
+    unconvert_frame_dist (fnum, &dmin);
+    if (dmin > *pdistout) {
+        return;
     }
 
     if (index >= 0  &&  dmin < 1.e20) {
@@ -15679,10 +15740,12 @@ void CDisplayList::closest_frame_symb (int fnum, CSW_F xin, CSW_F yin,
         return;
     }
 
+    symb_pick_list.clear();
+
     istat = PopulateSymbPatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    int         pt_size = (int)symb_patch_list.size();
-    int         *pt_data = symb_patch_list.data();
+    int         pt_size = (int)symb_pick_list.size();
+    int         *pt_data = symb_pick_list.data();
 
     nprim = sp_size;
     if (istat == 1) {
@@ -15759,10 +15822,12 @@ void CDisplayList::closest_frame_shape_border (int fnum, CSW_F xin, CSW_F yin,
         return;
     }
 
+    shape_pick_list.clear();
+
     istat = PopulateShapePatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    int        pt_size = (int)shape_patch_list.size();
-    int        *pt_data = shape_patch_list.data();
+    int        pt_size = (int)shape_pick_list.size();
+    int        *pt_data = shape_pick_list.data();
 
     nprim = hp_size;
     if (istat == 1) {
@@ -15858,10 +15923,12 @@ void CDisplayList::closest_frame_fill (int fnum, CSW_F xin, CSW_F yin,
         return;
     }
 
+    fill_pick_list.clear();
+
     istat = PopulateFillPatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    int        pt_size = (int)fill_patch_list.size();
-    int        *pt_data = fill_patch_list.data();
+    int        pt_size = (int)fill_pick_list.size();
+    int        *pt_data = fill_pick_list.data();
 
     nprim = fp_size;
     if (istat == 1) {
@@ -15981,10 +16048,12 @@ void CDisplayList::closest_frame_shape (int fnum, CSW_F xin, CSW_F yin,
         return;
     }
 
+    shape_pick_list.clear();
+
     istat = PopulateShapePatches (Pickx1, Picky1, Pickx2, Picky2);
 
-    int        pt_size = (int)shape_patch_list.size();
-    int        *pt_data = shape_patch_list.data();
+    int        pt_size = (int)shape_pick_list.size();
+    int        *pt_data = shape_pick_list.data();
 
     nprim = hp_size;
     if (istat == 1) {

@@ -56,7 +56,9 @@ CanvasManager::~CanvasManager ()
 
 
 int CanvasManager::ezx_AddGraphicsCanvasToManager (char *name,
-                                    long java_num)
+                                    long java_num,
+                                    void *v_jenv,
+                                    void *v_jobj)
 {
     GRaphicsCanvasStruct    *cptr = NULL;
     int                     i, cval;
@@ -94,9 +96,10 @@ int CanvasManager::ezx_AddGraphicsCanvasToManager (char *name,
             try {
                 SNF
                 cptr->dlist = new CDisplayList;
+                cptr->dlist->SetVoidJavaAreaPtrs (v_jenv, v_jobj);
             }
             catch (...) {
-                printf ("\n*****  caught new exception on display list  *****\n\n");
+                printf ("\n*****  caught new exception creating display list  *****\n\n");
                 fflush (stdout);
                 cptr->dlist = NULL;
                 break;
@@ -145,6 +148,7 @@ int CanvasManager::ezx_AddGraphicsCanvasToManager (char *name,
     try {
         SNF
         cptr->dlist = new CDisplayList;
+        cptr->dlist->SetVoidJavaAreaPtrs (v_jenv, v_jobj);
     }
     catch (...) {
         printf ("\n*****  caught new exception on display list  *****\n\n");

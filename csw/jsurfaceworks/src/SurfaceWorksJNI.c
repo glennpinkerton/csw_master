@@ -168,6 +168,30 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
     long             *llist2;
     int              i, lsize;
 
+
+    jint   moni_stat;
+    moni_stat = (*jnienv)->MonitorEnter(jnienv, jobj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return moni_stat;
+    }
+
+    threadid = (int)j_tid;
+    void *v_jenv = (void *)jnienv;
+    void *v_jobj = (void *)jobj;
+    void *vdum;
+    vdum = sw_get_void_jenv (threadid, v_jenv);
+    vdum = sw_get_void_jobj (threadid, v_jobj);
+    vdum = vdum;
+
+    moni_stat = (*jnienv)->MonitorExit(jnienv, jobj);
+    if (moni_stat < 0) {
+        printf ("Error exiting java monitor from SW line %d\n", __LINE__);
+        return moni_stat;
+    }
+
+
+
 /*
  *  This block of code can be uncommented to enable debug of
  *  this code when called from java.  The DebugBreak function
@@ -431,7 +455,6 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
  * no longer needs them.
  */
     command_id = (int)j_commandID;
-    threadid = (int)j_tid;
     if (j_ilist) {
         ilist = (*jnienv)->GetIntArrayElements (jnienv, j_ilist, JNI_FALSE);
     }
@@ -3376,7 +3399,6 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendStaticC
     jdoubleArray j_ddata,
     jint   j_tid
    )
-//    jint   j_tid
 {
     jint             *idata;
     float            *fdata;
@@ -3394,6 +3416,31 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendStaticC
     long             long_list_array[MAX_LIST_ARRAY];
     long             *llist2;
     int              i, lsize;
+
+    threadid = (int)j_tid;
+
+// ???? thread lock for static command  ????
+/*
+    jint   moni_stat;
+    moni_stat = (*jnienv)->MonitorEnter(jnienv, jobj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return moni_stat;
+    }
+
+    void *v_jenv = (void *)jnienv;
+    void *v_jobj = (void *)jobj;
+    void *vdum;
+    vdum = sw_get_void_jenv (threadid, v_jenv);
+    vdum = sw_get_void_jobj (threadid, v_jobj);
+    vdum = vdum;
+
+    moni_stat = (*jnienv)->MonitorExit(jnienv, jobj);
+    if (moni_stat < 0) {
+        printf ("Error exiting java monitor from SW line %d\n", __LINE__);
+        return moni_stat;
+    }
+*/
 
 /*
  *  This block of code can be uncommented to enable debug of
@@ -3441,8 +3488,6 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendStaticC
  * no longer needs them.
  */
     command_id = (int)j_commandID;
-    threadid = (int)j_tid;
-//    threadid = 0;
     if (j_ilist) {
         ilist = (*jnienv)->GetIntArrayElements (jnienv, j_ilist, JNI_FALSE);
     }
