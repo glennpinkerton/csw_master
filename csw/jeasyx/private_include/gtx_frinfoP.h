@@ -92,6 +92,8 @@ typedef struct {
 
 typedef struct {
     double       xmin, ymin, xmax, ymax;
+    double       xmin_spatial, ymin_spatial,
+                 xmax_spatial, ymax_spatial;
     double       x1, y1, x2, y2;
     CSW_F        px1orig, py1orig, px2orig, py2orig;
     CSW_F        px1, py1, px2, py2;
