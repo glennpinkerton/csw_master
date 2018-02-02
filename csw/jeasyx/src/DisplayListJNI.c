@@ -167,26 +167,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
     long             llist[100];
 
 
-    jint   moni_stat;
-    moni_stat = (*jnienv)->MonitorEnter(jnienv, jobj);
-    if (moni_stat < 0) {
-        printf ("Error entering java monitor from line %d\n", __LINE__);
-        return moni_stat;
-    }
-
     threadid = (int)j_thread_id;
-    void *v_jenv = (void *)jnienv;
-    void *v_jobj = (void *)jobj;
-    void *vdum;
-    vdum = ezx_get_void_jenv (threadid, v_jenv);
-    vdum = ezx_get_void_jobj (threadid, v_jobj);
-    vdum = vdum;
-
-    moni_stat = (*jnienv)->MonitorExit(jnienv, jobj);
-    if (moni_stat < 0) {
-        printf ("Error exiting java monitor from line %d\n", __LINE__);
-        return moni_stat;
-    }
 
 /*
  *  This block of code can be uncommented to enable debug of
@@ -616,26 +597,6 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
     dlist_index = (int)j_dlist_index;
     threadid = (int)j_threadid;
 
-    jint   moni_stat;
-    moni_stat = (*env)->MonitorEnter(env, obj);
-    if (moni_stat < 0) {
-        printf ("Error entering java monitor from line %d\n", __LINE__);
-        return;
-    }
-
-    void *v_jenv = (void *)env;
-    void *v_jobj = (void *)obj;
-    void *vdum;
-    vdum = ezx_get_void_jenv (threadid, v_jenv);
-    vdum = ezx_get_void_jobj (threadid, v_jobj);
-    vdum = vdum;
-
-    moni_stat = (*env)->MonitorExit(env, obj);
-    if (moni_stat < 0) {
-        printf ("Error exiting java monitor from line %d\n", __LINE__);
-        return;
-    }
-
 /*
  * Find the Java class methods for sending back graphics data.
  * These are all class methods of the JDisplayListBase java
@@ -849,6 +810,7 @@ void jni_call_add_fill_method (
         fflush (dbfile);
     }
   #endif
+
 
 /*
  * Call the java object's method.
@@ -1636,27 +1598,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
     int              status;
     jint             ilist[10];
 
-    jint   moni_stat;
-    moni_stat = (*env)->MonitorEnter(env, obj);
-    if (moni_stat < 0) {
-        printf ("Error entering java monitor from line %d\n", __LINE__);
-        return moni_stat;
-    }
-
     threadid = (int)j_threadid;
-    void *v_jenv = (void *)env;
-    void *v_jobj = (void *)obj;
-    void *vdum;
-    vdum = ezx_get_void_jenv (threadid, v_jenv);
-    vdum = ezx_get_void_jobj (threadid, v_jobj);
-    vdum = vdum;
-
-    moni_stat = (*env)->MonitorExit(env, obj);
-    if (moni_stat < 0) {
-        printf ("Error exiting java monitor from line %d\n", __LINE__);
-        return moni_stat;
-    }
-
 
     dlist_index = (int)j_dlist_index;
 
@@ -1820,28 +1762,7 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDrawSelected
     int              threadid;
 
 
-    jint   moni_stat;
-    moni_stat = (*env)->MonitorEnter(env, obj);
-    if (moni_stat < 0) {
-        printf ("Error entering java monitor from line %d\n", __LINE__);
-        return;
-    }
-
     threadid = (int)j_threadid;
-    void *v_jenv = (void *)env;
-    void *v_jobj = (void *)obj;
-    void *vdum;
-    vdum = ezx_get_void_jenv (threadid, v_jenv);
-    vdum = ezx_get_void_jobj (threadid, v_jobj);
-    vdum = vdum;
-
-    moni_stat = (*env)->MonitorExit(env, obj);
-    if (moni_stat < 0) {
-        printf ("Error exiting java monitor from line %d\n", __LINE__);
-        return;
-    }
-
-
 
   #if DEBUG_JNI_FILE
     sprintf (fileline, "\n\nCalling nativeDraw\n");
@@ -3368,29 +3289,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
     jint             ilist[10];
 
 
-    jint   moni_stat;
-    moni_stat = (*env)->MonitorEnter(env, obj);
-    if (moni_stat < 0) {
-        printf ("Error entering java monitor from line %d\n", __LINE__);
-        return moni_stat;
-    }
-
     threadid = (int)j_threadid;
-    void *v_jenv = (void *)env;
-    void *v_jobj = (void *)obj;
-    void *vdum;
-    vdum = ezx_get_void_jenv (threadid, v_jenv);
-    vdum = ezx_get_void_jobj (threadid, v_jobj);
-    vdum = vdum;
-
-    moni_stat = (*env)->MonitorExit(env, obj);
-    if (moni_stat < 0) {
-        printf ("Error exiting java monitor from line %d\n", __LINE__);
-        return moni_stat;
-    }
-
-    cls = NULL;
-    cls = cls;
 
 /*
  * If the int type is not a 32 bit signed integer, a conversion
@@ -4061,26 +3960,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_convertToFrame
     int              local_list[3];
 
 
-    jint   moni_stat;
-    moni_stat = (*env)->MonitorEnter(env, obj);
-    if (moni_stat < 0) {
-        printf ("Error entering java monitor from line %d\n", __LINE__);
-        return moni_stat;
-    }
-
     threadid = (int)j_threadid;
-    void *v_jenv = (void *)env;
-    void *v_jobj = (void *)obj;
-    void *vdum;
-    vdum = ezx_get_void_jenv (threadid, v_jenv);
-    vdum = ezx_get_void_jobj (threadid, v_jobj);
-    vdum = vdum;
-
-    moni_stat = (*env)->MonitorExit(env, obj);
-    if (moni_stat < 0) {
-        printf ("Error exiting java monitor from line %d\n", __LINE__);
-        return moni_stat;
-    }
 
     dlist_index = (int)j_dlist_index;
     threadid = (int)j_threadid;
@@ -4227,32 +4107,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
     long             llist[100];
 
 
-// ???? thread lock with static command ????
 
     threadid = (int)j_thread_id;
-/*
-    jint   moni_stat;
-    moni_stat = (*jnienv)->MonitorEnter(jnienv, jobj);
-    if (moni_stat < 0) {
-        printf ("Error entering java monitor from line %d\n", __LINE__);
-        return moni_stat;
-    }
-
-    void *v_jenv = (void *)jnienv;
-    void *v_jobj = (void *)jobj;
-    void *vdum;
-    vdum = ezx_get_void_jenv (threadid, v_jenv);
-    vdum = ezx_get_void_jobj (threadid, v_jobj);
-    vdum = vdum;
-
-    moni_stat = (*jnienv)->MonitorExit(jnienv, jobj);
-    if (moni_stat < 0) {
-        printf ("Error exiting java monitor from line %d\n", __LINE__);
-        return moni_stat;
-    }
-*/
-
-
 
 /*
  * If the int type is not a 32 bit signed integer, a conversion

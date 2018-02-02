@@ -6992,16 +6992,26 @@ int CDisplayList::CreateFrame (int rescaleable,
 
     frptr->patch_draw_flag = 0;
 
+    frptr->xmin_spatial = xmin;
+    frptr->ymin_spatial = ymin;
+    frptr->xmax_spatial = xmax;
+    frptr->ymax_spatial = ymax;
+
 /*
  * Allocate spatial indexes for the frame.
  */
     if (xmax > xmin  &&  ymax > ymin) {
         dx = xmax - xmin;
         dy = ymax - ymin;
+        double    dxy_10 = (dx + dy) / 20.0;
+        frptr->xmin_spatial = xmin - dxy_10;
+        frptr->ymin_spatial = ymin - dxy_10;
+        frptr->xmax_spatial = xmax + dxy_10;
+        frptr->ymax_spatial = ymax + dxy_10;
         aspect = dy / dx;
         if (rescaleable != 0) {
-            nc = (int)50;
-            nr = (int)(50 * aspect + .5);
+            nc = (int)60;
+            nr = (int)(60 * aspect + .5);
             ntot = nc * nr;
             ratio = (double)ntot / 2500.0;
             ratio = sqrt (ratio);
@@ -7013,12 +7023,12 @@ int CDisplayList::CreateFrame (int rescaleable,
             nr *= 2;
             frptr->ncol = nc;
             frptr->nrow = nr;
-            frptr->xspace = (xmax - xmin) / (nc - 1);
-            frptr->yspace = (ymax - ymin) / (nr - 1);
+            frptr->xspace = (frptr->xmax_spatial - frptr->xmin_spatial) / (nc - 1);
+            frptr->yspace = (frptr->ymax_spatial - frptr->ymin_spatial) / (nr - 1);
         }
         else {
-            nc = (int)10;
-            nr = (int)(10 * aspect + .5);
+            nc = (int)20;
+            nr = (int)(20 * aspect + .5);
             ntot = nc * nr;
             ratio = (double)ntot / 100.0;
             ratio = sqrt (ratio);
@@ -7026,10 +7036,12 @@ int CDisplayList::CreateFrame (int rescaleable,
             nr = (int)(nr / ratio + 0.5);
             if (nc < 2) nc = 2;
             if (nr < 2) nr = 2;
+            nc *= 2;
+            nr *= 2;
             frptr->ncol = nc;
             frptr->nrow = nr;
-            frptr->xspace = (xmax - xmin) / (nc - 1);
-            frptr->yspace = (ymax - ymin) / (nr - 1);
+            frptr->xspace = (frptr->xmax_spatial - frptr->xmin_spatial) / (nc - 1);
+            frptr->yspace = (frptr->ymax_spatial - frptr->ymin_spatial) / (nr - 1);
         }
         ntot = frptr->ncol * frptr->nrow + 1;
         frptr->line_index = (int **)csw_Calloc (ntot * sizeof(int *));
@@ -13276,10 +13288,10 @@ int CDisplayList::SetupSpatialIndexForFrame (int fnum)
     shape_spatial_index = frptr->shape_index;
     contour_spatial_index = frptr->contour_index;
 
-    index_xmin = frptr->xmin;
-    index_ymin = frptr->ymin;
-    index_xmax = frptr->xmax;
-    index_ymax = frptr->ymax;
+    index_xmin = frptr->xmin_spatial;
+    index_ymin = frptr->ymin_spatial;
+    index_xmax = frptr->xmax_spatial;
+    index_ymax = frptr->ymax_spatial;
     index_xspace = frptr->xspace;
     index_yspace = frptr->yspace;
 
@@ -13541,10 +13553,19 @@ int CDisplayList::PopulateLinePatches (double x1, double y1p,
     }
 
 /*
-    draw all prims in the extra grid cell if needed
+    find all line prims in the extra grid cell
 */
-    int       pt_size = (int)line_patch_list.size();
-    int       *pt_data = line_patch_list.data();
+    int       pt_size;
+    int       *pt_data;
+
+    if (patch_pick_flag == 0) {
+        pt_size = (int)line_patch_list.size();
+        pt_data = line_patch_list.data();
+    }
+    else {
+        pt_size = (int)line_pick_list.size();
+        pt_data = line_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -13573,8 +13594,14 @@ int CDisplayList::PopulateLinePatches (double x1, double y1p,
         }
     }
 
-    pt_size = (int)line_patch_list.size();
-    pt_data = line_patch_list.data();
+    if (patch_pick_flag == 0) {
+        pt_size = (int)line_patch_list.size();
+        pt_data = line_patch_list.data();
+    }
+    else {
+        pt_size = (int)line_pick_list.size();
+        pt_data = line_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -13760,10 +13787,18 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
     }
 
 /*
-    draw all prims in the extra grid cell if needed
+    find all fill prims in the extra grid cell
 */
-    int        pt_size = (int)fill_patch_list.size();
-    int        *pt_data = fill_patch_list.data();
+    int        pt_size;
+    int        *pt_data;
+    if (patch_pick_flag == 0) {
+        pt_size = (int)fill_patch_list.size();
+        pt_data = fill_patch_list.data();
+    }
+    else {
+        pt_size = (int)fill_pick_list.size();
+        pt_data = fill_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -13792,8 +13827,14 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
         }
     }
 
-    pt_size = (int)fill_patch_list.size();
-    pt_data = fill_patch_list.data();
+    if (patch_pick_flag == 0) {
+        pt_size = (int)fill_patch_list.size();
+        pt_data = fill_patch_list.data();
+    }
+    else {
+        pt_size = (int)fill_pick_list.size();
+        pt_data = fill_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -13980,10 +14021,18 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
     }
 
 /*
-    draw all prims in the extra grid cell if needed
+    find all text prims in the extra grid cell
 */
-    int        pt_size = (int)text_patch_list.size();
-    int        *pt_data = text_patch_list.data();
+    int        pt_size;
+    int        *pt_data;
+    if (patch_pick_flag == 0) {
+        pt_size = (int)text_patch_list.size();
+        pt_data = text_patch_list.data();
+    }
+    else {
+        pt_size = (int)text_pick_list.size();
+        pt_data = text_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -14012,8 +14061,14 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
         }
     }
 
-    pt_size = (int)text_patch_list.size();
-    pt_data = text_patch_list.data();
+    if (patch_pick_flag == 0) {
+        pt_size = (int)text_patch_list.size();
+        pt_data = text_patch_list.data();
+    }
+    else {
+        pt_size = (int)text_pick_list.size();
+        pt_data = text_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -14201,7 +14256,7 @@ int CDisplayList::PopulateSymbPatches (double x1, double y1p,
     }
 
 /*
-    draw all prims in the extra grid cell if needed
+    find all symb prims in the extra grid cell
 */
     offset = nc * nr;
     icell = symb_spatial_index [offset];
@@ -14412,10 +14467,18 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
     }
 
 /*
-    draw all prims in the extra grid cell if needed
+    find all shape prims in the extra grid cell
 */
-    int        pt_size = (int)shape_patch_list.size();
-    int        *pt_data = shape_patch_list.data();
+    int        pt_size;
+    int        *pt_data;
+    if (patch_pick_flag == 0) {
+        pt_size = (int)shape_patch_list.size();
+        pt_data = shape_patch_list.data();
+    }
+    else {
+        pt_size = (int)shape_pick_list.size();
+        pt_data = shape_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -14444,8 +14507,14 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
         }
     }
 
-    pt_size = (int)shape_patch_list.size();
-    pt_data = shape_patch_list.data();
+    if (patch_pick_flag == 0) {
+        pt_size = (int)shape_patch_list.size();
+        pt_data = shape_patch_list.data();
+    }
+    else {
+        pt_size = (int)shape_pick_list.size();
+        pt_data = shape_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -14633,10 +14702,18 @@ int CDisplayList::PopulateContourLinePatches (double x1, double y1p,
     }
 
 /*
-    draw all prims in the extra grid cell if needed
+    find all contour line prims in the extra grid cell
 */
-    int      pt_size = (int)contour_line_patch_list.size();
-    int      *pt_data = contour_line_patch_list.data();
+    int        pt_size;
+    int        *pt_data;
+    if (patch_pick_flag == 0) {
+        pt_size = (int)contour_line_patch_list.size();
+        pt_data = contour_line_patch_list.data();
+    }
+    else {
+        pt_size = (int)contour_line_pick_list.size();
+        pt_data = contour_line_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -14665,8 +14742,14 @@ int CDisplayList::PopulateContourLinePatches (double x1, double y1p,
         }
     }
 
-    pt_size = (int)contour_line_patch_list.size();
-    pt_data = contour_line_patch_list.data();
+    if (patch_pick_flag == 0) {
+        pt_size = (int)contour_line_patch_list.size();
+        pt_data = contour_line_patch_list.data();
+    }
+    else {
+        pt_size = (int)contour_line_pick_list.size();
+        pt_data = contour_line_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -16880,18 +16963,14 @@ void CDisplayList::reclip_and_draw_selected_fills (DLSelectable *dls)
         current_frame_num = fptr->frame_num;
         update_frame_limits ();
 
-        istat = ply_calc_obj.ply_ClipToBox1 (err_obj,
-                                fptr->x_orig, fptr->y_orig,
-                                fptr->npts_orig, fptr->ncomp_orig,
-                                Fx1, Fy1, Fx2, Fy2,
-                                xywork, xywork2, iwork, &nc1,
-                                _DL_MAX_WORK_ / 2, _DL_MAX_WORK_ / 2);
-        if (istat <= 0) {
-            continue;
-        }
-        xt0 = xywork;
-        yt0 = xywork2;
-        nc0 = iwork;
+        xt0 = fptr->x_orig;
+        yt0 = fptr->y_orig;
+        nc0 = fptr->npts_orig;
+        nc1 = fptr->ncomp_orig;
+
+//        xt0 = xywork;
+//        yt0 = xywork2;
+//        nc0 = iwork;
 
     /*
      *  flag the holes before putting in the display list
@@ -16899,6 +16978,11 @@ void CDisplayList::reclip_and_draw_selected_fills (DLSelectable *dls)
         istat = gpf_calcdraw_obj.gpf_addholeflags (xt0, yt0, nc0, nc1,
                                   &x_with_hole_flags, &y_with_hole_flags,
                                   &nptot, &memflg1);
+        xt0 = NULL;
+        yt0 = NULL;
+        nc0 = NULL;
+        nc1 = 0;
+
         if (istat != 1) {
             return;
         }
