@@ -811,6 +811,7 @@ void jni_call_add_fill_method (
     }
   #endif
 
+
 /*
  * Call the java object's method.
  */
@@ -2057,9 +2058,6 @@ void jni_call_add_selected_fill (
         blue_border = 0;
         alpha_border = 0;
     }
-
-printf ("\nin call to java select fill, sel idx = %d\n\n",
-selectable_index);
 
 /*
  * Call the java object method.

@@ -1798,6 +1798,7 @@ class JDisplayListBase extends DLConst {
      * If needed, the foreground image is drawn.  It has transparent
      * background pixels.
      */
+
         if (foregroundFlag == 1) {
             if (foregroundImage != null) {
                 g2d.drawImage (

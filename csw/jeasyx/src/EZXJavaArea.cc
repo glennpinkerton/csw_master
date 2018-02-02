@@ -606,11 +606,6 @@ int EZXJavaArea::ezx_AppendSelectedFillToJavaArea (
     }
     yp = xp + nptot;
 
-printf ("\nAppending selected fill to java area\n");
-printf ("red = %d   green = %d   blue = %d\n\n",
-  fptr->fill_red, fptr->fill_green, fptr->fill_blue);
-fflush (stdout);
-
     jni_call_add_selected_fill (
         fptr->selectable_object_num, 
         xp,

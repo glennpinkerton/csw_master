@@ -16963,18 +16963,14 @@ void CDisplayList::reclip_and_draw_selected_fills (DLSelectable *dls)
         current_frame_num = fptr->frame_num;
         update_frame_limits ();
 
-        istat = ply_calc_obj.ply_ClipToBox1 (err_obj,
-                                fptr->x_orig, fptr->y_orig,
-                                fptr->npts_orig, fptr->ncomp_orig,
-                                Fx1, Fy1, Fx2, Fy2,
-                                xywork, xywork2, iwork, &nc1,
-                                _DL_MAX_WORK_ / 2, _DL_MAX_WORK_ / 2);
-        if (istat <= 0) {
-            continue;
-        }
-        xt0 = xywork;
-        yt0 = xywork2;
-        nc0 = iwork;
+        xt0 = fptr->x_orig;
+        yt0 = fptr->y_orig;
+        nc0 = fptr->npts_orig;
+        nc1 = fptr->ncomp_orig;
+
+//        xt0 = xywork;
+//        yt0 = xywork2;
+//        nc0 = iwork;
 
     /*
      *  flag the holes before putting in the display list
@@ -16982,6 +16978,11 @@ void CDisplayList::reclip_and_draw_selected_fills (DLSelectable *dls)
         istat = gpf_calcdraw_obj.gpf_addholeflags (xt0, yt0, nc0, nc1,
                                   &x_with_hole_flags, &y_with_hole_flags,
                                   &nptot, &memflg1);
+        xt0 = NULL;
+        yt0 = NULL;
+        nc0 = NULL;
+        nc1 = 0;
+
         if (istat != 1) {
             return;
         }
