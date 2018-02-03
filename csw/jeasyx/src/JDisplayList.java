@@ -22,7 +22,6 @@ import java.util.Iterator;
 import javax.swing.SwingUtilities;
 
 
-//import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
@@ -38,8 +37,7 @@ import csw.jsurfaceworks.src.TriMesh;
   This class has the API functions to draw to and otherwise
   interact with and manage the 2D graphics display list.  This
   class is meant to be a collection of services to draw and
-  select to and from the screen.  The display list itself cannot
-  be extended by an application.
+  select to and from the screen.
 
   @author Glenn Pinkerton
 
@@ -3531,7 +3529,7 @@ of Font.BOLD|Font.ITALIC.
    the display list.  It will calculate all the very simple primitives and send
    them to Java for drawing.
   */
-    public int redraw ()
+    public synchronized int redraw ()
     {
 
         sendNativeCommand (
@@ -5223,7 +5221,7 @@ of Font.BOLD|Font.ITALIC.
 
 /*--------------------------------------------------------------------*/
 
-    void readSelectable (int selNum)
+    synchronized void readSelectable (int selNum)
     {
         Ilist[0] = selNum;
         sendNativeCommand (

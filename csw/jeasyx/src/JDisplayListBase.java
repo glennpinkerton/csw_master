@@ -1404,21 +1404,26 @@ class JDisplayListBase extends DLConst {
 
         int threadid = Thread.currentThread().hashCode();
 
-        int istat =
-        nativePick (nativeDlistID,
-                    threadid,
-                    frame.frame_num,
-                    ix, iy);
+        int  istat = -1;
+        synchronized (this) {
+          istat =
+          nativePick (nativeDlistID,
+                      threadid,
+                      frame.frame_num,
+                      ix, iy);
+        }
 
         if (istat == -1) {
             selectionAvailable = false;
             return false;
         }
 
-        convertToFrame (nativeDlistID,
-                        threadid,
-                        frame.frame_num,
-                        ix, iy);
+        synchronized (this) {
+          convertToFrame (nativeDlistID,
+                          threadid,
+                          frame.frame_num,
+                          ix, iy);
+        }
 
         setNativeSelectDrawNeeded (1);
 
@@ -3088,14 +3093,16 @@ class JDisplayListBase extends DLConst {
 
         int threadid = Thread.currentThread().hashCode();
 
-        convertToFrame (nativeDlistID,
-                        threadid,
-                        frame.frame_num,
-                        ix, iy);
+        synchronized (this) {
+          convertToFrame (nativeDlistID,
+                          threadid,
+                          frame.frame_num,
+                          ix, iy);
 
-        if (convertedX > 1.e20  ||
-            convertedY > 1.e20) {
-            return;
+          if (convertedX > 1.e20  ||
+              convertedY > 1.e20) {
+              return;
+          }
         }
 
         boolean doPopup;
