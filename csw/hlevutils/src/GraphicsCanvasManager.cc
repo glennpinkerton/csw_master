@@ -38,51 +38,62 @@
 CanvasManager::~CanvasManager ()
 {
 
-    if (CanvasList != NULL  &&  NumCanvasList > 0) {
-        int   i;
-        for (i=0; i<NumCanvasList; i++) {
+    GRaphicsCanvasStruct    *cl_data = NULL;
+    int                     cl_size = 0;
+
+    cl_data = CanvasList.data();
+    cl_size = CanvasList.size();
+    
+    if (cl_data != NULL  &&  cl_size > 0) {
+        for (int i=0; i<cl_size; i++) {
             CDisplayList  *dl = CanvasList[i].dlist;
-            if (dl) {
+            if (dl != NULL) {
                 delete dl;
             }
             CanvasList[i].dlist = NULL;
         }
-        csw_Free (CanvasList);
     }
 
 }
 
 
 
-
-int CanvasManager::ezx_AddGraphicsCanvasToManager (char *name,
-                                    long java_num,
-                                    void *v_jenv,
-                                    void *v_jobj)
+/*
+ * Check for a display list for the name and java_num.
+ * If none is found, create a new display list and add
+ * it, it's name and it's index to the CanvasList. If
+ * a valid display list if found or created, the index
+ * of the CanvasList element is returned.  On error,
+ * -1 is returned.
+ */
+int CanvasManager::CreateGraphicsCanvas (char *name,
+                                         long java_num)
 {
     GRaphicsCanvasStruct    *cptr = NULL;
-    int                     i, cval;
+    GRaphicsCanvasStruct    *cl_data = NULL;
+    int                     i, cval, cl_size = 0;
     char                    lname1[200], lname2[200];
 
     if (name == NULL) {
         return -1;
     }
 
+    cl_data = CanvasList.data ();
+    cl_size = CanvasList.size();
+
 /*
  * If there is already a display list of this name and num, 
  * use it.  Do not create a new dlist.
  */
     csw_StrClean2 (lname1, name, 200);
-    for (i=0; i<NumCanvasList; i++) {
-        cptr = CanvasList + i;
+    for (i=0; i<cl_size; i++) {
+        cptr = cl_data + i;
         if (cptr->dlist == NULL) {
             continue;
         }
         csw_StrClean2 (lname2, cptr->name, 200);
         cval = strcmp (lname1, lname2);
         if (cval == 0  &&  java_num == cptr->java_num) {
-            ActiveCanvas = cptr;
-            ActiveIndex = i;
             return i;
         }
     }
@@ -90,13 +101,12 @@ int CanvasManager::ezx_AddGraphicsCanvasToManager (char *name,
 /*
  * If a slot is not being used, use it.
  */
-    for (i=0; i<NumCanvasList; i++) {
-        cptr = CanvasList + i;
+    for (i=0; i<cl_size; i++) {
+        cptr = cl_data + i;
         if (cptr->dlist == NULL) {
             try {
                 SNF
-                cptr->dlist = new CDisplayList;
-                cptr->dlist->SetVoidJavaAreaPtrs (v_jenv, v_jobj);
+                cptr->dlist = new CDisplayList ();
             }
             catch (...) {
                 printf ("\n*****  caught new exception creating display list  *****\n\n");
@@ -107,8 +117,6 @@ int CanvasManager::ezx_AddGraphicsCanvasToManager (char *name,
             cptr->java_num = java_num;
             strncpy (cptr->name, name, 99);
             cptr->name[99] = '\0';
-            ActiveCanvas = cptr;
-            ActiveIndex = i;
             return i;
         }
     }
@@ -116,73 +124,64 @@ int CanvasManager::ezx_AddGraphicsCanvasToManager (char *name,
 /*
  * Grow the canvas list if needed.
  */
-    const int gcsize = sizeof(GRaphicsCanvasStruct);
-    const int gchunk = 10;
-
-    if (NumCanvasList >= MaxCanvasList) {
-        if (CanvasList == NULL) {
-            MaxCanvasList = gchunk;
-            CanvasList = static_cast <GRaphicsCanvasStruct *>
-                          (csw_Calloc (MaxCanvasList * gcsize));
-        }
-        else {
-            int oldmax = MaxCanvasList;
-            MaxCanvasList += gchunk;
-            CanvasList = static_cast <GRaphicsCanvasStruct *>
-                          (csw_Realloc(CanvasList, MaxCanvasList * gcsize));
-            if (CanvasList != NULL) {
-                memset ((void *)(CanvasList + oldmax), 0, gchunk * gcsize);
-            }
-        }  
+    
+    try {
+        GRaphicsCanvasStruct   gcs;
+        CanvasList.push_back (gcs);
     }
-
-    if (CanvasList == NULL) {
+    catch (...) {
+        printf ("\n***** exception adding GraphicsCanvasStruct *****\n\n");
+        fflush (stdout);
         return -1;
     }
 
+    cl_data = CanvasList.data();
+    cl_size = CanvasList.size();
+
 /*
- * Append to the end of the list.
+ * Associate the new dlist with the canvas struct just pushed back.
  */
-    cptr = CanvasList + NumCanvasList;
+    cptr = cl_data + cl_size - 1;
 
     try {
         SNF
-        cptr->dlist = new CDisplayList;
-        cptr->dlist->SetVoidJavaAreaPtrs (v_jenv, v_jobj);
+        cptr->dlist = new CDisplayList ();
     }
     catch (...) {
         printf ("\n*****  caught new exception on display list  *****\n\n");
         fflush (stdout);
         cptr->dlist = NULL;
     }
-    cptr->java_num = java_num;
+    cptr->java_num = cl_size - 1;
     strncpy (cptr->name, name, 99);
     cptr->name[99] = '\0';
 
-    ActiveCanvas = cptr;
-    ActiveIndex = NumCanvasList;
-
-    NumCanvasList++;
-
-    return (NumCanvasList - 1);
+    return (cl_size - 1);
 
 }
 
 
 
-int CanvasManager::ezx_RemoveGraphicsCanvasFromManager (char *name)
+int CanvasManager::RemoveGraphicsCanvasFromManager (char *name)
 {
-    GRaphicsCanvasStruct    *cptr;
-    int                     i, cval, istat;
+    GRaphicsCanvasStruct    *cptr = NULL, *cl_data = NULL;
+    int                     i, cval, istat, cl_size = 0;
     char                    local1[100], local2[100];
     
     if (name == NULL) {
         return -1;
     }
 
+    cl_data = CanvasList.data ();
+    cl_size = CanvasList.size ();
+
+    if (cl_data == NULL  ||  cl_size < 1) {
+        return -1;
+    }
+
     csw_StrClean2 (local1, name, 100);
-    for (i=0; i<NumCanvasList; i++) {
-        cptr = CanvasList + i;
+    for (i=0; i<cl_size; i++) {
+        cptr = cl_data + i;
         csw_StrClean2 (local2, cptr->name, 100);
         cval = strcmp (local1, local2);
         if (cval == 0) {
@@ -202,15 +201,22 @@ int CanvasManager::ezx_RemoveGraphicsCanvasFromManager (char *name)
 }
 
 
-int CanvasManager::ezx_RemoveGraphicsCanvasFromManager (int index)
+int CanvasManager::RemoveGraphicsCanvasFromManager (long index)
 {
-    GRaphicsCanvasStruct    *cptr;
+    GRaphicsCanvasStruct    *cptr = NULL, *cl_data = NULL;
+    int                     cl_size = 0;
+
+    cl_data = CanvasList.data();
+    if (cl_data == NULL) {
+        return -1;
+    }
+    cl_size = CanvasList.size();
     
-    if (index < 0  ||  index >= NumCanvasList) {
+    if (index < 0  ||  index >= cl_size) {
         return -1;
     }
 
-    cptr = CanvasList + index;
+    cptr = cl_data + index;
 
     if (cptr->dlist != NULL) {
         delete (cptr->dlist);
@@ -224,66 +230,23 @@ int CanvasManager::ezx_RemoveGraphicsCanvasFromManager (int index)
 }
 
 
-int CanvasManager::ezx_SetActiveGraphicsCanvas (char *name)
+
+CDisplayList *CanvasManager::GetDisplayList (int index)
 {
-    int                     i, cval;
-    char                    local1[100], local2[100];
-    GRaphicsCanvasStruct    *cptr;
+    int cl_size = CanvasList.size();
+    GRaphicsCanvasStruct *cl_data = CanvasList.data();
 
-    ActiveCanvas = NULL;
-    ActiveIndex = -1;
-    if (name == NULL) {
-        return -1;
-    }
-
-    csw_StrClean2 (local1, name, 100);
-    for (i=0; i<NumCanvasList; i++) {
-        cptr = CanvasList + i;
-        csw_StrClean2 (local2, cptr->name, 100);
-        cval = strcmp (local1, local2);
-        if (cval == 0) {
-            ActiveCanvas = cptr;
-            ActiveIndex = -1;
-            return cptr->java_num;
-        }
-    }
-
-    return -1;
-
-}
-
-
-int CanvasManager::ezx_SetActiveGraphicsCanvas (int index)
-{
-    GRaphicsCanvasStruct    *cptr;
-
-    ActiveCanvas = NULL;
-    ActiveIndex = -1;
-    if (index < 0  ||  index >= NumCanvasList) {
-        return -1;
-    }
-
-    cptr = CanvasList + index;
-    ActiveCanvas = cptr;
-    ActiveIndex = index;
-
-    return 1;
-
-}
-
-
-CDisplayList *CanvasManager::ezx_GetActiveDisplayList (void)
-{
-    if (ActiveCanvas == NULL) {
+    if (cl_data == NULL  ||  cl_size < 1) {
         return NULL;
     }
 
-    return ActiveCanvas->dlist;
+    if (index < 0  ||  index >= cl_size) {
+        return NULL;
+    }
+
+    GRaphicsCanvasStruct *cs = cl_data + index;
+
+    return cs->dlist;
 
 }
 
-
-int CanvasManager::ezx_GetActiveIndex (void)
-{
-    return ActiveIndex;
-}

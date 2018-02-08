@@ -24,6 +24,8 @@ import java.awt.Toolkit;
 import java.awt.color.ColorSpace;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -46,18 +48,10 @@ import javax.swing.WindowConstants;
 import org.apache.logging.log4j.Logger;
 
 import csw.jeasyx.src.*;
-
 import csw.jutils.src.ColorPalette;
-
 import csw.jsurfaceworks.src.Grid;
-
 import csw.jutils.src.CSWLogger;
 
-
-// imports flagged as unused by eclipse
-
-//import java.util.Date;
-//import org.apache.logging.log4j.LogManager;
 
 
 
@@ -116,7 +110,19 @@ public class JEasyXTest {
         JDisplayList.openLogFile (playback_file_name);
         JEasyXTestFrame frame = new JEasyXTestFrame ();
         frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                System.out.println("Main Window Closed");
+                e.getWindow().dispose();
+                JDLFrame.removeAllFrames ();
+            }
+        });
+
         frame.setVisible (true);
+
 
 //        timerTest ();
 
@@ -290,24 +296,27 @@ catch (Exception e) {
         JButton medium_button = new JButton ("Medium Random Frame");
         medium_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                HugeFrame frame = new HugeFrame (50);
-                frame.setVisible(true);
+                HugeFrame   hf = new HugeFrame (5);
+                HugeFrameRunnable run_frame = new HugeFrameRunnable (hf);
+                SwingUtilities.invokeLater (run_frame);
           }
         });
 
         JButton big_button = new JButton ("Big Random Frame");
         big_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                HugeFrame frame = new HugeFrame (1000);
-                frame.setVisible(true);
+                HugeFrame   hf = new HugeFrame (1000);
+                HugeFrameRunnable run_frame = new HugeFrameRunnable (hf);
+                SwingUtilities.invokeLater (run_frame);
           }
         });
 
         JButton huge_button = new JButton ("Huge Random Frame");
         huge_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                HugeFrame frame = new HugeFrame (-1);
-                frame.setVisible(true);
+                HugeFrame   hf = new HugeFrame (-1);
+                HugeFrameRunnable run_frame = new HugeFrameRunnable (hf);
+                SwingUtilities.invokeLater (run_frame);
           }
         });
 
@@ -450,7 +459,7 @@ catch (Exception e) {
     void setTextFrameTest (TextFrameTest f) {frame3 = f;}
 }
 
-class RandomPrimFrame extends JFrame
+class RandomPrimFrame extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -458,6 +467,8 @@ class RandomPrimFrame extends JFrame
     
     public RandomPrimFrame ()
     {
+        super (JDLFrame.FRAME_WITHOUT_TOOLBAR);
+
         double[] xline, yline;
         int[]    icomp;
 
@@ -471,12 +482,7 @@ class RandomPrimFrame extends JFrame
         setSize (700, 700);
         setResizable (true);
 
-        JDisplayListPanel panel = new JDisplayListPanel ();
-
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
-
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("random prim test",
@@ -540,7 +546,7 @@ class RandomPrimFrame extends JFrame
 
 };
 
-class SymbolFrame extends JFrame
+class SymbolFrame extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -548,6 +554,8 @@ class SymbolFrame extends JFrame
     
     public SymbolFrame ()
     {
+        super (JDLFrame.FRAME_WITHOUT_TOOLBAR);
+
         double xsym, ysym;
         int i;
 
@@ -556,12 +564,8 @@ class SymbolFrame extends JFrame
         setTitle ("Symbol Examples");
         setSize (900, 700);
         setResizable (true);
-        JDisplayListPanel panel =
-            new JDisplayListPanel ();
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("symbol table test",
@@ -583,7 +587,7 @@ class SymbolFrame extends JFrame
     }
 };
 
-class TextTableFrame extends JFrame
+class TextTableFrame extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -591,18 +595,16 @@ class TextTableFrame extends JFrame
     
     public TextTableFrame ()
     {
+        super (JDLFrame.FRAME_WITHOUT_TOOLBAR);
+
 
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle ("Text Fonts 0 - 19");
         setSize (1100, 700);
         setResizable (true);
-        JDisplayListPanel panel =
-            new JDisplayListPanel ();
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("fonts 0 - 19",
@@ -701,7 +703,7 @@ class TextTableFrame extends JFrame
     }
 };
 
-class Text2TableFrame extends JFrame
+class Text2TableFrame extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -709,17 +711,15 @@ class Text2TableFrame extends JFrame
     
     public Text2TableFrame ()
     {
+        super (JDLFrame.FRAME_WITHOUT_TOOLBAR);
+
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle ("Text Fonts 101 - 107");
         setSize (400, 400);
         setResizable (true);
-        JDisplayListPanel panel =
-            new JDisplayListPanel ();
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("font 101 - 107 test",
@@ -779,7 +779,7 @@ class Text2TableFrame extends JFrame
     }
 };
 
-class Text3TableFrame extends JFrame
+class Text3TableFrame extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -787,6 +787,8 @@ class Text3TableFrame extends JFrame
     
     public Text3TableFrame ()
     {
+        super (JDLFrame.FRAME_WITHOUT_TOOLBAR);
+
         double dy, upi;
 
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
@@ -794,12 +796,8 @@ class Text3TableFrame extends JFrame
         setTitle ("Default Font");
         setSize (1100, 600);
         setResizable (true);
-        JDisplayListPanel panel =
-            new JDisplayListPanel ();
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("default font window",
@@ -876,7 +874,7 @@ class Text3TableFrame extends JFrame
 
 
 class Frame1Frame
-  extends JFrame
+  extends JDLFrame
   implements DLRightClickListener, DLSelectListener, DLZoomPanListener
 
 {
@@ -913,6 +911,8 @@ class Frame1Frame
 
     public Frame1Frame ()
     {
+        super ();
+
         double[] xline, yline;
         int[]    icomp;
 
@@ -939,12 +939,7 @@ catch (Exception e) {
         setSize (700, 700);
         setResizable (true);
 
-        JEasyXGraphicsPanel gpanel = new JEasyXGraphicsPanel (BorderLayout.NORTH);
-
-        Container contentPane = getContentPane ();
-        contentPane.add (gpanel);
-
-        JDisplayList dl = gpanel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.addZoomPanListener (this);
 
@@ -1159,7 +1154,7 @@ catch (Exception e) {
 
 };
 
-class Frame2Frame extends JFrame
+class Frame2Frame extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -1167,6 +1162,8 @@ class Frame2Frame extends JFrame
     
     public Frame2Frame ()
     {
+        super ();
+
         double xsym, ysym;
         int i;
 
@@ -1175,12 +1172,8 @@ class Frame2Frame extends JFrame
         setTitle ("Symbol Examples in Frame");
         setSize (900, 700);
         setResizable (true);
-        JEasyXGraphicsPanel panel =
-            new JEasyXGraphicsPanel (BorderLayout.NORTH);
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("frame 2 test",
@@ -1230,7 +1223,7 @@ class Frame2Frame extends JFrame
 
 };
 
-class TextFrameTest extends JFrame
+class TextFrameTest extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -1238,17 +1231,15 @@ class TextFrameTest extends JFrame
 
     public TextFrameTest ()
     {
+        super ();
+
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle ("Text Frame Test");
         setSize (900, 600);
         setResizable (true);
-        JEasyXGraphicsPanel panel =
-            new JEasyXGraphicsPanel (BorderLayout.NORTH);
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("text frame test",
@@ -1299,7 +1290,7 @@ class TextFrameTest extends JFrame
 
 };
 
-class FrameLayoutTest extends JFrame
+class FrameLayoutTest extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -1307,6 +1298,8 @@ class FrameLayoutTest extends JFrame
 
     public FrameLayoutTest ()
     {
+        super ();
+
         double     angle;
 
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
@@ -1314,12 +1307,8 @@ class FrameLayoutTest extends JFrame
         setTitle ("Frame Layout Test");
         setSize (900, 600);
         setResizable (true);
-        JEasyXGraphicsPanel panel =
-            new JEasyXGraphicsPanel (BorderLayout.NORTH);
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("frame layout test",
@@ -1471,7 +1460,7 @@ class FrameLayoutTest extends JFrame
 };
 
 
-class ReversePrimFrame extends JFrame
+class ReversePrimFrame extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -1479,6 +1468,8 @@ class ReversePrimFrame extends JFrame
 
     public ReversePrimFrame ()
     {
+        super ();
+
         double[] xline, yline;
         int[]    icomp;
  
@@ -1492,12 +1483,7 @@ class ReversePrimFrame extends JFrame
         setSize (700, 700);
         setResizable (true);
 
-        JEasyXGraphicsPanel gpanel = new JEasyXGraphicsPanel (BorderLayout.NORTH);
-
-        Container contentPane = getContentPane ();
-        contentPane.add (gpanel);
-
-        JDisplayList dl = gpanel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("reverse axis test",
@@ -1609,7 +1595,7 @@ class ReversePrimFrame extends JFrame
 
 };
 
-class DashedLineFrame extends JFrame
+class DashedLineFrame extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -1617,6 +1603,8 @@ class DashedLineFrame extends JFrame
 
     public DashedLineFrame ()
     {
+        super (JDLFrame.FRAME_WITHOUT_TOOLBAR);
+
         double[] x, y;
         int i, patnum;
 
@@ -1625,12 +1613,8 @@ class DashedLineFrame extends JFrame
         setTitle ("Dashed Line Examples, dashscale = 1.0");
         setSize (900, 700);
         setResizable (true);
-        JDisplayListPanel panel =
-            new JDisplayListPanel ();
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("dashed line test",
@@ -1661,7 +1645,7 @@ class DashedLineFrame extends JFrame
     }
 };
 
-class Dashed2LineFrame extends JFrame
+class Dashed2LineFrame extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -1669,6 +1653,8 @@ class Dashed2LineFrame extends JFrame
 
     public Dashed2LineFrame ()
     {
+        super (JDLFrame.FRAME_WITHOUT_TOOLBAR);
+
         double[] x, y;
         int i, patnum;
 
@@ -1677,12 +1663,8 @@ class Dashed2LineFrame extends JFrame
         setTitle ("Dashed Line Examples, dashscale = 2.0");
         setSize (900, 700);
         setResizable (true);
-        JDisplayListPanel panel =
-            new JDisplayListPanel ();
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("dashed line test 2",
@@ -1713,7 +1695,7 @@ class Dashed2LineFrame extends JFrame
     }
 };
 
-class GridTest extends JFrame
+class GridTest extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -1721,6 +1703,8 @@ class GridTest extends JFrame
 
     public GridTest ()
     {
+        super ();
+
         double[] gdata;
         double   dx, dy, dist;
         int      i, j, k, jstart;
@@ -1730,12 +1714,8 @@ class GridTest extends JFrame
         setTitle ("Grid Test");
         setSize (900, 700);
         setResizable (true);
-        JEasyXGraphicsPanel panel =
-            new JEasyXGraphicsPanel (BorderLayout.NORTH);
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.beginPlot ("grid test",
                       0.0, 0.0, 100.0, 100.0);
@@ -1807,14 +1787,50 @@ class GridTest extends JFrame
 };
 
 
-class HugeFrame extends JFrame
+
+
+/**
+ * This class has a runnable that first populates the specified
+ * HugeFrame object.  After this object has been populated, the
+ * frame is made visible, which triggers the drawing of the objects
+ * previously set via the populateDlist method.
+ */
+class HugeFrameRunnable implements Runnable {
+
+    HugeFrame    hf;
+
+    public HugeFrameRunnable (HugeFrame hfin) {hf = hfin;}
+
+    public void run () {
+
+        hf.populateDlist ();
+        hf.setVisible (true);
+
+    }
+
+}
+
+
+
+class HugeFrame extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
     private static Logger  logger = CSWLogger.getMyLogger ();
 
-    public HugeFrame (int num_hint)
+    private int  num_hint = 50;
+
+
+    public HugeFrame (int nhint)
     {
+        super ();
+        num_hint = nhint;
+    }
+
+    public void populateDlist ()
+    {
+
+        int      nhint = num_hint;
 
         double[] xline, yline;
         int[]    icomp;
@@ -1837,31 +1853,24 @@ catch (Exception e) {
 
         DLSelectable dls = null;
 
-        xline = new double[10];
-        yline = new double[10];
+        xline = new double[100];
+        yline = new double[100];
         icomp = new int[10];
 
-        setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
-
-        if (num_hint <= 0) {
+        if (nhint <= 0) {
           ndo = 10000;
           xymax = 10000.0;
           setTitle ("Huge Random Frame Test * " + ndo);
         }
         else {
-          ndo = num_hint;
+          ndo = nhint;
           xymax = 2000.0;
-          setTitle ("Medium Random Frame Test * " + ndo);
+          setTitle ("Random Frame Test * " + ndo);
         }
         setSize (700, 700);
         setResizable (true);
 
-        JEasyXGraphicsPanel gpanel = new JEasyXGraphicsPanel (BorderLayout.NORTH);
-
-        Container contentPane = getContentPane ();
-        contentPane.add (gpanel);
-
-        JDisplayList dl = gpanel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("huge frame 1 test",
@@ -2122,7 +2131,7 @@ catch (Exception e) {
 
 
 
-class LithFrame extends JFrame
+class LithFrame extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -2130,6 +2139,8 @@ class LithFrame extends JFrame
 
     public LithFrame ()
     {
+        super ();
+
         int i;
 
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
@@ -2141,12 +2152,8 @@ class LithFrame extends JFrame
                    DLConst.ZOOM_OUT_BUTTON_MASK |
                    DLConst.ZOOM_BUTTON_MASK |
                    DLConst.ZOOM_FULL_BUTTON_MASK;
-        JEasyXGraphicsPanel panel =
-            new JEasyXGraphicsPanel (BorderLayout.NORTH, mask);
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("lith pat test",
@@ -2407,7 +2414,7 @@ class SymbolPartsFrame extends JFrame
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle ("Symbol Parts Test");
-        setSize (300, 150);
+        setSize (400, 450);
         setResizable (true);
 
 /*
@@ -2482,7 +2489,7 @@ catch (Exception e) {
 
 }
 
-class FrameSyncTest extends JFrame
+class FrameSyncTest extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -2490,6 +2497,8 @@ class FrameSyncTest extends JFrame
 
     public FrameSyncTest ()
     {
+        super ();
+
         double     angle;
 
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
@@ -2497,12 +2506,8 @@ class FrameSyncTest extends JFrame
         setTitle ("Frame Sync Test");
         setSize (900, 600);
         setResizable (true);
-        JEasyXGraphicsPanel panel =
-            new JEasyXGraphicsPanel ();
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("frame sync test",
@@ -2709,7 +2714,7 @@ class FrameSyncTest extends JFrame
 };
 
 
-class NoAspectFrame extends JFrame implements DLRightClickListener, DLSelectListener
+class NoAspectFrame extends JDLFrame implements DLRightClickListener, DLSelectListener
 {
     private static final long serialVersionUID = 1L;
 
@@ -2730,6 +2735,8 @@ class NoAspectFrame extends JFrame implements DLRightClickListener, DLSelectList
 
     public NoAspectFrame ()
     {
+        super ();
+
         double[] xline, yline;
         int[]    icomp;
  
@@ -2745,12 +2752,7 @@ class NoAspectFrame extends JFrame implements DLRightClickListener, DLSelectList
         setSize (700, 700);
         setResizable (true);
 
-        JEasyXGraphicsPanel gpanel = new JEasyXGraphicsPanel ();
-
-        Container contentPane = getContentPane ();
-        contentPane.add (gpanel);
-
-        JDisplayList dl = gpanel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.addRightClickListener (this);
         dl.addSelectListener (this);
@@ -2963,7 +2965,7 @@ class NoAspectFrame extends JFrame implements DLRightClickListener, DLSelectList
 
 
 
-class OverlapTest extends JFrame
+class OverlapTest extends JDLFrame
 {
     private static final long serialVersionUID = 1L;
 
@@ -2971,6 +2973,8 @@ class OverlapTest extends JFrame
 
     public OverlapTest ()
     {
+        super ();
+
         double[] gdata;
         double   dx, dy, dist;
         int      i, j, k, jstart;
@@ -2980,12 +2984,8 @@ class OverlapTest extends JFrame
         setTitle ("Grid Overlap Test");
         setSize (900, 700);
         setResizable (true);
-        JEasyXGraphicsPanel panel =
-            new JEasyXGraphicsPanel (BorderLayout.NORTH);
-        Container contentPane = getContentPane ();
-        contentPane.add (panel);
 
-        JDisplayList dl = panel.getDisplayList ();
+        JDisplayList dl = super.getDL ();
 
         dl.beginPlot ("grid test",
                       0.0, 0.0, 100.0, 100.0);

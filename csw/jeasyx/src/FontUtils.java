@@ -75,7 +75,7 @@ class FontUtils
 Font.ITALIC.  You can specify a logical or of Font.BOLD|Font.ITALIC for a
 style that is both bold and italic.
 */
-    public static double[] getTextMetrics (
+    public synchronized static double[] getTextMetrics (
         String     str,
         String     fontName,
         double     size,
@@ -118,7 +118,7 @@ style that is both bold and italic.
 @param str The text string to get the metrics for.
 @param font The font which will be used to draw the text.
 */
-    public static double[] getTextMetrics (
+    public synchronized static double[] getTextMetrics (
         String str,
         Font   font)
     {
@@ -156,7 +156,7 @@ style that is both bold and italic.
  or of Font.BOLD|Font.ITALIC.
 */
 
-    public static Font createFont (
+    public synchronized static Font createFont (
         String     fname,
         double     size,
         int        style)
@@ -183,7 +183,7 @@ style that is both bold and italic.
  size smaller than .02 inches, a default size of .10 inches is used.
 @param size The font height in inches.
 */
-    public static Font getDefaultFont (double size)
+    public synchronized static Font getDefaultFont (double size)
     {
         int     isize;
 
@@ -212,7 +212,7 @@ style that is both bold and italic.
 @param fontIn  The base font to derive from.
 @param size    The size, in screen inches, for the new font.
  */
-    public static Font deriveFont (
+    public synchronized static Font deriveFont (
         Font fontIn,
         double size)
     {
@@ -244,7 +244,7 @@ style that is both bold and italic.
 Font.ITALIC.  You can specify a logical or of Font.BOLD|Font.ITALIC for a
 style that is both bold and italic.
 */
-    public static double[] getTextBounds (
+    public synchronized static double[] getTextBounds (
         String     str,
         String     fontName,
         double     size,
@@ -284,7 +284,7 @@ style that is both bold and italic.
 @param str The text string to get the metrics for.
 @param font The font which will be used to draw the text.
 */
-    public static double[] getTextBounds (
+    public synchronized static double[] getTextBounds (
         String str,
         Font   font)
     {

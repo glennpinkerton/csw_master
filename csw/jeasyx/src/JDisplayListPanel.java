@@ -326,6 +326,11 @@ public class JDisplayListPanel extends JPanel
             return;
         }
 
+System.out.println ();
+System.out.println ("panel finalize called");
+System.out.println ();
+System.out.flush ();
+
         finalizedDlist.add (dlist);
 
         if (cleanupNeeded) {
@@ -341,6 +346,11 @@ public class JDisplayListPanel extends JPanel
                 JDisplayListPanel.cleanupFinalizedPanel ();
             }
         };
+
+System.out.println ();
+System.out.println ("panel finalize invoke called");
+System.out.println ();
+System.out.flush ();
 
         SwingUtilities.invokeLater (cleanup);
 

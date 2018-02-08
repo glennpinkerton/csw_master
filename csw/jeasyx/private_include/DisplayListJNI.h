@@ -453,6 +453,9 @@ extern "C" {
     void jni_open_prim_file_ezx (char *fname);
     void jni_close_prim_file_ezx ();
 
+    void jni_enter_monitor (void *v_jenv, void *v_jobj);
+    void jni_exit_monitor (void *v_jenv, void *v_jobj);
+
 #ifdef __cplusplus
 }
 #endif

@@ -18,9 +18,11 @@ extern "C" {
 #include <stdio.h>
 
 int ezx_process_command (
+    void              *v_jenv,
+    void              *v_jobj,
     int               dlist_index,
     int               command_id,
-    int               threadid,
+    long              threadid,
     long              *llist,
     int               *ilist,
     char              *cdata,

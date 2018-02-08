@@ -39,6 +39,7 @@
 
 #include <stdio.h>
 
+#include "csw/jeasyx/private_include/DisplayListJNI.h"
 #include "csw/jeasyx/private_include/DisplayList.h"
 #include "csw/jeasyx/private_include/EZXCommand.h"
 #include "csw/jeasyx/private_include/gtx_drawprim.h"
@@ -61,9 +62,11 @@
 extern "C" {
 
 int ezx_process_command (
+    void          *v_jenv,
+    void          *v_jobj,
     int           dlist_index,
     int           command_id,
-    int           threadid,
+    long          threadid,
     long          *llist,
     int           *ilist,
     char          *cdata,
@@ -110,23 +113,19 @@ int ezx_process_command (
 
 // Get a pointer to the canvas manager associated with this thread.
 
-    CanvasManager    *canvas_manager_ptr = ThreadGuard::GetCanvasManager (threadid);
-
-    if (canvas_manager_ptr == NULL) {
-        return -1;
-    }
+    CanvasManager    *canvas_manager_ptr = ThreadGuard::GetCanvasManager ();
 
     /*
      * Commands to open and close log files.
      * cdata has the log file name
      */
 #if _EZX_DEBUG_LOG_FILE_
-    LogFile = ThreadGuard::GetEZLogFile (threadid);
+    LogFile = ThreadGuard::GetEZLogFile (9999);
     if (command_id == GTX_OPEN_LOG_FILE) {
         if (LogFile == NULL) {
             LogFile = fopen (cdata, "wb");
         }
-        ThreadGuard::SetEZLogFile (threadid, LogFile);
+        ThreadGuard::SetEZLogFile (9999, LogFile);
         return 1;
     }
 
@@ -134,7 +133,7 @@ int ezx_process_command (
         if (LogFile) {
             fclose (LogFile);
             LogFile = NULL;
-            ThreadGuard::SetEZLogFile (threadid, NULL);
+            ThreadGuard::SetEZLogFile (9999, NULL);
         }
         return 1;
     }
@@ -165,7 +164,7 @@ int ezx_process_command (
         }
       #endif
 
-        istat = canvas_manager_ptr->ezx_RemoveGraphicsCanvasFromManager (ilist[0]);
+        istat = canvas_manager_ptr->RemoveGraphicsCanvasFromManager (ilist[0]);
         return istat;
     }
 
@@ -223,42 +222,38 @@ int ezx_process_command (
     }
 
 
-    canvas_manager_ptr->ezx_SetActiveGraphicsCanvas (dlist_index);
-
     long java_num = dlist_index;
     char *name = cdata;
 
+#if _EZX_DEBUG_LOG_FILE_
     int  new_dlindex = -1;
+#endif
 
-    dlist = canvas_manager_ptr->ezx_GetActiveDisplayList ();
+    dlist = canvas_manager_ptr->GetDisplayList (dlist_index);
 
     if (dlist == NULL) {
-        void  *v_env = ezx_get_void_jenv (threadid, NULL);
-        void  *v_obj = ezx_get_void_jobj (threadid, NULL);
+
+        jni_enter_monitor (v_jenv, v_jobj);
+
         istat =
-            canvas_manager_ptr->ezx_AddGraphicsCanvasToManager
-                (name, java_num, v_env, v_obj);
+            canvas_manager_ptr->CreateGraphicsCanvas
+                (name, java_num);
         if (istat == -1) {
+            jni_exit_monitor (v_jenv, v_jobj);
             return -1;
         }
         dlist =
-            canvas_manager_ptr->ezx_GetActiveDisplayList ();
-        if (dlist == NULL) {
-            return -1;
-        }
-        new_dlindex = canvas_manager_ptr->ezx_GetActiveIndex ();
+                canvas_manager_ptr->GetDisplayList (istat);
+#if _EZX_DEBUG_LOG_FILE_
+        new_dlindex = istat;
+#endif
+        java_num = istat;
+
+        jni_exit_monitor (v_jenv, v_jobj);
+
     }
 
-    CSWGrdAPI    *gapi = ThreadGuard::GetGrdAPI (threadid);
-    dlist->SetGrdAPIPtr (gapi);
-
-    native_dlist_id = istat;
-
-// short circuit to see if still crashes
-//if (true) {
-//return 1;
-//}
-
+    native_dlist_id = java_num;
 
     primnum = -1;
 
@@ -2374,21 +2369,6 @@ int ezx_process_command (
     return istat;
 
 }
-
-
-void *ezx_get_void_jenv (int threadid, void *v_jenv)
-{
-    void *vp = ThreadGuard::GetVoidJenv (threadid, v_jenv);
-    return vp;
-}
-
-
-void *ezx_get_void_jobj (int threadid, void *v_jobj)
-{
-    void *vp = ThreadGuard::GetVoidJobj (threadid, v_jobj);
-    return vp;
-}
-
 
 
 

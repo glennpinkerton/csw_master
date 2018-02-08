@@ -22,18 +22,18 @@ extern "C" {
 /*
  * Class:     csw_jsurfaceworks_src_JSurfaceWorksBase
  * Method:    sendCommand
- * Signature: (II[I[J[DLjava/lang/String;[I[F[DI)J
+ * Signature: (II[I[J[DLjava/lang/String;[I[F[DJ)J
  */
 JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
-  (JNIEnv *, jobject, jint, jint, jintArray, jlongArray, jdoubleArray, jstring, jintArray, jfloatArray, jdoubleArray, jint);
+  (JNIEnv *, jobject, jint, jint, jintArray, jlongArray, jdoubleArray, jstring, jintArray, jfloatArray, jdoubleArray, jlong);
 
 /*
  * Class:     csw_jsurfaceworks_src_JSurfaceWorksBase
  * Method:    sendStaticCommand
- * Signature: (II[I[J[DLjava/lang/String;[I[F[DI)J
+ * Signature: (II[I[J[DLjava/lang/String;[I[F[DJ)J
  */
 JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendStaticCommand
-  (JNIEnv *, jclass, jint, jint, jintArray, jlongArray, jdoubleArray, jstring, jintArray, jfloatArray, jdoubleArray, jint);
+  (JNIEnv *, jclass, jint, jint, jintArray, jlongArray, jdoubleArray, jstring, jintArray, jfloatArray, jdoubleArray, jlong);
 
 /*
  * Class:     csw_jsurfaceworks_src_JSurfaceWorksBase

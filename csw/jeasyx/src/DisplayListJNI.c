@@ -41,8 +41,6 @@
 
 #define _MAX_LONG_    1
 
-#define DEBUG_JNI_FILE 0
-
 #if INT_MAX != 2147483647
 #define MAX_LIST_SIZE \
 csw_jeasyx_src_JDisplayListBase_MAX_LIST_SIZE
@@ -89,13 +87,6 @@ static int            FunctionSet = 0;
 static void update_zoom_pan_method (int command_id);
 static int setup_return_select_method_ids(JNIEnv *env, jclass cls);
 
-#if DEBUG_JNI_FILE
-static FILE           *dbfile = NULL;
-static char           *cenv;
-static char           dbname[500];
-static char           fileline[1000];
-#endif
-
 
 /*
  * The primfile is used when "recording" of the graphical
@@ -140,7 +131,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
    jobject jobj,
    jint j_dlist_index,
    jint j_command_id,
-   jint j_thread_id,
+   jlong j_thread_id,
    jlongArray j_llist,
    jintArray j_ilist,
    jstring j_cdata,
@@ -153,7 +144,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
 ) {
     int              status, i;
     int              command_id;
-    int              threadid;
+    long             threadid;
     int              dlist_index;
     char             *cdata;
     unsigned char    *bdata;
@@ -167,7 +158,10 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
     long             llist[100];
 
 
-    threadid = (int)j_thread_id;
+    void  *v_jenv = (void *)jnienv;
+    void  *v_jobj = (void *)jobj;
+    
+    threadid = (long)j_thread_id;
 
 /*
  *  This block of code can be uncommented to enable debug of
@@ -212,31 +206,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
   #endif
 #endif
 
-  #if DEBUG_JNI_FILE
-    if (dbfile == NULL) {
-        cenv = getenv ("SRC_TREE");
-        if (cenv) {
-            strcpy (dbname, cenv);
-            terminate_directory_with_separator (dbname);
-        }
-        else {
-            dbname[0] = '\0';
-        }
-        strcat(dbname, "ezx_debug_jni.txt");
-        dbfile = fopen (dbname, "wb");
-        strcpy (fileline, "first line of debug file\n");
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-    if (dbfile) {
-        sprintf (fileline, "\n\nEntering sendCommand function\n");
-        if (dbfile) {
-            fputs (fileline, dbfile);
-            fflush (dbfile);
-        }
-    }
-  #endif
-
     JavaObj = jobj;
     JavaEnv = jnienv;
 
@@ -260,98 +229,34 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
     if (j_llist) {
         jllist = (*jnienv)->GetLongArrayElements (jnienv, j_llist, JNI_FALSE);
     }
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed GetLongArrayElements get %p %p\n", j_llist, jllist);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
     if (j_ilist) {
         ilist = (*jnienv)->GetIntArrayElements (jnienv, j_ilist, JNI_FALSE);
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed GetIntArrayElements %p %p\n", j_ilist, ilist);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
     if (j_cdata) {
         cdata = (char *)(*jnienv)->GetStringUTFChars (jnienv, j_cdata, JNI_FALSE);
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed GetStringUTFChars %p %p\n", j_cdata, cdata);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
     if (j_bdata) {
         bdata = (*jnienv)->GetBooleanArrayElements (jnienv, j_bdata, JNI_FALSE);
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed GetBooleanArrayElements %p %p\n", j_bdata, bdata);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
     if (j_sdata) {
         sdata = (*jnienv)->GetShortArrayElements (jnienv, j_sdata, JNI_FALSE);
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed GetShortArrayElements %p %p\n", j_sdata, sdata);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
     if (j_idata) {
         idata = (*jnienv)->GetIntArrayElements (jnienv, j_idata, JNI_FALSE);
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed GetIntArrayElements %p %p\n", j_idata, idata);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
     if (j_fdata) {
         fdata = (*jnienv)->GetFloatArrayElements (jnienv, j_fdata, JNI_FALSE);
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed GetFloatArrayElements %p %p\n", j_fdata, fdata);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
     if (j_ddata) {
         ddata = (*jnienv)->GetDoubleArrayElements (jnienv, j_ddata, JNI_FALSE);
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed GetDoubleArrayElements %p %p\n", j_ddata, ddata);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 
 /*
  * Assign 64 bit integer jlong values to C long values.
@@ -365,14 +270,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
             llist[i] = (long)jllist[i];
         }
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed long int conversion\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * If the command is a zoom or pan command, make sure the
@@ -393,7 +290,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
  */
 #if INT_MAX == 2147483647
     status =
-    ezx_process_command (dlist_index,
+    ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                          command_id,
                          threadid,
                          llist,
@@ -431,7 +329,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
     }
     if (ibad == 0) {
         status =
-        ezx_process_command (dlist_index,
+        ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                              command_id,
                              threadid,
                              llist,
@@ -456,14 +355,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
         if (ilist[0] >= 0) status = ilist[0];
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed process command\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Even though no copies of the elements were made above, the release
  * calls are needed.  Without these calls, the memory usage grows without end.
@@ -472,104 +363,78 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
         (*jnienv)->ReleaseLongArrayElements (jnienv, j_llist, jllist, JNI_FALSE);
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed ReleaseLongArrayElements %p %p\n", j_llist, jllist);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
     if (j_ilist) {
         (*jnienv)->ReleaseIntArrayElements (jnienv, j_ilist, ilist, JNI_FALSE);
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed ReleaseIntArrayElements %p %p\n", j_ilist, ilist);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
     if (j_cdata) {
         (*jnienv)->ReleaseStringUTFChars (jnienv, j_cdata, cdata);
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed ReleaseStringUTFChars %p %p\n", j_cdata, cdata);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
     if (j_bdata) {
         (*jnienv)->ReleaseBooleanArrayElements (jnienv, j_bdata, bdata, JNI_FALSE);
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed ReleaseBooleanArrayElements %p %p\n", j_bdata, bdata);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
     if (j_sdata) {
         (*jnienv)->ReleaseShortArrayElements (jnienv, j_sdata, sdata, JNI_FALSE);
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed ReleaseShortArrayElements %p %p\n", j_sdata, sdata);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
     if (j_idata) {
         (*jnienv)->ReleaseIntArrayElements (jnienv, j_idata, idata, JNI_FALSE);
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed ReleaseIntArrayElements %p %p\n", j_idata, idata);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
     if (j_fdata) {
         (*jnienv)->ReleaseFloatArrayElements (jnienv, j_fdata, fdata, JNI_FALSE);
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed ReleaseFloatArrayElements %p %p\n", j_fdata, fdata);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
     if (j_ddata) {
         (*jnienv)->ReleaseDoubleArrayElements (jnienv, j_ddata, ddata, JNI_FALSE);
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed ReleaseDoubleArrayElements %p %p\n", j_ddata, ddata);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-    sprintf (fileline, "Return from sendCommand status = %d\n", status);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
     return (jint)status;
+}
+
+
+
+void jni_enter_monitor (void *v_jenv, void * v_jobj) 
+{
+
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv    *jnienv = (JNIEnv *)v_jenv;
+    jobject   jobj = (jobject)v_jobj;
+
+    jint   moni_stat;
+    moni_stat = (*jnienv)->MonitorEnter(jnienv, jobj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return;
+    }
+
+}
+
+
+
+
+void jni_exit_monitor (void *v_jenv, void * v_jobj) 
+{
+
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv    *jnienv = (JNIEnv *)v_jenv;
+    jobject   jobj = (jobject)v_jobj;
+
+    jint   moni_stat;
+    moni_stat = (*jnienv)->MonitorExit(jnienv, jobj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return;
+    }
+
 }
 
 
@@ -577,6 +442,19 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
 
 /*
  *  Draw the current active display list back to the Java side.
+ *
+ *  This function requires that methods on the java side get called
+ *  to populate the "very simple primitive" lists on the java side.
+ *  Calling the java methods requires that the method calls use the
+ *  same JNIEnv and jobject as are specified in the parameters of
+ *  this function.
+ *
+ *  I tried to use EnterMonitor and ExitMonitor to bracket putting 
+ *  the JNIEnv and jobject into a static list, but I never got it
+ *  to work well, even with only a single thread.  I believe it is
+ *  better to use synchronized methods in the java code to lock any
+ *  native code that has to call back to the java side.  Time will
+ *  tell how this general strategy works.
  */
 JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
   (JNIEnv *env, jobject obj, jint j_dlist_index, jint j_threadid)
@@ -584,15 +462,10 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
     jclass           cls;
     int              dlist_index, threadid;
 
+    void  *v_jenv = (void *)env;
+    void  *v_jobj = (void *)obj;
+    
     static int       first_call = 1;
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\n\nCalling nativeDraw\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
     dlist_index = (int)j_dlist_index;
     threadid = (int)j_threadid;
@@ -603,6 +476,8 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
  * class.  They should be thread safe cached since they are not
  * changed after initial assignment.
  */
+
+  jni_enter_monitor (v_jenv, v_jobj);
  
   if (first_call == 1) {
 
@@ -613,61 +488,64 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
     int    sel_stat = 
     setup_return_select_method_ids(env, cls);
     if (sel_stat == -1) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     FillMethodID = (*env)->GetMethodID (env, cls, "addNativeFill",
                                      "([FFFIIIIIIII)V");
     if (FillMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     LineMethodID = (*env)->GetMethodID (env, cls, "addNativeLine",
                                      "([FIIIIIIFIII)V");
     if (LineMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     TextMethodID = (*env)->GetMethodID (env, cls, "addNativeText",
                                      "(FFLjava/lang/String;IIIIFFIIII)V");
     if (TextMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     ArcMethodID = (*env)->GetMethodID (env, cls, "addNativeArc",
                                 "(FFFFFFIIIIIFFII)V");
     if (ArcMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     FilledArcMethodID = (*env)->GetMethodID (env, cls, "addNativeFilledArc",
                                      "(FFFFFFIIIIIFFIII)V");
     if (FilledArcMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     ImageMethodID = (*env)->GetMethodID (env, cls, "addNativeImage",
                                       "(FFFFII[B[B[B[BIIII)V");
     if (ImageMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     FrameMethodID = (*env)->GetMethodID (env, cls, "addNativeFrame",
                                   "(FFFFDDDDIIIIILjava/lang/String;)V");
     if (FrameMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
   } /* end of first_call block */
 
+  jni_exit_monitor (v_jenv, v_jobj);
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Finished with method id assignment\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
+
 
 
 /*
@@ -682,6 +560,7 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
  * via the methods defined above.
  */
     ezx_process_command (
+                         v_jenv, v_jobj,
                          dlist_index,
                          GTX_DRAW_CURRENT_VIEW,
                          threadid,
@@ -694,14 +573,6 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
                          NULL,
                          NULL,
                          NULL);
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Returning from nativeDraw\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
     return;
 
@@ -779,14 +650,6 @@ void jni_call_add_fill_method (
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_fill_method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Allocate and fill the java array with the points.
  */
@@ -802,15 +665,6 @@ void jni_call_add_fill_method (
         npts*2,
         xy
     );
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 
 /*
  * Call the java object's method.
@@ -917,14 +771,6 @@ void jni_call_add_line_method (
     }
 
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_line_method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Allocate and fill the java array with the points.
  */
@@ -940,14 +786,6 @@ void jni_call_add_line_method (
         npts*2,
         xy
     );
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Call the java object's method.
@@ -1054,14 +892,6 @@ void jni_call_add_text_method (
         );
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_text_method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Allocate and fill the java string.
  */
@@ -1069,14 +899,6 @@ void jni_call_add_text_method (
     if (jtext == NULL) {
         return;
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Call the java object method.
@@ -1189,14 +1011,6 @@ void jni_call_add_arc_method (
           selectable
         );
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_arc_method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * call the java object method.
@@ -1314,16 +1128,6 @@ void jni_call_add_filled_arc_method (
         );
     }
 
-
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_filled_arc_method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * call the java object method.
  */
@@ -1377,14 +1181,6 @@ void jni_call_add_image_method (
     if (ImageMethodID == NULL) {
         return;
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_image_method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
     nt = ncol * nrow;
     jred = NULL;
@@ -1455,14 +1251,6 @@ void jni_call_add_image_method (
         nt,
         (jbyte *)trans
     );
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Call the java object method.
@@ -1574,15 +1362,11 @@ void jni_msg (char const *text)
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "%s", text);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 }
+
+
+
+
 
 JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
   (JNIEnv *env,
@@ -1598,6 +1382,9 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
     int              status;
     jint             ilist[10];
 
+    void  *v_jenv = (void *)env;
+    void  *v_jobj = (void *)obj;
+    
     threadid = (int)j_threadid;
 
     dlist_index = (int)j_dlist_index;
@@ -1608,15 +1395,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
     ilist[0] = j_frame_num;
     ilist[1] = j_ix;
     ilist[2] = j_iy;
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Completed GetIntArrayElements %p %p\n", j_ilist, ilist);
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 
 /*
  * The java object and environment are also needed for the calls to
@@ -1637,7 +1415,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
  */
 #if INT_MAX == 2147483647
     status =
-    ezx_process_command (dlist_index,
+    ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                          GTX_PICKPRIM,
                          threadid,
                          NULL,
@@ -1661,7 +1440,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
         }
     }
     status =
-    ezx_process_command (dlist_index,
+    ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                          GTX_PICKPRIM,
                          threadid,
                          NULLllist,
@@ -1674,14 +1454,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
                          NULL,
                          NULL);
 #endif
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Returning from nativeDraw\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
     return status;
 
@@ -1750,6 +1522,11 @@ static int setup_return_select_method_ids(JNIEnv  *env, jclass  cls) {
     return 1;
 }
 
+
+
+
+
+
 /*
  * Draw the selected objects from the current active display list
  * back to the Java side.
@@ -1761,16 +1538,11 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDrawSelected
     int              dlist_index;
     int              threadid;
 
+    void  *v_jenv = (void *)env;
+    void  *v_jobj = (void *)obj;
+    
 
     threadid = (int)j_threadid;
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\n\nCalling nativeDraw\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
     dlist_index = (int)j_dlist_index;
     threadid = (int)j_threadid;
@@ -1823,14 +1595,6 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDrawSelected
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Finished with method id assignment\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * The java object and environment are also needed for the calls back to draw.
  */
@@ -1843,6 +1607,7 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDrawSelected
  * via the methods defined above.
  */
     ezx_process_command (
+                         v_jenv, v_jobj,
                          dlist_index,
                          GTX_DRAW_SELECTED,
                          threadid,
@@ -1855,14 +1620,6 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDrawSelected
                          NULL,
                          NULL,
                          NULL);
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Returning from nativeSelectDraw\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
     return;
 
@@ -1919,14 +1676,6 @@ void jni_call_add_selected_fill (
     if (SelectFillMethodID == NULL) {
         return;
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_selected_fill\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Allocate and fill the java strings.
@@ -2023,14 +1772,6 @@ void jni_call_add_selected_fill (
         ncomp,
         npts
     );
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Correct for -1 color values.  If any color value is less than zero
@@ -2139,14 +1880,6 @@ void jni_call_add_selected_line (
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_selected_line\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Allocate and fill the java strings.
  */
@@ -2210,14 +1943,6 @@ void jni_call_add_selected_line (
         npts,
         yp
     );
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Correct for -1 color values.  If any color value is less than zero
@@ -2310,14 +2035,6 @@ void jni_call_add_selected_contour (
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_selected_contour\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Allocate and fill the java strings.
  */
@@ -2408,14 +2125,6 @@ void jni_call_add_selected_contour (
         npts,
         yp
     );
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Correct for -1 color values.  If any color value is less than zero
@@ -2516,14 +2225,6 @@ void jni_call_add_selected_rectangle (
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_selected_rectangle\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Allocate and fill the java strings.
  */
@@ -2553,14 +2254,6 @@ void jni_call_add_selected_rectangle (
             return;
         }
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Correct for -1 color values.  If any color value is less than zero
@@ -2678,14 +2371,6 @@ void jni_call_add_selected_arc (
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_selected_arc\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Allocate and fill the java strings.
  */
@@ -2715,14 +2400,6 @@ void jni_call_add_selected_arc (
             return;
         }
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Correct for -1 color values.  If any color value is less than zero
@@ -2846,14 +2523,6 @@ void jni_call_add_selected_text (
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_selected_text\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Allocate and fill the java strings.
  */
@@ -2894,14 +2563,6 @@ void jni_call_add_selected_text (
             return;
         }
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Correct for -1 color values.  If any color value is less than zero
@@ -3019,14 +2680,6 @@ void jni_call_add_selected_symb (
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_selected_symb\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Allocate and fill the java strings.
  */
@@ -3067,14 +2720,6 @@ void jni_call_add_selected_symb (
             return;
         }
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Correct for -1 color values.  If any color value is less than zero
@@ -3162,14 +2807,6 @@ void jni_call_add_selected_axis (
     if (SelectAxisMethodID == NULL) {
         return;
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_selected_axis\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Allocate and fill the java strings.
@@ -3262,19 +2899,7 @@ void jni_call_add_selected_axis (
 
 
 
-/*
- ************************************************************************
 
-                          n a t i v e E d i t
-
- ************************************************************************
-*/
-
-/*
- * Class:     csw_jeasyx_src_JDisplayListBase
- * Method:    nativeEdit
- * Signature: (II)I
- */
 JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
   (JNIEnv *env,
    jobject obj,
@@ -3288,6 +2913,9 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
     int              status;
     jint             ilist[10];
 
+    void  *v_jenv = (void *)env;
+    void  *v_jobj = (void *)obj;
+    
 
     threadid = (int)j_threadid;
 
@@ -3388,7 +3016,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
  */
 #if INT_MAX == 2147483647
     status =
-    ezx_process_command (dlist_index,
+    ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                          GTX_EDITPRIM,
                          threadid,
                          NULL,
@@ -3412,7 +3041,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
         }
     }
     status =
-    ezx_process_command (dlist_index,
+    ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                          GTX_EDITPRIM,
                          threadid,
                          NULLllist,
@@ -3429,6 +3059,10 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
     return status;
 
 }
+
+
+
+
 
 /*
  * Get the parts for the specified symbol.  This is a static method
@@ -3453,8 +3087,11 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_getNativeSymbolParts
     int     ilist[2];
     double  ddata[2];
 
-    int threadid;
+    long threadid;
 
+    void  *v_jenv = NULL;
+    void  *v_jobj = NULL;
+    
     JavaCls = cls;
     JavaEnv = env;
 
@@ -3503,6 +3140,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_getNativeSymbolParts
 
     istat =
     ezx_process_command (
+                         v_jenv, v_jobj,
                          0,
                          GTX_GET_SYMBOL_PARTS,
                          threadid,
@@ -3542,14 +3180,6 @@ void jni_call_add_symb_fill_method (
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_fill_method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Allocate and fill the java array with the points.
  */
@@ -3565,14 +3195,6 @@ void jni_call_add_symb_fill_method (
         npts*2,
         xy
     );
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Call the java object's method.
@@ -3625,14 +3247,6 @@ void jni_call_add_symb_line_method (
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_symb_line_method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Allocate and fill the java array with the points.
  */
@@ -3648,14 +3262,6 @@ void jni_call_add_symb_line_method (
         npts*2,
         xy
     );
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "Calling the actual java method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * Call the java object's method.
@@ -3711,14 +3317,6 @@ void jni_call_add_symb_arc_method (
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_arc_method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * call the java object method.
  */
@@ -3773,14 +3371,6 @@ void jni_call_add_symb_filled_arc_method (
     if (SymbFilledArcMethodID == NULL) {
         return;
     }
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_filled_arc_method\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
 
 /*
  * call the java object method.
@@ -3899,14 +3489,6 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_setFontMethods
 {
     jclass           cls;
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\n\nCalling nativeDraw\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
 /*
  * Find the Java class methods for getting font data.
  * The same method will be used by all threads, so the actual
@@ -3959,6 +3541,9 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_convertToFrame
     int              dlist_index, threadid;
     int              local_list[3];
 
+    void  *v_jenv = (void *)env;
+    void  *v_jobj = (void *)obj;
+    
 
     threadid = (int)j_threadid;
 
@@ -3988,6 +3573,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_convertToFrame
     local_list[2] = (int)y;
 
     ezx_process_command (
+                         v_jenv, v_jobj,
                          dlist_index,
                          GTX_CONVERT_TO_FRAME,
                          threadid,
@@ -4080,7 +3666,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
    jclass jobj,
    jint j_dlist_index,
    jint j_command_id,
-   jint j_thread_id,
+   jlong j_thread_id,
    jlongArray j_llist,
    jintArray j_ilist,
    jstring j_cdata,
@@ -4106,7 +3692,9 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
     jlong            *jllist;
     long             llist[100];
 
-
+    void  *v_jenv = NULL;
+    void  *v_jobj = NULL;
+    
 
     threadid = (int)j_thread_id;
 
@@ -4203,7 +3791,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
  */
 #if INT_MAX == 2147483647
     status =
-    ezx_process_command (dlist_index,
+    ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                          command_id,
                          threadid,
                          llist,
@@ -4241,7 +3830,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
     }
     if (ibad == 0) {
         status =
-        ezx_process_command (dlist_index,
+        ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                              command_id,
                              threadid,
                              llist,

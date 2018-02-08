@@ -31,7 +31,7 @@ import csw.jutils.src.XYZPolyline;
 
 public class JSurfaceWorksBase {
 
-    private int    initial_tid;
+    private long   initial_tid;
 
     JSurfaceWorksBase () {initial_tid = Thread.currentThread().hashCode();};
 
@@ -58,70 +58,51 @@ public class JSurfaceWorksBase {
 
 /*--------------------------------------------------------------------------*/
 
-    protected synchronized void endThread (int tid)
-    {
-/*
-        long status =
-        sendCommand (
-            SW_END_THREAD,
-            0,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            tid);
-*/
-    }
-
-    protected synchronized void endThread ()
-    {
-        //int    tid = Thread.currentThread().hashCode();
-
-/*
-        long status =
-        sendCommand (
-            SW_END_THREAD,
-            0,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            tid);
-*/
-    }
-
-/*--------------------------------------------------------------------------*/
-
   /**
    * Send a command that only needs the input integer list
    */
-    protected synchronized long sendNativeCommand (
+    protected long sendNativeCommand (
         int         command_id,
         int         expect_return,
         int[]       ilist
     )
     {
-        int    tid = Thread.currentThread().hashCode();
+        long   tid = Thread.currentThread().hashCode();
 
-        long status =
-        sendCommand (
-            command_id,
-            expect_return,
-            ilist,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            tid
-        );
+        long status = 0;
+
+        if (expect_return == 1) {
+          synchronized (this) {
+            status =
+            sendCommand (
+                command_id,
+                expect_return,
+                ilist,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                tid
+            );
+          }
+        }
+        else {
+            status =
+            sendCommand (
+                command_id,
+                expect_return,
+                ilist,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                tid
+            );
+        }
 
         return status;
     }
@@ -145,7 +126,7 @@ public class JSurfaceWorksBase {
             return -1;
         }
 
-        int    tid = Thread.currentThread().hashCode();
+        long   tid = Thread.currentThread().hashCode();
 
         long status =
         sendStaticCommand (
@@ -170,28 +151,50 @@ public class JSurfaceWorksBase {
    * Send a command that only needs the input integer list
    * and the double data list.
    */
-    protected synchronized long sendNativeCommand (
+    protected long sendNativeCommand (
         int         command_id,
         int         expect_return,
         int[]       ilist,
         double[]    ddata
     )
     {
-        int    tid = Thread.currentThread().hashCode();
+        long   tid = Thread.currentThread().hashCode();
 
-        long status =
-        sendCommand (
-            command_id,
-            expect_return,
-            ilist,
-            null,
-            null,
-            null,
-            null,
-            null,
-            ddata,
-            tid
-        );
+        long status = 0;
+
+        if (expect_return == 1) {
+          synchronized (this) {
+            status =
+            sendCommand (
+                command_id,
+                expect_return,
+                ilist,
+                null,
+                null,
+                null,
+                null,
+                null,
+                ddata,
+                tid
+            );
+          }
+        }
+        else {
+            status =
+            sendCommand (
+                command_id,
+                expect_return,
+                ilist,
+                null,
+                null,
+                null,
+                null,
+                null,
+                ddata,
+                tid
+            );
+        }
+
         return status;
     }
 
@@ -201,7 +204,7 @@ public class JSurfaceWorksBase {
    * Send a command that only needs the input integer list
    * and the double data list.
    */
-    protected synchronized long sendNativeCommand (
+    protected long sendNativeCommand (
         int         command_id,
         int         expect_return,
         int[]       ilist,
@@ -209,21 +212,42 @@ public class JSurfaceWorksBase {
         double[]    ddata
     )
     {
-        int    tid = Thread.currentThread().hashCode();
+        long   tid = Thread.currentThread().hashCode();
 
-        long status =
-        sendCommand (
-            command_id,
-            expect_return,
-            ilist,
-            null,
-            dlist,
-            null,
-            null,
-            null,
-            ddata,
-            tid
-        );
+        long status = 0;
+
+        if (expect_return == 1) {
+          synchronized (this) {
+            status =
+            sendCommand (
+                command_id,
+                expect_return,
+                ilist,
+                null,
+                dlist,
+                null,
+                null,
+                null,
+                ddata,
+                tid
+            );
+          }
+        }
+        else {
+            status =
+            sendCommand (
+                command_id,
+                expect_return,
+                ilist,
+                null,
+                dlist,
+                null,
+                null,
+                null,
+                ddata,
+                tid
+            );
+        }
 
         return status;
 
@@ -234,7 +258,7 @@ public class JSurfaceWorksBase {
   /**
    * Send a command that needs all possible parameters.
    */
-    protected synchronized long sendNativeCommand (
+    protected long sendNativeCommand (
         int         command_id,
         int         expect_return,
         int[]       ilist,
@@ -246,21 +270,42 @@ public class JSurfaceWorksBase {
         double[]    ddata
     )
     {
-        int    tid = Thread.currentThread().hashCode();
+        long   tid = Thread.currentThread().hashCode();
 
-        long status =
-        sendCommand (
-            command_id,
-            expect_return,
-            ilist,
-            llist,
-            dlist,
-            cdata,
-            idata,
-            fdata,
-            ddata,
-            tid
-        );
+        long status = 0;
+
+        if (expect_return == 1) {
+          synchronized (this) {
+            status =
+            sendCommand (
+                command_id,
+                expect_return,
+                ilist,
+                llist,
+                dlist,
+                cdata,
+                idata,
+                fdata,
+                ddata,
+                tid
+            );
+          }
+        }
+        else {
+            status =
+            sendCommand (
+                command_id,
+                expect_return,
+                ilist,
+                llist,
+                dlist,
+                cdata,
+                idata,
+                fdata,
+                ddata,
+                tid
+            );
+        }
 
         return status;
     }
@@ -283,7 +328,7 @@ public class JSurfaceWorksBase {
         int[]       idata,
         float[]     fdata,
         double[]    ddata,
-        int         tid
+        long        tid
     );
 
     protected native static long sendStaticCommand (
@@ -296,11 +341,11 @@ public class JSurfaceWorksBase {
         int[]       idata,
         float[]     fdata,
         double[]    ddata,
-        int         tid
+        long        tid
     );
 
   /*
-   * This is only for dll inclusion purposes.  It is never called.
+   * This is only for shared library inclusion purposes.  It is never called.
    */
     public native void bootMe ();
 

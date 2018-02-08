@@ -22,19 +22,15 @@
  *
  *  The ThreadGuard class is meant for keeping native language objects
  *  from interfering with each other when the java part of the code is
- *  running in a multi threaded manner.  The basic idea is that a 
- *  collection of threadid, ThreadGuardData pairs is kept in static 
- *  variables.  Objects that may collide are put into the ThreadGuardData
- *  object and they are retrieved via the threadid.  The threadid is
- *  passed by the csw java code with every jni function call.
+ *  running in a multi threaded manner.
  *
  *  No attempt is made to make this work with any c++ threading.  The
  *  member functions which can edit the guard_map collection must be
- *  protected using the MonitorEnter and MonitorExit functions.
+ *  protected using the EnterMonitor and ExitMonitor functions.
  *
  *  The objects that may interfere are those where the state must survive
  *  multiple jni calls.  Pointers to these objects are put into the
- *  ThreadGuardData object.
+ *  various stl collections managedd here.
  *
  *  Multi threading, especially with java and jni, can be tricky stuff.
  *  Think long and hard about implementing thread safety and subsequent
@@ -51,76 +47,31 @@
 namespace ThreadGuard
 {
 
-  class ThreadGuardData
-  {
+  PATCHSplit *GetPatchSplit (long jside_id);
+  GRDVert *GetGrdVert (long jside_id);
+  long    CreateGrdVert (long jside_id);
+  CSWGrdAPI *GetGrdAPI (long jside_id);
+  long    CreateGrdAPI (long jside_id);
+  SWCalc *GetSWCalc (long jside_id);
 
-   public:
+  CanvasManager  *GetCanvasManager ();
 
-    PATCHSplit  *psplit = NULL;
-    GRDVert     *gvert = NULL;
-    CSWGrdAPI   *grdapi = NULL;
-    SWCalc      *swcalc = NULL;
-    FILE        *swlogfile = NULL;
-    FILE        *saveswlogfile = NULL;
-    FILE        *ezlogfile = NULL;
+  FILE *GetSWLogFile (long jside_id);
+  FILE *GetSWSaveLogFile (long jside_id);
 
-    CanvasManager  *canvas_manager = NULL;
+  void SetSWLogFiles (long jside_id, FILE *log, FILE *save);
 
-  /*
-   *  I have not been able to compile any file with the
-   *  java 8 jni headers using the fedora 26 g++ compiler.
-   *  Since this ThreadGuard definition needs to be
-   *  included in c++ files, I cannot use structures 
-   *  from the jni headers.  The use of void pointers
-   *  here is a work around for the header file issue.
-   */
-    void        *v_jenv = NULL;
-    void        *v_jobj = NULL;
+  FILE *GetEZLogFile (long jside_id);
+  void SetEZLogFile (long jside_id, FILE *log);
 
-    ThreadGuardData () {};
-    ~ThreadGuardData ()
-    {  
-        if (swlogfile) fclose (swlogfile);
-        swlogfile = NULL;
-        if (saveswlogfile) fclose (saveswlogfile);
-        saveswlogfile = NULL;
-        if (ezlogfile) fclose (ezlogfile);
-        ezlogfile = NULL;
+  void RemovePatchSplit (long jside_id);
+  void RemoveGRDVert (long jside_id);
+  void RemoveGrdAPI (long jside_id);
+  void RemoveSWCalc (long jside_id);
+  void RemoveSWLogFiles (long jside_id);
+  void RemoveEZLogFile (long jside_id);
 
-        delete (psplit);
-        psplit = NULL;
-        delete (gvert);
-        gvert = NULL;
-        delete (grdapi);
-        grdapi = NULL;
-        delete (swcalc);
-        swcalc = NULL;
-        delete canvas_manager;
-        canvas_manager = NULL;
-    };
-    
-  };  // end of ThreadGuardData class
-
-  PATCHSplit *GetPatchSplit (int threadid);
-  GRDVert *GetGRDVert (int threadid);
-  CSWGrdAPI *GetGrdAPI (int threadid);
-  SWCalc *GetSWCalc (int threadid);
-
-  CanvasManager  *GetCanvasManager (int threadid);
-
-  FILE *GetSWLogFile (int threadid);
-  FILE *GetSWSaveLogFile (int threadid);
-
-  void SetSWLogFiles (int threadid, FILE *log, FILE *save);
-
-  FILE *GetEZLogFile (int threadid);
-  void SetEZLogFile (int threadid, FILE *log);
-
-  void RemoveThreadData (int threadid);
   void RemoveAllThreadData (void);
-
-  void *GetVoidJenv (int threadid, void *v_jenv);
-  void *GetVoidJobj (int threadid, void *v_jobj);
 
 }; // end of namespace
 
