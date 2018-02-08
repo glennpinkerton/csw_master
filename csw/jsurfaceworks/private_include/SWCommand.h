@@ -121,7 +121,7 @@ extern "C" {
 
 long sw_process_command (
     int               command_id,
-    int               threadid,
+    long              threadid,
     int               *ilist,
     long              *llist,
     double            *dlist,

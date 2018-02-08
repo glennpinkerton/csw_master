@@ -18,11 +18,11 @@
         </Root>
         <Logger name="csw_utest" level="INFO" additivity="false">
             <AppenderRef ref="Console" level="off"/>
-            <AppenderRef ref="TestFile" level="info"/>
+            <AppenderRef ref="TestFile" level="off"/>
         </Logger>
         <Logger name="csw_run" level="INFO" additivity="false">
-            <AppenderRef ref="Console" level="error"/>
-            <AppenderRef ref="RunFile" level="info"/>
+            <AppenderRef ref="Console" level="off"/>
+            <AppenderRef ref="RunFile" level="off"/>
         </Logger>
     </Loggers>
 </Configuration>

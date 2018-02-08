@@ -131,7 +131,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
    jobject jobj,
    jint j_dlist_index,
    jint j_command_id,
-   jint j_thread_id,
+   jlong j_thread_id,
    jlongArray j_llist,
    jintArray j_ilist,
    jstring j_cdata,
@@ -144,7 +144,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
 ) {
     int              status, i;
     int              command_id;
-    int              threadid;
+    long             threadid;
     int              dlist_index;
     char             *cdata;
     unsigned char    *bdata;
@@ -158,7 +158,10 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
     long             llist[100];
 
 
-    threadid = (int)j_thread_id;
+    void  *v_jenv = (void *)jnienv;
+    void  *v_jobj = (void *)jobj;
+    
+    threadid = (long)j_thread_id;
 
 /*
  *  This block of code can be uncommented to enable debug of
@@ -287,7 +290,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
  */
 #if INT_MAX == 2147483647
     status =
-    ezx_process_command (dlist_index,
+    ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                          command_id,
                          threadid,
                          llist,
@@ -325,7 +329,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
     }
     if (ibad == 0) {
         status =
-        ezx_process_command (dlist_index,
+        ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                              command_id,
                              threadid,
                              llist,
@@ -391,6 +396,49 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
 
 
 
+void jni_enter_monitor (void *v_jenv, void * v_jobj) 
+{
+
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv    *jnienv = (JNIEnv *)v_jenv;
+    jobject   jobj = (jobject)v_jobj;
+
+    jint   moni_stat;
+    moni_stat = (*jnienv)->MonitorEnter(jnienv, jobj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return;
+    }
+
+}
+
+
+
+
+void jni_exit_monitor (void *v_jenv, void * v_jobj) 
+{
+
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv    *jnienv = (JNIEnv *)v_jenv;
+    jobject   jobj = (jobject)v_jobj;
+
+    jint   moni_stat;
+    moni_stat = (*jnienv)->MonitorExit(jnienv, jobj);
+    if (moni_stat < 0) {
+        printf ("Error entering java monitor from line %d\n", __LINE__);
+        return;
+    }
+
+}
+
+
+
 
 /*
  *  Draw the current active display list back to the Java side.
@@ -401,7 +449,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
  *  same JNIEnv and jobject as are specified in the parameters of
  *  this function.
  *
- *  I tried to use MonitorEnter and MonitorExit to bracket putting 
+ *  I tried to use EnterMonitor and ExitMonitor to bracket putting 
  *  the JNIEnv and jobject into a static list, but I never got it
  *  to work well, even with only a single thread.  I believe it is
  *  better to use synchronized methods in the java code to lock any
@@ -414,6 +462,9 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
     jclass           cls;
     int              dlist_index, threadid;
 
+    void  *v_jenv = (void *)env;
+    void  *v_jobj = (void *)obj;
+    
     static int       first_call = 1;
 
     dlist_index = (int)j_dlist_index;
@@ -425,6 +476,8 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
  * class.  They should be thread safe cached since they are not
  * changed after initial assignment.
  */
+
+  jni_enter_monitor (v_jenv, v_jobj);
  
   if (first_call == 1) {
 
@@ -435,52 +488,63 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
     int    sel_stat = 
     setup_return_select_method_ids(env, cls);
     if (sel_stat == -1) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     FillMethodID = (*env)->GetMethodID (env, cls, "addNativeFill",
                                      "([FFFIIIIIIII)V");
     if (FillMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     LineMethodID = (*env)->GetMethodID (env, cls, "addNativeLine",
                                      "([FIIIIIIFIII)V");
     if (LineMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     TextMethodID = (*env)->GetMethodID (env, cls, "addNativeText",
                                      "(FFLjava/lang/String;IIIIFFIIII)V");
     if (TextMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     ArcMethodID = (*env)->GetMethodID (env, cls, "addNativeArc",
                                 "(FFFFFFIIIIIFFII)V");
     if (ArcMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     FilledArcMethodID = (*env)->GetMethodID (env, cls, "addNativeFilledArc",
                                      "(FFFFFFIIIIIFFIII)V");
     if (FilledArcMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     ImageMethodID = (*env)->GetMethodID (env, cls, "addNativeImage",
                                       "(FFFFII[B[B[B[BIIII)V");
     if (ImageMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
     FrameMethodID = (*env)->GetMethodID (env, cls, "addNativeFrame",
                                   "(FFFFDDDDIIIIILjava/lang/String;)V");
     if (FrameMethodID == NULL) {
+        jni_exit_monitor (v_jenv, v_jobj);
         return;
     }
 
   } /* end of first_call block */
+
+  jni_exit_monitor (v_jenv, v_jobj);
+
 
 
 
@@ -496,6 +560,7 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
  * via the methods defined above.
  */
     ezx_process_command (
+                         v_jenv, v_jobj,
                          dlist_index,
                          GTX_DRAW_CURRENT_VIEW,
                          threadid,
@@ -1317,6 +1382,9 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
     int              status;
     jint             ilist[10];
 
+    void  *v_jenv = (void *)env;
+    void  *v_jobj = (void *)obj;
+    
     threadid = (int)j_threadid;
 
     dlist_index = (int)j_dlist_index;
@@ -1347,7 +1415,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
  */
 #if INT_MAX == 2147483647
     status =
-    ezx_process_command (dlist_index,
+    ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                          GTX_PICKPRIM,
                          threadid,
                          NULL,
@@ -1371,7 +1440,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
         }
     }
     status =
-    ezx_process_command (dlist_index,
+    ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                          GTX_PICKPRIM,
                          threadid,
                          NULLllist,
@@ -1468,6 +1538,9 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDrawSelected
     int              dlist_index;
     int              threadid;
 
+    void  *v_jenv = (void *)env;
+    void  *v_jobj = (void *)obj;
+    
 
     threadid = (int)j_threadid;
 
@@ -1534,6 +1607,7 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDrawSelected
  * via the methods defined above.
  */
     ezx_process_command (
+                         v_jenv, v_jobj,
                          dlist_index,
                          GTX_DRAW_SELECTED,
                          threadid,
@@ -2839,6 +2913,9 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
     int              status;
     jint             ilist[10];
 
+    void  *v_jenv = (void *)env;
+    void  *v_jobj = (void *)obj;
+    
 
     threadid = (int)j_threadid;
 
@@ -2939,7 +3016,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
  */
 #if INT_MAX == 2147483647
     status =
-    ezx_process_command (dlist_index,
+    ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                          GTX_EDITPRIM,
                          threadid,
                          NULL,
@@ -2963,7 +3041,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
         }
     }
     status =
-    ezx_process_command (dlist_index,
+    ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                          GTX_EDITPRIM,
                          threadid,
                          NULLllist,
@@ -3008,8 +3087,11 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_getNativeSymbolParts
     int     ilist[2];
     double  ddata[2];
 
-    int threadid;
+    long threadid;
 
+    void  *v_jenv = NULL;
+    void  *v_jobj = NULL;
+    
     JavaCls = cls;
     JavaEnv = env;
 
@@ -3058,6 +3140,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_getNativeSymbolParts
 
     istat =
     ezx_process_command (
+                         v_jenv, v_jobj,
                          0,
                          GTX_GET_SYMBOL_PARTS,
                          threadid,
@@ -3458,6 +3541,9 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_convertToFrame
     int              dlist_index, threadid;
     int              local_list[3];
 
+    void  *v_jenv = (void *)env;
+    void  *v_jobj = (void *)obj;
+    
 
     threadid = (int)j_threadid;
 
@@ -3487,6 +3573,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_convertToFrame
     local_list[2] = (int)y;
 
     ezx_process_command (
+                         v_jenv, v_jobj,
                          dlist_index,
                          GTX_CONVERT_TO_FRAME,
                          threadid,
@@ -3579,7 +3666,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
    jclass jobj,
    jint j_dlist_index,
    jint j_command_id,
-   jint j_thread_id,
+   jlong j_thread_id,
    jlongArray j_llist,
    jintArray j_ilist,
    jstring j_cdata,
@@ -3605,7 +3692,9 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
     jlong            *jllist;
     long             llist[100];
 
-
+    void  *v_jenv = NULL;
+    void  *v_jobj = NULL;
+    
 
     threadid = (int)j_thread_id;
 
@@ -3702,7 +3791,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
  */
 #if INT_MAX == 2147483647
     status =
-    ezx_process_command (dlist_index,
+    ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                          command_id,
                          threadid,
                          llist,
@@ -3740,7 +3830,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
     }
     if (ibad == 0) {
         status =
-        ezx_process_command (dlist_index,
+        ezx_process_command (v_jenv, v_jobj,
+                         dlist_index,
                              command_id,
                              threadid,
                              llist,

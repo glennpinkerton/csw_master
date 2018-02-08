@@ -1,4 +1,4 @@
-#!/bin/bash  -v
+#!/bin/bash
 
 export classpath=$CSW_PARENT
 lpath=/usr/java/jdk1.8.0_152/jre/lib/amd64

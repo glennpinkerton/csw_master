@@ -32,6 +32,8 @@ import csw.jutils.src.CSWLogger;
 import csw.jsurfaceworks.src.Grid;
 import csw.jsurfaceworks.src.TriMesh;
 
+import csw.jeasyx.src.JDLFrame;
+
 
 /**
   This class has the API functions to draw to and otherwise
@@ -228,6 +230,8 @@ public class JDisplayList extends JDisplayListBase {
 
     private static ArrayList<Integer>      finalizedIDList = 
 		new ArrayList<Integer> ();
+    private static ArrayList<JDisplayList>      finalizedDPList = 
+		new ArrayList<JDisplayList> ();
     private static boolean        cleanupNeeded = false;
 
 /**
@@ -244,6 +248,7 @@ public class JDisplayList extends JDisplayListBase {
         Integer i = new Integer (nativeDlistID);
 
         finalizedIDList.add (i);
+        finalizedDPList.add (this);
 
         if (cleanupNeeded) {
             return;
@@ -271,7 +276,7 @@ public class JDisplayList extends JDisplayListBase {
 
   /*
    * This method calls native code to free all the memory associated with
-   * the finalized trimesh objects currently on the list.  This must complete
+   * the finalized graphical objects currently on the list.  This must complete
    * without thread switching, so it is declared synchronized.
    */
     static private synchronized void cleanupFinalizedDisplayList ()
@@ -284,8 +289,11 @@ public class JDisplayList extends JDisplayListBase {
 
         size = finalizedIDList.size ();
         for (i=0; i<size; i++) {
+            JDisplayList jdl = finalizedDPList.get (i);
+            JDLFrame.markFrameAsDeleted (jdl);
             iobj = finalizedIDList.get (i);
             ilist[0] = iobj.intValue();
+
             sendStaticNativeCommand (
                 ilist[0],
                 GTX_DELETEWINDOW,

@@ -67,6 +67,7 @@ class CDisplayList {
 private:
 
     CSWGrdAPI    *grdapi_ptr = NULL;
+    CSWGrdAPI    grdapi_obj;
 
     GPFGraph     gpf_graph_obj;
     GPFCalcdraw  gpf_calcdraw_obj;
@@ -86,13 +87,11 @@ public:
     CDisplayList &operator=(const CDisplayList &old);
     virtual ~CDisplayList();
 
-    void SetGrdAPIPtr (CSWGrdAPI *p) {grdapi_ptr = p;};
-
-    void SetVoidJavaAreaPtrs (void *v_jenv_in, void *v_jobj_in) 
-    {
-         ezx_java_obj.SetJNIPtrs (v_jenv_in, v_jobj_in);
-    }
-
+/*
+    void SetGrdAPIPtr (CSWGrdAPI *p) {
+      grdapi_ptr = p;
+    };
+*/
 
     int gtx_SendBackSymbolParts (int symb, 
                                  double dsize,

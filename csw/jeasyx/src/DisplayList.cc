@@ -62,6 +62,7 @@ CDisplayList::CDisplayList()
 {
     int          i;
 
+    grdapi_ptr = &(grdapi_obj);
     gtx_drawprim_obj.SetEZXJavaPtr (&ezx_java_obj);
 
     dfile = NULL;
@@ -2996,7 +2997,9 @@ int CDisplayList::AddFill (double *xptsin, double *yptsin,
     fptr = fp_data + next_fill;
     fptr->x_orig = x_orig;
     fptr->y_orig = y_orig;
+    x_orig = y_orig = NULL;
     fptr->npts_orig = npts_orig;
+    npts_orig = NULL;
     fptr->ncomp_orig = ncomp;
 
     fptr->maxpts = nptot;
