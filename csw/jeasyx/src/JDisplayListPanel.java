@@ -275,6 +275,11 @@ public class JDisplayListPanel extends JPanel
             height = getHeight ();
         }
 
+            x = 0;
+            y = 0;
+            width = getWidth ();
+            height = getHeight ();
+
         dlist.drawToDevice (g2d, x, y, width, height);
 
     }
@@ -326,11 +331,6 @@ public class JDisplayListPanel extends JPanel
             return;
         }
 
-System.out.println ();
-System.out.println ("panel finalize called");
-System.out.println ();
-System.out.flush ();
-
         finalizedDlist.add (dlist);
 
         if (cleanupNeeded) {
@@ -346,11 +346,6 @@ System.out.flush ();
                 JDisplayListPanel.cleanupFinalizedPanel ();
             }
         };
-
-System.out.println ();
-System.out.println ("panel finalize invoke called");
-System.out.println ();
-System.out.flush ();
 
         SwingUtilities.invokeLater (cleanup);
 

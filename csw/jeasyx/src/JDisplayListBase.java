@@ -119,7 +119,7 @@ class JDisplayListBase extends DLConst {
     {
         needsNativeRedraw = 1;
 
-        long  threadid = this.hashCode();
+        int  threadid = Thread.currentThread().hashCode();
 
         int status =
         sendCommand (
@@ -154,7 +154,7 @@ class JDisplayListBase extends DLConst {
     {
         needsNativeRedraw = 1;
 
-        long threadid = this.hashCode();
+        int  threadid = Thread.currentThread().hashCode();
 
         int status =
         sendCommand (
@@ -182,7 +182,7 @@ class JDisplayListBase extends DLConst {
     )
     {
 
-        long threadid = Thread.currentThread().hashCode();
+        int  threadid = Thread.currentThread().hashCode();
 
         int status =
         sendStaticCommand (
@@ -215,7 +215,7 @@ class JDisplayListBase extends DLConst {
     {
         needsNativeRedraw = 1;
 
-        long threadid = this.hashCode();
+        int  threadid = Thread.currentThread().hashCode();
 
         int status =
         sendCommand (
@@ -249,7 +249,7 @@ class JDisplayListBase extends DLConst {
     {
         needsNativeRedraw = 1;
 
-        long threadid = this.hashCode();
+        int  threadid = Thread.currentThread().hashCode();
 
         int status =
         sendCommand (
@@ -284,7 +284,7 @@ class JDisplayListBase extends DLConst {
     {
         needsNativeRedraw = 1;
 
-        long threadid = this.hashCode();
+        int  threadid = Thread.currentThread().hashCode();
 
         int status =
         sendCommand (
@@ -320,7 +320,7 @@ class JDisplayListBase extends DLConst {
     {
         needsNativeRedraw = 1;
 
-        long threadid = this.hashCode();
+        int  threadid = Thread.currentThread().hashCode();
 
         int status =
         sendCommand (
@@ -359,7 +359,7 @@ class JDisplayListBase extends DLConst {
     {
         needsNativeRedraw = 1;
 
-        long threadid = this.hashCode();
+        int  threadid = Thread.currentThread().hashCode();
 
         int status =
         sendCommand (
@@ -393,7 +393,7 @@ class JDisplayListBase extends DLConst {
     protected native int sendCommand (
         int         nativeDlistID,
         int         command_id,
-        long        threadid,
+        int         threadid,
         long[]      llist,
         int[]       ilist,
         String      cdata,
@@ -408,7 +408,7 @@ class JDisplayListBase extends DLConst {
     protected native static int sendStaticCommand (
         int         nativeDlistID,
         int         command_id,
-        long        threadid,
+        int         threadid,
         long[]      llist,
         int[]       ilist,
         String      cdata,
@@ -1306,7 +1306,7 @@ class JDisplayListBase extends DLConst {
         screenWidth = width;
         screenHeight = height;
 
-        int threadid = this.hashCode();
+        int threadid = Thread.currentThread().hashCode();
 
         if (needsNativeRedraw == 1) {
 
@@ -1402,28 +1402,23 @@ class JDisplayListBase extends DLConst {
             return false;
         }
 
-        int threadid = this.hashCode();
+        int threadid = Thread.currentThread().hashCode();
 
-        int  istat = -1;
-        synchronized (this) {
-          istat =
-          nativePick (nativeDlistID,
-                      threadid,
-                      frame.frame_num,
-                      ix, iy);
-        }
+        int istat =
+        nativePick (nativeDlistID,
+                    threadid,
+                    frame.frame_num,
+                    ix, iy);
 
         if (istat == -1) {
             selectionAvailable = false;
             return false;
         }
 
-        synchronized (this) {
-          convertToFrame (nativeDlistID,
-                          threadid,
-                          frame.frame_num,
-                          ix, iy);
-        }
+        convertToFrame (nativeDlistID,
+                        threadid,
+                        frame.frame_num,
+                        ix, iy);
 
         setNativeSelectDrawNeeded (1);
 
@@ -1803,7 +1798,6 @@ class JDisplayListBase extends DLConst {
      * If needed, the foreground image is drawn.  It has transparent
      * background pixels.
      */
-
         if (foregroundFlag == 1) {
             if (foregroundImage != null) {
                 g2d.drawImage (
@@ -1930,7 +1924,7 @@ class JDisplayListBase extends DLConst {
 
         clearSelectedPrims ();
 
-        int threadid = this.hashCode();
+        int threadid = Thread.currentThread().hashCode();
 
         int istat =
         nativeEdit (nativeDlistID,
@@ -3091,18 +3085,16 @@ class JDisplayListBase extends DLConst {
         convertedY = 1.e30;
         convertedZ = 1.e30;
 
-        int threadid = this.hashCode();
+        int threadid = Thread.currentThread().hashCode();
 
-        synchronized (this) {
-          convertToFrame (nativeDlistID,
-                          threadid,
-                          frame.frame_num,
-                          ix, iy);
+        convertToFrame (nativeDlistID,
+                        threadid,
+                        frame.frame_num,
+                        ix, iy);
 
-          if (convertedX > 1.e20  ||
-              convertedY > 1.e20) {
-              return;
-          }
+        if (convertedX > 1.e20  ||
+            convertedY > 1.e20) {
+            return;
         }
 
         boolean doPopup;
@@ -3716,7 +3708,7 @@ class JDisplayListBase extends DLConst {
   of text strings.  The boundsOut array is allocated on the native side
   and is filled in here.
   */
-    private synchronized void getTextBounds (
+    private void getTextBounds (
         String       text,
         int          fontNumber,
         double       fontSize,

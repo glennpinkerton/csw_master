@@ -22,6 +22,7 @@ import java.util.Iterator;
 import javax.swing.SwingUtilities;
 
 
+//import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
@@ -32,14 +33,13 @@ import csw.jutils.src.CSWLogger;
 import csw.jsurfaceworks.src.Grid;
 import csw.jsurfaceworks.src.TriMesh;
 
-import csw.jeasyx.src.JDLFrame;
-
 
 /**
   This class has the API functions to draw to and otherwise
   interact with and manage the 2D graphics display list.  This
   class is meant to be a collection of services to draw and
-  select to and from the screen.
+  select to and from the screen.  The display list itself cannot
+  be extended by an application.
 
   @author Glenn Pinkerton
 
@@ -230,8 +230,6 @@ public class JDisplayList extends JDisplayListBase {
 
     private static ArrayList<Integer>      finalizedIDList = 
 		new ArrayList<Integer> ();
-    private static ArrayList<JDisplayList>      finalizedDPList = 
-		new ArrayList<JDisplayList> ();
     private static boolean        cleanupNeeded = false;
 
 /**
@@ -248,7 +246,6 @@ public class JDisplayList extends JDisplayListBase {
         Integer i = new Integer (nativeDlistID);
 
         finalizedIDList.add (i);
-        finalizedDPList.add (this);
 
         if (cleanupNeeded) {
             return;
@@ -276,7 +273,7 @@ public class JDisplayList extends JDisplayListBase {
 
   /*
    * This method calls native code to free all the memory associated with
-   * the finalized graphical objects currently on the list.  This must complete
+   * the finalized trimesh objects currently on the list.  This must complete
    * without thread switching, so it is declared synchronized.
    */
     static private synchronized void cleanupFinalizedDisplayList ()
@@ -289,11 +286,8 @@ public class JDisplayList extends JDisplayListBase {
 
         size = finalizedIDList.size ();
         for (i=0; i<size; i++) {
-            JDisplayList jdl = finalizedDPList.get (i);
-            JDLFrame.markFrameAsDeleted (jdl);
             iobj = finalizedIDList.get (i);
             ilist[0] = iobj.intValue();
-
             sendStaticNativeCommand (
                 ilist[0],
                 GTX_DELETEWINDOW,
@@ -3537,7 +3531,7 @@ of Font.BOLD|Font.ITALIC.
    the display list.  It will calculate all the very simple primitives and send
    them to Java for drawing.
   */
-    public synchronized int redraw ()
+    public int redraw ()
     {
 
         sendNativeCommand (
@@ -5229,7 +5223,7 @@ of Font.BOLD|Font.ITALIC.
 
 /*--------------------------------------------------------------------*/
 
-    synchronized void readSelectable (int selNum)
+    void readSelectable (int selNum)
     {
         Ilist[0] = selNum;
         sendNativeCommand (
