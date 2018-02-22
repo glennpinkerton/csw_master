@@ -28,7 +28,6 @@ JAVA_SRC=\
  DLZoomPanListener.java\
  FontUtils.java\
  JDisplayList.java\
- JDLFrame.java\
  JDisplayListPanel.java\
  JDLEditListener.java\
  JLineEditor.java\
@@ -66,7 +65,6 @@ JAVA_CLASSES=\
  DLZoomPanListener.class\
  FontUtils.class\
  JDisplayList.class\
- JDLFrame.class\
  JDisplayListPanel.class\
  JDLEditListener.class\
  JLineEditor.class\

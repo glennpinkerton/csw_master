@@ -14,6 +14,7 @@ package csw.jsurfaceworks.src;
 
 import java.util.ArrayList;
 import java.util.Date;
+//import java.util.Iterator;
 
 import javax.swing.SwingUtilities;
 
@@ -208,6 +209,8 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
                      null);
         //isPaused = false;
 
+        //jsw.endThread ();
+
         return status;
     }
 
@@ -269,6 +272,8 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
             null,
             data);
 
+        //jsw.endThread ();
+
         return;
 
     }
@@ -300,6 +305,8 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
             0,
             null,
             data);
+
+        //jsw.endThread ();
 
         return;
 
@@ -346,6 +353,8 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
             null,
             data);
 
+        //jsw.endThread ();
+
         return;
 
     }
@@ -390,6 +399,8 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
             0,
             null,
             data);
+
+        //jsw.endThread ();
 
         return;
 
@@ -1275,6 +1286,8 @@ set to false if the trimesh is for anything else.
                            ilist,
                            ddata);
 
+        //jsw.endThread ();
+
         return (int)istat;
     }
 
@@ -1396,6 +1409,8 @@ set to false if the trimesh is for anything else.
                            0,
                            ilist,
                            ddata);
+        //jsw.endThread ();
+
         return;
     }
 
@@ -4465,6 +4480,8 @@ or set to false if the trimesh will be used for anything else.
 
         JSurfaceWorks jsw = new JSurfaceWorks ();
         jsw.calcDrapedPoints ((TriMesh)null, (ArrayList<XYZPolyline>)null);
+        //jsw.endThread ();
+
 
         return;
     }

@@ -440,18 +440,18 @@ extern "C" {
 /*
  * Class:     csw_jeasyx_src_JDisplayListBase
  * Method:    sendCommand
- * Signature: (IIJ[J[ILjava/lang/String;[Z[S[I[F[DI)I
+ * Signature: (III[J[ILjava/lang/String;[Z[S[I[F[DI)I
  */
 JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
-  (JNIEnv *, jobject, jint, jint, jlong, jlongArray, jintArray, jstring, jbooleanArray, jshortArray, jintArray, jfloatArray, jdoubleArray, jint);
+  (JNIEnv *, jobject, jint, jint, jint, jlongArray, jintArray, jstring, jbooleanArray, jshortArray, jintArray, jfloatArray, jdoubleArray, jint);
 
 /*
  * Class:     csw_jeasyx_src_JDisplayListBase
  * Method:    sendStaticCommand
- * Signature: (IIJ[J[ILjava/lang/String;[Z[S[I[F[DI)I
+ * Signature: (III[J[ILjava/lang/String;[Z[S[I[F[DI)I
  */
 JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
-  (JNIEnv *, jclass, jint, jint, jlong, jlongArray, jintArray, jstring, jbooleanArray, jshortArray, jintArray, jfloatArray, jdoubleArray, jint);
+  (JNIEnv *, jclass, jint, jint, jint, jlongArray, jintArray, jstring, jbooleanArray, jshortArray, jintArray, jfloatArray, jdoubleArray, jint);
 
 /*
  * Class:     csw_jeasyx_src_JDisplayListBase

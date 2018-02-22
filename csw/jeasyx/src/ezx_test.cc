@@ -149,7 +149,6 @@ int main (int argc, char *argv[])
             case GTX_DRAW_CURRENT_VIEW:
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -169,7 +168,6 @@ int main (int argc, char *argv[])
             case GTX_DRAW_SELECTED:
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -189,7 +187,6 @@ int main (int argc, char *argv[])
             case GTX_UNSELECT_ALL:
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -222,7 +219,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -242,7 +238,6 @@ int main (int argc, char *argv[])
             case GTX_DEFAULT_ATTRIB:
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -287,7 +282,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -315,7 +309,6 @@ int main (int argc, char *argv[])
                 strcpy (cdata, inbuff);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -343,7 +336,6 @@ int main (int argc, char *argv[])
                 sscanf (inbuff, "%d", ilist+0);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -376,7 +368,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -412,7 +403,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -492,7 +482,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -558,7 +547,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -619,7 +607,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -648,7 +635,6 @@ int main (int argc, char *argv[])
                 strcpy (cdata, inbuff);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -682,7 +668,6 @@ int main (int argc, char *argv[])
                         ilist+4);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -721,7 +706,6 @@ int main (int argc, char *argv[])
                 }
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -776,7 +760,6 @@ int main (int argc, char *argv[])
                 }
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -809,7 +792,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -848,7 +830,6 @@ int main (int argc, char *argv[])
                 strcpy (cdata, inbuff);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -883,7 +864,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -921,7 +901,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1041,7 +1020,6 @@ int main (int argc, char *argv[])
                 }
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1075,7 +1053,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1108,7 +1085,6 @@ int main (int argc, char *argv[])
                );
 
                ezx_process_command (
-                    NULL, NULL,
                    dlist_index,
                    command_id,
                    threadid,
@@ -1137,7 +1113,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1177,7 +1152,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1206,7 +1180,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1245,7 +1218,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1272,7 +1244,6 @@ int main (int argc, char *argv[])
                 sscanf (inbuff, "%d", ilist+0);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1304,7 +1275,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1336,7 +1306,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1363,7 +1332,6 @@ int main (int argc, char *argv[])
                 sscanf (inbuff, "%d", ilist+0);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1393,7 +1361,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1423,7 +1390,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1450,7 +1416,6 @@ int main (int argc, char *argv[])
                 sscanf (inbuff, "%d", ilist+0);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1477,7 +1442,6 @@ int main (int argc, char *argv[])
                 sscanf (inbuff, "%d", ilist+0);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1504,7 +1468,6 @@ int main (int argc, char *argv[])
                 sscanf (inbuff, "%d", ilist+0);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1531,7 +1494,6 @@ int main (int argc, char *argv[])
                 sscanf (inbuff, "%lf", ddata+0);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1558,7 +1520,6 @@ int main (int argc, char *argv[])
                 sscanf (inbuff, "%lf", ddata+0);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1585,7 +1546,6 @@ int main (int argc, char *argv[])
                sscanf (inbuff, "%d", ilist+0);
 
                ezx_process_command (
-                    NULL, NULL,
                    dlist_index,
                    command_id,
                    threadid,
@@ -1612,7 +1572,6 @@ int main (int argc, char *argv[])
                 sscanf (inbuff, "%d", ilist+0);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1641,7 +1600,6 @@ int main (int argc, char *argv[])
                     ddata+1);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1680,7 +1638,6 @@ int main (int argc, char *argv[])
                 }
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1707,7 +1664,6 @@ int main (int argc, char *argv[])
                 strcpy (cdata, inbuff);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1740,7 +1696,6 @@ int main (int argc, char *argv[])
                 );
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1767,7 +1722,6 @@ int main (int argc, char *argv[])
                 strcpy (cdata, inbuff);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1794,7 +1748,6 @@ int main (int argc, char *argv[])
                 strcpy (cdata, inbuff);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1814,7 +1767,6 @@ int main (int argc, char *argv[])
             case GTX_UNSETLAYER:
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1834,7 +1786,6 @@ int main (int argc, char *argv[])
             case GTX_UNSETITEM:
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1854,7 +1805,6 @@ int main (int argc, char *argv[])
             case GTX_UNSETFRAME:
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1908,7 +1858,6 @@ int main (int argc, char *argv[])
                 }
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -1967,7 +1916,6 @@ int main (int argc, char *argv[])
                 }
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -2054,7 +2002,6 @@ int main (int argc, char *argv[])
                }
 
                ezx_process_command (
-                    NULL, NULL,
                    dlist_index,
                    command_id,
                    threadid,
@@ -2109,7 +2056,6 @@ int main (int argc, char *argv[])
                }
 
                ezx_process_command (
-                    NULL, NULL,
                    dlist_index,
                    command_id,
                    threadid,
@@ -2130,7 +2076,6 @@ int main (int argc, char *argv[])
            case GTX_DELETE_SELECTED:
 
                ezx_process_command (
-                    NULL, NULL,
                    dlist_index,
                    command_id,
                    threadid,
@@ -2151,7 +2096,6 @@ int main (int argc, char *argv[])
            case GTX_HIDE_SELECTED:
 
                ezx_process_command (
-                    NULL, NULL,
                    dlist_index,
                    command_id,
                    threadid,
@@ -2172,7 +2116,6 @@ int main (int argc, char *argv[])
            case GTX_UNHIDE_ALL:
 
                ezx_process_command (
-                    NULL, NULL,
                    dlist_index,
                    command_id,
                    threadid,
@@ -2204,7 +2147,6 @@ int main (int argc, char *argv[])
                        ilist+1);
 
                ezx_process_command (
-                    NULL, NULL,
                    dlist_index,
                    command_id,
                    threadid,
@@ -2231,7 +2173,6 @@ int main (int argc, char *argv[])
                 sscanf (inbuff, "%d %d", ilist+0, ilist+1);
 
                 ezx_process_command (
-                    NULL, NULL,
                     dlist_index,
                     command_id,
                     threadid,
@@ -2282,7 +2223,6 @@ int main (int argc, char *argv[])
                }
 
                ezx_process_command (
-                    NULL, NULL,
                    dlist_index,
                    command_id,
                    threadid,
@@ -2320,7 +2260,6 @@ int main (int argc, char *argv[])
     }
 
     ezx_process_command (
-                    NULL, NULL,
         dlist_index,
         GTX_CLOSE_LOG_FILE,
         threadid,
