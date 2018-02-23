@@ -965,14 +965,11 @@ public class JDisplayListPanel extends JPanel
 
         // Button 1
         if (button_1 != 0) {
-System.out.println ();
-System.out.println ("In selectObject  ix = " + ix + "  iy = " + iy);
             if (!e.isControlDown()) {
                 dlist.unselectAll();
                 dlist.pickFrameObject (ix, iy);
             } else {
                 int index = dlist.getSelectableIndex(ix, iy);
-System.out.println ("index for ctrl pick = " + index);
                 if (index < 0) {
                     return;
                 }

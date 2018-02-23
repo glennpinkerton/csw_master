@@ -13529,10 +13529,19 @@ int CDisplayList::PopulateLinePatches (double x1, double y1p,
     }
 
 /*
-    draw all prims in the extra grid cell if needed
+    Populate patch with all prims in the extra grid cell if needed
 */
-    int       pt_size = (int)line_patch_list.size();
-    int       *pt_data = line_patch_list.data();
+    int  pt_size = 0;
+    int  *pt_data = NULL;
+
+    if (patch_pick_flag == 0) {
+        pt_size = (int)line_patch_list.size();
+        pt_data = line_patch_list.data();
+    }
+    else {
+        pt_size = (int)line_pick_list.size();
+        pt_data = line_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -13561,8 +13570,14 @@ int CDisplayList::PopulateLinePatches (double x1, double y1p,
         }
     }
 
-    pt_size = (int)line_patch_list.size();
-    pt_data = line_patch_list.data();
+    if (patch_pick_flag == 0) {
+        pt_size = (int)line_patch_list.size();
+        pt_data = line_patch_list.data();
+    }
+    else {
+        pt_size = (int)line_pick_list.size();
+        pt_data = line_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -13748,10 +13763,19 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
     }
 
 /*
-    draw all prims in the extra grid cell if needed
+    Populate patch with all prims in the extra grid cell if needed
 */
-    int        pt_size = (int)fill_patch_list.size();
-    int        *pt_data = fill_patch_list.data();
+    int  pt_size = 0;
+    int  *pt_data = NULL;
+
+    if (patch_pick_flag == 0) {
+        pt_size = (int)fill_patch_list.size();
+        pt_data = fill_patch_list.data();
+    }
+    else {
+        pt_size = (int)fill_pick_list.size();
+        pt_data = fill_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -13780,8 +13804,14 @@ int CDisplayList::PopulateFillPatches (double x1, double y1p,
         }
     }
 
-    pt_size = (int)fill_patch_list.size();
-    pt_data = fill_patch_list.data();
+    if (patch_pick_flag == 0) {
+        pt_size = (int)fill_patch_list.size();
+        pt_data = fill_patch_list.data();
+    }
+    else {
+        pt_size = (int)fill_pick_list.size();
+        pt_data = fill_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -13968,10 +13998,19 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
     }
 
 /*
-    draw all prims in the extra grid cell if needed
+    Populate patch with all prims in the extra grid cell if needed
 */
-    int        pt_size = (int)text_patch_list.size();
-    int        *pt_data = text_patch_list.data();
+    int  pt_size = 0;
+    int  *pt_data = NULL;
+
+    if (patch_pick_flag == 0) {
+        pt_size = (int)text_patch_list.size();
+        pt_data = text_patch_list.data();
+    }
+    else {
+        pt_size = (int)text_pick_list.size();
+        pt_data = text_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -14000,8 +14039,14 @@ int CDisplayList::PopulateTextPatches (double x1, double y1p,
         }
     }
 
-    pt_size = (int)text_patch_list.size();
-    pt_data = text_patch_list.data();
+    if (patch_pick_flag == 0) {
+        pt_size = (int)text_patch_list.size();
+        pt_data = text_patch_list.data();
+    }
+    else {
+        pt_size = (int)text_pick_list.size();
+        pt_data = text_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -14189,7 +14234,7 @@ int CDisplayList::PopulateSymbPatches (double x1, double y1p,
     }
 
 /*
-    draw all prims in the extra grid cell if needed
+    Populate patch with all prims in the extra grid cell if needed
 */
     offset = nc * nr;
     icell = symb_spatial_index [offset];
@@ -14333,12 +14378,14 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
     if (row1 < 0) {
         row1 = 0;
     }
+/*
     if (row2 < 0) {
         row2 = 0;
     }
     if (row1 > nr-1) {
         row1 = nr - 1;
     }
+*/
     if (row2 > nr-1) {
         row2 = nr - 1;
     }
@@ -14369,7 +14416,7 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
     }
 
 /*
-    redraw the shape primitives in the region
+    Populate patch with the shape primitives in the region
 */
     for (j=row1; j<=row2; j++) {
         offset = j*nc;
@@ -14400,10 +14447,19 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
     }
 
 /*
-    draw all prims in the extra grid cell if needed
+    Populate patch with all prims in the extra grid cell if needed
 */
-    int        pt_size = (int)shape_patch_list.size();
-    int        *pt_data = shape_patch_list.data();
+    int  pt_size = 0;
+    int  *pt_data = NULL;
+
+    if (patch_pick_flag == 0) {
+        pt_size = (int)shape_patch_list.size();
+        pt_data = shape_patch_list.data();
+    }
+    else {
+        pt_size = (int)shape_pick_list.size();
+        pt_data = shape_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -14432,8 +14488,14 @@ int CDisplayList::PopulateShapePatches (double x1, double y1p,
         }
     }
 
-    pt_size = (int)shape_patch_list.size();
-    pt_data = shape_patch_list.data();
+    if (patch_pick_flag == 0) {
+        pt_size = (int)shape_patch_list.size();
+        pt_data = shape_patch_list.data();
+    }
+    else {
+        pt_size = (int)shape_pick_list.size();
+        pt_data = shape_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -14621,10 +14683,19 @@ int CDisplayList::PopulateContourLinePatches (double x1, double y1p,
     }
 
 /*
-    draw all prims in the extra grid cell if needed
+    Populate patch with all prims in the extra grid cell if needed
 */
-    int      pt_size = (int)contour_line_patch_list.size();
-    int      *pt_data = contour_line_patch_list.data();
+    int  pt_size = 0;
+    int  *pt_data = NULL;
+
+    if (patch_pick_flag == 0) {
+        pt_size = (int)contour_line_patch_list.size();
+        pt_data = contour_line_patch_list.data();
+    }
+    else {
+        pt_size = (int)contour_line_pick_list.size();
+        pt_data = contour_line_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
@@ -14653,8 +14724,14 @@ int CDisplayList::PopulateContourLinePatches (double x1, double y1p,
         }
     }
 
-    pt_size = (int)contour_line_patch_list.size();
-    pt_data = contour_line_patch_list.data();
+    if (patch_pick_flag == 0) {
+        pt_size = (int)contour_line_patch_list.size();
+        pt_data = contour_line_patch_list.data();
+    }
+    else {
+        pt_size = (int)contour_line_pick_list.size();
+        pt_data = contour_line_pick_list.data();
+    }
 
     if (pt_data != NULL  &&  pt_size > 0) {
         for (j=0; j<pt_size; j++) {
