@@ -495,14 +495,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
 
 /*
  * Class:     csw_jeasyx_src_JDisplayListBase
- * Method:    getNativeSymbolParts
- * Signature: (IIDDI)I
- */
-JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_getNativeSymbolParts
-  (JNIEnv *, jclass, jint, jint, jdouble, jdouble, jint);
-
-/*
- * Class:     csw_jeasyx_src_JDisplayListBase
  * Method:    setFontMethods
  * Signature: ()V
  */

@@ -52,46 +52,6 @@ public class JDisplayList extends JDisplayListBase {
   * Static methods.
   */
 
-/**
- Return the lines, text, fills, circles, etc. needed to draw
- a symbol.  This can be used if symbols need to be drawn on
- something other than a JDisplayListPanel.  For example, in
- the graphic properties dialogs, a symbol preview is drawn
- by using this.  The method returns a {@link SymbolParts}
- object, which has lists of the various primitive pieces
- used to draw the symbol.
-*/
-    public static synchronized SymbolParts getSymbolParts (
-        int      symb,
-        double   size,
-        double   angle
-    )
-    {
-        clearSymbolParts ();
-
-        Toolkit tk = Toolkit.getDefaultToolkit ();
-        int dpi = tk.getScreenResolution ();
-
-        int threadid = Thread.currentThread().hashCode();
-
-        int istat =
-        getNativeSymbolParts (
-            threadid,
-            symb,
-            size,
-            angle,
-            dpi);
-        if (istat == -1) {
-            return null;
-        }
-
-        SymbolParts sparts = buildSymbolParts ();
-
-        return sparts;
-
-    }
-
-
 /*--------------------------------------------------------------------*/
 
 

@@ -599,12 +599,6 @@ class GTXDrawPrim
     
     void gtx_reset_exact_text_length (void);
     
-    int gtx_SendBackSymbolParts (
-        int symb,
-        double size,
-        double angle,
-        int dpi);
-    
 }; // end of main class
 
 

@@ -552,20 +552,6 @@ CDisplayList::~CDisplayList()
 
 /*--------------------------------------------------------------------------*/
 
-
-int CDisplayList::gtx_SendBackSymbolParts (int symb,
-                                            double dsize,
-                                            double dangle,
-                                            int dpi)
-{
-    gtx_drawprim_obj.gtx_SendBackSymbolParts (symb, dsize, dangle, dpi);
-    return 1;
-}
-
-
-
-/*--------------------------------------------------------------------------*/
-
 void CDisplayList::SetPageUnitsType (int type) {
     if (type < 1  ||  type > 2) {
         type = 1;
@@ -1406,8 +1392,6 @@ int CDisplayList::DrawAllLines (void)
     if ((int)line_prim_list.size() < 1) {
         return 0;
     }
-
-    jni_msg ("\nDisplay list lines being drawn\n");
 
     int       pt_size = (int)line_patch_list.size();
     int       *pt_data = line_patch_list.data();
@@ -3147,8 +3131,6 @@ int CDisplayList::DrawAllFills (void)
         free_xylocal = true;
     }
 
-    jni_msg ("\nDisplay list fills being drawn\n");
-
     for (ido=0; ido<nloop; ido++) {
 
         i = ido;
@@ -3847,8 +3829,6 @@ int CDisplayList::DrawAllTexts (void)
     if (tp_data == NULL  ||  tp_size < 1) {
         return 0;
     }
-
-    jni_msg ("\nDisplay list texts being drawn\n");
 
     int        pt_size = (int)text_patch_list.size();
     int        *pt_data = text_patch_list.data();
@@ -5081,8 +5061,6 @@ int CDisplayList::DrawAllShapes (void)
     if (hp_data == NULL  ||  hp_size < 1) {
         return 0;
     }
-
-    jni_msg ("\nDisplay list shapes being drawn\n");
 
     int        pt_size = (int)shape_patch_list.size();
     int        *pt_data = shape_patch_list.data();
@@ -20971,8 +20949,6 @@ int CDisplayList::DrawAllContourLines (void)
     if (cp_data == NULL  ||  cp_size < 1) {
         return 0;
     }
-
-    jni_msg ("\nDisplay list contour lines being drawn\n");
 
     nloop = cp_size;
     int      pt_size = (int)contour_line_patch_list.size();

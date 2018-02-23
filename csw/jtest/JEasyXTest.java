@@ -361,20 +361,6 @@ catch (Exception e) {
           }
         });
 
-        JButton part_button = new JButton ("Get Symbol Parts");
-        part_button.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent ae){
-              get_sparts ();
-          }
-        });
-
-        JButton jfont_button = new JButton ("Java Font Chooser");
-        jfont_button.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent ae){
-              jfont_chooser ();
-          }
-        });
-
         JButton sync_button = new JButton ("Synchronized Frame Test");
         sync_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
@@ -402,8 +388,6 @@ catch (Exception e) {
         contentPane.add (grid_button);
         contentPane.add (overlap_button);
         contentPane.add (font_button);
-        contentPane.add (part_button);
-        contentPane.add (jfont_button);
         contentPane.add (sync_button);
         contentPane.add (noaspect_button);
 
@@ -411,35 +395,6 @@ catch (Exception e) {
 
     }
 
-    void get_sparts ()
-    {
-        SymbolPartsFrame f = new SymbolPartsFrame ();
-        f.setVisible(true);
-    }
-
-    void jfont_chooser ()
-    {
-/*
-        String[] fnames;
-
-        fnames =
-            GraphicsEnvironment.
-            getLocalGraphicsEnvironment().
-            getAvailableFontFamilyNames ();
-
-        int size = fnames.length;
-
-        System.out.println ();
-        for (int i=0; i<size; i++) {
-            System.out.println (fnames[i]);
-        }
-        System.out.println ();
-*/
-
-        TestFont tf = new TestFont ();
-        tf.setVisible(true);
-
-    }
 
 
     Frame1Frame getFrame1 () {return frame1;}
@@ -448,7 +403,10 @@ catch (Exception e) {
     void setFrame1 (Frame1Frame f) {frame1 = f;}
     void setFrame2 (Frame2Frame f) {frame2 = f;}
     void setTextFrameTest (TextFrameTest f) {frame3 = f;}
+
 }
+
+
 
 class RandomPrimFrame extends JDLFrame
 {
@@ -2336,99 +2294,8 @@ class FontFrame extends JFrame
     }  // end of private LocalPanel class
 };
 
-class SymbolPartsFrame extends JFrame
-{
-    private static final long serialVersionUID = 1L;
 
-    private static Logger  logger = CSWLogger.getMyLogger ();
 
-    private JTextField    tField;
-    private PreviewPanel  pPanel;
-
-    private JTextField getSymbolNumberField ()
-    {
-        return tField;
-    }
-
-    public SymbolPartsFrame ()
-    {
-        setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
-
-        setTitle ("Symbol Parts Test");
-        setSize (300, 150);
-        setResizable (true);
-
-/*
-try {
-int idum = System.in.read();
-}
-catch (Exception e) {
-}
-*/
-
-        Container contentPane = getContentPane ();
-        contentPane.setLayout (new BorderLayout ());
-
-        pPanel = new PreviewPanel ();
-        pPanel.setBackground (Color.white);
-        pPanel.setPreferredSize (new Dimension (150, 150));
-        contentPane.add (pPanel, BorderLayout.CENTER);
-
-        JPanel jp = new JPanel ();
-        jp.setPreferredSize (new Dimension (150, 150));
-
-        tField = new JTextField (6);
-        tField.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent ae){
-            String fn = SymbolPartsFrame.this.getSymbolNumberField().getText ();
-            SymbolPartsFrame.this.setSymbolNumber (fn);
-          }
-        });
-
-        JLabel tl = new JLabel ("Symbol Number:");
-
-        tl.setLocation (10, 100);
-        tField.setLocation (10, 140);
-        jp.add (tl, null);
-        jp.add (tField, null);
-
-        contentPane.add (jp, BorderLayout.NORTH);
-
-        logger.info ("    Symbol Parts Frame constructed");
-
-    }
-
-    private void setSymbolNumber (String str)
-    {
-
-        Integer itmp;
-
-        try
-        {
-            itmp = Integer.valueOf (str);
-        }
-        catch (Exception e)
-        {
-            return;
-        }
-
-        pPanel.clearData ();
-
-        int snum = itmp.intValue ();
-
-        SymbolParts sparts = JDisplayList.getSymbolParts (snum, 1.0, -45.0);
-
-        pPanel.addLineList (sparts.lineList);
-        pPanel.addFillList (sparts.fillList);
-        pPanel.addTextList (sparts.textList);
-        pPanel.addArcList (sparts.arcList);
-        pPanel.addFilledArcList (sparts.filledArcList);
-
-        pPanel.repaint ();
-
-    }
-
-}
 
 class FrameSyncTest extends JDLFrame
 {

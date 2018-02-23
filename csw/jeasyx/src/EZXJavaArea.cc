@@ -70,12 +70,6 @@ int EZXJavaArea::ezx_SetFrameInJavaArea (int frame_num)
     return 1;
 }
 
-void EZXJavaArea::ezx_SetStaticSymbolFlag (int ival)
-{
-    if (ival != 0) ival = 1;
-    StaticSymbolFlag = ival;
-}
-
 
 int EZXJavaArea::ezx_AppendFillToJavaArea (
     CSW_F          *xy,
@@ -124,37 +118,19 @@ int EZXJavaArea::ezx_AppendFillToJavaArea (
 
     freeflag = ConvertToFloat (xy, npts, &fxy);
 
-    if (StaticSymbolFlag == 1) {
-        jni_call_add_symb_fill_method (
-            fxy,
-            thickness * ScreenDPI,
-            patscale,
-            npts,
-            red,
-            green,
-            blue,
-            AlphaValue,
-            pattern,
-            CurrentFrame,
-            ImageID,
-            selectable
-        );
-    }
-    else {
-        jni_call_add_fill_method (
-            fxy,
-            thickness * ScreenDPI,
-            patscale,
-            npts,
-            red,
-            green,
-            blue,
-            AlphaValue,
-            pattern,
-            CurrentFrame,
-            selectable
-        );
-    }
+    jni_call_add_fill_method (
+        fxy,
+        thickness * ScreenDPI,
+        patscale,
+        npts,
+        red,
+        green,
+        blue,
+        AlphaValue,
+        pattern,
+        CurrentFrame,
+        selectable
+    );
 
     if  (freeflag) {
         csw_Free (fxy);
@@ -204,36 +180,19 @@ int EZXJavaArea::ezx_AppendLineToJavaArea (
 
     freeflag = ConvertToFloat (xy, npts, &fxy);
 
-    if (StaticSymbolFlag == 1) {
-        jni_call_add_symb_line_method (
-            fxy,
-            npts,
-            red,
-            green,
-            blue,
-            AlphaValue,
-            pattern,
-            thickness * ScreenDPI,
-            CurrentFrame,
-            ImageID,
-            selectable
-        );
-    }
-    else {
-        jni_call_add_line_method (
-            fxy,
-            npts,
-            red,
-            green,
-            blue,
-            AlphaValue,
-            pattern,
-            thickness * ScreenDPI,
-            CurrentFrame,
-            image_id,
-            selectable
-        );
-    }
+    jni_call_add_line_method (
+        fxy,
+        npts,
+        red,
+        green,
+        blue,
+        AlphaValue,
+        pattern,
+        thickness * ScreenDPI,
+        CurrentFrame,
+        image_id,
+        selectable
+    );
 
     if (freeflag) {
         csw_Free (fxy);
@@ -331,45 +290,23 @@ int EZXJavaArea::ezx_AppendArcToJavaArea (
 
     closure += DrawingPriority * 10000;
 
-    if (StaticSymbolFlag == 1) {
-        jni_call_add_symb_arc_method (
-            (float)x,
-            (float)y,
-            r1,
-            r2,
-            ang1,
-            ang2,
-            closure,
-            red,
-            green,
-            blue,
-            AlphaValue,
-            thickness * ScreenDPI,
-            angle,
-            CurrentFrame,
-            ImageID,
-            selectable
-        );
-    }
-    else {
-        jni_call_add_arc_method (
-            (float)x,
-            (float)y,
-            r1,
-            r2,
-            ang1,
-            ang2,
-            closure,
-            red,
-            green,
-            blue,
-            AlphaValue,
-            thickness * ScreenDPI,
-            angle,
-            CurrentFrame,
-            selectable
-        );
-    }
+    jni_call_add_arc_method (
+        (float)x,
+        (float)y,
+        r1,
+        r2,
+        ang1,
+        ang2,
+        closure,
+        red,
+        green,
+        blue,
+        AlphaValue,
+        thickness * ScreenDPI,
+        angle,
+        CurrentFrame,
+        selectable
+    );
 
     return 1;
 
@@ -422,47 +359,24 @@ int EZXJavaArea::ezx_AppendFilledArcToJavaArea (
     fputs (Lbuff, DebugFile);
 #endif
 
-    if (StaticSymbolFlag == 1) {
-        jni_call_add_symb_filled_arc_method (
-            (float)x,
-            (float)y,
-            r1,
-            r2,
-            ang1,
-            ang2,
-            closure,
-            red,
-            green,
-            blue,
-            AlphaValue,
-            thickness * ScreenDPI,
-            angle,
-            pattern,
-            CurrentFrame,
-            ImageID,
-            selectable
-        );
-    }
-    else {
-        jni_call_add_filled_arc_method (
-            (float)x,
-            (float)y,
-            r1,
-            r2,
-            ang1,
-            ang2,
-            closure,
-            red,
-            green,
-            blue,
-            AlphaValue,
-            thickness * ScreenDPI,
-            angle,
-            pattern,
-            CurrentFrame,
-            selectable
-        );
-    }
+    jni_call_add_filled_arc_method (
+        (float)x,
+        (float)y,
+        r1,
+        r2,
+        ang1,
+        ang2,
+        closure,
+        red,
+        green,
+        blue,
+        AlphaValue,
+        thickness * ScreenDPI,
+        angle,
+        pattern,
+        CurrentFrame,
+        selectable
+    );
 
     return 1;
 

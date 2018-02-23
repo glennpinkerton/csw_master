@@ -185,44 +185,6 @@ int ezx_process_command (
     }
 #endif
 
-
-/*--------------------------------------------------------------
- *  If this is a GET_SYMBOL_PARTS command, do that and nothing else
- *
- * ilist[0] has the symbol number
- * ddata[0] has the symbol size
- * ddata[1] has the symbol angle
- * ilist[1] has the device dpi
- */
-    if (command_id == GTX_GET_SYMBOL_PARTS)
-    {
-
-        GTXDrawPrim   gtx_drawprim_obj;
-
-      #if _EZX_DEBUG_LOG_FILE_
-        if (LogFile) {
-            sprintf (LogFileLine, "command=%d 0\n", command_id);
-            fputs (LogFileLine, LogFile);
-            sprintf (LogFileLine,
-                     "%d %.15e %.15e %d\n",
-                     ilist[0],
-                     ddata[0],
-                     ddata[1],
-                     ilist[1]);
-            fputs (LogFileLine, LogFile);
-        }
-      #endif
-
-        istat =
-        gtx_drawprim_obj.gtx_SendBackSymbolParts (ilist[0],
-                                        ddata[0],
-                                        ddata[1],
-                                        ilist[1]);
-
-       return 1;
-    }
-
-
     canvas_manager_ptr->ezx_SetActiveGraphicsCanvas (dlist_index);
 
     long java_num = dlist_index;
