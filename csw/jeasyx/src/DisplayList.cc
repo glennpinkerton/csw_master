@@ -6970,12 +6970,22 @@ int CDisplayList::CreateFrame (int rescaleable,
 
     frptr->patch_draw_flag = 0;
 
+    frptr->xmin_spatial = xmin;
+    frptr->ymin_spatial = ymin;
+    frptr->xmax_spatial = xmax;
+    frptr->ymax_spatial = ymax;
+
 /*
  * Allocate spatial indexes for the frame.
  */
     if (xmax > xmin  &&  ymax > ymin) {
         dx = xmax - xmin;
         dy = ymax - ymin;
+        double    dxy_10 = (dx + dy) / 20.0;
+        frptr->xmin_spatial = xmin - dxy_10;
+        frptr->ymin_spatial = ymin - dxy_10;
+        frptr->xmax_spatial = xmax + dxy_10;
+        frptr->ymax_spatial = ymax + dxy_10;
         aspect = dy / dx;
         if (rescaleable != 0) {
             nc = (int)50;
@@ -6991,8 +7001,8 @@ int CDisplayList::CreateFrame (int rescaleable,
             nr *= 2;
             frptr->ncol = nc;
             frptr->nrow = nr;
-            frptr->xspace = (xmax - xmin) / (nc - 1);
-            frptr->yspace = (ymax - ymin) / (nr - 1);
+            frptr->xspace = (frptr->xmax_spatial - frptr->xmin_spatial) / (nc - 1);
+            frptr->yspace = (frptr->ymax_spatial - frptr->ymin_spatial) / (nr - 1);
         }
         else {
             nc = (int)10;
@@ -7006,8 +7016,8 @@ int CDisplayList::CreateFrame (int rescaleable,
             if (nr < 2) nr = 2;
             frptr->ncol = nc;
             frptr->nrow = nr;
-            frptr->xspace = (xmax - xmin) / (nc - 1);
-            frptr->yspace = (ymax - ymin) / (nr - 1);
+            frptr->xspace = (frptr->xmax_spatial - frptr->xmin_spatial) / (nc - 1);
+            frptr->yspace = (frptr->ymax_spatial - frptr->ymin_spatial) / (nr - 1);
         }
         ntot = frptr->ncol * frptr->nrow + 1;
         frptr->line_index = (int **)csw_Calloc (ntot * sizeof(int *));
@@ -13254,10 +13264,10 @@ int CDisplayList::SetupSpatialIndexForFrame (int fnum)
     shape_spatial_index = frptr->shape_index;
     contour_spatial_index = frptr->contour_index;
 
-    index_xmin = frptr->xmin;
-    index_ymin = frptr->ymin;
-    index_xmax = frptr->xmax;
-    index_ymax = frptr->ymax;
+    index_xmin = frptr->xmin_spatial;
+    index_ymin = frptr->ymin_spatial;
+    index_xmax = frptr->xmax_spatial;
+    index_ymax = frptr->ymax_spatial;
     index_xspace = frptr->xspace;
     index_yspace = frptr->yspace;
 
