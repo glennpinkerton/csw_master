@@ -63,8 +63,6 @@ class EZXJavaArea
     int AlphaValue = 255;
     int ScreenDPI = 72;
 
-    int StaticSymbolFlag = 0;
-
     int ImageID = -1;
 
     FILE    *DebugFile = NULL;
@@ -92,8 +90,6 @@ class EZXJavaArea
     int ezx_SetFrameInJavaArea (int frame_num);
     
     void ezx_SetImageIDInJavaArea (int id);
-    
-    void ezx_SetStaticSymbolFlag (int ival);
     
     int ezx_AppendFrameToJavaArea (
         CSW_F xmin,

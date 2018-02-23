@@ -34,10 +34,7 @@ JAVA_SRC=\
  LithFill.java\
  LocalDraw.java\
  NativePrim.java\
- JEasyXGraphicsPanel.java\
- SymbolButton.java\
- SymbolParts.java\
- PreviewPanel.java
+ JEasyXGraphicsPanel.java
 
 JAVA_CLASSES=\
  JDisplayListBase.class\
@@ -71,10 +68,7 @@ JAVA_CLASSES=\
  LithFill.class\
  LocalDraw.class\
  NativePrim.class\
- JEasyXGraphicsPanel.class\
- SymbolButton.class\
- SymbolParts.class\
- PreviewPanel.class
+ JEasyXGraphicsPanel.class
 
 JAR_FILE=jeasyx.jar
 PACKAGE_PATH=csw/jeasyx/src

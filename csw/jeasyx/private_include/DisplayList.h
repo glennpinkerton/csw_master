@@ -93,12 +93,6 @@ public:
          ezx_java_obj.SetJNIPtrs (v_jenv_in, v_jobj_in);
     }
 
-
-    int gtx_SendBackSymbolParts (int symb, 
-                                 double dsize,
-                                 double dangle,
-                                 int dpi); 
-
   /*
    * Set and get various boundary stuff
    */
