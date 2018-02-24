@@ -65,13 +65,22 @@ public class JDisplayList extends JDisplayListBase {
         if (dlp == null) {
             String emsg =
                new String
-                 ("The panel must be specified when constructing a JDisplayList object");
+                 ("The panel must be specified when " +
+                  "constructing a JDisplayList object");
             logger.error (emsg);
             throw new IllegalArgumentException (emsg);
         }
         dlPanel = dlp;
 
-        logger.info ("    JDisplayList constructor succeeded.    ");
+        nativeDlistID = CreateNative.createDlistResources ();
+        if (nativeDlistID < 0) {
+            logger.error
+            ("    JDisplayList constructor " +
+             "failed to get native resources.");
+        }
+        else {
+            logger.info ("    JDisplayList constructor succeeded.    ");
+        }
 
         setFont ("arial", Font.PLAIN);
     }

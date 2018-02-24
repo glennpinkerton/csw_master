@@ -17,10 +17,12 @@ extern "C" {
 
 #include <stdio.h>
 
+int ezx_create_new_dlist_data ();
+
 int ezx_process_command (
     int               dlist_index,
     int               command_id,
-    int               threadid,
+    long              threadid,
     long              *llist,
     int               *ilist,
     char              *cdata,
@@ -31,9 +33,6 @@ int ezx_process_command (
     double            *ddata,
     FILE              *dfile
 );
-
-void *ezx_get_void_jenv (int threadid, void *v_jenv);
-void *ezx_get_void_jobj (int threadid, void *v_jobj);
 
 #ifdef __cplusplus
 }

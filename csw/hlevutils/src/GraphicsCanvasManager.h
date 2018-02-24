@@ -8,6 +8,8 @@
          ************************************************
 */
 
+#include <vector>
+
 #include <csw/jeasyx/private_include/DisplayList.h>
 
 #ifndef _GRAPHICS_CANVAS_MANAGER_H_
@@ -20,8 +22,7 @@
 
 typedef struct {
     CDisplayList      *dlist = NULL;
-    long              java_num = 0;
-    char              name[100] = {'\0'};
+    long              java_num = -1;
 } GRaphicsCanvasStruct;
 
 
@@ -36,25 +37,18 @@ class CanvasManager
 
   private:
 
-    GRaphicsCanvasStruct    *CanvasList = NULL;
-    int                     NumCanvasList = 0;
-    int                     MaxCanvasList = 0;
-    int                     First = 1;
-
-    GRaphicsCanvasStruct    *ActiveCanvas = NULL;
-    int                     ActiveIndex = -1;
+    std::vector<GRaphicsCanvasStruct>    CanvasList;
 
 
   public:
 
-    int ezx_AddGraphicsCanvasToManager (char *name, long java_num,
-                                        void *v_jenv, void *v_jobj);
-    int ezx_RemoveGraphicsCanvasFromManager (char *name);
-    int ezx_RemoveGraphicsCanvasFromManager (int index);
-    int ezx_SetActiveGraphicsCanvas (char *name);
-    int ezx_SetActiveGraphicsCanvas (int index);
-    CDisplayList *ezx_GetActiveDisplayList (void);
-    int ezx_GetActiveIndex (void);
+    void CleanAll () {
+        CanvasList.clear();
+    };
+
+    int RemoveGraphicsCanvasFromManager (long index);
+    int CreateGraphicsCanvas ();
+    CDisplayList *GetDisplayList (int index);
 
 }; //end of main class
 

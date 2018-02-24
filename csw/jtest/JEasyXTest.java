@@ -24,6 +24,8 @@ import java.awt.Toolkit;
 import java.awt.color.ColorSpace;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -113,6 +115,21 @@ public class JEasyXTest {
         JDisplayList.openLogFile (playback_file_name);
         JEasyXTestFrame frame = new JEasyXTestFrame ();
         frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
+
+        frame.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                System.out.println ();
+                System.out.println("Main Window Closed");
+                System.out.flush ();
+                e.getWindow().dispose();
+                JDLFrameList.removeAllFrames ();
+            }
+        });
+
+
         frame.setVisible (true);
 
 //        timerTest ();

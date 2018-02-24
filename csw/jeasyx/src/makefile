@@ -6,6 +6,7 @@ JAVA_SRC=\
  JDisplayListBase.java\
  AxisProperties.java\
  CLine.java\
+ CreateNative.java\
  DLArc.java\
  DLConst.java\
  DLContour.java\
@@ -40,6 +41,7 @@ JAVA_CLASSES=\
  JDisplayListBase.class\
  AxisProperties.class\
  CLine.class\
+ CreateNative.class\
  DLArc.class\
  DLConst.class\
  DLContour.class\

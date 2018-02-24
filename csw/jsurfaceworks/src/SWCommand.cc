@@ -94,7 +94,7 @@ extern "C" {
 */
 long sw_process_command (
     int           command_id,
-    int           threadid,
+    long          threadid,
     int           *ilist,
     long          *llist,
     double        *dlist,
@@ -137,14 +137,28 @@ long sw_process_command (
         assert (false);
     }
 
-    GRDVert       *gvert = ThreadGuard::GetGRDVert (threadid);
+    GRDVert       *gvert = ThreadGuard::GetGrdVert (threadid);
     if (gvert == NULL) {
-        assert (false);
+        long  istat = ThreadGuard::CreateGrdVert (threadid);
+        if (istat == -1) {
+            assert (false);
+        }
+        gvert = ThreadGuard::GetGrdVert (threadid);
+        if (gvert == NULL) {
+            assert (false);
+        }
     }
 
     CSWGrdAPI     *grdapi = ThreadGuard::GetGrdAPI (threadid);
     if (grdapi == NULL) {
-        assert (false);
+        long  istat = ThreadGuard::CreateGrdAPI (threadid);
+        if (istat == -1) {
+            assert (false);
+        }
+        grdapi = ThreadGuard::GetGrdAPI (threadid);
+        if (grdapi == NULL) {
+            assert (false);
+        }
     }
 
     SWCalc        *swcalc = ThreadGuard::GetSWCalc (threadid);
@@ -3168,21 +3182,6 @@ long sw_process_command (
     return istat;
 }
 
-
-
-
-void *sw_get_void_jenv (int threadid, void *v_jenv)
-{
-    void *vp = ThreadGuard::GetVoidJenv (threadid, v_jenv);
-    return vp;
-}
-
-
-void *sw_get_void_jobj (int threadid, void *v_jobj)
-{
-    void *vp = ThreadGuard::GetVoidJobj (threadid, v_jobj);
-    return vp;
-}
 
 
 

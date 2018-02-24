@@ -76,10 +76,11 @@ private:
     CSWContourApi  conapi_obj;
     CSWPolyUtils   ply_utils_obj;
     GTXDrawPrim    gtx_drawprim_obj;
-    EZXJavaArea    ezx_java_obj;
 
 
 public:
+
+    EZXJavaArea    ezx_java_obj;
 
     CDisplayList();
     CDisplayList (const CDisplayList &old);

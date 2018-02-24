@@ -18,35 +18,117 @@
 namespace ThreadGuard
 {
 
-// implement the thread data collection via an stl map object
+// implement collections of resources via stl map objects.
+// The index of each map is the hashcode from the java resource
+// object and the value is the pointer to the c++ object.
+// The java code is responsible for synchronizing a resource
+// when it is being modified.  The c++ JNI level code uses
+// EnterMonitor and ExitMonitor to "lock" the update of any
+// of the maps defined here.
 
-    std::map <int, ThreadGuardData> guard_map;
+// The original code for this used a map of structures, with each
+// structure having pointers to various objects.  Experience says
+// that different object types can and will have different key
+// values.  Thus, separate maps are needed for each object type.
+
+// Many web sites say unique pointers should be used in collections
+// like those defined below.  The syntax complexity of the unique
+// pointers obfuscates the code  more than it helps in this context
+// (at least in my opinion).  I have chosen to forego the use of
+// unique pointers here.
+
+    CanvasManager   CanvasMgr;
+    std::map <long, CSWGrdAPI*> grd_api_map;
+    std::map <long, PATCHSplit*> patch_split_map;
+    std::map <long, GRDVert*> grd_vert_map;
+    std::map <long, SWCalc*> sw_calc_map;
+
+    std::map <long, FILE*> sw_save_log_file_map;
+    std::map <long, FILE*> sw_log_file_map;
+    std::map <long, FILE*> ez_log_file_map;
 
 }  // end of ThreadGuard namespace
 
 
+void ThreadGuard::RemoveAllThreadData (void)
+{
+    std::map<long, CSWGrdAPI*>::iterator gapi_it;
+    std::map<long, PATCHSplit*>::iterator ps_it;
+    std::map<long, GRDVert*>::iterator gv_it;
+    std::map<long, SWCalc*>::iterator sw_it;
+    std::map<long, FILE*>::iterator ezf_it;
+    std::map<long, FILE*>::iterator swf_it;
+    std::map<long, FILE*>::iterator swsf_it;
 
-PATCHSplit *ThreadGuard::GetPatchSplit (int threadid)
+    gapi_it = grd_api_map.begin();
+    while (gapi_it != grd_api_map.end()) {
+        delete (gapi_it->second);
+        gapi_it->second = NULL;
+        gapi_it++;
+    }
+    grd_api_map.clear();
+
+    ps_it = patch_split_map.begin();
+    while (ps_it != patch_split_map.end()) {
+        delete (ps_it->second);
+        ps_it->second = NULL;
+        ps_it++;
+    }
+    patch_split_map.clear();
+
+    gv_it = grd_vert_map.begin();
+    while (gv_it != grd_vert_map.end()) {
+        delete (gv_it->second);
+        gv_it->second = NULL;
+        gv_it++;
+    }
+    grd_vert_map.clear();
+
+    sw_it = sw_calc_map.begin();
+    while (sw_it != sw_calc_map.end()) {
+        delete (sw_it->second);
+        sw_it->second = NULL;
+        sw_it++;
+    }
+    sw_calc_map.clear();
+
+    swsf_it = sw_save_log_file_map.begin();
+    while (swsf_it != sw_save_log_file_map.end()) {
+        delete (swsf_it->second);
+        swsf_it->second = NULL;
+        swsf_it++;
+    }
+    sw_save_log_file_map.clear();
+
+    ezf_it = ez_log_file_map.begin();
+    while (ezf_it != ez_log_file_map.end()) {
+        delete (ezf_it->second);
+        ezf_it->second = NULL;
+        ezf_it++;
+    }
+    ez_log_file_map.clear();
+
+    CanvasMgr.CleanAll ();
+}
+
+
+
+
+PATCHSplit *ThreadGuard::GetPatchSplit (long jside_id)
 {
 
-    ThreadGuardData  tgd;
+    std::map<long, PATCHSplit*>::iterator it;
+    PATCHSplit  *ps = NULL;
 
-// Ownership of the psplit pointer is passed off to the guard_map.
-// Set psplit to NULL in tgd to prevent it from being deleted when
-// tgd goes out of scope.
     auto fscope = [&]()
     {
-        tgd.psplit = NULL;
     };
     CSWScopeGuard func_scope_guard (fscope);
 
-    std::map<int, ThreadGuardData>::iterator it;
-    PATCHSplit  *ps = NULL;
+    it = patch_split_map.find(jside_id);
 
-    it = guard_map.find(threadid);
-
-    if (it != guard_map.end()) {
-        ps = it->second.psplit;
+    if (it != patch_split_map.end()) {
+        ps = it->second;
         if (ps == NULL) {
             try {
                 SNF;
@@ -56,26 +138,27 @@ PATCHSplit *ThreadGuard::GetPatchSplit (int threadid)
                 printf ("\n***** Exception from new in GetPatchSplit *****\n\n");
                 return NULL;
             }
-            it->second.psplit = ps;
+            it->second = ps;
         }
         return ps;
     }
 
     try {
         SNF;
-        tgd.psplit = new PATCHSplit ();
+        ps = new PATCHSplit ();
     }
     catch (...) {
         printf ("\n***** Exception from new in GetPatchSplit *****\n\n");
-        return NULL;
+        delete (ps);
+        ps = NULL;
+        return ps;
     }
 
     try {
-        guard_map[threadid] = tgd;
-        ps = tgd.psplit;
+        patch_split_map[jside_id] = ps;
     }
     catch (...) {
-        delete (tgd.psplit);
+        delete (ps);
         ps = NULL;
     }
 
@@ -84,52 +167,22 @@ PATCHSplit *ThreadGuard::GetPatchSplit (int threadid)
 
 
 
-void ThreadGuard::RemoveAllThreadData (void)
-{
-    guard_map.clear();
-}
 
-
-
-
-void ThreadGuard::RemoveThreadData (int threadid)
+GRDVert *ThreadGuard::GetGrdVert (long jside_id)
 {
 
-    std::map<int, ThreadGuardData>::iterator it;
-
-    it = guard_map.find(threadid);
-
-    if (it != guard_map.end()) {
-        guard_map.erase (threadid);
-    }
-
-}
-
-
-
-
-GRDVert *ThreadGuard::GetGRDVert (int threadid)
-{
-
-    ThreadGuardData  tgd;
-
-// Ownership of the gvert pointer is passed off to the guard_map.
-// Set gvert to NULL in tgd to prevent it from being deleted when
-// tgd goes out of scope.
+    std::map<long, GRDVert*>::iterator it;
+    GRDVert  *gv = NULL;
 
     auto fscope = [&]()
     {
-        tgd.gvert = NULL;
     };
     CSWScopeGuard func_scope_guard (fscope);
 
-    std::map<int, ThreadGuardData>::iterator it;
-    GRDVert     *gv = NULL;
+    it = grd_vert_map.find(jside_id);
 
-    it = guard_map.find(threadid);
-
-    if (it != guard_map.end()) {
-        gv = it->second.gvert;
+    if (it != grd_vert_map.end()) {
+        gv = it->second;
         if (gv == NULL) {
             try {
                 SNF;
@@ -139,26 +192,28 @@ GRDVert *ThreadGuard::GetGRDVert (int threadid)
                 printf ("\n***** Exception from new in GetGrdVert *****\n\n");
                 return NULL;
             }
-            it->second.gvert = gv;
+            it->second = gv;
         }
         return gv;
     }
 
     try {
         SNF;
-        tgd.gvert = new GRDVert ();
+        gv = new GRDVert ();
     }
     catch (...) {
         printf ("\n***** Exception from new in GetGrdVert *****\n\n");
-        return NULL;
+        delete (gv);
+        gv = NULL;
+        return gv;
     }
 
     try {
-        guard_map[threadid] = tgd;
-        gv = tgd.gvert;
+        grd_vert_map[jside_id] = gv;
     }
     catch (...) {
-        delete (tgd.gvert);
+        printf ("\n***** Exception setting grd vert in map *****\n\n");
+        delete (gv);
         gv = NULL;
     }
 
@@ -168,58 +223,51 @@ GRDVert *ThreadGuard::GetGRDVert (int threadid)
 
 
 
-
-CSWGrdAPI *ThreadGuard::GetGrdAPI (int threadid)
+CSWGrdAPI *ThreadGuard::GetGrdAPI (long jside_id)
 {
 
-    ThreadGuardData  tgd;
-
-// Ownership of the grdapi pointer is passed off to the guard_map.
-// Set grdapi to NULL in tgd to prevent it from being deleted when
-// tgd goes out of scope.
+    std::map<long, CSWGrdAPI*>::iterator it;
+    CSWGrdAPI  *gapi = NULL;
 
     auto fscope = [&]()
     {
-        tgd.grdapi = NULL;
     };
     CSWScopeGuard func_scope_guard (fscope);
 
-    std::map<int, ThreadGuardData>::iterator it;
-    CSWGrdAPI   *gapi = NULL;
+    it = grd_api_map.find(jside_id);
 
-    it = guard_map.find(threadid);
-
-    if (it != guard_map.end()) {
-        gapi = it->second.grdapi;
+    if (it != grd_api_map.end()) {
+        gapi = it->second;
         if (gapi == NULL) {
             try {
                 SNF;
                 gapi = new CSWGrdAPI ();
-                it->second.grdapi = gapi;
             }
             catch (...) {
-                printf ("\n***** Exception from new in GetGrdAPI *****\n\n");
-                return gapi;
+                printf ("\n***** Exception from new in GetCSWGrdAPI *****\n\n");
+                return NULL;
             }
+            it->second = gapi;
         }
         return gapi;
     }
 
     try {
         SNF;
-        tgd.grdapi = new CSWGrdAPI ();
+        gapi = new CSWGrdAPI ();
     }
     catch (...) {
-        printf ("\n***** Exception from new in GetGrdAPI *****\n\n");
+        printf ("\n***** Exception from new in GetCSWGrdAPI *****\n\n");
+        delete (gapi);
+        gapi = NULL;
         return gapi;
     }
 
     try {
-        guard_map[threadid] = tgd;
-        gapi = tgd.grdapi;
+        grd_api_map[jside_id] = gapi;
     }
     catch (...) {
-        delete (tgd.grdapi);
+        delete (gapi);
         gapi = NULL;
     }
 
@@ -229,77 +277,69 @@ CSWGrdAPI *ThreadGuard::GetGrdAPI (int threadid)
 
 
 
-
-
-SWCalc  *ThreadGuard::GetSWCalc (int threadid)
+SWCalc  *ThreadGuard::GetSWCalc (long jside_id)
 {
 
-    ThreadGuardData  tgd;
-
-// Ownership of the swcalc pointer is passed off to the guard_map.
-// Set swcalc to NULL in tgd to prevent it from being deleted when
-// tgd goes out of scope.
+    std::map<long, SWCalc*>::iterator it;
+    SWCalc  *sw = NULL;
 
     auto fscope = [&]()
     {
-        tgd.swcalc = NULL;
+        delete (sw);
     };
     CSWScopeGuard func_scope_guard (fscope);
 
-    std::map<int, ThreadGuardData>::iterator it;
-    SWCalc      *swc = NULL;
+    it = sw_calc_map.find(jside_id);
 
-    it = guard_map.find(threadid);
-
-    if (it != guard_map.end()) {
-        swc = it->second.swcalc;
-        if (swc == NULL) {
+    if (it != sw_calc_map.end()) {
+        sw = it->second;
+        if (sw == NULL) {
             try {
                 SNF;
-                swc = new SWCalc ();
-                it->second.swcalc = swc;
+                sw = new SWCalc ();
             }
             catch (...) {
                 printf ("\n***** Exception from new in GetSWCalc *****\n\n");
                 return NULL;
             }
+            it->second = sw;
         }
-        return swc;
+        return sw;
     }
 
     try {
         SNF;
-        tgd.swcalc = new SWCalc ();
+        sw = new SWCalc ();
     }
     catch (...) {
         printf ("\n***** Exception from new in GetSWCalc *****\n\n");
-        return NULL;
+        return sw;
     }
 
     try {
-        guard_map[threadid] = tgd;
-        swc = tgd.swcalc;
+        sw_calc_map[jside_id] = sw;
     }
     catch (...) {
-        delete (tgd.swcalc);
-        swc = NULL;
+        delete (sw);
+        sw = NULL;
     }
 
-    return swc;
+    return sw;
 }
 
 
 
 
-FILE  *ThreadGuard::GetSWLogFile (int threadid)
+
+FILE  *ThreadGuard::GetSWLogFile (long jside_id)
 {
-    std::map<int, ThreadGuardData>::iterator it;
+    std::map<long, FILE*>::iterator it;
     FILE  *swf = NULL;
 
-    it = guard_map.find(threadid);
+    it = sw_log_file_map.find(jside_id);
 
-    if (it != guard_map.end()) {
-        swf = it->second.swlogfile;
+    if (it != sw_log_file_map.end()) {
+        swf = it->second;
         return swf;
     }
 
@@ -309,15 +349,15 @@ FILE  *ThreadGuard::GetSWLogFile (int threadid)
 
 
 
-FILE  *ThreadGuard::GetSWSaveLogFile (int threadid)
+FILE  *ThreadGuard::GetSWSaveLogFile (long jside_id)
 {
-    std::map<int, ThreadGuardData>::iterator it;
+    std::map<long, FILE*>::iterator it;
     FILE  *swf = NULL;
 
-    it = guard_map.find(threadid);
+    it = sw_save_log_file_map.find(jside_id);
 
-    if (it != guard_map.end()) {
-        swf = it->second.saveswlogfile;
+    if (it != sw_save_log_file_map.end()) {
+        swf = it->second;
         return swf;
     }
 
@@ -326,40 +366,37 @@ FILE  *ThreadGuard::GetSWSaveLogFile (int threadid)
 
 
 
-void ThreadGuard::SetSWLogFiles (int threadid, FILE *swf, FILE *swsf)
+void ThreadGuard::SetSWLogFiles (long jside_id, FILE *swf, FILE *swsf)
 {
 
-    ThreadGuardData  tgd;
+    std::map<long, FILE*>::iterator it;
+    std::map<long, FILE*>::iterator it2;
 
-// Ownership of the logfile pointers is passed off to the guard_map.
-// Set the logfile pointers to NULL in tgd to prevent close when
-// tgd goes out of scope.
+    it = sw_log_file_map.find(jside_id);
+    it2 = sw_save_log_file_map.find(jside_id);
 
-    auto fscope = [&]()
-    {
-        tgd.swlogfile = NULL;
-        tgd.saveswlogfile = NULL;
-    };
-    CSWScopeGuard func_scope_guard (fscope);
-
-    std::map<int, ThreadGuardData>::iterator it;
-
-    it = guard_map.find(threadid);
-
-    if (it != guard_map.end()) {
-        it->second.swlogfile = swf;
-        it->second.saveswlogfile = swsf;
-        return;
+    if (it != sw_log_file_map.end()) {
+        it->second = swf;
+    }
+    else {
+        try {
+            sw_log_file_map[jside_id] = swf;
+        }
+        catch (...) {
+            printf ("\n**** Error adding sw log file to map ****\n\n");
+        }
     }
 
-    tgd.swlogfile = swf;
-    tgd.saveswlogfile = swsf;
-
-    try {
-        guard_map[threadid] = tgd;
+    if (it2 != sw_save_log_file_map.end()) {
+        it2->second = swsf;
     }
-    catch (...) {
-        printf ("\n**** Error adding sw log files to Thread Guard ****\n\n");
+    else {
+        try {
+            sw_save_log_file_map[jside_id] = swsf;
+        }
+        catch (...) {
+            printf ("\n**** Error adding sw save log file to map ****\n\n");
+        }
     }
 
     return;
@@ -368,15 +405,15 @@ void ThreadGuard::SetSWLogFiles (int threadid, FILE *swf, FILE *swsf)
 
 
 
-FILE  *ThreadGuard::GetEZLogFile (int threadid)
+FILE  *ThreadGuard::GetEZLogFile (long jside_id)
 {
-    std::map<int, ThreadGuardData>::iterator it;
+    std::map<long, FILE*>::iterator it;
     FILE  *ezf = NULL;
 
-    it = guard_map.find(threadid);
+    it = ez_log_file_map.find(jside_id);
 
-    if (it != guard_map.end()) {
-        ezf = it->second.ezlogfile;
+    if (it != ez_log_file_map.end()) {
+        ezf = it->second;
         return ezf;
     }
 
@@ -385,37 +422,23 @@ FILE  *ThreadGuard::GetEZLogFile (int threadid)
 
 
 
-void ThreadGuard::SetEZLogFile (int threadid, FILE *ezf)
+void ThreadGuard::SetEZLogFile (long jside_id, FILE *ezf)
 {
 
-    ThreadGuardData  tgd;
+    std::map<long, FILE*>::iterator it;
 
-// Ownership of the logfile pointer is passed off to the guard_map.
-// Set the logfile pointer to NULL in tgd to prevent close when
-// tgd goes out of scope.
+    it = ez_log_file_map.find(jside_id);
 
-    auto fscope = [&]()
-    {
-        tgd.ezlogfile = NULL;
-    };
-    CSWScopeGuard func_scope_guard (fscope);
-
-    std::map<int, ThreadGuardData>::iterator it;
-
-    it = guard_map.find(threadid);
-
-    if (it != guard_map.end()) {
-        it->second.ezlogfile = ezf;
+    if (it != ez_log_file_map.end()) {
+        it->second = ezf;
         return;
     }
 
-    tgd.ezlogfile = ezf;
-
     try {
-        guard_map[threadid] = tgd;
+        ez_log_file_map[jside_id] = ezf;
     }
     catch (...) {
-        printf ("\n**** Error adding ez log file to Thread Guard ****\n\n");
+        printf ("\n**** Error adding ez log file to map ****\n\n");
     }
 
     return;
@@ -424,139 +447,88 @@ void ThreadGuard::SetEZLogFile (int threadid, FILE *ezf)
 
 
 
-CanvasManager *ThreadGuard::GetCanvasManager (int threadid)
+CanvasManager *ThreadGuard::GetCanvasManager ()
 {
-
-    ThreadGuardData  tgd;
-
-// Ownership of the canvas_manager pointer is passed off to the guard_map.
-// Set canvas_manager to NULL in tgd to prevent it from being deleted when
-// tgd goes out of scope.
-
-    auto fscope = [&]()
-    {
-        tgd.canvas_manager = NULL;
-    };
-    CSWScopeGuard func_scope_guard (fscope);
-
-    std::map<int, ThreadGuardData>::iterator it;
-    CanvasManager  *cm = NULL;
-
-    it = guard_map.find(threadid);
-
-    if (it != guard_map.end()) {
-        cm = it->second.canvas_manager;
-        if (cm == NULL) {
-            try {
-                //SNF;
-                cm = new CanvasManager ();
-                it->second.canvas_manager = cm;
-            }
-            catch (...) {
-                printf ("\n***** Exception from new in GetCanvasManager *****\n\n");
-                return NULL;
-            }
-        }
-        return cm;
-    }
-
-    try {
-        //SNF;
-        tgd.canvas_manager = new CanvasManager ();
-    }
-    catch (...) {
-        printf ("\n***** Exception from new in GetCanvasManager *****\n\n");
-        return NULL;
-    }
-
-    try {
-        guard_map[threadid] = tgd;
-        cm = tgd.canvas_manager;
-    }
-    catch (...) {
-        delete (tgd.canvas_manager);
-        cm = NULL;
-    }
-
-    return cm;
+    return &(ThreadGuard::CanvasMgr);
 }
 
 
 
-void *ThreadGuard::GetVoidJenv (int threadid, void *vpin)
+long ThreadGuard::CreateGrdAPI (long jside_id)
 {
 
-    ThreadGuardData  tgd;
+    std::map<long, CSWGrdAPI*>::iterator it;
+    CSWGrdAPI  *gapi = NULL;
 
     auto fscope = [&]()
     {
-        tgd.v_jenv = NULL;
     };
     CSWScopeGuard func_scope_guard (fscope);
 
-    std::map<int, ThreadGuardData>::iterator it;
-    void  *vp = NULL;
+    it = grd_api_map.find(jside_id);
 
-    it = guard_map.find(threadid);
-
-    if (it != guard_map.end()) {
-        vp = it->second.v_jenv;
-        if (vp == NULL) {
-            vp = vpin;
-            it->second.v_jenv = vp;
-        }
-        return vp;
+    if (it != grd_api_map.end()) {
+        return it->first;
     }
-
-    vp = vpin;
-    tgd.v_jenv = vp;
 
     try {
-        guard_map[threadid] = tgd;
+        SNF;
+        gapi = new CSWGrdAPI ();
     }
     catch (...) {
-        vp = NULL;
+        printf ("\n***** Exception from new in GetCSWGrdAPI *****\n\n");
+        delete (gapi);
+        return -1;
     }
 
-    return vp;
+    try {
+        grd_api_map[jside_id] = gapi;
+    }
+    catch (...) {
+        delete (gapi);
+        return -1;
+    }
+
+    return jside_id;
 }
 
 
 
-void *ThreadGuard::GetVoidJobj (int threadid, void *vpin)
+long ThreadGuard::CreateGrdVert (long jside_id)
 {
 
-    ThreadGuardData  tgd;
+    std::map<long, GRDVert*>::iterator it;
+    GRDVert  *gv = NULL;
 
     auto fscope = [&]()
     {
-        tgd.v_jobj = NULL;
     };
     CSWScopeGuard func_scope_guard (fscope);
 
-    std::map<int, ThreadGuardData>::iterator it;
-    void  *vp = NULL;
+    it = grd_vert_map.find(jside_id);
 
-    it = guard_map.find(threadid);
-
-    if (it != guard_map.end()) {
-        vp = it->second.v_jobj;
-        if (vp == NULL) {
-            vp = vpin;
-            it->second.v_jobj = vp;
-        }
-        return vp;
+    if (it != grd_vert_map.end()) {
+        return it->first;
     }
-
-    vp = vpin;
-    tgd.v_jobj = vp;
 
     try {
-        guard_map[threadid] = tgd;
+        SNF;
+        gv = new GRDVert ();
     }
     catch (...) {
-        vp = NULL;
+        printf ("\n***** Exception from new in GetGRDVert *****\n\n");
+        delete (gv);
+        return -1;
     }
 
-    return vp;
+    try {
+        grd_vert_map[jside_id] = gv;
+    }
+    catch (...) {
+        delete (gv);
+        return -1;
+    }
+
+    return jside_id;
 }
+
