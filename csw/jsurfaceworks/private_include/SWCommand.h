@@ -121,7 +121,7 @@ extern "C" {
 
 long sw_process_command (
     int               command_id,
-    int               threadid,
+    long              threadid,
     int               *ilist,
     long              *llist,
     double            *dlist,
@@ -130,9 +130,6 @@ long sw_process_command (
     float             *fdata,
     double            *ddata
 );
-
-void *sw_get_void_jenv (int threadid, void *v_jenv);
-void *sw_get_void_jobj (int threadid, void *v_jobj);
 
 
 /* close extern C block */
