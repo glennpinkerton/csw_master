@@ -25,7 +25,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
     void jni_call_add_frame_method (
+        void *v_jenv,
+        void *v_jobj,
         float x1,
         float y1,
         float x2,
@@ -42,6 +46,8 @@ extern "C" {
         char  *fname
     );
     void jni_call_add_fill_method (
+        void *v_jenv,
+        void *v_jobj,
         float *xy,
         float thickness,
         float patscale,
@@ -55,6 +61,8 @@ extern "C" {
         int selectable
     );
     void jni_call_add_line_method (
+        void *v_jenv,
+        void *v_jobj,
         float *xy,
         int npts,
         int red,
@@ -68,6 +76,8 @@ extern "C" {
         int selectable
     );
    void jni_call_add_text_method (
+        void *v_jenv,
+        void *v_jobj,
         float x,
         float y,
         char *text,
@@ -83,6 +93,8 @@ extern "C" {
         int selectable
     );
    void jni_call_add_arc_method (
+        void *v_jenv,
+        void *v_jobj,
         float x,
         float y,
         float r1,
@@ -100,6 +112,8 @@ extern "C" {
         int selectable
     );
    void jni_call_add_filled_arc_method (
+        void *v_jenv,
+        void *v_jobj,
         float x,
         float y,
         float r1,
@@ -118,6 +132,8 @@ extern "C" {
         int selectable
     );
    void jni_call_add_image_method (
+        void *v_jenv,
+        void *v_jobj,
         float x1,
         float y1,
         float x2,
@@ -133,6 +149,9 @@ extern "C" {
         int image_id,
         int selectable
     );
+
+
+
 
     void jni_call_add_selected_fill (
        int             selectable_index,
@@ -424,6 +443,8 @@ extern "C" {
     );
 
     void jni_call_set_zoom_pan_data_method (
+        void  *v_jenv,
+        void  *v_jobj,
         char       *fname,
         double     ox1,
         double     oy1,

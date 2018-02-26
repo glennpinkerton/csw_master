@@ -53,13 +53,6 @@ csw_jeasyx_src_JDisplayListBase_MAX_LIST_SIZE
  * They are set once and then read by all threads.  It should not
  * matter which thread sets them since they will not change.
  */
-static jmethodID      FillMethodID = NULL,
-                      LineMethodID = NULL,
-                      TextMethodID = NULL,
-                      ArcMethodID = NULL,
-                      FilledArcMethodID = NULL,
-                      ImageMethodID = NULL,
-                      FrameMethodID = NULL;
 
 static jmethodID      SelectFillMethodID = NULL,
                       SelectLineMethodID = NULL,
@@ -78,15 +71,12 @@ static jmethodID      SymbFillMethodID = NULL,
 
 static jmethodID      FontBoundsMethodID = NULL;
 
-static jmethodID      SetZoomPanDataMethodID = NULL;
-
 static JNIEnv         *JavaEnv;
 static jobject        JavaObj;
 static jclass         JavaCls;
 
 static int            FunctionSet = 0;
 
-static void update_zoom_pan_method (int command_id);
 static int setup_return_select_method_ids(JNIEnv *env, jclass cls);
 
 #if DEBUG_JNI_FILE
@@ -270,6 +260,10 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
  */
     command_id = (int)j_command_id;
     dlist_index = (int)j_dlist_index;
+
+    ezx_set_void_ptrs (dlist_index, (void *)jnienv, (void *)jobj);
+
+
     if (j_llist) {
         jllist = (*jnienv)->GetLongArrayElements (jnienv, j_llist, JNI_FALSE);
     }
@@ -386,12 +380,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
         fflush (dbfile);
     }
   #endif
-
-/*
- * If the command is a zoom or pan command, make sure the
- * zoom pan java method is valid.
- */
-    update_zoom_pan_method (command_id);
 
 /*
  * Do whatever is needed from the command.
@@ -610,6 +598,8 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
     dlist_index = (int)j_dlist_index;
     threadid = (int)j_threadid;
 
+    ezx_set_void_ptrs (dlist_index, (void *)env, (void *)obj);
+
 /*
  * Find the Java class methods for sending back graphics data.
  * These are all class methods of the JDisplayListBase java
@@ -629,48 +619,6 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
         return;
     }
 
-    FillMethodID = (*env)->GetMethodID (env, cls, "addNativeFill",
-                                     "([FFFIIIIIIII)V");
-    if (FillMethodID == NULL) {
-        return;
-    }
-
-    LineMethodID = (*env)->GetMethodID (env, cls, "addNativeLine",
-                                     "([FIIIIIIFIII)V");
-    if (LineMethodID == NULL) {
-        return;
-    }
-
-    TextMethodID = (*env)->GetMethodID (env, cls, "addNativeText",
-                                     "(FFLjava/lang/String;IIIIFFIIII)V");
-    if (TextMethodID == NULL) {
-        return;
-    }
-
-    ArcMethodID = (*env)->GetMethodID (env, cls, "addNativeArc",
-                                "(FFFFFFIIIIIFFII)V");
-    if (ArcMethodID == NULL) {
-        return;
-    }
-
-    FilledArcMethodID = (*env)->GetMethodID (env, cls, "addNativeFilledArc",
-                                     "(FFFFFFIIIIIFFIII)V");
-    if (FilledArcMethodID == NULL) {
-        return;
-    }
-
-    ImageMethodID = (*env)->GetMethodID (env, cls, "addNativeImage",
-                                      "(FFFFII[B[B[B[BIIII)V");
-    if (ImageMethodID == NULL) {
-        return;
-    }
-
-    FrameMethodID = (*env)->GetMethodID (env, cls, "addNativeFrame",
-                                  "(FFFFDDDDIIIIILjava/lang/String;)V");
-    if (FrameMethodID == NULL) {
-        return;
-    }
-
   } /* end of first_call block */
 
 
@@ -686,8 +634,10 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
 /*
  * The java object and environment are also needed for the calls back to draw.
  */
-    JavaObj = obj;
-    JavaEnv = env;
+    //JavaObj = obj;
+    //JavaEnv = env;
+    JavaObj = NULL;
+    JavaEnv = NULL;
 
 /*
  * Send the draw command to the current active display list.
@@ -759,6 +709,8 @@ static void write_fill_method_params (
 
 
 void jni_call_add_fill_method (
+    void    *v_jenv,
+    void    *v_jobj,
     float       *xy,
     float       thickness,
     float       patScale,
@@ -788,6 +740,18 @@ void jni_call_add_fill_method (
           selectable);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+printf ("Null java pointers\n");
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID FillMethodID = (*jenv)->GetMethodID (jenv, jcls, "addNativeFill",
+                                     "([FFFIIIIIIII)V");
     if (FillMethodID == NULL) {
         return;
     }
@@ -803,13 +767,13 @@ void jni_call_add_fill_method (
 /*
  * Allocate and fill the java array with the points.
  */
-    jxy = (*JavaEnv)->NewFloatArray (JavaEnv, 2 * npts);
+    jxy = (*jenv)->NewFloatArray (jenv, 2 * npts);
     if (jxy == NULL) {
         return;
     }
 
-    (*JavaEnv)->SetFloatArrayRegion (
-        JavaEnv,
+    (*jenv)->SetFloatArrayRegion (
+        jenv,
         jxy,
         0,
         npts*2,
@@ -827,9 +791,9 @@ void jni_call_add_fill_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         FillMethodID,
         jxy,
         thickness,
@@ -847,7 +811,7 @@ void jni_call_add_fill_method (
 /*
  * Delete the java points array.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jxy);
+    (*jenv)->DeleteLocalRef (jenv, jxy);
 
     return;
 
@@ -895,6 +859,8 @@ static void write_line_method_params (
 
 
 void jni_call_add_line_method (
+    void    *v_jenv,
+    void    *v_jobj,
     float       *xy,
     int         npts,
     int         red,
@@ -924,6 +890,18 @@ void jni_call_add_line_method (
           selectable);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+printf ("Null java pointers\n");
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID LineMethodID = (*jenv)->GetMethodID (jenv, jcls, "addNativeLine",
+                                     "([FIIIIIIFIII)V");
     if (LineMethodID == NULL) {
         return;
     }
@@ -940,13 +918,13 @@ void jni_call_add_line_method (
 /*
  * Allocate and fill the java array with the points.
  */
-    jxy = (*JavaEnv)->NewFloatArray (JavaEnv, 2 * npts);
+    jxy = (*jenv)->NewFloatArray (jenv, 2 * npts);
     if (jxy == NULL) {
         return;
     }
 
-    (*JavaEnv)->SetFloatArrayRegion (
-        JavaEnv,
+    (*jenv)->SetFloatArrayRegion (
+        jenv,
         jxy,
         0,
         npts*2,
@@ -964,9 +942,9 @@ void jni_call_add_line_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         LineMethodID,
         jxy,
         npts,
@@ -984,7 +962,7 @@ void jni_call_add_line_method (
 /*
  * Delete the java points array.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jxy);
+    (*jenv)->DeleteLocalRef (jenv, jxy);
 
     return;
 
@@ -1028,6 +1006,8 @@ static void write_text_method_params (
 }
 
 void jni_call_add_text_method (
+    void    *v_jenv,
+    void    *v_jobj,
     float       x,
     float       y,
     char        *text,
@@ -1044,6 +1024,18 @@ void jni_call_add_text_method (
 ) {
     jstring           jtext;
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+printf ("Null java pointers\n");
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID TextMethodID = (*jenv)->GetMethodID (jenv, jcls, "addNativeText",
+                                     "(FFLjava/lang/String;IIIIFFIIII)V");
     if (TextMethodID == NULL) {
         return;
     }
@@ -1077,7 +1069,7 @@ void jni_call_add_text_method (
 /*
  * Allocate and fill the java string.
  */
-    jtext = (*JavaEnv)->NewStringUTF (JavaEnv, text);
+    jtext = (*jenv)->NewStringUTF (jenv, text);
     if (jtext == NULL) {
         return;
     }
@@ -1093,9 +1085,9 @@ void jni_call_add_text_method (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         TextMethodID,
         x,
         y,
@@ -1115,7 +1107,7 @@ void jni_call_add_text_method (
 /*
  * Delete the java char array.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jtext);
+    (*jenv)->DeleteLocalRef (jenv, jtext);
 
     return;
 
@@ -1161,6 +1153,8 @@ static void write_arc_method_params (
 }
 
 void jni_call_add_arc_method (
+    void    *v_jenv,
+    void    *v_jobj,
     float       x,
     float       y,
     float       r1,
@@ -1178,6 +1172,18 @@ void jni_call_add_arc_method (
     int         selectable
 ) {
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+printf ("Null java pointers\n");
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID ArcMethodID = (*jenv)->GetMethodID (jenv, jcls, "addNativeArc",
+                                "(FFFFFFIIIIIFFII)V");
     if (ArcMethodID == NULL) {
         return;
     }
@@ -1213,9 +1219,9 @@ void jni_call_add_arc_method (
 /*
  * call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         ArcMethodID,
         x,
         y,
@@ -1283,6 +1289,8 @@ static void write_filled_arc_method_params (
 
 
 void jni_call_add_filled_arc_method (
+    void    *v_jenv,
+    void    *v_jobj,
     float       x,
     float       y,
     float       r1,
@@ -1301,6 +1309,18 @@ void jni_call_add_filled_arc_method (
     int         selectable
 ) {
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+printf ("Null java pointers\n");
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID FilledArcMethodID = (*jenv)->GetMethodID (jenv, jcls, "addNativeFilledArc",
+                                     "(FFFFFFIIIIIFFIII)V");
     if (FilledArcMethodID == NULL) {
         return;
     }
@@ -1339,9 +1359,9 @@ void jni_call_add_filled_arc_method (
 /*
  * call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         FilledArcMethodID,
         x,
         y,
@@ -1368,6 +1388,8 @@ void jni_call_add_filled_arc_method (
 
 
 void jni_call_add_image_method (
+    void    *v_jenv,
+    void    *v_jobj,
     float           x1,
     float           y1,
     float           x2,
@@ -1386,6 +1408,18 @@ void jni_call_add_image_method (
     jbyteArray      jred, jgreen, jblue, jtrans;
     int             nt;
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+printf ("Null java pointers\n");
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID ImageMethodID = (*jenv)->GetMethodID (jenv, jcls, "addNativeImage",
+                                      "(FFFFII[B[B[B[BIIII)V");
     if (ImageMethodID == NULL) {
         return;
     }
@@ -1407,61 +1441,61 @@ void jni_call_add_image_method (
 /*
  * Allocate space for the java color component arrays.
  */
-    jred = (*JavaEnv)->NewByteArray (JavaEnv, nt);
+    jred = (*jenv)->NewByteArray (jenv, nt);
     if (jred == NULL) {
         return;
     }
 
-    jgreen = (*JavaEnv)->NewByteArray (JavaEnv, nt);
+    jgreen = (*jenv)->NewByteArray (jenv, nt);
     if (jgreen == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jred);
+        (*jenv)->DeleteLocalRef (jenv, jred);
         return;
     }
 
-    jblue = (*JavaEnv)->NewByteArray (JavaEnv, nt);
+    jblue = (*jenv)->NewByteArray (jenv, nt);
     if (jblue == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jred);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jgreen);
+        (*jenv)->DeleteLocalRef (jenv, jred);
+        (*jenv)->DeleteLocalRef (jenv, jgreen);
         return;
     }
 
-    jtrans = (*JavaEnv)->NewByteArray (JavaEnv, nt);
+    jtrans = (*jenv)->NewByteArray (jenv, nt);
     if (jtrans == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jred);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jgreen);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jblue);
+        (*jenv)->DeleteLocalRef (jenv, jred);
+        (*jenv)->DeleteLocalRef (jenv, jgreen);
+        (*jenv)->DeleteLocalRef (jenv, jblue);
         return;
     }
 
 /*
  * Fill in the java color component arrays.
  */
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
+    (*jenv)->SetByteArrayRegion (
+        jenv,
         jred,
         0,
         nt,
         (jbyte *)red
     );
 
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
+    (*jenv)->SetByteArrayRegion (
+        jenv,
         jgreen,
         0,
         nt,
         (jbyte *)green
     );
 
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
+    (*jenv)->SetByteArrayRegion (
+        jenv,
         jblue,
         0,
         nt,
         (jbyte *)blue
     );
 
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
+    (*jenv)->SetByteArrayRegion (
+        jenv,
         jtrans,
         0,
         nt,
@@ -1479,9 +1513,9 @@ void jni_call_add_image_method (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         ImageMethodID,
         x1,
         y1,
@@ -1502,10 +1536,10 @@ void jni_call_add_image_method (
 /*
  * Delete the java color component arrays.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jred);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jgreen);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jblue);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jtrans);
+    (*jenv)->DeleteLocalRef (jenv, jred);
+    (*jenv)->DeleteLocalRef (jenv, jgreen);
+    (*jenv)->DeleteLocalRef (jenv, jblue);
+    (*jenv)->DeleteLocalRef (jenv, jtrans);
 
     return;
 
@@ -1516,6 +1550,8 @@ void jni_call_add_image_method (
 
 
 void jni_call_add_frame_method (
+    void    *v_jenv,
+    void    *v_jobj,
     float       x1,
     float       y1,
     float       x2,
@@ -1533,13 +1569,25 @@ void jni_call_add_frame_method (
 ) {
     jstring            jfname;
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+printf ("Null java pointers\n");
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID FrameMethodID = (*jenv)->GetMethodID (jenv, jcls, "addNativeFrame",
+                                  "(FFFFDDDDIIIIILjava/lang/String;)V");
     if (FrameMethodID == NULL) {
         return;
     }
 
     jfname = NULL;
     if (fname != NULL) {
-        jfname = (*JavaEnv)->NewStringUTF (JavaEnv, fname);
+        jfname = (*jenv)->NewStringUTF (jenv, fname);
         if (jfname == NULL) {
             return;
         }
@@ -1548,9 +1596,9 @@ void jni_call_add_frame_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         FrameMethodID,
         x1,
         y1,
@@ -1747,7 +1795,6 @@ static int setup_return_select_method_ids(JNIEnv  *env, jclass  cls) {
 JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDrawSelected
   (JNIEnv *env, jobject obj, jint j_dlist_index, jint j_threadid)
 {
-    jclass           cls;
     int              dlist_index;
     int              threadid;
 
@@ -1760,55 +1807,14 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDrawSelected
   #endif
 
     dlist_index = (int)j_dlist_index;
+
+    ezx_set_void_ptrs (dlist_index, (void *)env, (void *)obj);
+
     threadid = (int)j_threadid;
 
 /*
  * Find the Java class methods for sending back graphics data.
  */
-
-    cls = (*env)->GetObjectClass (env, obj);
-
-    FillMethodID = (*env)->GetMethodID (env, cls, "addNativeFill",
-                                     "([FFFIIIIIIII)V");
-    if (FillMethodID == NULL) {
-        return;
-    }
-
-    LineMethodID = (*env)->GetMethodID (env, cls, "addNativeLine",
-                                     "([FIIIIIIFIII)V");
-    if (LineMethodID == NULL) {
-        return;
-    }
-
-    TextMethodID = (*env)->GetMethodID (env, cls, "addNativeText",
-                                     "(FFLjava/lang/String;IIIIFFIIII)V");
-    if (TextMethodID == NULL) {
-        return;
-    }
-
-    ArcMethodID = (*env)->GetMethodID (env, cls, "addNativeArc",
-                                    "(FFFFFFIIIIIFFII)V");
-    if (ArcMethodID == NULL) {
-        return;
-    }
-
-    FilledArcMethodID = (*env)->GetMethodID (env, cls, "addNativeFilledArc",
-                                         "(FFFFFFIIIIIFFIII)V");
-    if (FilledArcMethodID == NULL) {
-        return;
-    }
-
-    ImageMethodID = (*env)->GetMethodID (env, cls, "addNativeImage",
-                                      "(FFFFII[B[B[B[BIIII)V");
-    if (ImageMethodID == NULL) {
-        return;
-    }
-
-    FrameMethodID = (*env)->GetMethodID (env, cls, "addNativeFrame",
-                                      "(FFFFDDDDIIIIILjava/lang/String;)V");
-    if (FrameMethodID == NULL) {
-        return;
-    }
 
   #if DEBUG_JNI_FILE
     sprintf (fileline, "Finished with method id assignment\n");
@@ -3700,24 +3706,9 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_convertToFrame
 }
 
 
-static void update_zoom_pan_method (int command_id)
-{
-    jclass               cls;
-
-    if (command_id == GTX_PANFRAME  ||
-        command_id == GTX_ZOOMFRAME  ||
-        command_id == GTX_ZOOMEXTENTS ||
-        command_id == GTX_ZOOMOUT)
-    {
-        cls = (*JavaEnv)->GetObjectClass (JavaEnv, JavaObj);
-        SetZoomPanDataMethodID = (*JavaEnv)->GetMethodID (JavaEnv, cls, "setZoomPanData",
-                                     "(Ljava/lang/String;DDDDDDDD)V");
-    }
-
-}
-
-
 void jni_call_set_zoom_pan_data_method (
+    void  *v_jenv,
+    void  *v_jobj,
     char      *fname,
     double    ox1,
     double    oy1,
@@ -3730,6 +3721,18 @@ void jni_call_set_zoom_pan_data_method (
 ) {
     jstring           jname;
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+printf ("Null java pointers\n");
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID SetZoomPanDataMethodID = (*jenv)->GetMethodID (jenv, jcls, "setZoomPanData",
+                                     "(Ljava/lang/String;DDDDDDDD)V");
     if (SetZoomPanDataMethodID == NULL) {
         return;
     }
@@ -3737,7 +3740,7 @@ void jni_call_set_zoom_pan_data_method (
 /*
  * Allocate and fill the java string.
  */
-    jname = (*JavaEnv)->NewStringUTF (JavaEnv, fname);
+    jname = (*jenv)->NewStringUTF (jenv, fname);
     if (jname == NULL) {
         return;
     }
@@ -3745,9 +3748,9 @@ void jni_call_set_zoom_pan_data_method (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         SetZoomPanDataMethodID,
         jname,
         ox1, oy1, ox2, oy2,

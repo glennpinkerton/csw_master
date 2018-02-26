@@ -34,6 +34,8 @@ int ezx_process_command (
     FILE              *dfile
 );
 
+void ezx_set_void_ptrs (int dlist_id, void *v_jenv, void *v_jobj);
+
 #ifdef __cplusplus
 }
 #endif

@@ -2356,5 +2356,30 @@ int ezx_process_command (
 }
 
 
+void ezx_set_void_ptrs (int dlist_index, void *v_jenv, void *v_jobj)
+{
+
+    if (dlist_index < 0) {
+        return;
+    }
+
+// Get a pointer to the global canvas manager.
+
+    CanvasManager    *canvas_manager_ptr = ThreadGuard::GetCanvasManager ();
+
+// Get the display list pointer for this dlist_index
+
+    CDisplayList *dlist = canvas_manager_ptr->GetDisplayList (dlist_index);
+
+    if (dlist == NULL) {
+        return;
+    }
+
+    dlist->ezx_java_obj.SetJNIPtrs (v_jenv, v_jobj);
+
+    return;
+
+}
+
 }  // end of extern "C" block
 

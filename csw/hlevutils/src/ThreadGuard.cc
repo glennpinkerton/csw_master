@@ -137,8 +137,6 @@ void ThreadGuard::RemoveThreadData (long jside_id)
     std::map<long, FILE*>::iterator swf_it;
     std::map<long, FILE*>::iterator swsf_it;
 
-printf ("\nRemoveThreadData called for jside_id = %ld\n\n", jside_id);
-
     it_ps = patch_split_map.find (jside_id);
     if (it_ps != patch_split_map.end()) {
         delete (it_ps->second);
