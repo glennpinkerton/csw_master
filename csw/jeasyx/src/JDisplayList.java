@@ -62,6 +62,7 @@ public class JDisplayList extends JDisplayListBase {
   */
     JDisplayList (JDisplayListPanel dlp)
     {
+        nativeDlistID = -1;
         if (dlp == null) {
             String emsg =
                new String
@@ -93,16 +94,14 @@ public class JDisplayList extends JDisplayListBase {
 
     private int pageUnitsType = 1;
 
+    public int getNativeID ()
+    {
+        return nativeDlistID;
+    }
+
  /*
   * The collection of API methods used to draw to and otherwise manage the
-  * display list follow.  The names are based on the EasyX function names
-  * as documented in the EasyX reference manual.  Function names have
-  * the gtx_ removed, but the calling parameters are identical to the C
-  * syntax described in that manual.  From Java, anything referred to as
-  * CSW_Float in the reference should be double.
-  *
-  * Only a portion of the functions are supplied here.  If more prove
-  * useful they can be added later.
+  * display list follows.
   *
   * These functions boil down to sending Command calls to the native
   * side.  The arrays used in the Command function are allocated here

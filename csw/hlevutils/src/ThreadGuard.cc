@@ -92,9 +92,21 @@ void ThreadGuard::RemoveAllThreadData (void)
     }
     sw_calc_map.clear();
 
+    swf_it = sw_log_file_map.begin();
+    while (swf_it != sw_log_file_map.end()) {
+        if (swf_it->second != NULL) {
+            fclose (swf_it->second);
+        }
+        swf_it->second = NULL;
+        swf_it++;
+    }
+    sw_save_log_file_map.clear();
+
     swsf_it = sw_save_log_file_map.begin();
     while (swsf_it != sw_save_log_file_map.end()) {
-        delete (swsf_it->second);
+        if (swsf_it->second != NULL) {
+            fclose (swsf_it->second);
+        }
         swsf_it->second = NULL;
         swsf_it++;
     }
@@ -102,13 +114,73 @@ void ThreadGuard::RemoveAllThreadData (void)
 
     ezf_it = ez_log_file_map.begin();
     while (ezf_it != ez_log_file_map.end()) {
-        delete (ezf_it->second);
+        if (ezf_it->second != NULL) {
+            fclose (ezf_it->second);
+        }
         ezf_it->second = NULL;
         ezf_it++;
     }
     ez_log_file_map.clear();
 
     CanvasMgr.CleanAll ();
+}
+
+
+
+void ThreadGuard::RemoveThreadData (long jside_id)
+{
+    std::map<long, PATCHSplit*>::iterator it_ps;
+    std::map<long, GRDVert*>::iterator it_gv;
+    std::map<long, CSWGrdAPI*>::iterator it_ap;
+    std::map<long, SWCalc*>::iterator it_sw;
+    std::map<long, FILE*>::iterator ezf_it;
+    std::map<long, FILE*>::iterator swf_it;
+    std::map<long, FILE*>::iterator swsf_it;
+
+printf ("\nRemoveThreadData called for jside_id = %ld\n\n", jside_id);
+
+    it_ps = patch_split_map.find (jside_id);
+    if (it_ps != patch_split_map.end()) {
+        delete (it_ps->second);
+        it_ps->second = NULL;
+    }
+
+    it_gv = grd_vert_map.find (jside_id);
+    if (it_gv != grd_vert_map.end()) {
+        delete (it_gv->second);
+        it_gv->second = NULL;
+    }
+
+    it_ap = grd_api_map.find(jside_id);
+    if (it_ap != grd_api_map.end()) {
+        delete (it_ap->second);
+        it_ap->second = NULL;
+    }
+
+    ezf_it = ez_log_file_map.find (jside_id);
+    if (ezf_it != ez_log_file_map.end()) {
+        if (ezf_it->second != NULL) {
+            fclose (ezf_it->second);
+        }
+        ezf_it->second = NULL;
+    }
+
+    swf_it = sw_log_file_map.find (jside_id);
+    if (swf_it != sw_log_file_map.end()) {
+        if (swf_it->second != NULL) {
+            fclose (swf_it->second);
+        }
+        swf_it->second = NULL;
+    }
+
+    swsf_it = sw_save_log_file_map.find (jside_id);
+    if (swsf_it != sw_save_log_file_map.end()) {
+        if (swsf_it->second != NULL) {
+            fclose (swsf_it->second);
+        }
+        swf_it->second = NULL;
+    }
+
 }
 
 
@@ -285,7 +357,6 @@ SWCalc  *ThreadGuard::GetSWCalc (long jside_id)
 
     auto fscope = [&]()
     {
-        delete (sw);
     };
     CSWScopeGuard func_scope_guard (fscope);
 
@@ -300,9 +371,10 @@ SWCalc  *ThreadGuard::GetSWCalc (long jside_id)
             }
             catch (...) {
                 printf ("\n***** Exception from new in GetSWCalc *****\n\n");
-                return NULL;
+                sw = NULL;
             }
             it->second = sw;
+            sw = NULL;
         }
         return sw;
     }
@@ -313,7 +385,7 @@ SWCalc  *ThreadGuard::GetSWCalc (long jside_id)
     }
     catch (...) {
         printf ("\n***** Exception from new in GetSWCalc *****\n\n");
-        return sw;
+        sw = NULL;
     }
 
     try {

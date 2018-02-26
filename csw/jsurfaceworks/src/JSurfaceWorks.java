@@ -18,10 +18,14 @@ import java.util.Date;
 
 import javax.swing.SwingUtilities;
 
+import org.apache.logging.log4j.Logger;
+
+import csw.jeasyx.src.CreateNative;
 import csw.jutils.src.Bounds3D;
 import csw.jutils.src.ContactPolyline;
 import csw.jutils.src.NodeArray3D;
 import csw.jutils.src.TriangleArray;
+import csw.jutils.src.CSWLogger;
 
 import csw.jutils.src.XYPolyline;
 import csw.jutils.src.XYZNode;
@@ -35,19 +39,21 @@ import csw.jutils.src.XYZPolyline;
   command processor.  The actual calculation work is done in native functions.
 <p>
   This class is intended to be a calculation engine only.  You should create
-  a new instance as an local automatic variable, use it as you need, and
+  a new instance as a local variable on the stack, use it as you need, and
   let it get garbage collected when the method goes out of scope.
 <p>
   The effect is similar to calling static class methods.  Static methods
   are not used because of the native interface.  When data is returned from the
-  native interface, it needs to be returned to the same JSurfaceWorks object that initiated
-  the calculation, so I require an object to be instantiated in order to use
-  the methods.
+  native interface, it needs to be returned to the same JSurfaceWorks object
+  that initiated the calculation, so I require an object to be instantiated in
+  order to use the methods.
 
   @author Glenn Pinkerton
 
 */
 public class JSurfaceWorks extends JSurfaceWorksBase {
+
+    private static Logger logger = CSWLogger.getMyLogger ();
 
     static private final int SW_OPEN_LOG_FILE        = 9988;
     static private final int SW_PAUSE_LOG_FILE       = 9987;
@@ -157,6 +163,42 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
     int          IdataMax = HUGE_CHUNK;
     int          DdataMax = HUGE_CHUNK;
 
+    int          nativeID = -1;
+
+
+/**
+ *  Two constructors are provided.  The "default" constructor takes
+ *  no parameters.  This constructor sets the nativeID to -1, which 
+ *  makes the init method create native resources.
+ */
+    public JSurfaceWorks () {
+        nativeID = -1;
+        init ();
+    }
+
+
+    public JSurfaceWorks (int nid) {
+        nativeID = nid;
+        init ();
+    }
+
+
+    private void init ()
+    {
+        if (nativeID < 0) {
+            nativeID = CreateNative.createDlistResources ();
+            if (nativeID < 0) {
+                logger.error
+                ("    JSurfaceWorks constructor " +
+                 "failed to get native resources.");
+            }
+            else {
+                logger.info ("    JSurfaceWorks constructor succeeded.    ");
+            }
+        }
+    }
+
+
     private void newIdata (int size)
     {
         int     istat = 0;
@@ -183,13 +225,8 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
 
 /*-------------------------------------------------------------*/
 
-    //private static boolean isPaused;
-    
     static public long openLogFile (String fileName)
     {
-
-//System.out.println ("JSW log file attempt: " + fileName);
-//System.out.flush();
 
         if (fileName == null) {
             return -1;

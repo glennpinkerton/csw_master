@@ -567,15 +567,16 @@ public class JDisplayListPanel extends JPanel
         int dx = ix - x1Zoom;
         if (dx < 0) dx = -dx;
         if (dx < 2) {
-            zoomStarted = 0;
-            return;
+            ix = x1Zoom + 2;
         }
         dx = iy - y1Zoom;
         if (dx < 0) dx = -dx;
         if (dx < 2) {
-            zoomStarted = 0;
-            return;
+            iy = y1Zoom + 2;
         }
+
+System.out.println ("calling dlist zoomFrame");
+System.out.flush ();
 
         dlist.zoomFrame (zoomFrame,
                          zoomBordersFlag,
