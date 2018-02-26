@@ -32,7 +32,8 @@ static int (*JNIFunc)(char*, int, float, float*) = NULL;
 
 void gtx_SetTextBoundsJNIFunction (int (*func)(char*, int, float, float*))
 {
-    JNIFunc = func;
+    //JNIFunc = func;
+    JNIFunc = NULL;
 }
 
 

@@ -6543,14 +6543,10 @@ int CDisplayList::RescaleFrame (char *name, int resize_border_flag,
                 main_frame_num = i;
                 frmain = frptr;
 
-                jni_call_set_zoom_pan_data_method (
+                ezx_java_obj.SetZoomPan (
                     frptr->name,
                     oldx1, oldy1, oldx2, oldy2,
                     fx1, fy1, fx2, fy2);
-              //  oldx1 = oldx1;
-              //  oldy1 = oldy1;
-              //  oldx2 = oldx2;
-              //  oldy2 = oldy2;
 
                 break;
             }

@@ -253,6 +253,16 @@ class EZXJavaArea
         char           *layer_name,
         char           *item_name
     );
+
+    void SetZoomPan (char *fname,
+                     double oldx1,
+                     double oldy1,
+                     double oldx2,
+                     double oldy2,
+                     double fx1,
+                     double fy1,
+                     double fx2,
+                     double fy2);
     
 }; // end of main class
     

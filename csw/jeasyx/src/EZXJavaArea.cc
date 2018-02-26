@@ -71,6 +71,32 @@ int EZXJavaArea::ezx_SetFrameInJavaArea (int frame_num)
 }
 
 
+void EZXJavaArea::SetZoomPan (char *fname,
+                              double oldx1,
+                              double oldy1,
+                              double oldx2,
+                              double oldy2,
+                              double fx1,
+                              double fy1,
+                              double fx2,
+                              double fy2)
+{
+    jni_call_set_zoom_pan_data_method (
+        v_jenv,
+        v_jobj,
+        fname,
+        oldx1,
+        oldy1,
+        oldx2,
+        oldy2,
+        fx1,
+        fy1,
+        fx2,
+        fy2);
+}
+  
+
+
 int EZXJavaArea::ezx_AppendFillToJavaArea (
     CSW_F          *xy,
     CSW_F          thickness,
@@ -119,6 +145,8 @@ int EZXJavaArea::ezx_AppendFillToJavaArea (
     freeflag = ConvertToFloat (xy, npts, &fxy);
 
     jni_call_add_fill_method (
+        v_jenv,
+        v_jobj,
         fxy,
         thickness * ScreenDPI,
         patscale,
@@ -181,6 +209,8 @@ int EZXJavaArea::ezx_AppendLineToJavaArea (
     freeflag = ConvertToFloat (xy, npts, &fxy);
 
     jni_call_add_line_method (
+        v_jenv,
+        v_jobj,
         fxy,
         npts,
         red,
@@ -233,6 +263,8 @@ int EZXJavaArea::ezx_AppendTextToJavaArea (
 #endif
 
     jni_call_add_text_method (
+        v_jenv,
+        v_jobj,
         (float)x,
         (float)y,
         text,
@@ -291,6 +323,8 @@ int EZXJavaArea::ezx_AppendArcToJavaArea (
     closure += DrawingPriority * 10000;
 
     jni_call_add_arc_method (
+        v_jenv,
+        v_jobj,
         (float)x,
         (float)y,
         r1,
@@ -360,6 +394,8 @@ int EZXJavaArea::ezx_AppendFilledArcToJavaArea (
 #endif
 
     jni_call_add_filled_arc_method (
+        v_jenv,
+        v_jobj,
         (float)x,
         (float)y,
         r1,
@@ -417,6 +453,8 @@ int EZXJavaArea::ezx_AppendImageToJavaArea (
 #endif
 
     jni_call_add_image_method (
+        v_jenv,
+        v_jobj,
         (float)x1,
         (float)y1,
         (float)x2,
@@ -471,6 +509,8 @@ int EZXJavaArea::ezx_AppendFrameToJavaArea (
 #endif
 
     jni_call_add_frame_method (
+        v_jenv,
+        v_jobj,
         (float)x1, (float)y1, (float)x2, (float)y2,
         fx1, fy1, fx2, fy2,
         borderflag,
