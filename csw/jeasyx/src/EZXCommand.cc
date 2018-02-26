@@ -179,6 +179,7 @@ int ezx_process_command (
         }
       #endif
 
+        ThreadGuard::RemoveThreadData ((long)(ilist[0]));
         istat = canvas_manager_ptr->RemoveGraphicsCanvasFromManager (ilist[0]);
         return istat;
     }

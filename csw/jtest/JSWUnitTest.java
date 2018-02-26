@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -16,6 +16,9 @@ import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -39,6 +42,8 @@ import csw.jeasyx.src.DLConst;
 import csw.jeasyx.src.DLSurfaceProperties;
 import csw.jeasyx.src.JDisplayList;
 import csw.jeasyx.src.JEasyXGraphicsPanel;
+import csw.jeasyx.src.JDLFrame;
+import csw.jeasyx.src.JDLFrameList;
 
 /**
  *
@@ -91,6 +96,19 @@ public class JSWUnitTest {
         JSWUnitTestFrame frame = new JSWUnitTestFrame (nphint);
         frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
         frame.setVisible (true);
+
+        frame.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                System.out.println ();
+                System.out.println("Main Window Closed");
+                System.out.flush ();
+                e.getWindow().dispose();
+                JDLFrameList.removeAllFrames ();
+            }
+        });
 
     }
 
@@ -250,13 +268,16 @@ catch (Exception e) {
 
 }
 
-class TriMesh10Frame extends JFrame
+class TriMesh10Frame extends JDLFrame
 {
 
     private static final long serialVersionUID = 1L;
 
     public TriMesh10Frame (int nphint)
     {
+        super ();
+        int  dl_id = super.getNativeID ();
+
         JSurfaceWorks      sw;
         Random             random;
         double[]           x, y, z;
@@ -271,15 +292,10 @@ class TriMesh10Frame extends JFrame
         setTitle ("TriMesh Test " + np);
         setSize (900, 700);
         setResizable (true);
-        setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
-        JEasyXGraphicsPanel gpanel = new JEasyXGraphicsPanel ();
+        JDisplayList dl = super.getDL ();
 
-        Container contentPane = getContentPane ();
-        contentPane.add (gpanel);
-
-        JDisplayList dl = gpanel.getDisplayList ();
-        sw = new JSurfaceWorks ();
+        sw = new JSurfaceWorks (dl_id);
 
         x = new double[np];
         y = new double[np];
@@ -355,17 +371,21 @@ class TriMesh10Frame extends JFrame
 
 };
 
-class Grid10Frame extends JFrame
+class Grid10Frame extends JDLFrame
 {
 
     private static final long serialVersionUID = 1L;
 
     public Grid10Frame (int nphint)
     {
+        super ();
+
         JSurfaceWorks      sw;
         Random             random;
         double[]           x, y, z;
         int                i;
+
+        int  dl_id = super.getNativeID ();
 
         random = new Random();
         long  ctw = System.currentTimeMillis ();
@@ -383,7 +403,8 @@ class Grid10Frame extends JFrame
         contentPane.add (gpanel);
 
         JDisplayList dl = gpanel.getDisplayList ();
-        sw = new JSurfaceWorks ();
+
+        sw = new JSurfaceWorks (dl_id);
 
         x = new double[np];
         y = new double[np];

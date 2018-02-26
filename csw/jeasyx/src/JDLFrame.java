@@ -45,6 +45,7 @@ public class JDLFrame extends JFrame {
   *  by a derived class via the getDL method.
   */
     private JDisplayList  dl = null;
+    private int           dlist_id = -1;
 
 /**
  *  This constructor will create a frame with a "tool bar" at the
@@ -92,6 +93,8 @@ public class JDLFrame extends JFrame {
           dl = dpanel.getDisplayList ();
         }
 
+        dlist_id = dl.getNativeID ();
+
         long  nid = 0;
 
         JDLFrameList.addFrame (nid, this);
@@ -99,6 +102,8 @@ public class JDLFrame extends JFrame {
     }
 
     public JDisplayList getDL () {return dl;}
+
+    public int getNativeID () {return dlist_id;};
 
 /*
  * derived class needs to override this method for the

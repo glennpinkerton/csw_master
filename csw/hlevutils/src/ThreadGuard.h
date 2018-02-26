@@ -71,6 +71,7 @@ namespace ThreadGuard
   void RemoveSWLogFiles (long jside_id);
   void RemoveEZLogFile (long jside_id);
 
+  void RemoveThreadData (long jsiae_id);
   void RemoveAllThreadData (void);
 
 }; // end of namespace

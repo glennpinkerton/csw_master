@@ -16,6 +16,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <csw/hlevutils/src/ThreadGuard.h>
+
 #include <csw/jsurfaceworks/private_include/SurfaceWorksJNI.h>
 #include <csw/jsurfaceworks/private_include/SWCommand.h>
 #include <csw/utils/include/csw_.h>
@@ -3493,6 +3495,8 @@ int main (int argc, char *argv[])
         }
 
     } /* end of for loop reading the file */
+
+    ThreadGuard::RemoveAllThreadData ();
 
     if (fptr != NULL) {
         fclose (fptr);

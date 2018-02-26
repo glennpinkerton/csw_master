@@ -12,8 +12,10 @@ package csw.jeasyx.src;
 
 /**
  *  The CreateNative class is only used for creating native side resources
- *  associated with the display list.  This class cannot be instantiated.  
- *  It provides static methods at package scope which in turn call native
+ *  associated with the display list or the surface calculation code.
+ *
+ *  This class cannot be instantiated.  
+ *  It provides static methods at public scope which in turn call native
  *  methods to create C and C++ resources on the native side.
  *
  *  I (Glenn) isolate these static methods in an attempt to lock the resource
@@ -24,7 +26,7 @@ package csw.jeasyx.src;
  *  locking to insure that native resource creation does not clobber itself.
  */
 
-class CreateNative 
+public class CreateNative 
 {
 
 // private constructor should insure no objects of this class 
@@ -34,7 +36,7 @@ class CreateNative
 
 // static method to create display list native resources
 
-    static synchronized int  createDlistResources ()
+    public static synchronized int  createDlistResources ()
     {
         int    istat = -1;
 
