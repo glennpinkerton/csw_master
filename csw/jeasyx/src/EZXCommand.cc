@@ -53,6 +53,8 @@
 #include "csw/utils/include/csw_.h"
 #include "csw/utils/private_include/csw_scope.h"
 
+#include <csw/utils/private_include/TextBounds.h>
+
 
 
 /*
@@ -2380,6 +2382,44 @@ void ezx_set_void_ptrs (int dlist_index, void *v_jenv, void *v_jobj)
     return;
 
 }
+
+
+int  ezx_get_jenv (int dlist_index,
+                   void **venv,
+                   void **vobj)
+{
+    *venv = NULL;
+    *vobj = NULL;
+
+    if (dlist_index < 0) {
+        return -1;
+    }
+
+// Get a pointer to the global canvas manager.
+
+    CanvasManager    *canvas_manager_ptr = ThreadGuard::GetCanvasManager ();
+
+// Get the display list pointer for this dlist_index
+
+    CDisplayList *dlist = canvas_manager_ptr->GetDisplayList (dlist_index);
+
+    if (dlist == NULL) {
+        return -1;
+    }
+
+    void *v_jenv = dlist->ezx_java_obj.GetVenv();
+    void *v_jobj = dlist->ezx_java_obj.GetVobj();
+
+    *venv = v_jenv;
+    *vobj = v_jobj;
+
+    return 1;
+
+}
+
+
+
+
 
 }  // end of extern "C" block
 

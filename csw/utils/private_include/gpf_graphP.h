@@ -392,6 +392,8 @@ class GPFGraph  :  public GraphBase
 
   private:
 
+    int    dlist_index = -1;
+
     GPFCalcdraw      calcdraw_obj;
     CSWTimeUtil      timeutil_obj;
     GPFFont          font_obj;
@@ -521,6 +523,8 @@ class GPFGraph  :  public GraphBase
 
 
   public:
+
+    void SetDlistIndex (int index) {dlist_index = index;};
 
     int gpf_StartGraph (CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,
                         CSW_F units, int basetime,

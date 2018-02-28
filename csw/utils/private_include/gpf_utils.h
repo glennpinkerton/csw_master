@@ -91,7 +91,8 @@
                              double x, double y, double z, double *dist);
     int gpf_perpdsquare (CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,
                          CSW_F x, CSW_F y, CSW_F *dist);
-    int gpf_HorTextBoxSize (const char *text, int font, CSW_F size, CSW_F gap,
+    int gpf_HorTextBoxSize (int dlist_index,
+                            const char *text, int font, CSW_F size, CSW_F gap,
                             CSW_F *width, CSW_F *height, int *nlinesout,
                             CSW_F page_units_per_inch);
     int gpf_FindClosest (CSW_F x, CSW_F y, CSW_F *xa, CSW_F *ya, int npts);

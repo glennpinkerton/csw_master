@@ -459,7 +459,8 @@ extern "C" {
     void jni_msg (char const *text);
 
     int jni_get_text_bounds (
-        char    *text,
+        int     dlist_index,
+        const char    *text,
         int     font_num,
         float   fsize,
         float   *bounds);

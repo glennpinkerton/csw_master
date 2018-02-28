@@ -36,6 +36,10 @@ int ezx_process_command (
 
 void ezx_set_void_ptrs (int dlist_id, void *v_jenv, void *v_jobj);
 
+int  ezx_get_jenv (int dlist_index,
+                   void **venv,
+                   void **vobj);
+
 #ifdef __cplusplus
 }
 #endif

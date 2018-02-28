@@ -82,7 +82,7 @@ public:
 
     EZXJavaArea    ezx_java_obj;
 
-    CDisplayList();
+    CDisplayList(int index);
     CDisplayList (const CDisplayList &old);
     CDisplayList &operator=(const CDisplayList &old);
     virtual ~CDisplayList();
@@ -975,6 +975,8 @@ private:
     int      *ImageNFaultPoints = NULL,
              ImageNFaults,
              ImageNFaultTotal;
+
+    int      dlist_index = -1;
 
   /*
    * graphic attribute state members

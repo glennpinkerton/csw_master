@@ -47,7 +47,6 @@ class JDisplayListBase extends DLConst {
 
     JDisplayListBase () {
         createDefaultPopupButtons ();
-        registerFontMethods ();
     }
 
   /*
@@ -3432,31 +3431,6 @@ class JDisplayListBase extends DLConst {
         return FontUtils.getDefaultFont (size);
     }
 
-/*-------------------------------------------------------------------------*/
-
-    private native void setFontMethods ();
-
-/*-------------------------------------------------------------------------*/
-
-    private boolean fontsRegistered = false;
-
-  /**
-   * Inform the native code that font methods are accessile for this object
-   * This is called the first time any drawing setup call is made for the
-   * DisplayList object.
-   */
-    protected void registerFontMethods ()
-    {
-
-        if (fontsRegistered) {
-            return;
-        }
-
-        setFontMethods ();
-
-        return;
-
-    }
 
 /*-------------------------------------------------------------------------*/
 

@@ -575,9 +575,6 @@ public class JDisplayListPanel extends JPanel
             iy = y1Zoom + 2;
         }
 
-System.out.println ("calling dlist zoomFrame");
-System.out.flush ();
-
         dlist.zoomFrame (zoomFrame,
                          zoomBordersFlag,
                          x1Zoom,

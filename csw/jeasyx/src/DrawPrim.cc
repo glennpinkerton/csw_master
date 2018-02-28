@@ -3021,6 +3021,7 @@ CSW_F GTXDrawPrim::exact_text_length (char *text, CSW_F size, int font)
      */
         tsize = size / PageUnitsPerInch;
         gtx_GetTextBounds (
+            dlist_index,
             text,
             font,
             tsize,

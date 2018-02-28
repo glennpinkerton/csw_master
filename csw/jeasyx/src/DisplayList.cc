@@ -58,7 +58,7 @@ void CDisplayList::ZeroInit (T p, int n) {
 /*
  * Constructor
  */
-CDisplayList::CDisplayList()
+CDisplayList::CDisplayList(int index)
 {
     int          i;
 
@@ -69,6 +69,11 @@ CDisplayList::CDisplayList()
     page_units_type = 1;
 
     ImageID = -1;
+
+    dlist_index = index;
+
+    gtx_drawprim_obj.SetDlistIndex (dlist_index);
+    gpf_graph_obj.SetDlistIndex (dlist_index);
 
 /*
  * Initialize graphic attribute states to defaults.
@@ -4241,6 +4246,7 @@ int CDisplayList::CalcTextBounds (int text_prim_num,
  * Get the text bounds in inches.
  */
     gtx_GetTextBounds (
+        dlist_index,
         tptr->chardata,
         tptr->font_num,
         tptr->size,
@@ -15725,7 +15731,8 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
     /*
      * Get the text bounds in inches.
      */
-        gtx_GetTextBounds (tptr->chardata,
+        gtx_GetTextBounds (dlist_index,
+                           tptr->chardata,
                            tptr->font_num,
                            tptr->size,
                            bounds);
@@ -19060,7 +19067,8 @@ void CDisplayList::distance_to_text (CSW_F xin,
  * Get the rotated rectangle bounding the text
  * and check for distance to it.
  */
-    gtx_GetTextBounds (chardata,
+    gtx_GetTextBounds (dlist_index,
+                     chardata,
                      font_num,
                      fsize,
                      bounds);
