@@ -28,12 +28,18 @@
 
 /*-----------------------------------------------------------------------------*/
 
-static int (*JNIFunc)(char*, int, float, float*) = NULL;
+static int (*JNIFunc)(int, const char*, int, float, float*) = NULL;
 
-void gtx_SetTextBoundsJNIFunction (int (*func)(char*, int, float, float*))
+/*
+ * This function must be called from the CreateNative code to make it
+ * thread safe.  Only the first call will do anything.  Only one
+ * text bounds jni function is allowed per JVM.
+ */
+void gtx_SetTextBoundsJNIFunction (int (*func)(int, const char*, int, float, float*))
 {
-    //JNIFunc = func;
-    JNIFunc = NULL;
+    if (JNIFunc == NULL) {
+        JNIFunc = func;
+    }
 }
 
 
@@ -43,7 +49,8 @@ void gtx_SetTextBoundsJNIFunction (int (*func)(char*, int, float, float*))
  * be at least 3 elements long.
  */
 void gtx_GetTextBounds (
-    char       *text,
+    int        dlid,
+    const char       *text,
     int        font_num,
     CSW_F      fsize,
     CSW_F      *bounds)
@@ -82,9 +89,11 @@ void gtx_GetTextBounds (
     }
 
     else {
+      if (dlid >= 0) {
         if (JNIFunc != NULL) {
             istat =
             (*JNIFunc) (
+                dlid,
                 text,
                 font_num,
                 ffsize,
@@ -100,6 +109,12 @@ void gtx_GetTextBounds (
             bounds[1] = (double) (fbounds[1]);
             bounds[2] = (double) (fbounds[2]);
         }
+      }
+      else {
+        bounds[0] = strlen(text) * fsize * .75f;
+        bounds[1] = fsize;
+        bounds[2] = 0;
+      }
     }
 
     return;

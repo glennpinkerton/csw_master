@@ -39,21 +39,7 @@
 CanvasManager::~CanvasManager ()
 {
 
-    GRaphicsCanvasStruct    *cl_data = NULL;
-    int                     cl_size = 0;
-
-    cl_data = CanvasList.data();
-    cl_size = CanvasList.size();
-    
-    if (cl_data != NULL  &&  cl_size > 0) {
-        for (int i=0; i<cl_size; i++) {
-            CDisplayList  *dl = CanvasList[i].dlist;
-            if (dl != NULL) {
-                delete dl;
-            }
-            CanvasList[i].dlist = NULL;
-        }
-    }
+    RemoveAllFromManager ();
 
 }
 
@@ -80,7 +66,7 @@ int CanvasManager::CreateGraphicsCanvas ()
         cptr = cl_data + i;
         if (cptr->dlist == NULL) {
             try {
-                cptr->dlist = new CDisplayList ();
+                cptr->dlist = new CDisplayList (i);
             }
             catch (...) {
                 printf ("\n*****  caught new exception creating display list  *****\n\n");
@@ -115,7 +101,7 @@ int CanvasManager::CreateGraphicsCanvas ()
     cptr = cl_data + cl_size - 1;
 
     try {
-        cptr->dlist = new CDisplayList ();
+        cptr->dlist = new CDisplayList (cl_size - 1);
     }
     catch (...) {
         printf ("\n*****  caught new exception on display list  *****\n\n");
@@ -175,6 +161,29 @@ CDisplayList *CanvasManager::GetDisplayList (int index)
     GRaphicsCanvasStruct *cs = cl_data + index;
 
     return cs->dlist;
+
+}
+
+
+int CanvasManager::RemoveAllFromManager ()
+{
+    GRaphicsCanvasStruct    *cl_data = NULL;
+    int                     cl_size = 0;
+
+    cl_data = CanvasList.data();
+    cl_size = CanvasList.size();
+    
+    if (cl_data != NULL  &&  cl_size > 0) {
+        for (int i=0; i<cl_size; i++) {
+            CDisplayList  *dl = CanvasList[i].dlist;
+            if (dl != NULL) {
+                delete dl;
+            }
+            CanvasList[i].dlist = NULL;
+        }
+    }
+
+    return 1;
 
 }
 

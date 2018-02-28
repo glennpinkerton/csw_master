@@ -493,14 +493,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_convertToFrame
 JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
   (JNIEnv *, jobject, jint, jint, jint);
 
-/*
- * Class:     csw_jeasyx_src_JDisplayListBase
- * Method:    setFontMethods
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_setFontMethods
-  (JNIEnv *, jobject);
-
 #ifdef __cplusplus
 }
 #endif

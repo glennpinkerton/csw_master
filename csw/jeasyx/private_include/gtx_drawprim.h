@@ -80,6 +80,8 @@ class GTXDrawPrim
 
     EZXJavaArea    *ezx_java_ptr = NULL;
 
+    int            dlist_index = -1;
+
 
   public:
 
@@ -87,6 +89,9 @@ class GTXDrawPrim
     ~GTXDrawPrim () {gtx_FreeDrawPrim ();};
 
     void SetEZXJavaPtr (EZXJavaArea *p) {ezx_java_ptr = p;};
+
+    void SetDlistIndex (int index) {dlist_index = index;};
+
 
   private:    
 

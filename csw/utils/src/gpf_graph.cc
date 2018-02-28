@@ -1493,7 +1493,8 @@ int GPFGraph::gpf_CalcGraphAxis (int position, const char *caption,
     if (labels  &&  nlabels > 0) {
         nmajor = 2;
         for (i=0; i<nlabels; i++) {
-            gpf_HorTextBoxSize (labels[i], AxisLabelFont, AxisLabelSize,
+            gpf_HorTextBoxSize (dlist_index,
+                                labels[i], AxisLabelFont, AxisLabelSize,
                                 AxisLabelSize/3.0f, &tlen, &theight, &nl,
                                 PageUnitsPerInch);
             nmajor += nl;
@@ -1541,7 +1542,8 @@ int GPFGraph::gpf_CalcGraphAxis (int position, const char *caption,
         xtmax = 0.0;
         for (i=0; i<nlabels; i++) {
 
-            gpf_HorTextBoxSize (labels[i], AxisLabelFont, AxisLabelSize,
+            gpf_HorTextBoxSize (dlist_index,
+                                labels[i], AxisLabelFont, AxisLabelSize,
                                 AxisLabelSize/3.0f, &tlen, &theight, &nl,
                                 PageUnitsPerInch);
             if (theight > offsety) offsety = theight;
@@ -3720,7 +3722,8 @@ int GPFGraph::gpf_CalcGraphTitle (const char *title,
 /*
     Get the height and width of the text.
 */
-    gpf_HorTextBoxSize (title, GraphTitleFont, GraphTitleSize,
+    gpf_HorTextBoxSize (dlist_index,
+                        title, GraphTitleFont, GraphTitleSize,
                         GraphTitleSize / 3.0f, &tlen, &theight, &nlines,
                         PageUnitsPerInch);
 
@@ -4347,7 +4350,8 @@ int GPFGraph::gpf_CalcGraphLegend (const char *legendtitle, int drawtitle,
     if (drawtitle) {
         if (GraphTitlePos == GTX_TITLE_IN_LEGEND  ||  LegendPosition == GTX_GLOBAL_LEGEND) {
             if (legendtitle) {
-                gpf_HorTextBoxSize (legendtitle, GraphTitleFont, GraphTitleSize,
+                gpf_HorTextBoxSize (dlist_index,
+                                    legendtitle, GraphTitleFont, GraphTitleSize,
                                     GraphTitleSize / 3.0f, &titlewidth, &titleheight,
                                     &ntextline, PageUnitsPerInch);
                 width = titlewidth;
@@ -4376,7 +4380,8 @@ int GPFGraph::gpf_CalcGraphLegend (const char *legendtitle, int drawtitle,
         }
 
         gpf_HorTextBoxSize
-                    (legptr->text, legptr->textfont, legptr->textsize,
+                    (dlist_index,
+                     legptr->text, legptr->textfont, legptr->textsize,
                      legptr->textsize / 3.0f, &twidth, &theight, &ntextline,
                      PageUnitsPerInch);
         theight += legptr->textthick * 2.0f;
@@ -4656,7 +4661,8 @@ int GPFGraph::gpf_CalcGraphLegend (const char *legendtitle, int drawtitle,
             case LEGEND_LINE:
 
                 gpf_HorTextBoxSize
-                    (legptr->text, legptr->textfont, legptr->textsize,
+                    (dlist_index,
+                     legptr->text, legptr->textfont, legptr->textsize,
                      legptr->textsize / 3.0f, &twidth, &theight, &ntextline,
                      PageUnitsPerInch);
                 if (legptr->thick > theight) theight = legptr->thick;
@@ -4710,7 +4716,8 @@ int GPFGraph::gpf_CalcGraphLegend (const char *legendtitle, int drawtitle,
             case LEGEND_SYMB:
 
                 gpf_HorTextBoxSize
-                    (legptr->text, legptr->textfont, legptr->textsize,
+                    (dlist_index,
+                     legptr->text, legptr->textfont, legptr->textsize,
                      legptr->textsize / 3.0f, &twidth, &theight, &ntextline,
                      PageUnitsPerInch);
                 theight += legptr->textthick * 2.0f;
@@ -4785,7 +4792,8 @@ int GPFGraph::gpf_CalcGraphLegend (const char *legendtitle, int drawtitle,
             case LEGEND_POINT:
 
                 gpf_HorTextBoxSize
-                    (legptr->text, legptr->textfont, legptr->textsize,
+                    (dlist_index,
+                     legptr->text, legptr->textfont, legptr->textsize,
                      legptr->textsize / 3.0f, &twidth, &theight, &ntextline,
                      PageUnitsPerInch);
                 theight += legptr->textthick * 2.0f;
@@ -4842,7 +4850,8 @@ int GPFGraph::gpf_CalcGraphLegend (const char *legendtitle, int drawtitle,
             case LEGEND_FILL:
 
                 gpf_HorTextBoxSize
-                    (legptr->text, legptr->textfont, legptr->textsize,
+                    (dlist_index,
+                     legptr->text, legptr->textfont, legptr->textsize,
                      legptr->textsize / 3.0f, &twidth, &theight, &ntextline,
                      PageUnitsPerInch);
                 theight += legptr->textthick * 2.0f;
@@ -5062,7 +5071,8 @@ int GPFGraph::MultiLineTextPrims (GRaphTextRec **tptrin, const char *text,
 /*
     Calculate width of text for centering.
 */
-    gpf_HorTextBoxSize (text, font, size, gap,
+    gpf_HorTextBoxSize (dlist_index,
+                        text, font, size, gap,
                         &twidth, &theight, &nlines,
                         PageUnitsPerInch);
     if (centerflag == 2) x -= twidth / 2.0f;
@@ -7398,6 +7408,7 @@ CSW_F GPFGraph::exact_text_length (char *text, CSW_F size, int font)
     else {
         tsize = size / PageUnitsPerInch;
         gtx_GetTextBounds (
+            dlist_index,
             text,
             font,
             tsize,

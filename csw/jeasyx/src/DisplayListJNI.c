@@ -64,18 +64,8 @@ static jmethodID      SelectFillMethodID = NULL,
                       SelectContourMethodID = NULL,
                       ConvertedXYZMethodID = NULL;
 
-static jmethodID      SymbFillMethodID = NULL,
-                      SymbLineMethodID = NULL,
-                      SymbArcMethodID = NULL,
-                      SymbFilledArcMethodID = NULL;
-
-static jmethodID      FontBoundsMethodID = NULL;
-
 static JNIEnv         *JavaEnv;
 static jobject        JavaObj;
-static jclass         JavaCls;
-
-static int            FunctionSet = 0;
 
 static int setup_return_select_method_ids(JNIEnv *env, jclass cls);
 
@@ -173,33 +163,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
     threadid = (int)j_thread_id;
 
 /*
- *  This block of code can be uncommented to enable debug of
- *  this code when called from java.  The DebugBreak function
- *  is only available under microsloth.
-#ifdef _GUI_MSWIN_
-    static int       first = 1;
-    if (first) {
-        first = 0;
-        DebugBreak ();
-    }
-#endif
- */
-
-/*
- * The first time this is called, I need to set the function
- * pointer on the TextBounds.c file (located in the utils
- * area).  This is done because there are circular references
- * if I try to use the function name directly from the utils
- * library.
- */
-    if (FunctionSet == 0) {
-        gtx_SetTextBoundsJNIFunction (
-            jni_get_text_bounds
-        );
-        FunctionSet = 1;
-    }
-
-/*
  * If the int type is not a 32 bit signed integer, a conversion
  * from jint to int will be needed.  If the int is smaller than
  * a 32 bit signed then don't even compile since there will be
@@ -263,6 +226,9 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
 
     ezx_set_void_ptrs (dlist_index, (void *)jnienv, (void *)jobj);
 
+    if (command_id == GTX_CREATEWINDOW) {
+        gtx_SetTextBoundsJNIFunction (jni_get_text_bounds);
+    }
 
     if (j_llist) {
         jllist = (*jnienv)->GetLongArrayElements (jnienv, j_llist, JNI_FALSE);
@@ -1639,6 +1605,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
 
     dlist_index = (int)j_dlist_index;
     threadid = (int)j_threadid;
+
+    ezx_set_void_ptrs (dlist_index, (void *)env, (void *)obj);
 
 /*
  * Fill the ilist array.
@@ -3298,6 +3266,11 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
     dlist_index = (int)j_dlist_index;
     threadid = (int)j_threadid;
 
+    dlist_index = (int)j_dlist_index;
+
+    ezx_set_void_ptrs (dlist_index, (void *)env, (void *)obj);
+
+    threadid = (int)j_threadid;
 /*
  * Fill the ilist array.
  */
@@ -3421,107 +3394,16 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
 
 }
 
-/*
- * Get the parts for the specified symbol.  This is a static method
- * that does not need a display list available to work.  This should 
- * be synchronized for thread safety in the java code.
- */
-JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_getNativeSymbolParts
-(
-    JNIEnv *env,
-    jclass cls,
-    jint j_threadid,
-    jint j_symbol_number,
-    jdouble j_symbol_size,
-    jdouble j_symbol_angle,
-    jint j_dpi
-)
-{
-    jint    jstat;
-    int     istat;
-    int     symb, dpi;
-    double  size, angle;
-    int     ilist[2];
-    double  ddata[2];
-
-    int threadid;
-
-    JavaCls = cls;
-    JavaEnv = env;
-
-    threadid = (int)j_threadid;
-
-    SymbFillMethodID =
-        (*env)->GetStaticMethodID (env, cls, "addSymbNativeFill",
-                                   "([FFFIIIIIIIII)V");
-    if (SymbFillMethodID == NULL) {
-        return -1;
-    }
-
-    SymbLineMethodID =
-        (*env)->GetStaticMethodID (env, cls, "addSymbNativeLine",
-                                   "([FIIIIIIFIII)V");
-    if (SymbLineMethodID == NULL) {
-        return -1;
-    }
-
-    SymbArcMethodID =
-        (*env)->GetStaticMethodID (env, cls, "addSymbNativeArc",
-                                   "(FFFFFFIIIIIFFIII)V");
-    if (SymbArcMethodID == NULL) {
-        return -1;
-    }
-
-    SymbFilledArcMethodID =
-        (*env)->GetStaticMethodID (env, cls, "addSymbNativeFilledArc",
-                                   "(FFFFFFIIIIIFFIIII)V");
-    if (SymbFilledArcMethodID == NULL) {
-        return -1;
-    }
-
-    symb = (int)j_symbol_number;
-    size = (double)j_symbol_size;
-    angle = (double)j_symbol_angle;
-    dpi = (int)j_dpi;
-
-/*
- * Use the process command so the command gets logged if needed.
- */
-    ilist[0] = symb;
-    ilist[1] = dpi;
-    ddata[0] = size;
-    ddata[1] = angle;
-
-    istat =
-    ezx_process_command (
-                         0,
-                         GTX_GET_SYMBOL_PARTS,
-                         threadid,
-                         NULL,
-                         ilist,
-                         NULL,
-                         NULL,
-                         NULL,
-                         NULL,
-                         NULL,
-                         ddata,
-                         NULL);
-    jstat = (jint)istat;
-
-    return jstat;
-
-}
-
-
-
 /*-------------------------------------------------------------------------*/
 
 int jni_get_text_bounds (
-    char    *text,
+    int     dlist_index,
+    const char    *text,
     int     font_num,
     float   fsize,
     float   *bounds)
 {
+
     jstring      jtext;
     jint         jfont_num;
     jdouble      jfsize;
@@ -3531,33 +3413,71 @@ int jni_get_text_bounds (
     double       dtest[3];
 
     bounds[0] = 0.0;
-    bounds[1] = 0.0;
+    bounds[1] = fsize;
     bounds[2] = 0.0;
 
-    if (FontBoundsMethodID == NULL) {
+    if (text == NULL  ||  dlist_index < 0) {
+printf ("text NULL or index -1\n");
+fflush (stdout);
         return -1;
     }
 
-    jtext = (*JavaEnv)->NewStringUTF (JavaEnv, text);
+    void   *v_jenv = NULL;
+    void   *v_jobj = NULL;
+
+    int  vstat = ezx_get_jenv (dlist_index,
+                               &v_jenv,
+                               &v_jobj);
+
+    int  tlen = strlen (text);
+    bounds[0] = .75 * fsize * tlen;
+
+    jmethodID      FontBoundsMethodID = NULL;
+
+    if (vstat == -1  ||  v_jenv == NULL  ||  v_jobj == NULL) {
+printf ("Null java pointers\n");
+fflush (stdout);
+        return -1;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    FontBoundsMethodID = (*jenv)->GetMethodID (jenv, jcls, "getTextBounds",
+                                     "(Ljava/lang/String;ID[D)V");
+
+    if (FontBoundsMethodID == NULL) {
+printf ("Null method id\n");
+fflush (stdout);
+        return -1;
+    }
+
+    jtext = (*jenv)->NewStringUTF (jenv, text);
     if (jtext == NULL) {
+printf ("null jtext\n");
+fflush (stdout);
         return -1;
     }
 
     jfont_num = (jint)font_num;
     jfsize = (jdouble)fsize;
 
-    jbounds = (*JavaEnv)->NewDoubleArray (JavaEnv, 3);
+    jbounds = (*jenv)->NewDoubleArray (jenv, 3);
     if (jbounds == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jtext);
+        (*jenv)->DeleteLocalRef (jenv, jtext);
+printf ("null jbounds\n");
+fflush (stdout);
         return -1;
     }
 
-    dtest[0] = 10.0;
-    dtest[1] = 20.0;
-    dtest[2] = 30.0;
+    dtest[0] = (double)bounds[0];
+    dtest[1] = (double)fsize;;
+    dtest[2] = 0.0;
 
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         jbounds,
         0,
         3,
@@ -3566,16 +3486,16 @@ int jni_get_text_bounds (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         FontBoundsMethodID,
         jtext,
         jfont_num,
         jfsize,
         jbounds);
 
-    ddata = (*JavaEnv)->GetDoubleArrayElements (JavaEnv, jbounds, NULL);
+    ddata = (*jenv)->GetDoubleArrayElements (jenv, jbounds, NULL);
 
     if (ddata != NULL) {
         bounds[0] = (float)ddata[0];
@@ -3583,45 +3503,14 @@ int jni_get_text_bounds (
         bounds[2] = (float)ddata[2];
     }
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jtext);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jbounds);
+    (*jenv)->DeleteLocalRef (jenv, jtext);
+    (*jenv)->DeleteLocalRef (jenv, jbounds);
 
     return 1;
 
 }
 
 
-
-/*
- *  Draw the current active display list back to the Java side.
- */
-JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_setFontMethods
-  (JNIEnv *env, jobject obj)
-{
-    jclass           cls;
-
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\n\nCalling nativeDraw\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
-    }
-  #endif
-
-/*
- * Find the Java class methods for getting font data.
- * The same method will be used by all threads, so the actual
- * caching of the method id hefre is not thread critical.
- * However, the java code which does the work should be synchronized.
- */
-    cls = (*env)->GetObjectClass (env, obj);
-
-    FontBoundsMethodID = (*env)->GetMethodID (env, cls, "getTextBounds",
-                                     "(Ljava/lang/String;ID[D)V");
-
-    return;
-
-}
 
 /*-------------------------------------------------------------------------*/
 
@@ -3662,6 +3551,8 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_convertToFrame
 
     dlist_index = (int)j_dlist_index;
     threadid = (int)j_threadid;
+
+    ezx_set_void_ptrs (dlist_index, (void *)env, (void *)obj);
 
     JavaEnv = env;
     JavaObj = obj;

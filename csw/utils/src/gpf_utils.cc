@@ -1452,7 +1452,8 @@ int gpf_perpdsquare (CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,
 
 */
 
-int gpf_HorTextBoxSize (const char *text, int font, CSW_F size, CSW_F gap,
+int gpf_HorTextBoxSize (int dlist_index,
+                        const char *text, int font, CSW_F size, CSW_F gap,
                         CSW_F *width, CSW_F *height, int *nlinesout,
                         CSW_F page_units_per_inch)
 {
@@ -1509,6 +1510,7 @@ int gpf_HorTextBoxSize (const char *text, int font, CSW_F size, CSW_F gap,
     tsize = size / page_units_per_inch;
     for (i=0; i<nlines; i++) {
         gtx_GetTextBounds (
+            dlist_index,
             cptrs[i],
             font,
             tsize,

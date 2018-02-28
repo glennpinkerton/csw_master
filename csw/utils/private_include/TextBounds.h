@@ -18,10 +18,11 @@ extern "C"
 {
 #endif
 
-void gtx_SetTextBoundsJNIFunction (int (*func)(char*, int, float, float*));
+void gtx_SetTextBoundsJNIFunction (int (*func)(int, const char*, int, float, float*));
 
 void gtx_GetTextBounds (
-    char    *text,
+    int     dlist_index,
+    const char    *text,
     int     font_num,
     CSW_F   size,
     CSW_F   *bounds);

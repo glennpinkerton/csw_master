@@ -82,6 +82,9 @@ class EZXJavaArea
         v_jobj = vp2;
     }
 
+    void *GetVenv () {return v_jenv;};
+    void *GetVobj () {return v_jobj;};
+
     void ezx_SetScreenDPI (int ival);
     void ezx_SetAlphaValue (int ival);
     

@@ -122,6 +122,7 @@ void ThreadGuard::RemoveAllThreadData (void)
     }
     ez_log_file_map.clear();
 
+    CanvasMgr.RemoveAllFromManager ();
     CanvasMgr.CleanAll ();
 }
 

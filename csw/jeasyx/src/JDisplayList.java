@@ -423,7 +423,6 @@ public class JDisplayList extends JDisplayListBase {
             dlist_yminHint = page_yminHint;
             dlist_xmaxHint = page_xmaxHint;
             dlist_ymaxHint = page_ymaxHint;
-            registerFontMethods ();
         }
 
         return nativeDlistID;

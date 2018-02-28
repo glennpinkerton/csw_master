@@ -46,6 +46,7 @@ class CanvasManager
         CanvasList.clear();
     };
 
+    int RemoveAllFromManager ();
     int RemoveGraphicsCanvasFromManager (long index);
     int CreateGraphicsCanvas ();
     CDisplayList *GetDisplayList (int index);
