@@ -561,6 +561,8 @@ int EZXJavaArea::ezx_AppendSelectedFillToJavaArea (
     yp = xp + nptot;
 
     jni_call_add_selected_fill (
+        v_jenv,
+        v_jobj,
         fptr->selectable_object_num, 
         xp,
         yp,
@@ -630,6 +632,8 @@ int EZXJavaArea::ezx_AppendSelectedLineToJavaArea (
     }
 
     jni_call_add_selected_line (
+        v_jenv,
+        v_jobj,
         lptr->selectable_object_num, 
         xp,
         yp,
@@ -756,6 +760,8 @@ int EZXJavaArea::ezx_AppendSelectedContourToJavaArea (
     }
 
     jni_call_add_selected_contour (
+        v_jenv,
+        v_jobj,
         cptr->selectable_object_num, 
         xp,
         yp,
@@ -804,6 +810,8 @@ int EZXJavaArea::ezx_AppendSelectedRectangleToJavaArea (
     }
 
     jni_call_add_selected_rectangle (
+        v_jenv,
+        v_jobj,
         rptr->selectable_object_num, 
         rptr->fval[0],
         rptr->fval[1],
@@ -858,6 +866,8 @@ int EZXJavaArea::ezx_AppendSelectedArcToJavaArea (
     closure = (int)(aptr->fval[7] + 0.01);
 
     jni_call_add_selected_arc (
+        v_jenv,
+        v_jobj,
         aptr->selectable_object_num, 
         aptr->fval[0],
         aptr->fval[1],
@@ -911,6 +921,8 @@ int EZXJavaArea::ezx_AppendSelectedTextToJavaArea (
     }
 
     jni_call_add_selected_text (
+        v_jenv,
+        v_jobj,
         tptr->selectable_object_num, 
         tptr->x,
         tptr->y,
@@ -968,6 +980,8 @@ int EZXJavaArea::ezx_AppendSelectedSymbToJavaArea (
     }
 
     jni_call_add_selected_symb (
+        v_jenv,
+        v_jobj,
         sptr->selectable_object_num, 
         sptr->x,
         sptr->y,
@@ -1010,6 +1024,8 @@ int EZXJavaArea::ezx_AppendSelectedAxisToJavaArea (
     ap = aptr->ap;
 
     jni_call_add_selected_axis (
+        v_jenv,
+        v_jobj,
         ap->label_flag,
         ap->tick_flag,
         ap->tick_direction,

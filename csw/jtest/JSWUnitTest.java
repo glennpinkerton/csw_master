@@ -10,6 +10,8 @@
 
 package csw.jtest;
 
+import java.lang.Math;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -168,7 +170,15 @@ catch (Exception e) {
         JButton grid_10_button = new JButton (nphint + " Point Grid");
         grid_10_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                Grid10Frame frame = new Grid10Frame (nphint);
+                Grid10Frame frame = new Grid10Frame (nphint, false);
+                frame.setVisible (true);
+          }
+        });
+
+        JButton grid_sm_button = new JButton ("Smooth Grid");
+        grid_sm_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                Grid10Frame frame = new Grid10Frame (nphint, true);
                 frame.setVisible (true);
           }
         });
@@ -256,6 +266,7 @@ catch (Exception e) {
 
         contentPane.add (trimesh_10_button);
         contentPane.add (grid_10_button);
+        contentPane.add (grid_sm_button);
         contentPane.add (trimesh_file_button);
         contentPane.add (divide_file_button);
         contentPane.add (grid_file_button);
@@ -376,7 +387,7 @@ class Grid10Frame extends JDLFrame
 
     private static final long serialVersionUID = 1L;
 
-    public Grid10Frame (int nphint)
+    public Grid10Frame (int nphint, boolean smooth_flag)
     {
         super ();
 
@@ -410,10 +421,23 @@ class Grid10Frame extends JDLFrame
         y = new double[np];
         z = new double[np];
 
-        for (i=0; i<np; i++) {
+        if (smooth_flag) {
+            generate_smooth_xyz (x, y, z, np,
+                                 200.0, 150.0);
+        }
+        else {
+          for (i=0; i<np; i++) {
             x[i] = random.nextDouble () * 200.0;
-            y[i] = random.nextDouble () * 100.0;
-            z[i] = random.nextDouble () * 100.0;
+            y[i] = random.nextDouble () * 150.0;
+            z[i] = random.nextDouble ();
+            if (z[i] > .7) {
+                z[i] *= z[i];
+            }
+            if (z[i] < .3) {
+                z[i] = Math.sqrt(z[i]);
+            }
+            z[i] *= 100.0;
+          }
         }
 
         Grid grid = sw.calcGrid
@@ -468,6 +492,125 @@ class Grid10Frame extends JDLFrame
         dl.addGrid ("test grid 10",
                     grid,
                     dlp);
+    }
+
+    
+    void generate_smooth_xyz (double[] x,
+                              double[] y,
+                              double[] z,
+                              int  np,
+                              double  xw,
+                              double  yh)
+    {
+        double    x1, y1, z1;
+        double    x2, y2, z2;
+        double    x3, y3, z3;
+        double    x4, y4, z4;
+        double    x5, y5, z5;
+        double    x6, y6, z6;
+
+        double    zz = (xw + yh) / 8.0;
+
+        Random  random = new Random();
+
+        x1 = xw * random.nextDouble () - 1.5 * xw;
+        y1 = yh * random.nextDouble () - 1.5 * yh;
+        z1 = (xw + yh) * random.nextDouble();
+        if (z1 < zz) z1 = zz;
+
+        x2 = .4 * xw * random.nextDouble ();
+        y2 = .4 * yh * random.nextDouble ();
+        z2 = (xw + yh) / 8.0 * random.nextDouble();
+        if (z2 < zz) z2 = zz;
+
+        x3 = .4 * xw * random.nextDouble ();
+        y3 = .4 * yh * random.nextDouble () + .5 * yh;
+        z3 = (xw + yh) / 8.0 * random.nextDouble();
+        if (z3 < zz) z3 = zz;
+
+        x4 = .4 * xw * random.nextDouble () + .5 * xw;
+        y4 = .4 * yh * random.nextDouble ();
+        z4 = (xw + yh) / 8.0 * random.nextDouble();
+        if (z4 < zz) z4 = zz;
+
+        x5 = .4 * xw * random.nextDouble () + .6 * xw;
+        y5 = .4 * yh * random.nextDouble () + .6 * yh;
+        z5 = (xw + yh) / 8.0 * random.nextDouble();
+        if (z5 < zz) z5 = zz;
+
+        x6 = xw * random.nextDouble () + xw;
+        y6 = yh * random.nextDouble () + yh;
+        z6 = (xw + yh) * random.nextDouble();
+        if (z6 < zz) z6 = zz;
+
+        double   xt, yt, zt, dx, dy, dz, dd, zval;
+        double   zvmin = 1.e30;
+        double   zvmax = -1.e30;
+
+        for (int i=0; i<np; i++) {
+            x[i] = random.nextDouble () * xw;
+            y[i] = random.nextDouble () * yh;
+            xt = x[i];
+            yt = y[i];
+
+            dx = xt - x1;
+            dy = yt - y1;
+            dx *= dx;
+            dy *= dy;
+            dz = z1 * z1;
+            dd = dx + dy + dz;
+            zval = 9.0 / dd;
+
+            dx = xt - x2;
+            dy = yt - y2;
+            dx *= dx;
+            dy *= dy;
+            dz = z2 * z2;
+            dd = dx + dy + dz;
+            zval += (2.0 / dd);
+
+            dx = xt - x3;
+            dy = yt - y3;
+            dx *= dx;
+            dy *= dy;
+            dz = z3 * z3;
+            dd = dx + dy + dz;
+            zval += (2.0 / dd);
+
+            dx = xt - x4;
+            dy = yt - y4;
+            dx *= dx;
+            dy *= dy;
+            dz = z4 * z4;
+            dd = dx + dy + dz;
+            zval += (2.0 / dd);
+
+            dx = xt - x5;
+            dy = yt - y5;
+            dx *= dx;
+            dy *= dy;
+            dz = z5 * z5;
+            dd = dx + dy + dz;
+            zval += (2.0 / dd);
+
+            dx = xt - x6;
+            dy = yt - y6;
+            dx *= dx;
+            dy *= dy;
+            dz = z6 * z6;
+            dd = dx + dy + dz;
+            zval += (5.0 / dd);
+
+            if (zval < zvmin) zvmin = zval;
+            if (zval > zvmax) zvmax = zval;
+            z[i] = zval;
+        }
+
+        double  scl = 100.0 / (zvmax - zvmin);
+        for (int i=0; i<np; i++) {
+            z[i] = (z[i] - zvmin) * scl;
+        }
+
     }
 
 }

@@ -54,19 +54,6 @@ csw_jeasyx_src_JDisplayListBase_MAX_LIST_SIZE
  * matter which thread sets them since they will not change.
  */
 
-static jmethodID      SelectFillMethodID = NULL,
-                      SelectLineMethodID = NULL,
-                      SelectTextMethodID = NULL,
-                      SelectSymbMethodID = NULL,
-                      SelectAxisMethodID = NULL,
-                      SelectArcMethodID = NULL,
-                      SelectRectMethodID = NULL,
-                      SelectContourMethodID = NULL,
-                      ConvertedXYZMethodID = NULL;
-
-static JNIEnv         *JavaEnv;
-static jobject        JavaObj;
-
 static int setup_return_select_method_ids(JNIEnv *env, jclass cls);
 
 #if DEBUG_JNI_FILE
@@ -202,9 +189,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
         }
     }
   #endif
-
-    JavaObj = jobj;
-    JavaEnv = jnienv;
 
     jllist = NULL;
     ilist = NULL;
@@ -598,14 +582,6 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDraw
 
 
 /*
- * The java object and environment are also needed for the calls back to draw.
- */
-    //JavaObj = obj;
-    //JavaEnv = env;
-    JavaObj = NULL;
-    JavaEnv = NULL;
-
-/*
  * Send the draw command to the current active display list.
  * This will send all the viewable primitives to the java side
  * via the methods defined above.
@@ -707,7 +683,6 @@ void jni_call_add_fill_method (
     }
 
     if (v_jenv == NULL  ||  v_jobj == NULL) {
-printf ("Null java pointers\n");
         return;
     }
 
@@ -857,7 +832,6 @@ void jni_call_add_line_method (
     }
 
     if (v_jenv == NULL  ||  v_jobj == NULL) {
-printf ("Null java pointers\n");
         return;
     }
 
@@ -991,7 +965,6 @@ void jni_call_add_text_method (
     jstring           jtext;
 
     if (v_jenv == NULL  ||  v_jobj == NULL) {
-printf ("Null java pointers\n");
         return;
     }
 
@@ -1139,7 +1112,6 @@ void jni_call_add_arc_method (
 ) {
 
     if (v_jenv == NULL  ||  v_jobj == NULL) {
-printf ("Null java pointers\n");
         return;
     }
 
@@ -1276,7 +1248,6 @@ void jni_call_add_filled_arc_method (
 ) {
 
     if (v_jenv == NULL  ||  v_jobj == NULL) {
-printf ("Null java pointers\n");
         return;
     }
 
@@ -1375,7 +1346,6 @@ void jni_call_add_image_method (
     int             nt;
 
     if (v_jenv == NULL  ||  v_jobj == NULL) {
-printf ("Null java pointers\n");
         return;
     }
 
@@ -1536,7 +1506,6 @@ void jni_call_add_frame_method (
     jstring            jfname;
 
     if (v_jenv == NULL  ||  v_jobj == NULL) {
-printf ("Null java pointers\n");
         return;
     }
 
@@ -1625,13 +1594,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativePick
 
 
 /*
- * The java object and environment are also needed for the calls to
- * send back the select set.
- */
-    JavaObj = obj;
-    JavaEnv = env;
-
-/*
  * Send the pick command to the current active display list.
  */
 
@@ -1702,56 +1664,6 @@ static int setup_return_select_method_ids(JNIEnv  *env, jclass  cls) {
  * Find the Java class methods for sending back the selected data.
  */
 
-    SelectFillMethodID = (*env)->GetMethodID (env, cls, "addSelectedFill",
-    "(I[D[D[IIDDDIIIIIIIIIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;III)V");
-    if (SelectFillMethodID == NULL) {
-        return -1;
-    }
-
-    SelectArcMethodID = (*env)->GetMethodID (env, cls, "addSelectedArc",
-    "(IDDDDDDDIDDDIIIIIIIIIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;III)V");
-    if (SelectArcMethodID == NULL) {
-        return -1;
-    }
-
-    SelectRectMethodID = (*env)->GetMethodID (env, cls, "addSelectedRectangle",
-    "(IDDDDDDDDDIIIIIIIIIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;III)V");
-    if (SelectRectMethodID == NULL) {
-        return -1;
-    }
-
-    SelectLineMethodID = (*env)->GetMethodID (env, cls, "addSelectedLine",
-    "(I[D[DIDDIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;IIII)V");
-    if (SelectLineMethodID == NULL) {
-        return -1;
-    }
-
-    SelectContourMethodID = (*env)->GetMethodID (env, cls, "addSelectedContour",
-    "(I[D[DIDDZIIIILjava/lang/String;IDDDDILjava/lang/String;"
-    "Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
-    if (SelectContourMethodID == NULL) {
-        return -1;
-    }
-
-    SelectTextMethodID = (*env)->GetMethodID (env, cls, "addSelectedText",
-    "(IDDIDDDDDDIIIIIIIIIIIIIIIIIILjava/lang/String;"
-    "Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
-    if (SelectTextMethodID == NULL) {
-        return -1;
-    }
-
-    SelectSymbMethodID = (*env)->GetMethodID (env, cls, "addSelectedSymb",
-    "(IDDIDDDIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
-    if (SelectSymbMethodID == NULL) {
-        return -1;
-    }
-
-    SelectAxisMethodID = (*env)->GetMethodID (env, cls, "addSelectedAxis",
-    "(IIILjava/lang/String;DIIIIIIDDDIDDDDIIDD"
-    "Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
-    if (SelectAxisMethodID == NULL) {
-        return -1;
-    }
 
     return 1;
 }
@@ -1793,12 +1705,6 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDrawSelected
   #endif
 
 /*
- * The java object and environment are also needed for the calls back to draw.
- */
-    JavaObj = obj;
-    JavaEnv = env;
-
-/*
  * Send the draw command to the current active display list.
  * This will send all the viewable primitives to the java side
  * via the methods defined above.
@@ -1832,6 +1738,8 @@ JNIEXPORT void JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeDrawSelected
 
 
 void jni_call_add_selected_fill (
+    void    *v_jenv,
+    void    *v_jobj,
     int             selectable_index,
     double          *xp,
     double          *yp,
@@ -1877,24 +1785,28 @@ void jni_call_add_selected_fill (
   #endif
 #endif
 
-    if (SelectFillMethodID == NULL) {
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_selected_fill\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID SelectFillMethodID = (*jenv)->GetMethodID (jenv, jcls, "addSelectedFill",
+    "(I[D[D[IIDDDIIIIIIIIIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;III)V");
+
+    if (SelectFillMethodID == NULL) {
+        return;
     }
-  #endif
 
 /*
  * Allocate and fill the java strings.
  */
     jfname = NULL;
     if (fname != NULL) {
-        jfname = (*JavaEnv)->NewStringUTF (JavaEnv, fname);
+        jfname = (*jenv)->NewStringUTF (jenv, fname);
         if (jfname == NULL) {
             return;
         }
@@ -1902,19 +1814,19 @@ void jni_call_add_selected_fill (
 
     jlname = NULL;
     if (lname != NULL) {
-        jlname = (*JavaEnv)->NewStringUTF (JavaEnv, lname);
+        jlname = (*jenv)->NewStringUTF (jenv, lname);
         if (jlname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
             return;
         }
     }
 
     jiname = NULL;
     if (iname != NULL) {
-        jiname = (*JavaEnv)->NewStringUTF (JavaEnv, iname);
+        jiname = (*jenv)->NewStringUTF (jenv, iname);
         if (jiname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
             return;
         }
     }
@@ -1937,48 +1849,48 @@ void jni_call_add_selected_fill (
 /*
  * Allocate and fill the java arrays with the points.
  */
-    jxp = (*JavaEnv)->NewDoubleArray (JavaEnv, nptot);
+    jxp = (*jenv)->NewDoubleArray (jenv, nptot);
     if (jxp == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
+        (*jenv)->DeleteLocalRef (jenv, jfname);
+        (*jenv)->DeleteLocalRef (jenv, jlname);
+        (*jenv)->DeleteLocalRef (jenv, jiname);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         jxp,
         0,
         nptot,
         xp
     );
 
-    jyp = (*JavaEnv)->NewDoubleArray (JavaEnv, nptot);
+    jyp = (*jenv)->NewDoubleArray (jenv, nptot);
     if (jyp == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jxp);
+        (*jenv)->DeleteLocalRef (jenv, jfname);
+        (*jenv)->DeleteLocalRef (jenv, jlname);
+        (*jenv)->DeleteLocalRef (jenv, jiname);
+        (*jenv)->DeleteLocalRef (jenv, jxp);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         jyp,
         0,
         nptot,
         yp
     );
 
-    jnpts = (*JavaEnv)->NewIntArray (JavaEnv, ncomp);
+    jnpts = (*jenv)->NewIntArray (jenv, ncomp);
     if (jnpts == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jxp);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jyp);
+        (*jenv)->DeleteLocalRef (jenv, jfname);
+        (*jenv)->DeleteLocalRef (jenv, jlname);
+        (*jenv)->DeleteLocalRef (jenv, jiname);
+        (*jenv)->DeleteLocalRef (jenv, jxp);
+        (*jenv)->DeleteLocalRef (jenv, jyp);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         jnpts,
         0,
         ncomp,
@@ -2023,9 +1935,9 @@ void jni_call_add_selected_fill (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         SelectFillMethodID,
         (jint)selectable_index,
         jxp,
@@ -2058,12 +1970,12 @@ void jni_call_add_selected_fill (
 /*
  * Delete local references to arrays and strings.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jxp);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jyp);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jnpts);
+    (*jenv)->DeleteLocalRef (jenv, jfname);
+    (*jenv)->DeleteLocalRef (jenv, jlname);
+    (*jenv)->DeleteLocalRef (jenv, jiname);
+    (*jenv)->DeleteLocalRef (jenv, jxp);
+    (*jenv)->DeleteLocalRef (jenv, jyp);
+    (*jenv)->DeleteLocalRef (jenv, jnpts);
 
     return;
 }
@@ -2071,6 +1983,8 @@ void jni_call_add_selected_fill (
 
 
 void jni_call_add_selected_line (
+    void    *v_jenv,
+    void    *v_jobj,
     int             selectable_index,
     double          *xp,
     double          *yp,
@@ -2087,14 +2001,26 @@ void jni_call_add_selected_line (
     int             linepat,
     int             symbol,
     int             arrow_style,
-    int             native_index
-) {
+    int             native_index) 
+{
     jstring            jfname,
                        jlname,
                        jiname;
 
     jdoubleArray       jxp,
                        jyp;
+
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID SelectLineMethodID = (*jenv)->GetMethodID (jenv, jcls, "addSelectedLine",
+    "(I[D[DIDDIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;IIII)V");
 
     if (SelectLineMethodID == NULL) {
         return;
@@ -2113,7 +2039,7 @@ void jni_call_add_selected_line (
  */
     jfname = NULL;
     if (fname != NULL) {
-        jfname = (*JavaEnv)->NewStringUTF (JavaEnv, fname);
+        jfname = (*jenv)->NewStringUTF (jenv, fname);
         if (jfname == NULL) {
             return;
         }
@@ -2121,19 +2047,19 @@ void jni_call_add_selected_line (
 
     jlname = NULL;
     if (lname != NULL) {
-        jlname = (*JavaEnv)->NewStringUTF (JavaEnv, lname);
+        jlname = (*jenv)->NewStringUTF (jenv, lname);
         if (jlname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
             return;
         }
     }
 
     jiname = NULL;
     if (iname != NULL) {
-        jiname = (*JavaEnv)->NewStringUTF (JavaEnv, iname);
+        jiname = (*jenv)->NewStringUTF (jenv, iname);
         if (jiname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
             return;
         }
     }
@@ -2141,31 +2067,31 @@ void jni_call_add_selected_line (
 /*
  * Allocate and fill the java arrays with the points.
  */
-    jxp = (*JavaEnv)->NewDoubleArray (JavaEnv, npts);
+    jxp = (*jenv)->NewDoubleArray (jenv, npts);
     if (jxp == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
+        (*jenv)->DeleteLocalRef (jenv, jfname);
+        (*jenv)->DeleteLocalRef (jenv, jlname);
+        (*jenv)->DeleteLocalRef (jenv, jiname);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         jxp,
         0,
         npts,
         xp
     );
 
-    jyp = (*JavaEnv)->NewDoubleArray (JavaEnv, npts);
+    jyp = (*jenv)->NewDoubleArray (jenv, npts);
     if (jyp == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jxp);
+        (*jenv)->DeleteLocalRef (jenv, jfname);
+        (*jenv)->DeleteLocalRef (jenv, jlname);
+        (*jenv)->DeleteLocalRef (jenv, jiname);
+        (*jenv)->DeleteLocalRef (jenv, jxp);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         jyp,
         0,
         npts,
@@ -2196,9 +2122,9 @@ void jni_call_add_selected_line (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         SelectLineMethodID,
         (jint)selectable_index,
         jxp,
@@ -2222,11 +2148,11 @@ void jni_call_add_selected_line (
 /*
  * Delete local references to arrays and strings.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jxp);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jyp);
+    (*jenv)->DeleteLocalRef (jenv, jfname);
+    (*jenv)->DeleteLocalRef (jenv, jlname);
+    (*jenv)->DeleteLocalRef (jenv, jiname);
+    (*jenv)->DeleteLocalRef (jenv, jxp);
+    (*jenv)->DeleteLocalRef (jenv, jyp);
 
     return;
 }
@@ -2234,6 +2160,8 @@ void jni_call_add_selected_line (
 
 
 void jni_call_add_selected_contour (
+    void    *v_jenv,
+    void    *v_jobj,
     int             selectable_index,
     double          *xp,
     double          *yp,
@@ -2256,8 +2184,8 @@ void jni_call_add_selected_contour (
     char            *lname,
     char            *iname,
     char            *sname,
-    int             native_index
-) {
+    int             native_index)
+{
     jstring            jfname,
                        jlname,
                        jiname;
@@ -2267,24 +2195,29 @@ void jni_call_add_selected_contour (
     jdoubleArray       jxp,
                        jyp;
 
-    if (SelectContourMethodID == NULL) {
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
         return;
     }
 
-  #if DEBUG_JNI_FILE
-    sprintf (fileline, "\nEntered jni_call_add_selected_contour\n");
-    if (dbfile) {
-        fputs (fileline, dbfile);
-        fflush (dbfile);
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID SelectContourMethodID = (*jenv)->GetMethodID (jenv, jcls, "addSelectedContour",
+    "(I[D[DIDDZIIIILjava/lang/String;IDDDDILjava/lang/String;"
+    "Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
+
+    if (SelectContourMethodID == NULL) {
+        return;
     }
-  #endif
 
 /*
  * Allocate and fill the java strings.
  */
     jfname = NULL;
     if (fname != NULL) {
-        jfname = (*JavaEnv)->NewStringUTF (JavaEnv, fname);
+        jfname = (*jenv)->NewStringUTF (jenv, fname);
         if (jfname == NULL) {
             return;
         }
@@ -2292,42 +2225,42 @@ void jni_call_add_selected_contour (
 
     jlname = NULL;
     if (lname != NULL) {
-        jlname = (*JavaEnv)->NewStringUTF (JavaEnv, lname);
+        jlname = (*jenv)->NewStringUTF (jenv, lname);
         if (jlname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
             return;
         }
     }
 
     jiname = NULL;
     if (iname != NULL) {
-        jiname = (*JavaEnv)->NewStringUTF (JavaEnv, iname);
+        jiname = (*jenv)->NewStringUTF (jenv, iname);
         if (jiname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
             return;
         }
     }
 
     jsname = NULL;
     if (sname != NULL) {
-        jsname = (*JavaEnv)->NewStringUTF (JavaEnv, sname);
+        jsname = (*jenv)->NewStringUTF (jenv, sname);
         if (jsname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jiname);
             return;
         }
     }
 
     jlabel = NULL;
     if (label != NULL) {
-        jlabel = (*JavaEnv)->NewStringUTF (JavaEnv, label);
+        jlabel = (*jenv)->NewStringUTF (jenv, label);
         if (jlabel == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jsname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jiname);
+            (*jenv)->DeleteLocalRef (jenv, jsname);
             return;
         }
     }
@@ -2335,35 +2268,35 @@ void jni_call_add_selected_contour (
 /*
  * Allocate and fill the java arrays with the points.
  */
-    jxp = (*JavaEnv)->NewDoubleArray (JavaEnv, npts);
+    jxp = (*jenv)->NewDoubleArray (jenv, npts);
     if (jxp == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jsname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jlabel);
+        (*jenv)->DeleteLocalRef (jenv, jfname);
+        (*jenv)->DeleteLocalRef (jenv, jlname);
+        (*jenv)->DeleteLocalRef (jenv, jiname);
+        (*jenv)->DeleteLocalRef (jenv, jsname);
+        (*jenv)->DeleteLocalRef (jenv, jlabel);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         jxp,
         0,
         npts,
         xp
     );
 
-    jyp = (*JavaEnv)->NewDoubleArray (JavaEnv, npts);
+    jyp = (*jenv)->NewDoubleArray (jenv, npts);
     if (jyp == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jsname);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jlabel);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, jxp);
+        (*jenv)->DeleteLocalRef (jenv, jfname);
+        (*jenv)->DeleteLocalRef (jenv, jlname);
+        (*jenv)->DeleteLocalRef (jenv, jiname);
+        (*jenv)->DeleteLocalRef (jenv, jsname);
+        (*jenv)->DeleteLocalRef (jenv, jlabel);
+        (*jenv)->DeleteLocalRef (jenv, jxp);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         jyp,
         0,
         npts,
@@ -2394,9 +2327,9 @@ void jni_call_add_selected_contour (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         SelectContourMethodID,
         (jint)selectable_index,
         jxp,
@@ -2426,13 +2359,13 @@ void jni_call_add_selected_contour (
 /*
  * Delete local references to arrays and strings.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jsname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jlabel);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jxp);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jyp);
+    (*jenv)->DeleteLocalRef (jenv, jfname);
+    (*jenv)->DeleteLocalRef (jenv, jlname);
+    (*jenv)->DeleteLocalRef (jenv, jiname);
+    (*jenv)->DeleteLocalRef (jenv, jsname);
+    (*jenv)->DeleteLocalRef (jenv, jlabel);
+    (*jenv)->DeleteLocalRef (jenv, jxp);
+    (*jenv)->DeleteLocalRef (jenv, jyp);
 
     return;
 }
@@ -2440,6 +2373,8 @@ void jni_call_add_selected_contour (
 
 
 void jni_call_add_selected_rectangle (
+    void    *v_jenv,
+    void    *v_jobj,
     int             selectable_index,
     double          xc,
     double          yc,
@@ -2467,11 +2402,24 @@ void jni_call_add_selected_rectangle (
     char            *iname,
     int             fillpat,
     int             linepat,
-    int             native_index
-) {
+    int             native_index)
+{
     jstring            jfname,
                        jlname,
                        jiname;
+
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID SelectRectMethodID = (*jenv)->GetMethodID
+     (jenv, jcls, "addSelectedRectangle",
+    "(IDDDDDDDDDIIIIIIIIIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;III)V");
 
     if (SelectRectMethodID == NULL) {
         return;
@@ -2490,7 +2438,7 @@ void jni_call_add_selected_rectangle (
  */
     jfname = NULL;
     if (fname != NULL) {
-        jfname = (*JavaEnv)->NewStringUTF (JavaEnv, fname);
+        jfname = (*jenv)->NewStringUTF (jenv, fname);
         if (jfname == NULL) {
             return;
         }
@@ -2498,19 +2446,19 @@ void jni_call_add_selected_rectangle (
 
     jlname = NULL;
     if (lname != NULL) {
-        jlname = (*JavaEnv)->NewStringUTF (JavaEnv, lname);
+        jlname = (*jenv)->NewStringUTF (jenv, lname);
         if (jlname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
             return;
         }
     }
 
     jiname = NULL;
     if (iname != NULL) {
-        jiname = (*JavaEnv)->NewStringUTF (JavaEnv, iname);
+        jiname = (*jenv)->NewStringUTF (jenv, iname);
         if (jiname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
             return;
         }
     }
@@ -2553,9 +2501,9 @@ void jni_call_add_selected_rectangle (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         SelectRectMethodID,
         (jint)selectable_index,
         xc,
@@ -2590,9 +2538,9 @@ void jni_call_add_selected_rectangle (
 /*
  * Delete local references to arrays and strings.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
+    (*jenv)->DeleteLocalRef (jenv, jfname);
+    (*jenv)->DeleteLocalRef (jenv, jlname);
+    (*jenv)->DeleteLocalRef (jenv, jiname);
 
     return;
 }
@@ -2600,6 +2548,8 @@ void jni_call_add_selected_rectangle (
 
 
 void jni_call_add_selected_arc (
+    void    *v_jenv,
+    void    *v_jobj,
     int             selectable_index,
     double          xc,
     double          yc,
@@ -2629,11 +2579,24 @@ void jni_call_add_selected_arc (
     char            *iname,
     int             fillpat,
     int             linepat,
-    int             native_index
-) {
+    int             native_index)
+{
     jstring            jfname,
                        jlname,
                        jiname;
+
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID SelectArcMethodID = (*jenv)->GetMethodID
+     (jenv, jcls, "addSelectedArc",
+    "(IDDDDDDDIDDDIIIIIIIIIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;III)V");
 
     if (SelectArcMethodID == NULL) {
         return;
@@ -2652,7 +2615,7 @@ void jni_call_add_selected_arc (
  */
     jfname = NULL;
     if (fname != NULL) {
-        jfname = (*JavaEnv)->NewStringUTF (JavaEnv, fname);
+        jfname = (*jenv)->NewStringUTF (jenv, fname);
         if (jfname == NULL) {
             return;
         }
@@ -2660,19 +2623,19 @@ void jni_call_add_selected_arc (
 
     jlname = NULL;
     if (lname != NULL) {
-        jlname = (*JavaEnv)->NewStringUTF (JavaEnv, lname);
+        jlname = (*jenv)->NewStringUTF (jenv, lname);
         if (jlname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
             return;
         }
     }
 
     jiname = NULL;
     if (iname != NULL) {
-        jiname = (*JavaEnv)->NewStringUTF (JavaEnv, iname);
+        jiname = (*jenv)->NewStringUTF (jenv, iname);
         if (jiname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
             return;
         }
     }
@@ -2715,9 +2678,9 @@ void jni_call_add_selected_arc (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         SelectArcMethodID,
         (jint)selectable_index,
         xc,
@@ -2754,9 +2717,9 @@ void jni_call_add_selected_arc (
 /*
  * Delete local references to arrays and strings.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
+    (*jenv)->DeleteLocalRef (jenv, jfname);
+    (*jenv)->DeleteLocalRef (jenv, jlname);
+    (*jenv)->DeleteLocalRef (jenv, jiname);
 
     return;
 }
@@ -2764,6 +2727,8 @@ void jni_call_add_selected_arc (
 
 
 void jni_call_add_selected_text (
+    void    *v_jenv,
+    void    *v_jobj,
     int             selectable_index,
     double          xp,
     double          yp,
@@ -2796,12 +2761,25 @@ void jni_call_add_selected_text (
     char            *fname,
     char            *lname,
     char            *iname,
-    int             native_index
-) {
+    int             native_index)
+{
     jstring            jfname,
                        jlname,
                        jiname;
     jstring            jtextdata;
+
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID SelectTextMethodID = (*jenv)->GetMethodID (jenv, jcls, "addSelectedText",
+    "(IDDIDDDDDDIIIIIIIIIIIIIIIIIILjava/lang/String;"
+    "Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
 
     if (SelectTextMethodID == NULL) {
         return;
@@ -2820,7 +2798,7 @@ void jni_call_add_selected_text (
  */
     jfname = NULL;
     if (fname != NULL) {
-        jfname = (*JavaEnv)->NewStringUTF (JavaEnv, fname);
+        jfname = (*jenv)->NewStringUTF (jenv, fname);
         if (jfname == NULL) {
             return;
         }
@@ -2828,30 +2806,30 @@ void jni_call_add_selected_text (
 
     jlname = NULL;
     if (lname != NULL) {
-        jlname = (*JavaEnv)->NewStringUTF (JavaEnv, lname);
+        jlname = (*jenv)->NewStringUTF (jenv, lname);
         if (jlname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
             return;
         }
     }
 
     jiname = NULL;
     if (iname != NULL) {
-        jiname = (*JavaEnv)->NewStringUTF (JavaEnv, iname);
+        jiname = (*jenv)->NewStringUTF (jenv, iname);
         if (jiname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
             return;
         }
     }
 
     jtextdata = NULL;
     if (textdata != NULL) {
-        jtextdata = (*JavaEnv)->NewStringUTF (JavaEnv, textdata);
+        jtextdata = (*jenv)->NewStringUTF (jenv, textdata);
         if (jtextdata == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jiname);
             return;
         }
     }
@@ -2901,9 +2879,9 @@ void jni_call_add_selected_text (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         SelectTextMethodID,
         (jint)selectable_index,
         xp,
@@ -2943,10 +2921,10 @@ void jni_call_add_selected_text (
 /*
  * Delete local references to arrays and strings.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jtextdata);
+    (*jenv)->DeleteLocalRef (jenv, jfname);
+    (*jenv)->DeleteLocalRef (jenv, jlname);
+    (*jenv)->DeleteLocalRef (jenv, jiname);
+    (*jenv)->DeleteLocalRef (jenv, jtextdata);
 
     return;
 }
@@ -2954,6 +2932,8 @@ void jni_call_add_selected_text (
 
 
 void jni_call_add_selected_symb (
+    void    *v_jenv,
+    void    *v_jobj,
     int             selectable_index,
     double          xp,
     double          yp,
@@ -2969,12 +2949,24 @@ void jni_call_add_selected_symb (
     char            *lname,
     char            *iname,
     char            *sname,
-    int             native_index
-) {
+    int             native_index)
+{
     jstring            jfname,
                        jlname,
                        jiname;
     jstring            jsname;
+
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID SelectSymbMethodID = (*jenv)->GetMethodID (jenv, jcls, "addSelectedSymb",
+    "(IDDIDDDIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
 
     if (SelectSymbMethodID == NULL) {
         return;
@@ -2993,7 +2985,7 @@ void jni_call_add_selected_symb (
  */
     jfname = NULL;
     if (fname != NULL) {
-        jfname = (*JavaEnv)->NewStringUTF (JavaEnv, fname);
+        jfname = (*jenv)->NewStringUTF (jenv, fname);
         if (jfname == NULL) {
             return;
         }
@@ -3001,30 +2993,30 @@ void jni_call_add_selected_symb (
 
     jlname = NULL;
     if (lname != NULL) {
-        jlname = (*JavaEnv)->NewStringUTF (JavaEnv, lname);
+        jlname = (*jenv)->NewStringUTF (jenv, lname);
         if (jlname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
             return;
         }
     }
 
     jiname = NULL;
     if (iname != NULL) {
-        jiname = (*JavaEnv)->NewStringUTF (JavaEnv, iname);
+        jiname = (*jenv)->NewStringUTF (jenv, iname);
         if (jiname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
             return;
         }
     }
 
     jsname = NULL;
     if (sname != NULL) {
-        jsname = (*JavaEnv)->NewStringUTF (JavaEnv, sname);
+        jsname = (*jenv)->NewStringUTF (jenv, sname);
         if (jsname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jiname);
             return;
         }
     }
@@ -3053,9 +3045,9 @@ void jni_call_add_selected_symb (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         SelectSymbMethodID,
         (jint)selectable_index,
         xp,
@@ -3078,14 +3070,16 @@ void jni_call_add_selected_symb (
 /*
  * Delete local references to arrays and strings.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
+    (*jenv)->DeleteLocalRef (jenv, jfname);
+    (*jenv)->DeleteLocalRef (jenv, jlname);
+    (*jenv)->DeleteLocalRef (jenv, jiname);
 
     return;
 }
 
 void jni_call_add_selected_axis (
+    void    *v_jenv,
+    void    *v_jobj,
     int         label_flag,
     int         tick_flag,
     int         tick_direction,
@@ -3112,13 +3106,25 @@ void jni_call_add_selected_axis (
     char        *fname,
     char        *lname,
     char        *iname,
-    int         prim_num
-)
+    int         prim_num)
 {
     jstring            jfname,
                        jlname,
                        jiname;
     jstring            jcaption;
+
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID SelectAxisMethodID = (*jenv)->GetMethodID (jenv, jcls, "addSelectedAxis",
+    "(IIILjava/lang/String;DIIIIIIDDDIDDDDIIDD"
+    "Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
 
     if (SelectAxisMethodID == NULL) {
         return;
@@ -3137,7 +3143,7 @@ void jni_call_add_selected_axis (
  */
     jfname = NULL;
     if (fname != NULL) {
-        jfname = (*JavaEnv)->NewStringUTF (JavaEnv, fname);
+        jfname = (*jenv)->NewStringUTF (jenv, fname);
         if (jfname == NULL) {
             return;
         }
@@ -3145,30 +3151,30 @@ void jni_call_add_selected_axis (
 
     jlname = NULL;
     if (lname != NULL) {
-        jlname = (*JavaEnv)->NewStringUTF (JavaEnv, lname);
+        jlname = (*jenv)->NewStringUTF (jenv, lname);
         if (jlname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
             return;
         }
     }
 
     jiname = NULL;
     if (iname != NULL) {
-        jiname = (*JavaEnv)->NewStringUTF (JavaEnv, iname);
+        jiname = (*jenv)->NewStringUTF (jenv, iname);
         if (jiname == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
             return;
         }
     }
 
     jcaption = NULL;
     if (caption != NULL) {
-        jcaption = (*JavaEnv)->NewStringUTF (JavaEnv, caption);
+        jcaption = (*jenv)->NewStringUTF (jenv, caption);
         if (jcaption == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
+            (*jenv)->DeleteLocalRef (jenv, jfname);
+            (*jenv)->DeleteLocalRef (jenv, jlname);
+            (*jenv)->DeleteLocalRef (jenv, jiname);
             return;
         }
     }
@@ -3176,9 +3182,9 @@ void jni_call_add_selected_axis (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         SelectAxisMethodID,
         (jint)label_flag,
         (jint)tick_flag,
@@ -3212,10 +3218,10 @@ void jni_call_add_selected_axis (
 /*
  * Delete local references to arrays and strings.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jfname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jlname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jiname);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, jcaption);
+    (*jenv)->DeleteLocalRef (jenv, jfname);
+    (*jenv)->DeleteLocalRef (jenv, jlname);
+    (*jenv)->DeleteLocalRef (jenv, jiname);
+    (*jenv)->DeleteLocalRef (jenv, jcaption);
 
     return;
 
@@ -3243,7 +3249,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
    jint j_threadid,
    jint j_sel_num)
 {
-    jclass           cls;
     int              dlist_index;
     int              threadid;
     int              status;
@@ -3275,70 +3280,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_nativeEdit
  * Fill the ilist array.
  */
     ilist[0] = j_sel_num;
-
-/*
- * Find the Java class methods for sending back the selected data.
- */
-
-    cls = (*env)->GetObjectClass (env, obj);
-
-    SelectFillMethodID = (*env)->GetMethodID (env, cls, "addSelectedFill",
-    "(I[D[D[IIDDDIIIIIIIIIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;III)V");
-    if (SelectFillMethodID == NULL) {
-        return -1;
-    }
-
-    SelectArcMethodID = (*env)->GetMethodID (env, cls, "addSelectedArc",
-    "(IDDDDDDDIDDDIIIIIIIIIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;III)V");
-    if (SelectArcMethodID == NULL) {
-        return -1;
-    }
-
-    SelectRectMethodID = (*env)->GetMethodID (env, cls, "addSelectedRectangle",
-    "(IDDDDDDDDDIIIIIIIIIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;III)V");
-    if (SelectRectMethodID == NULL) {
-        return -1;
-    }
-
-    SelectLineMethodID = (*env)->GetMethodID (env, cls, "addSelectedLine",
-    "(I[D[DIDDIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;IIII)V");
-    if (SelectLineMethodID == NULL) {
-        return -1;
-    }
-
-    SelectContourMethodID = (*env)->GetMethodID (env, cls, "addSelectedContour",
-    "(I[D[DIDDZIIIILjava/lang/String;IDDDDILjava/lang/String;"
-    "Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
-    if (SelectContourMethodID == NULL) {
-        return -1;
-    }
-
-    SelectTextMethodID = (*env)->GetMethodID (env, cls, "addSelectedText",
-    "(IDDIDDDDDDIIIIIIIIIIIIIIIIIILjava/lang/String;"
-    "Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
-    if (SelectTextMethodID == NULL) {
-        return -1;
-    }
-
-    SelectSymbMethodID = (*env)->GetMethodID (env, cls, "addSelectedSymb",
-    "(IDDIDDDIIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
-    if (SelectSymbMethodID == NULL) {
-        return -1;
-    }
-
-    SelectAxisMethodID = (*env)->GetMethodID (env, cls, "addSelectedAxis",
-    "(IIILjava/lang/String;DIIIIIIDDDIDDDDIIDD"
-    "Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
-    if (SelectAxisMethodID == NULL) {
-        return -1;
-    }
-
-/*
- * The java object and environment are also needed for the calls to
- * send back the select set.
- */
-    JavaObj = obj;
-    JavaEnv = env;
 
 /*
  * Send the pick command to the current active display list.
@@ -3417,8 +3358,6 @@ int jni_get_text_bounds (
     bounds[2] = 0.0;
 
     if (text == NULL  ||  dlist_index < 0) {
-printf ("text NULL or index -1\n");
-fflush (stdout);
         return -1;
     }
 
@@ -3435,8 +3374,6 @@ fflush (stdout);
     jmethodID      FontBoundsMethodID = NULL;
 
     if (vstat == -1  ||  v_jenv == NULL  ||  v_jobj == NULL) {
-printf ("Null java pointers\n");
-fflush (stdout);
         return -1;
     }
 
@@ -3449,15 +3386,11 @@ fflush (stdout);
                                      "(Ljava/lang/String;ID[D)V");
 
     if (FontBoundsMethodID == NULL) {
-printf ("Null method id\n");
-fflush (stdout);
         return -1;
     }
 
     jtext = (*jenv)->NewStringUTF (jenv, text);
     if (jtext == NULL) {
-printf ("null jtext\n");
-fflush (stdout);
         return -1;
     }
 
@@ -3467,8 +3400,6 @@ fflush (stdout);
     jbounds = (*jenv)->NewDoubleArray (jenv, 3);
     if (jbounds == NULL) {
         (*jenv)->DeleteLocalRef (jenv, jtext);
-printf ("null jbounds\n");
-fflush (stdout);
         return -1;
     }
 
@@ -3515,10 +3446,25 @@ fflush (stdout);
 /*-------------------------------------------------------------------------*/
 
 void jni_return_converted_xyz (
+    void    *v_jenv,
+    void    *v_jobj,
     double  x,
     double  y,
     double  z)
 {
+
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv  *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass jcls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID ConvertedXYZMethodID = (*jenv)->GetMethodID (jenv, jcls, "setConvertedXYZ",
+                                     "(DDD)V");
+
     if (ConvertedXYZMethodID == NULL) {
         return;
     }
@@ -3526,9 +3472,9 @@ void jni_return_converted_xyz (
 /*
  * Call the java object method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         ConvertedXYZMethodID,
         x,
         y,
@@ -3545,7 +3491,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_convertToFrame
   (JNIEnv *env, jobject obj, jint j_dlist_index,
    jint j_threadid,  jint fnum, jint x, jint y)
 {
-    jclass           cls;
     int              dlist_index, threadid;
     int              local_list[3];
 
@@ -3553,21 +3498,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_convertToFrame
     threadid = (int)j_threadid;
 
     ezx_set_void_ptrs (dlist_index, (void *)env, (void *)obj);
-
-    JavaEnv = env;
-    JavaObj = obj;
-
-/*
- * Find the Java class methods for sending back graphics data.
- */
-
-    cls = (*env)->GetObjectClass (env, obj);
-
-    ConvertedXYZMethodID = (*env)->GetMethodID (env, cls, "setConvertedXYZ",
-                                     "(DDD)V");
-    if (ConvertedXYZMethodID == NULL) {
-        return (jint)-1;
-    }
 
 /*
  * Convert the point and call the method to set the results back in the java side.
@@ -3590,8 +3520,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_convertToFrame
                          NULL,
                          NULL);
 
-    ConvertedXYZMethodID = NULL;
-
     return (jint)1;
 
 }
@@ -3613,7 +3541,6 @@ void jni_call_set_zoom_pan_data_method (
     jstring           jname;
 
     if (v_jenv == NULL  ||  v_jobj == NULL) {
-printf ("Null java pointers\n");
         return;
     }
 
@@ -3712,8 +3639,6 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendStaticCommand
     #error The int data type with this compiler is less than 32 bits, ABORT.
   #endif
 #endif
-
-    JavaEnv = jnienv;
 
     jllist = NULL;
     ilist = NULL;

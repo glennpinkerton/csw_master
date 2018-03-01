@@ -2930,8 +2930,11 @@ class JDisplayListBase extends DLConst {
     void callSelectListeners ()
     {
 
-        int size = selectListenerList.size();
-        if (size < 1) {
+        if (selectableList == null) {
+            return;
+        }
+
+        if (selectableList.size () < 1) {
             return;
         }
 
@@ -2946,6 +2949,13 @@ class JDisplayListBase extends DLConst {
         info.xScreen = screenX;
         info.yScreen = screenY;
         info.selectableList = selectableList;
+
+        info.dump ();
+
+        int size = selectListenerList.size();
+        if (size < 1) {
+            return;
+        }
 
         DLSelectListener sl;
 
