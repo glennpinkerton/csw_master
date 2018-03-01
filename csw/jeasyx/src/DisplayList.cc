@@ -15043,7 +15043,11 @@ int CDisplayList::ConvertToFrame (int frame_num,
     current_frame_num = framesav;
     update_frame_limits ();
 
-    jni_return_converted_xyz ((double)xt1, (double)yt1, (double)zt1);
+    void *v_jenv = ezx_java_obj.GetVenv ();
+    void *v_jobj = ezx_java_obj.GetVobj ();
+
+    jni_return_converted_xyz (v_jenv, v_jobj,
+                             (double)xt1, (double)yt1, (double)zt1);
 
     return 1;
 

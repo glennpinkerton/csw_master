@@ -154,6 +154,8 @@ extern "C" {
 
 
     void jni_call_add_selected_fill (
+       void    *v_jenv,
+       void    *v_jobj,
        int             selectable_index,
        double          *xp,
        double          *yp,
@@ -183,6 +185,8 @@ extern "C" {
     );
 
     void jni_call_add_selected_line (
+       void    *v_jenv,
+       void    *v_jobj,
         int             selectable_index,
         double          *xp,
         double          *yp,
@@ -203,6 +207,8 @@ extern "C" {
     );
 
     void jni_call_add_selected_contour (
+       void    *v_jenv,
+       void    *v_jobj,
         int             selectable_index,
         double          *xp,
         double          *yp,
@@ -229,6 +235,8 @@ extern "C" {
     );
     
     void jni_call_add_selected_rectangle (
+       void    *v_jenv,
+       void    *v_jobj,
         int             selectable_index,
         double          xc,
         double          yc,
@@ -260,6 +268,8 @@ extern "C" {
     );
     
     void jni_call_add_selected_arc (
+       void    *v_jenv,
+       void    *v_jobj,
         int             selectable_index,
         double          xc,
         double          yc,
@@ -293,6 +303,8 @@ extern "C" {
     );
     
     void jni_call_add_selected_text (
+       void    *v_jenv,
+       void    *v_jobj,
         int             selectable_index,
         double          xp,
         double          yp,
@@ -329,6 +341,8 @@ extern "C" {
     );
     
     void jni_call_add_selected_symb (
+       void    *v_jenv,
+       void    *v_jobj,
         int             selectable_index,
         double          xp,
         double          yp,
@@ -348,6 +362,8 @@ extern "C" {
     );
 
     void jni_call_add_selected_axis (
+       void    *v_jenv,
+       void    *v_jobj,
         int         label_flag,
         int         tick_flag,
         int         tick_direction,
@@ -466,6 +482,8 @@ extern "C" {
         float   *bounds);
 
     void jni_return_converted_xyz (
+        void   *v_jenv,
+        void   *v_jobj,
         double  x,
         double  y,
         double  z);
