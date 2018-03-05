@@ -1223,7 +1223,7 @@ int CSWGrdUtils::grd_bicub_interp
                       CSW_F xmin, CSW_F ymin, CSW_F xmax, CSW_F ymax,
                       int irforce, int icforce)
 {
-    const static double  wt[] =
+    static const double  wt[] =
        {
         1.0, 0.0, -3.0, 2.0, 0.0, 0.0, 0.0, 0.0, -3.0, 0.0, 9.0, -6.0, 2.0, 0.0, -6.0, 4.0,
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 0.0, -9.0, 6.0, -2.0, 0.0, 6.0, -4.0,

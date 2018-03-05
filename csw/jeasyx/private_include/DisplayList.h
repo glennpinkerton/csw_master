@@ -161,7 +161,8 @@ public:
                      double perp_move,
                      char *cdata,
                      int scale_width_to_attach_frame,
-                     int scale_height_to_attach_frame);
+                     int scale_height_to_attach_frame,
+                     int scale_text_sizes);
 
    int SetFrameAxisValues (
                     char   *cdata,
@@ -679,6 +680,8 @@ private:
     int set_grid_for_contour_vec (double x1, double y1, double x2, double y2,
                                   int contour_num);
     int set_in_contour_extra (int contour_num);
+
+    CSW_F  scale_text_size (int fnum, CSW_F size_in);
 
     void convert_frame_array (CSW_F *xy, int npts);
     void convert_frame_array (int fnum, CSW_F *xy, int npts);
@@ -1239,7 +1242,7 @@ private:
 
     CSW_F           page_units_per_inch;
 
-    int             screen_dpi;
+    int             screen_dpi = 72;
 
   /*
    * misc. variables for internal use.

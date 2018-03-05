@@ -184,7 +184,7 @@ class JEasyXTestFrame extends JFrame
 {
     private static final long serialVersionUID = 1L;
 
-    private Frame1Frame      frame1 = null;
+    private SmallerFrame      frame1 = null;
     private Frame2Frame      frame2 = null;
     private TextFrameTest    frame3 = null;
 
@@ -204,10 +204,13 @@ catch (Exception e) {
 }
 */
 
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation (screenSize.width - 250, 50);
+
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle ("JDisplayList Unit Test");
-        setSize (200, 750);
+        setSize (220, 750);
         setResizable (false);
         Container contentPane = getContentPane ();
         contentPane.setLayout (new GridLayout(25,1));
@@ -295,7 +298,7 @@ catch (Exception e) {
         JButton small_button = new JButton ("Small Random Frame");
         small_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                Frame1Frame frame = new Frame1Frame ();
+                SmallerFrame frame = new SmallerFrame ();
                 setFrame1 (frame);
                 frame.setVisible(true);
           }
@@ -414,10 +417,10 @@ catch (Exception e) {
 
 
 
-    Frame1Frame getFrame1 () {return frame1;}
+    SmallerFrame getFrame1 () {return frame1;}
     Frame2Frame getFrame2 () {return frame2;}
     TextFrameTest getTextFrameTest () {return frame3;}
-    void setFrame1 (Frame1Frame f) {frame1 = f;}
+    void setFrame1 (SmallerFrame f) {frame1 = f;}
     void setFrame2 (Frame2Frame f) {frame2 = f;}
     void setTextFrameTest (TextFrameTest f) {frame3 = f;}
 
@@ -590,7 +593,8 @@ class TextTableFrame extends JDLFrame
                         null,
                         DLConst.FRAME_NO_ATTACH,
                         0.0,
-                        0.0);
+                        0.0,
+                        0);
 
         dl.setTextColor (0, 0, 0);
         dl.setTextFillColor (200, 200, 200);
@@ -702,7 +706,8 @@ class Text2TableFrame extends JDLFrame
                         null,
                         DLConst.FRAME_NO_ATTACH,
                         0.0,
-                        0.0);
+                        0.0,
+                        0);
 
         dl.setTextColor (0, 0, 0);
         dl.setTextFillColor (200, 200, 200);
@@ -777,7 +782,8 @@ class Text3TableFrame extends JDLFrame
                         null,
                         DLConst.FRAME_NO_ATTACH,
                         0.0,
-                        0.0);
+                        0.0,
+                        0);
 
         dl.setTextColor (0, 0, 0);
         dl.setTextFillColor (200, 200, 200);
@@ -823,7 +829,7 @@ class Text3TableFrame extends JDLFrame
 };
 
 
-class Frame1Frame
+class SmallerFrame
   extends JDLFrame
   implements DLRightClickListener, DLSelectListener, DLZoomPanListener
 
@@ -859,7 +865,7 @@ class Frame1Frame
     }
 
 
-    public Frame1Frame ()
+    public SmallerFrame ()
     {
         super ();
 
@@ -894,22 +900,22 @@ catch (Exception e) {
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("random frame 1 test",
-                      0.0, 0.0, 200.0, 200.0);
+                      0.0, 0.0, 20.0, 20.0);
         dl.setColor (5, 5, 5);
 
         dl.setFrameClip (1);
-        dl.createFrame ("frame1 test",
+        dl.createFrame ("Small frame test",
                         0.0,
                         0.0,
-                        250.0,
+                        200.0,
                         200.0,
                         0.0,
                         0.0,
-                        250.0,
+                        20.0,
+                        20.0,
+                        0.0,
+                        0.0,
                         200.0,
-                        0.0,
-                        0.0,
-                        250.0,
                         200.0,
                         1,
                         0,
@@ -920,7 +926,8 @@ catch (Exception e) {
                         null,
                         DLConst.FRAME_NO_ATTACH,
                         0.0,
-                        0.0);
+                        0.0,
+                        2);
 
         dl.addLogComment ("setting up frame axis properties");
 
@@ -940,7 +947,7 @@ catch (Exception e) {
         dl.setSelectable (dls);
         ap.setMajorInterval (200.0);
         ap.setCaption ("Vertical Axis Test");
-        dl.addAxis (185.0, 5.0, 185.0, 195.0, 1000.0, 0.0, -1, ap);
+//        dl.addAxis (185.0, 5.0, 185.0, 195.0, 1000.0, 0.0, -1, ap);
 
         dls = new DLSelectable ();
         dl.setSelectable (dls);
@@ -948,7 +955,7 @@ catch (Exception e) {
         ap.setLabelAngle (90.0);
         ap.setLabelAnchor (4);
         ap.setMajorInterval (20.0);
-        dl.addAxis (10.0, 120.0, 170.0, 120.0, 0.0, 100.0, -1, ap);
+//        dl.addAxis (10.0, 120.0, 170.0, 120.0, 0.0, 100.0, -1, ap);
 
         dls = new DLSelectable ();
         dl.setSelectable (dls);
@@ -957,7 +964,7 @@ catch (Exception e) {
         ap.setLabelAnchor (4);
         ap.setMajorInterval (20.0);
         ap.setTickDirection (1);
-        dl.addAxis (10.0, 10.0, 170.0, 10.0, 0.0, 100.0, -1, ap);
+//        dl.addAxis (10.0, 10.0, 170.0, 10.0, 0.0, 100.0, -1, ap);
 
         dl.addLogComment ("line in a selectable");
         dls = new DLSelectable ();
@@ -1146,7 +1153,8 @@ class Frame2Frame extends JDLFrame
                         null,
                         DLConst.FRAME_NO_ATTACH,
                         0.0,
-                        0.0);
+                        0.0,
+                        0);
 
         dl.setSymbolColor (0, 0, 0);
         dl.setLineThickness (.01);
@@ -1209,7 +1217,8 @@ class TextFrameTest extends JDLFrame
                         null,
                         DLConst.FRAME_NO_ATTACH,
                         0.0,
-                        0.0);
+                        0.0,
+                        0);
 
         dl.setTextColor (0, 0, 0);
         dl.setTextFillColor (200, 200, 200);
@@ -1275,7 +1284,8 @@ class FrameLayoutTest extends JDLFrame
                         null,
                         DLConst.FRAME_NO_ATTACH,
                         0.0,
-                        0.0);
+                        0.0,
+                        0);
 
         double[] xf = new double[10];
         double[] yf = new double[10];
@@ -1447,7 +1457,8 @@ class ReversePrimFrame extends JDLFrame
                         null,
                         DLConst.FRAME_NO_ATTACH,
                         0.0,
-                        0.0);
+                        0.0,
+                        0);
 
         xline[0] = 10.0;
         yline[0] = 10.0;
@@ -1669,7 +1680,8 @@ class GridTest extends JDLFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                        0);
 
         gdata = new double[100];
         for (i=0; i<10; i++) {
@@ -1747,9 +1759,9 @@ class HugeFrame extends JDLFrame
  *  Sometimes the native C/C++ code needs to be debugged while
  *  being run under the Java Virtual Machine.  In my (Glenn) 
  *  experience, this is not always possible (maybe half the
- *  tinme?).  But, if it is possible, the JVM needs to be waiting
+ *  time?).  But, if it is possible, the JVM needs to be waiting
  *  on something like this keyboard input.  During the wait, 
- *  gdb can be started in anothe rwindow and attached to the JVM
+ *  gdb can be started in another window and attached to the JVM
  *  process.
 try {
 System.out.println();
@@ -1779,11 +1791,18 @@ catch (Exception e) {
           setTitle ("Random Frame Test * " + ndo);
         }
 
+        double prat = (double)nhint / 2000.0;
+        if (prat < 1.0) prat = 1.0;
+        if (prat > 2.0) prat = 2.0;
+        if (nhint == -1) {
+            prat = 2.0;
+        }
+
         JDisplayList dl = super.getDL ();
 
         dl.setBackgroundColor (255, 255, 255);
         dl.beginPlot ("huge frame 1 test",
-                      0.0, 0.0, 200.0, 200.0);
+                      0.0, 0.0, 40.0 * prat, 40.0 * prat);
         dl.setColor (5, 5, 5);
 
         dl.setFrameClip (1);
@@ -1791,37 +1810,19 @@ catch (Exception e) {
                         0.0,
                         0.0,
                         xymax,
-                        xymax,
-                        50.0,
-                        50.0,
-                        150.0,
-                        150.0,
-                        0.0,
-                        0.0,
-                        xymax,
-                        xymax,
-                        1,
-                        0,
-                        0,
-                        DLConst.FRAME_LABEL_ALL_SIDES_BORDER,
-                        null,
-                        null,
-                        null,
-                        DLConst.FRAME_NO_ATTACH,
-                        0.0,
-                        0.0);
+                        xymax);
 
         AxisProperties ap = new AxisProperties ();
         ap.setLabelFlag (1);
         ap.setTickDirection (-1);
         ap.setCaption ("Right side caption");
-        dl.setFrameAxisProperties ("frame1 test", DLConst.FRAME_RIGHT_AXIS, ap);
+        dl.setFrameAxisProperties ("huge frame1 test", DLConst.FRAME_RIGHT_AXIS, ap);
         ap.setCaption ("Left side caption");
-        dl.setFrameAxisProperties ("frame1 test", DLConst.FRAME_LEFT_AXIS, ap);
+        dl.setFrameAxisProperties ("huge frame1 test", DLConst.FRAME_LEFT_AXIS, ap);
         ap.setCaption ("Bottom side caption");
-        dl.setFrameAxisProperties ("frame1 test", DLConst.FRAME_BOTTOM_AXIS, ap);
+        dl.setFrameAxisProperties ("huge frame1 test", DLConst.FRAME_BOTTOM_AXIS, ap);
         ap.setCaption ("Top side caption");
-        dl.setFrameAxisProperties ("frame1 test", DLConst.FRAME_TOP_AXIS, ap);
+        dl.setFrameAxisProperties ("huge frame1 test", DLConst.FRAME_TOP_AXIS, ap);
 
         random = new Random();
         long seed = 1234579;
@@ -1831,9 +1832,6 @@ catch (Exception e) {
         double xyrand_shift = xymax / 10.0;
 
         double tfact = 1.0;
-        //if (ndo > 20) tfact = .75;
-        //if (ndo > 50) tfact = .5;
-        //if (ndo > 100) tfact = .25;
 
         double shfact = 4;
         if (ndo > 20) shfact = 2;
@@ -2099,7 +2097,8 @@ class LithFrame extends JDLFrame
                         null,
                         DLConst.FRAME_NO_ATTACH,
                         0.0,
-                        0.0);
+                        0.0,
+                        0);
 
         dl.setTextAnchor (2);
         dl.setLineThickness (.01);
@@ -2360,7 +2359,8 @@ class FrameSyncTest extends JDLFrame
                         null,
                         DLConst.FRAME_NO_ATTACH,
                         0.0,
-                        0.0);
+                        0.0,
+                        0);
 
         double[] xf = new double[10];
         double[] yf = new double[10];
@@ -2457,7 +2457,7 @@ class FrameSyncTest extends JDLFrame
                         DLConst.FRAME_ATTACH_RIGHT_MIDDLE,
                         0.5,
                         0.0,
-                        true, true);
+                        true, true, 0);
 
         xf = new double[10];
         yf = new double[10];
@@ -2603,7 +2603,8 @@ class NoAspectFrame extends JDLFrame implements DLRightClickListener, DLSelectLi
                         null,
                         DLConst.FRAME_NO_ATTACH,
                         0.0,
-                        0.0);
+                        0.0,
+                        0);
 
         AxisProperties ap = new AxisProperties ();
         ap.setLabelFlag (1);
@@ -2829,7 +2830,8 @@ class OverlapTest extends JDLFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
         gdata = new double[100];
         for (i=0; i<10; i++) {

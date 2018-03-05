@@ -245,8 +245,9 @@ int EZXJavaArea::ezx_AppendTextToJavaArea (
     CSW_F          size,
     int            font,
     int            image_id,
-    int            selectable
-) {
+    int            selectable)
+{
+
 #if DEBUG_NATIVE_ONLY
     if (DebugFile == NULL) {
         DebugFile = fopen ("C:\\glenn\\src\\native_ezx.dbg", "wb");
