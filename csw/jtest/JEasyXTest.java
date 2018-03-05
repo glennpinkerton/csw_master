@@ -42,6 +42,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
@@ -307,27 +308,33 @@ catch (Exception e) {
         JButton medium_button = new JButton ("Medium Random Frame");
         medium_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                HugeFrame frame = new HugeFrame (50);
-                frame.populateDlist ();
-                frame.setVisible(true);
+                HugeFrame hf = new HugeFrame (50);
+                HugeFrameRunnable run_frame = new HugeFrameRunnable (hf);
+                SwingUtilities.invokeLater (run_frame);
+                //frame.populateDlist ();
+                //frame.setVisible(true);
           }
         });
 
         JButton big_button = new JButton ("Big Random Frame");
         big_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                HugeFrame frame = new HugeFrame (1000);
-                frame.populateDlist ();
-                frame.setVisible(true);
+                HugeFrame hf = new HugeFrame (1000);
+                HugeFrameRunnable run_frame = new HugeFrameRunnable (hf);
+                SwingUtilities.invokeLater (run_frame);
+                //frame.populateDlist ();
+                //frame.setVisible(true);
           }
         });
 
         JButton huge_button = new JButton ("Huge Random Frame");
         huge_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                HugeFrame frame = new HugeFrame (-1);
-                frame.populateDlist ();
-                frame.setVisible(true);
+                HugeFrame hf = new HugeFrame (-1);
+                HugeFrameRunnable run_frame = new HugeFrameRunnable (hf);
+                SwingUtilities.invokeLater (run_frame);
+                //frame.populateDlist ();
+                //frame.setVisible(true);
           }
         });
 
@@ -1723,6 +1730,57 @@ class GridTest extends JDLFrame
     }
 };
 
+
+
+
+class HFWorker extends SwingWorker<Integer, Void> {
+
+    HugeFrame    hf = null;
+
+    HFWorker (HugeFrame  hfin)
+    {
+         hf = hfin;
+    }
+
+    protected Integer doInBackground () {
+        hf.populateDlist ();
+        return 0;
+    }
+
+    protected void done () {
+        hf.setVisible (true);
+    }
+
+}
+
+
+
+/**
+ * This class has a runnable that first populates the specified
+ * HugeFrame object.  After this object has been populated, the
+ * frame is made visible, which triggers the drawing of the objects
+ * previously set via the populateDlist method.
+ */
+class HugeFrameRunnable implements Runnable {
+
+    HugeFrame    hf;
+
+    public HugeFrameRunnable (HugeFrame hfin) {hf = hfin;}
+
+    public void run () {
+
+// uncomment for threads
+  //      HFWorker hfw = new HFWorker (hf);
+  //      hfw.execute ();
+
+
+// comment for threads
+        hf.populateDlist ();
+        hf.setVisible (true);
+
+    }
+
+}
 
 
 
