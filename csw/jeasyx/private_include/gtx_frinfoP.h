@@ -95,6 +95,7 @@ typedef struct {
     double       xmin_spatial, ymin_spatial,
                  xmax_spatial, ymax_spatial;
     double       x1, y1, x2, y2;
+    double       orig_x1, orig_y1, orig_x2, orig_y2;
     CSW_F        px1orig, py1orig, px2orig, py2orig;
     CSW_F        px1, py1, px2, py2;
     CSW_F        left_margin, right_margin, top_margin, bottom_margin;
@@ -141,6 +142,9 @@ typedef struct {
     CSW_F        extra_gap,
                  perpendicular_move;
     int          patch_draw_flag;
+
+    int          scale_text_sizes = 0;
+
 } FRameStruct;
 
 /*

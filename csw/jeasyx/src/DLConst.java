@@ -549,6 +549,13 @@ public class DLConst {
     final static int GTX_EDITFLAG        = 2000;
     final static int GTX_LIMIT_MSG       = 4000;
 
+  /*
+   * Display list size scaling constants.
+   */
+    final static int FRAME_NO_SIZE_SCALE = 0;
+    final static int FRAME_EXACT_SIZE_SCALE = 1;
+    final static int FRAME_AUTO_SIZE_SCALE = 2;
+
 };
 
 

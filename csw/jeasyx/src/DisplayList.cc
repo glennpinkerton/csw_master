@@ -1410,6 +1410,8 @@ int CDisplayList::DrawAllLines (void)
 
     bool  bframe = false;
 
+    CSW_F  scaled_thick = 1.0;
+
     for (ido=0; ido<nloop; ido++) {
 
         i = ido;
@@ -1459,12 +1461,16 @@ int CDisplayList::DrawAllLines (void)
 
         gtx_drawprim_obj.gtx_SetImageIDForDraw (lptr->image_id);
 
+        scaled_thick = (CSW_F)lptr->thick;
+        if (bframe) {
+            scaled_thick = scale_text_size (lptr->frame_num, scaled_thick);
+        }
 
         gtx_drawprim_obj.gtx_cliplineprim
                         (lptr->xypts,
                          lptr->npts,
                          lptr->smooth_flag,
-                         (CSW_F)lptr->thick,
+                         scaled_thick,
                          lptr->red,
                          lptr->green,
                          lptr->blue,
@@ -3886,6 +3892,8 @@ int CDisplayList::DrawAllTexts (void)
     nmod = n / 2000;
     if (nmod < 1) nmod = 1;
 
+    CSW_F  scaled_tsize = .1;
+
     n = 0;
     for (ido=0; ido<nloop; ido++) {
 
@@ -3954,6 +3962,12 @@ int CDisplayList::DrawAllTexts (void)
         xoff = tptr->xoff * page_units_per_inch;
         yoff = tptr->yoff * page_units_per_inch;
 
+        scaled_tsize = tptr->size;
+        if (bframe) {
+            scaled_tsize = scale_text_size (tptr->frame_num,
+                                            tptr->size);
+        }
+
      /*
       * If the text needs a background rectangle, draw it here.
       * These rectangles have a priority of 2, just below the text
@@ -3974,7 +3988,7 @@ int CDisplayList::DrawAllTexts (void)
                              tptr->bg_green,
                              tptr->bg_blue,
                              tptr->angle,
-                             tptr->size,
+                             scaled_tsize,
                              tptr->font_num,
                              tptr->bgflag);
         }
@@ -3996,7 +4010,7 @@ int CDisplayList::DrawAllTexts (void)
                          tptr->fill_green,
                          tptr->fill_blue,
                          tptr->angle,
-                         tptr->size,
+                         scaled_tsize,
                          tptr->font_num);
 
         gtx_drawprim_obj.gtx_reset_exact_text_length ();
@@ -4477,6 +4491,8 @@ int CDisplayList::DrawAllSymbs (void)
     double  xpsym = 0.0;
     double  ypsym = 0.0;
 
+    CSW_F  scaled_size = .1;
+
     for (ido=0; ido<nloop; ido++) {
 
         i = ido;
@@ -4507,6 +4523,8 @@ int CDisplayList::DrawAllSymbs (void)
         xpsym = sptr->x;
         ypsym = sptr->y;
 
+        scaled_size = sptr->size;
+
     /*
      * Check the symbol bbox against the symbol frame.
      */
@@ -4519,6 +4537,8 @@ int CDisplayList::DrawAllSymbs (void)
             }
 
             convert_frame_point (sptr->frame_num, &xpsym, &ypsym);
+
+            scaled_size = scale_text_size (sptr->frame_num, scaled_size);
         }
 
 
@@ -4527,7 +4547,7 @@ int CDisplayList::DrawAllSymbs (void)
                         (xpsym,
                          ypsym,
                          sptr->symb_num,
-                         sptr->size,
+                         scaled_size,
                          sptr->thick,
                          sptr->red,
                          sptr->green,
@@ -6702,7 +6722,8 @@ int CDisplayList::CreateFrame (int rescaleable,
                                double perp_move,
                                char *cdata,
                                int scale_width_to_attach_frame,
-                               int scale_height_to_attach_frame)
+                               int scale_height_to_attach_frame,
+                               int scale_text_sizes)
 {
     FRameStruct       *frptr, *fp2;
     double            dt;
@@ -6896,6 +6917,10 @@ int CDisplayList::CreateFrame (int rescaleable,
     frptr->y1 = fy1;
     frptr->x2 = fx2;
     frptr->y2 = fy2;
+    frptr->orig_x1 = fx1;
+    frptr->orig_y1 = fy1;
+    frptr->orig_x2 = fx2;
+    frptr->orig_y2 = fy2;
     frptr->px1 = px1;
     frptr->py1 = py1;
     frptr->px2 = px2;
@@ -7037,6 +7062,8 @@ int CDisplayList::CreateFrame (int rescaleable,
     frptr->num_symb_index = 0;
     frptr->num_shape_index = 0;
     frptr->num_contour_index = 0;
+
+    frptr->scale_text_sizes = scale_text_sizes;
 
     return (num_frame_list - 1);
 }
@@ -16832,6 +16859,8 @@ void CDisplayList::reclip_and_draw_selected_lines (DLSelectable *dls)
         return;
     }
 
+    CSW_F  scaled_thick = 1.0;
+
     for (ido=0; ido<nprim; ido++) {
 
         i = lines[ido];
@@ -16849,11 +16878,6 @@ void CDisplayList::reclip_and_draw_selected_lines (DLSelectable *dls)
         current_frame_num = lptr->frame_num;
         update_frame_limits ();
 
-    /*
-     * Clip the master frame prim to the current
-     * frame limits and scale to the current
-     * page location.
-     */
         gpf_calcdraw_obj.gpf_cliplineprim (lptr->xypts, lptr->npts,
                           Fx1, Fy1, Fx2, Fy2,
                           xywork2, &ncout, iwork);
@@ -16880,17 +16904,18 @@ void CDisplayList::reclip_and_draw_selected_lines (DLSelectable *dls)
 
         ezx_java_obj.ezx_SetFrameInJavaArea (lptr->frame_num);
 
+        scaled_thick = scale_text_size (lptr->frame_num, (CSW_F)lptr->thick);
+
         gtx_drawprim_obj.gtx_cliplineprim(xy,
                          npts,
                          lptr->smooth_flag,
-                         (CSW_F)lptr->thick,
+                         scaled_thick,
                          lptr->red,
                          lptr->green,
                          lptr->blue,
                          lptr->dashpat,
                          (CSW_F)lptr->dashscale,
                          lptr->arrowstyle);
-
     }
 
     return;
@@ -17158,6 +17183,8 @@ void CDisplayList::reclip_and_draw_selected_texts (DLSelectable *dls)
       * The text character fills and strokes themselves have the
       * highest priority and are set to 3.
       */
+        CSW_F scaled_size = scale_text_size (tptr->frame_num, tptr->size);
+
         ezx_java_obj.ezx_SetDrawingPriority (3);
         gtx_drawprim_obj.gtx_cliptextprim(x + xoff,
                          y + yoff,
@@ -17171,7 +17198,7 @@ void CDisplayList::reclip_and_draw_selected_texts (DLSelectable *dls)
                          tptr->fill_green,
                          tptr->fill_blue,
                          tptr->angle,
-                         tptr->size,
+                         scaled_size,
                          tptr->font_num);
 
         gtx_drawprim_obj.gtx_reset_exact_text_length ();
@@ -17264,10 +17291,12 @@ void CDisplayList::reclip_and_draw_selected_symbs (DLSelectable *dls)
 
         ezx_java_obj.ezx_SetFrameInJavaArea (sptr->frame_num);
 
+        CSW_F scaled_size = scale_text_size (sptr->frame_num, sptr->size);
+
         gtx_drawprim_obj.gtx_clipsymbprim(xt,
                          yt,
                          sptr->symb_num,
-                         sptr->size,
+                         scaled_size,
                          sptr->thick,
                          sptr->red,
                          sptr->green,
@@ -20945,6 +20974,72 @@ void CDisplayList::unconvert_frame_array (int fnum, CSW_F *xy, int npts)
     return;
 }
 
+
+
+
+
+CSW_F CDisplayList::scale_text_size (int fnum, CSW_F size_in)
+{
+    CSW_F size_out = size_in;
+
+    if (fnum < 0  ||  fnum >= num_frame_list  ||  frame_list == NULL) {
+        return size_out;
+    }
+
+    FRameStruct  *frptr = frame_list + fnum;
+    if (frptr->scale_text_sizes == 0  ||
+        frptr->rescaleable == 0) {
+        return size_out;
+    }
+
+    CSW_F    sw_inches;
+    CSW_F    sh_inches;
+
+    CSW_F    sx, sy;
+    CSW_F    sx1, sy1, sx2, sy2;
+    CSW_F    px1, py1, px2, py2;
+    CSW_F    fx1, fy1, fx2, fy2;
+
+    px1 = frptr->px1;
+    py1 = frptr->py1;
+    px2 = frptr->px2;
+    py2 = frptr->py2;
+
+    gtx_drawprim_obj.gtx_scalef (px1, py1, &sx1, &sy1);
+    gtx_drawprim_obj.gtx_scalef (px2, py2, &sx2, &sy2);
+
+    sw_inches = (sx2 - sx1) / (CSW_F)screen_dpi;
+    sh_inches = (sy2 - sy1) / (CSW_F)screen_dpi;
+
+/*
+ * ratio of actual physical size on the device to the virtual
+ * "page size" of the frame border.
+ */
+    double  st1, st2, stxy;
+    st1  = sw_inches / (px2 - px1);
+    if (st1 < 0.0) st1 = -st1;
+    st2  = sh_inches / (py2 - py1);
+    if (st2 < 0.0) st2 = -st2;
+    stxy = (st1 + st2) / 2.0;
+
+    fx1 = frptr->x1;
+    fy1 = frptr->y1;
+    fx2 = frptr->x2;
+    fy2 = frptr->y2;
+
+    sx = (frptr->orig_x2 - frptr->orig_x1) / (fx2 - fx1);
+    sy = (frptr->orig_y2 - frptr->orig_y1) / (fy2 - fy1);
+
+    double  sc_all = (sx + sy) / 2.0 * stxy;
+    if (frptr->scale_text_sizes == 2) {
+        sc_all = sqrt (sc_all);
+    }
+
+    size_out = size_in * sc_all;
+
+    return size_out;
+
+}
 
 
 

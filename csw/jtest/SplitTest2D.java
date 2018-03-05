@@ -95,7 +95,8 @@ class SplitTest2D extends JFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
     }
 

@@ -12,9 +12,11 @@ package csw.jtest;
 
 import java.lang.Math;
 
+import java.awt.Toolkit;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -152,6 +154,9 @@ catch (Exception e) {
         JSurfaceWorks.openLogFile (sw_playback_file_name);
 
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation (screenSize.width - 250, 50);
 
         setTitle ("JSurfaceWorks Unit Test");
         setSize (200, 400);
@@ -362,7 +367,8 @@ class TriMesh10Frame extends JDLFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
         DLSurfaceProperties dlp = new DLSurfaceProperties ();
         dlp.setShowNodes (true);
@@ -479,7 +485,8 @@ class Grid10Frame extends JDLFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
         DLSurfaceProperties dlp = new DLSurfaceProperties ();
         dlp.setShowNodes (true);
@@ -608,7 +615,8 @@ class Grid10Frame extends JDLFrame
 
         double  scl = 100.0 / (zvmax - zvmin);
         for (int i=0; i<np; i++) {
-            z[i] = (z[i] - zvmin) * scl;
+            double dd2 = random.nextDouble () - .5;
+            z[i] = (z[i] - zvmin) * scl + dd2;
         }
 
     }
@@ -756,7 +764,8 @@ class TFileFrame extends JFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
 
         n = 0;
@@ -839,7 +848,8 @@ class TFileFrame extends JFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
 
         int nedge = dblist.getNumEdges();
@@ -953,7 +963,8 @@ class TFileFrame extends JFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
 
         double[] xnodes = tmesh.getNodeXArray();
@@ -1223,7 +1234,8 @@ class FileioFrame extends JFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
         DLSurfaceProperties dlp = new DLSurfaceProperties ();
         ColorPalette cpal = new ColorPalette();
@@ -1304,7 +1316,8 @@ class FileioFrame extends JFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
         DLSurfaceProperties dlp = new DLSurfaceProperties ();
         ColorPalette cpal = new ColorPalette();
@@ -1446,7 +1459,8 @@ class PFileFrame extends JFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
         repaint ();
 
@@ -1801,7 +1815,8 @@ class ContourFrame extends JFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
         if (tmesh != null) {
             DLSurfaceProperties dlp = new DLSurfaceProperties ();
@@ -2018,7 +2033,8 @@ class DivideFrame extends JFrame
                            null,
                            DLConst.FRAME_NO_ATTACH,
                            0.0,
-                           0.0);
+                           0.0,
+                           0);
             frameCreated = true;
         }
 
@@ -2084,7 +2100,8 @@ class DivideFrame extends JFrame
                            null,
                            DLConst.FRAME_NO_ATTACH,
                            0.0,
-                           0.0);
+                           0.0,
+                           0);
             frameCreated = true;
         }
 
@@ -2191,7 +2208,8 @@ class DivideFrame extends JFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
             frameCreated = true;
         }
 
@@ -2543,7 +2561,8 @@ class GridFileFrame extends JFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
         dl.addGrid ("test grid", grid, null);
 
@@ -2789,7 +2808,8 @@ class ResampleFrame extends JFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
         int npts = pointList.npts;
         double[] xpts = pointList.x;

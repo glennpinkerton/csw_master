@@ -478,6 +478,7 @@ int ezx_process_command (
      *  ilist[4] has attach position
      *  ilist[5] has scale width to attach
      *  ilist[6] has scale height to attach
+     *  ilist[7] has scale text size flag
      *  cdata[0] has name, attach frame name, and captions
      */
         case GTX_CREATEFRAME:
@@ -549,7 +550,8 @@ int ezx_process_command (
                 ddata[13],
                 cdata,
                 ilist[5],
-                ilist[6]
+                ilist[6],
+                ilist[7]
             );
 
             break;

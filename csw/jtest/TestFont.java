@@ -139,7 +139,8 @@ public class TestFont extends JFrame
                        null,
                        DLConst.FRAME_NO_ATTACH,
                        0.0,
-                       0.0);
+                       0.0,
+                       0);
 
         repaint ();
 

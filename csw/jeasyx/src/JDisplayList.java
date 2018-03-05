@@ -38,7 +38,7 @@ import csw.jsurfaceworks.src.TriMesh;
   This class has the API functions to draw to and otherwise
   interact with and manage the 2D graphics display list.  This
   class is meant to be a collection of services to draw and
-  select to and from the screen.  The display list itself cannot
+  select to and from the screen.  The display list class cannot
   be extended by an application.
 
   @author Glenn Pinkerton
@@ -47,12 +47,6 @@ import csw.jsurfaceworks.src.TriMesh;
 public class JDisplayList extends JDisplayListBase {
 
     private static Logger logger = CSWLogger.getMyLogger ();
-
- /*
-  * Static methods.
-  */
-
-/*--------------------------------------------------------------------*/
 
 
  /**
@@ -93,6 +87,11 @@ public class JDisplayList extends JDisplayListBase {
     private double dlist_ymaxHint = 0.0;
 
     private int pageUnitsType = 1;
+
+    private double beginXmin = 1.e30;
+    private double beginYmin = 1.e30;
+    private double beginXmax = -1.e30;
+    private double beginYmax = -1.e30;
 
     public int getNativeID ()
     {
@@ -388,6 +387,11 @@ public class JDisplayList extends JDisplayListBase {
         if (beginPlotCalled) {
             return 1;
         }
+
+        beginXmin = page_xminHint;
+        beginYmin = page_yminHint;
+        beginXmax = page_xmaxHint;
+        beginYmax = page_ymaxHint;
 
         beginPlotCalled = true;
 
@@ -1067,7 +1071,8 @@ public class JDisplayList extends JDisplayListBase {
         double extraGap,
         double perpendicularMove,
         boolean scaleWidthToAttachFrame,
-        boolean scaleHeightToAttachFrame)
+        boolean scaleHeightToAttachFrame,
+        int    scale_text_sizes)
     {
 
     /*
@@ -1110,6 +1115,7 @@ public class JDisplayList extends JDisplayListBase {
         if (scaleHeightToAttachFrame == true) {
             Ilist[6] = 1;
         }
+        Ilist[7] = scale_text_sizes;
 
         String str = name;
         str = str.concat (MSG_STRING_SEPARATOR);
@@ -3192,7 +3198,7 @@ of Font.BOLD|Font.ITALIC.
   larger than 9999 or less than -9999 to get commas inserted.
   @param x The x coordinate for the number's current anchor position.
   @param y The y coordinate for the number's current anchor position.
-  @param size The text size, in device size units.
+  @param size The text size, in page units.
   @param angle The rotation angle in degrees.
   @param value The actual number to draw.
   @param ndec Number of digits to the right of the decimal point.
@@ -4144,7 +4150,7 @@ of Font.BOLD|Font.ITALIC.
   The size is in device size units and the angle is in degrees.
   @param x The x coordinate for the number's current anchor position.
   @param y The y coordinate for the number's current anchor position.
-  @param size The text size, in device size units.
+  @param size The text size, in page units (i.e. inches, cm or the like)
   @param angle The rotation angle in degrees.
   @param text Single line of text to draw.
   */
@@ -5325,7 +5331,8 @@ of Font.BOLD|Font.ITALIC.
         String attachFrameName,
         int attachPosition,
         double extraGap,
-        double perpendicularMove)
+        double perpendicularMove,
+        int  scale_text_sizes)
     {
 
     /*
@@ -5362,6 +5369,7 @@ of Font.BOLD|Font.ITALIC.
         Ilist[4] = attachPosition;
         Ilist[5] = 0;
         Ilist[6] = 0;
+        Ilist[7] = scale_text_sizes;
 
         String str = name;
         str = str.concat (MSG_STRING_SEPARATOR);
@@ -5415,8 +5423,76 @@ of Font.BOLD|Font.ITALIC.
       return selectableList;
     }
 
+
+
+/*-------------------------------------------------------------*/
+
+  /**
+     Define and set a drawing frame on the current drawing page.
+     Subsequent location coordinates must be in the frame coordinate
+     system until the frame is changed or unset.
+  <p>
+    This method can be used to create a simple single frame that is the only
+    frame in the plot area.  The frame will be rescaleable and it will use
+    automatic scaling for text size, symbol size and line thickness in response
+    to zooming.
+  <p>
+    The expected limits of the frame (xmin, ymin to xmax, ymax) do not need
+    to be exact.  If in doubt, err on the larger side.  However, try to be
+    somewhat close.  These values are used to set up some frame resources at
+    creation time and there are efficiency advantages to having the limits
+    fairly close.
+  <p>
+  @param name Unique name (in this display list) for the frame
+  @param xminHint The expected minimum X coordinate of graphics drawn to the frame.
+  @param yminHint The expected minimum Y coordinate of graphics drawn to the frame.
+  @param xmaxHint The expected maximum X coordinate of graphics drawn to the frame.
+  @param ymaxHint The expected maximum Y coordinate of graphics drawn to the frame.
+   */
+    public int createFrame (
+        String name,
+        double xminHint,
+        double yminHint,
+        double xmaxHint,
+        double ymaxHint)
+    {
+
+        if (beginPlotCalled == false) {
+            beginPlot ("plot page for frame: " + name,
+                       0.0, 0.0, 20.0, 20.0);
+        }
+
+        setFrameClip (1);
+        createFrame (name,
+                     xminHint,
+                     yminHint,
+                     xmaxHint,
+                     ymaxHint,
+                     beginXmin,
+                     beginYmin,
+                     beginXmax,
+                     beginYmax,
+                     xminHint,
+                     yminHint,
+                     xmaxHint,
+                     ymaxHint,
+                     1,
+                     0,
+                     0,
+                     DLConst.FRAME_LABEL_ALL_SIDES_BORDER,
+                     null,
+                     null,
+                     null,
+                     DLConst.FRAME_NO_ATTACH,
+                     0.0,
+                     0.0,
+                     DLConst.FRAME_AUTO_SIZE_SCALE);
+        return 1;
+
+    }
+
+
 /*---------------------------------------------------------------------*/
 
 }  // end of JDisplayList class definition
-
 

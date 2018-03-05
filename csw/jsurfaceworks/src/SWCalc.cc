@@ -2522,8 +2522,7 @@ int SWCalc::sw_GridToTriMesh (
 
 /*
  * !!!! Function to write constraint lines to text file,
- * used for debuging only.  When this is needed, remove the
- * if 0 end endif that bracket the function.
+ * used for debuging only.  
  */
 void SWCalc::WriteConstraintLines
 (
@@ -2536,14 +2535,10 @@ void SWCalc::WriteConstraintLines
 )
 {
     int    do_write, i;
-    static int    first = 1;
-    static int    nv[1000];
+    int    nv[1000];
 
-    if (first) {
-        for (i=0; i<1000; i++) {
-            nv[i] = 1;
-        }
-        first = 0;
+    for (i=0; i<1000; i++) {
+        nv[i] = 1;
     }
 
     do_write = csw_GetDoWrite ();

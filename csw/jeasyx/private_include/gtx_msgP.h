@@ -254,6 +254,13 @@
 #define GTX_SWAPOUT           9998
 #define GTX_MEMLOCK           9997
 
+/*
+ * frame size scaling constants
+ */
+#define  FRAME_NO_SIZE_SCALE   0
+#define  FRAME_EXACT_SIZE_SCALE   1
+#define  FRAME_AUTO_SIZE_SCALE   2
+
 
 #endif
 /*

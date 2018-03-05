@@ -399,8 +399,8 @@ int CSWGrdTsurf::grd_calc_trend_grid (CSW_F *x, CSW_F *y, CSW_F *z, int npts, in
     int              do_write;
     char             fname[100];
 
-    const static int       minpts [] = {3, 6, 10, 15, 21, 28, 36, 45};
-    const static int       maxpts [] = {200, 200, 200, 300, 400, 500, 800, 950};
+    static const int       minpts [] = {3, 6, 10, 15, 21, 28, 36, 45};
+    static const int       maxpts [] = {200, 200, 200, 300, 400, 500, 800, 950};
 
 
     auto fscope = [&]()
