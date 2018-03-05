@@ -93,8 +93,6 @@ public class JDisplayListPanel extends JPanel
         addMouseListener(mouse_listen);
         addMouseMotionListener(mouse_listen);
 
-        addComponentListener (new JDLPComponentListener ());
-
         logger.info ("    JDisplayListPanel successfully constructed    ");
     }
 
@@ -134,7 +132,7 @@ public class JDisplayListPanel extends JPanel
     {
         resetModes ();
         dlist.unselectAll ();
-        repaint ();
+        dlp_repaint ();
     }
 
 /*---------------------------------------------------------------------------*/
@@ -146,7 +144,7 @@ public class JDisplayListPanel extends JPanel
         int iframe = dlist.getSingleRescaleFrame ();
         if (iframe != -1) {
             dlist.zoomToExtents (iframe);
-            repaint ();
+            dlp_repaint ();
         }
         else {
             zoomExtentsMode = 1;
@@ -162,7 +160,7 @@ public class JDisplayListPanel extends JPanel
         int iframe = dlist.getSingleRescaleFrame ();
         if (iframe != -1) {
             dlist.zoomOut (iframe);
-            repaint ();
+            dlp_repaint ();
         }
         else {
             zoomOutMode = 1;
@@ -197,11 +195,31 @@ public class JDisplayListPanel extends JPanel
 
 /*---------------------------------------------------------------------------*/
 
+/*
+ * The initial draw to the panel almost always is done twice because
+ * the paintComponent method is called more than once.  I have encapsulated
+ * the repaint call here so I can try to figure out what is happening 
+ * with the event dispatching which causes multiple initial draws.
+ */
+    void dlp_repaint ()
+    {
+        if (dlp_draw_now ()) {
+            repaint ();
+        }
+    }
+
+    private boolean dlp_draw_now ()
+    {
+        return true;
+    }
+
+/*---------------------------------------------------------------------------*/
+
     void redraw ()
     {
         dlist.setNativeDrawNeeded (1);
         resetModes ();
-        repaint ();
+        dlp_repaint ();
     }
 
 /*---------------------------------------------------------------------------*/
@@ -472,7 +490,7 @@ public class JDisplayListPanel extends JPanel
 
         dlist.clearZoomPanShapes ();
 
-        repaint ();
+        dlp_repaint ();
 
         resetModes ();
 
@@ -547,7 +565,7 @@ public class JDisplayListPanel extends JPanel
             0   // fill flag
         );
 
-        repaint ();
+        dlp_repaint ();
 
         return;
 
@@ -584,7 +602,7 @@ public class JDisplayListPanel extends JPanel
 
         dlist.clearZoomPanShapes ();
 
-        repaint ();
+        dlp_repaint ();
 
         resetModes ();
 
@@ -616,45 +634,6 @@ public class JDisplayListPanel extends JPanel
         public void windowDeactivated (WindowEvent e) {}
         public void windowOpened (WindowEvent e) {}
     };
-
-/*---------------------------------------------------------------------------*/
-
-/*
- * The component listener is needed to insure that a repaint is
- * always done when the panel is resized.
- */
-    private class JDLPComponentListener extends ComponentAdapter
-    {
-        public void componentResized (ComponentEvent e)
-        {
-
-        /*
-         * If the display list is using screen coordinates as its
-         * "page units" then do not repaint in response to resize.
-         * Any resize processing should be done by the application
-         * when using screen coordinates as page units.
-         */
-            int type = dlist.getPageUnitsType ();
-            if (type == 2) {
-                return;
-            }
-
-            repaint ();
-        }
-
-        public void componentHidden (ComponentEvent e)
-        {
-        }
-
-        public void componentMoved (ComponentEvent e)
-        {
-        }
-
-        public void componentShown (ComponentEvent e)
-        {
-            repaint ();
-        }
-    }
 
 /*---------------------------------------------------------------------------*/
 
@@ -907,7 +886,7 @@ public class JDisplayListPanel extends JPanel
 
         dlist.zoomToExtents (iframe);
 
-        repaint ();
+        dlp_repaint ();
 
         return;
 
@@ -926,7 +905,7 @@ public class JDisplayListPanel extends JPanel
 
         dlist.zoomOut (iframe);
 
-        repaint ();
+        dlp_repaint ();
 
         return;
 
@@ -945,7 +924,7 @@ public class JDisplayListPanel extends JPanel
 
         dlist.zoomIn (iframe, ix, iy);
 
-        repaint ();
+        dlp_repaint ();
 
         return;
 
@@ -975,7 +954,7 @@ public class JDisplayListPanel extends JPanel
                 dlist.setSelected(dls, !dls.isSelected);
             }
 
-            repaint ();
+            dlp_repaint ();
 
         // Button 3
         } else if (button_3 != 0) {
