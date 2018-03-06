@@ -1743,11 +1743,16 @@ class HFWorker extends SwingWorker<Integer, Void> {
     }
 
     protected Integer doInBackground () {
+System.out.println ();
+System.out.println ("entered do in background");
+System.out.flush ();
         hf.populateDlist ();
         return 0;
     }
 
     protected void done () {
+System.out.println ("entered done from HFWorker");
+System.out.flush ();
         hf.setVisible (true);
     }
 
@@ -1770,13 +1775,13 @@ class HugeFrameRunnable implements Runnable {
     public void run () {
 
 // uncomment for threads
-  //      HFWorker hfw = new HFWorker (hf);
-  //      hfw.execute ();
+        HFWorker hfw = new HFWorker (hf);
+        hfw.execute ();
 
 
 // comment for threads
-        hf.populateDlist ();
-        hf.setVisible (true);
+  //      hf.populateDlist ();
+  //      hf.setVisible (true);
 
     }
 

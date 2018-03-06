@@ -10846,6 +10846,11 @@ void CDisplayList::find_frame_limits (int frame_num,
     DLSurf         *surf;
     DLContour      *cont;
 
+    if (frame_num < 0  ||  frame_num >= num_frame_list  ||  frame_list == NULL) {
+        return;
+    }
+    FRameStruct       *frptr = frame_list + frame_num;
+
     xmin = *xmin_out;
     ymin = *ymin_out;
     xmax = *xmax_out;
@@ -10892,7 +10897,8 @@ void CDisplayList::find_frame_limits (int frame_num,
     int           tp_size = (int)text_prim_list.size();
     TExtPrim      *tp_data = text_prim_list.data();
 
-    if (tp_data != NULL  &&  tp_size > 0) {
+    if (tp_data != NULL  &&  tp_size > 0  &&
+        frptr->scale_text_sizes == 0) {
         for (i=0; i<tp_size; i++) {
             tptr = tp_data + i;
             if (tptr->deleted_flag == 1  ||
