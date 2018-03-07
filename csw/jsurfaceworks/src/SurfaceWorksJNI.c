@@ -49,8 +49,8 @@ csw_jsurfaceworks_src_JSurfaceWorksBase_MAX_LIST_ARRAY
 /*
  * Set static file variables.
  */
-static JNIEnv         *JavaEnv = NULL;
-static jobject        JavaObj = NULL;
+//static JNIEnv         *jenv = NULL;
+//static jobject        jobj = NULL;
 
 
 /*
@@ -129,7 +129,6 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
     long              status;
     int              command_id;
     int              threadid;
-    int              expect_return;
 
     jint             *ilist;
     jlong            *llist;
@@ -145,18 +144,9 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
 
     threadid = (int)j_tid;
 
-    expect_return = (int)j_expect_return;
-
 /*
  * Find the Java class methods if this message expects returned data.
  */
-
-    if (expect_return) {
-
-        JavaEnv = jnienv;
-        JavaObj = jobj;
-
-    }
 
 /*
  * If the int type is not a 32 bit signed integer, a conversion
@@ -510,54 +500,54 @@ void jni_call_store_tri_mesh_method (
 /*
  * Put the nodes into java arrays.
  */
-    j_xnode = (*JavaEnv)->NewDoubleArray (JavaEnv, numnode);
+    j_xnode = (*jenv)->NewDoubleArray (jenv, numnode);
     if (j_xnode == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_xnode,
         0,
         numnode,
         (double *)xnode
     );
 
-    j_ynode = (*JavaEnv)->NewDoubleArray (JavaEnv, numnode);
+    j_ynode = (*jenv)->NewDoubleArray (jenv, numnode);
     if (j_ynode == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_ynode,
         0,
         numnode,
         (double *)ynode
     );
 
-    j_znode = (*JavaEnv)->NewDoubleArray (JavaEnv, numnode);
+    j_znode = (*jenv)->NewDoubleArray (jenv, numnode);
     if (j_znode == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_znode,
         0,
         numnode,
         (double *)znode
     );
 
-    j_nodeflags = (*JavaEnv)->NewIntArray (JavaEnv, numnode);
+    j_nodeflags = (*jenv)->NewIntArray (jenv, numnode);
     if (j_nodeflags == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_nodeflags,
         0,
         numnode,
@@ -569,90 +559,90 @@ void jni_call_store_tri_mesh_method (
 /*
  * Put the edges into java arrays.
  */
-    j_n1edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_n1edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_n1edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_n1edge,
         0,
         numedge,
         jn1edge
     );
 
-    j_n2edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_n2edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_n2edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_n2edge,
         0,
         numedge,
         jn2edge
     );
 
-    j_t1edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_t1edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_t1edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_t1edge,
         0,
         numedge,
         jt1edge
     );
 
-    j_t2edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_t2edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_t2edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_t2edge,
         0,
         numedge,
         jt2edge
     );
 
-    j_edgeflags = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_edgeflags = (*jenv)->NewIntArray (jenv, numedge);
     if (j_edgeflags == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_edgeflags,
         0,
         numedge,
@@ -664,90 +654,90 @@ void jni_call_store_tri_mesh_method (
 /*
  * Put the triangles into java arrays.
  */
-    j_e1tri = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_e1tri = (*jenv)->NewIntArray (jenv, numtri);
     if (j_e1tri == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_e1tri,
         0,
         numtri,
         je1tri
     );
 
-    j_e2tri = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_e2tri = (*jenv)->NewIntArray (jenv, numtri);
     if (j_e2tri == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_e1tri);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_e2tri,
         0,
         numtri,
         je2tri
     );
 
-    j_e3tri = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_e3tri = (*jenv)->NewIntArray (jenv, numtri);
     if (j_e3tri == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_e1tri);
+        (*jenv)->DeleteLocalRef (jenv, j_e2tri);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_e3tri,
         0,
         numtri,
         je3tri
     );
 
-    j_triflags = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_triflags = (*jenv)->NewIntArray (jenv, numtri);
     if (j_triflags == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e3tri);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_e1tri);
+        (*jenv)->DeleteLocalRef (jenv, j_e2tri);
+        (*jenv)->DeleteLocalRef (jenv, j_e3tri);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_triflags,
         0,
         numtri,
@@ -759,9 +749,9 @@ void jni_call_store_tri_mesh_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         StoreTriMeshMethodID,
         j_xnode,
         j_ynode,
@@ -784,19 +774,19 @@ void jni_call_store_tri_mesh_method (
 /*
  * Delete the local java arrays.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e3tri);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_triflags);
+    (*jenv)->DeleteLocalRef (jenv, j_xnode);
+    (*jenv)->DeleteLocalRef (jenv, j_ynode);
+    (*jenv)->DeleteLocalRef (jenv, j_znode);
+    (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+    (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+    (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+    (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+    (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+    (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+    (*jenv)->DeleteLocalRef (jenv, j_e1tri);
+    (*jenv)->DeleteLocalRef (jenv, j_e2tri);
+    (*jenv)->DeleteLocalRef (jenv, j_e3tri);
+    (*jenv)->DeleteLocalRef (jenv, j_triflags);
 }
 
 /*------------------------------------------------------------------------*/
@@ -962,54 +952,54 @@ void jni_call_add_tri_mesh_method (
 /*
  * Put the nodes into java arrays.
  */
-    j_xnode = (*JavaEnv)->NewDoubleArray (JavaEnv, numnode);
+    j_xnode = (*jenv)->NewDoubleArray (jenv, numnode);
     if (j_xnode == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_xnode,
         0,
         numnode,
         xnode
     );
 
-    j_ynode = (*JavaEnv)->NewDoubleArray (JavaEnv, numnode);
+    j_ynode = (*jenv)->NewDoubleArray (jenv, numnode);
     if (j_ynode == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_ynode,
         0,
         numnode,
         ynode
     );
 
-    j_znode = (*JavaEnv)->NewDoubleArray (JavaEnv, numnode);
+    j_znode = (*jenv)->NewDoubleArray (jenv, numnode);
     if (j_znode == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_znode,
         0,
         numnode,
         znode
     );
 
-    j_nodeflags = (*JavaEnv)->NewIntArray (JavaEnv, numnode);
+    j_nodeflags = (*jenv)->NewIntArray (jenv, numnode);
     if (j_nodeflags == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_nodeflags,
         0,
         numnode,
@@ -1021,90 +1011,90 @@ void jni_call_add_tri_mesh_method (
 /*
  * Put the edges into java arrays.
  */
-    j_n1edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_n1edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_n1edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_n1edge,
         0,
         numedge,
         jn1edge
     );
 
-    j_n2edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_n2edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_n2edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_n2edge,
         0,
         numedge,
         jn2edge
     );
 
-    j_t1edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_t1edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_t1edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_t1edge,
         0,
         numedge,
         jt1edge
     );
 
-    j_t2edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_t2edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_t2edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_t2edge,
         0,
         numedge,
         jt2edge
     );
 
-    j_edgeflags = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_edgeflags = (*jenv)->NewIntArray (jenv, numedge);
     if (j_edgeflags == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_edgeflags,
         0,
         numedge,
@@ -1116,90 +1106,90 @@ void jni_call_add_tri_mesh_method (
 /*
  * Put the triangles into java arrays.
  */
-    j_e1tri = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_e1tri = (*jenv)->NewIntArray (jenv, numtri);
     if (j_e1tri == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_e1tri,
         0,
         numtri,
         je1tri
     );
 
-    j_e2tri = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_e2tri = (*jenv)->NewIntArray (jenv, numtri);
     if (j_e2tri == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_e1tri);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_e2tri,
         0,
         numtri,
         je2tri
     );
 
-    j_e3tri = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_e3tri = (*jenv)->NewIntArray (jenv, numtri);
     if (j_e3tri == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_e1tri);
+        (*jenv)->DeleteLocalRef (jenv, j_e2tri);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_e3tri,
         0,
         numtri,
         je3tri
     );
 
-    j_triflags = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_triflags = (*jenv)->NewIntArray (jenv, numtri);
     if (j_triflags == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e3tri);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_e1tri);
+        (*jenv)->DeleteLocalRef (jenv, j_e2tri);
+        (*jenv)->DeleteLocalRef (jenv, j_e3tri);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_triflags,
         0,
         numtri,
@@ -1211,9 +1201,9 @@ void jni_call_add_tri_mesh_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddTriMeshMethodID,
         j_xnode,
         j_ynode,
@@ -1236,19 +1226,19 @@ void jni_call_add_tri_mesh_method (
 /*
  * Delete the local java arrays.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e3tri);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_triflags);
+    (*jenv)->DeleteLocalRef (jenv, j_xnode);
+    (*jenv)->DeleteLocalRef (jenv, j_ynode);
+    (*jenv)->DeleteLocalRef (jenv, j_znode);
+    (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+    (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+    (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+    (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+    (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+    (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+    (*jenv)->DeleteLocalRef (jenv, j_e1tri);
+    (*jenv)->DeleteLocalRef (jenv, j_e2tri);
+    (*jenv)->DeleteLocalRef (jenv, j_e3tri);
+    (*jenv)->DeleteLocalRef (jenv, j_triflags);
 
     return;
 
@@ -1344,25 +1334,25 @@ void jni_call_add_grid_method (
 
     ntot = ncol * nrow;
 
-    j_data = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)ntot);
+    j_data = (*jenv)->NewDoubleArray (jenv, (jsize)ntot);
     if (j_data == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_data,
         0,
         ntot,
         data
     );
 
-    j_mask = (*JavaEnv)->NewByteArray (JavaEnv, (jsize)ntot);
+    j_mask = (*jenv)->NewByteArray (jenv, (jsize)ntot);
     if (j_mask == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_data);
+        (*jenv)->DeleteLocalRef (jenv, j_data);
         return;
     }
-    (*JavaEnv)->SetByteArrayRegion (
-        JavaEnv,
+    (*jenv)->SetByteArrayRegion (
+        jenv,
         j_mask,
         0,
         ntot,
@@ -1371,14 +1361,14 @@ void jni_call_add_grid_method (
 
     j_derror = NULL;
     if (derror != NULL  &&  npts > 0) {
-        j_derror = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+        j_derror = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
         if (j_derror == NULL) {
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, j_data);
-            (*JavaEnv)->DeleteLocalRef (JavaEnv, j_mask);
+            (*jenv)->DeleteLocalRef (jenv, j_data);
+            (*jenv)->DeleteLocalRef (jenv, j_mask);
             return;
         }
-        (*JavaEnv)->SetDoubleArrayRegion (
-            JavaEnv,
+        (*jenv)->SetDoubleArrayRegion (
+            jenv,
             j_derror,
             0,
             npts,
@@ -1389,9 +1379,9 @@ void jni_call_add_grid_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddGridMethodID,
         j_data,
         j_derror,
@@ -1405,10 +1395,10 @@ void jni_call_add_grid_method (
         (jint)npts
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_data);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_mask);
+    (*jenv)->DeleteLocalRef (jenv, j_data);
+    (*jenv)->DeleteLocalRef (jenv, j_mask);
     if (j_derror != NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_derror);
+        (*jenv)->DeleteLocalRef (jenv, j_derror);
     }
 
     return;
@@ -1461,36 +1451,36 @@ void jni_call_add_draped_line_method (
         return;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
         y
     );
 
-    j_z = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_z = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_z == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_z,
         0,
         npts,
@@ -1500,9 +1490,9 @@ void jni_call_add_draped_line_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddDrapedLineMethodID,
         j_x,
         j_y,
@@ -1510,9 +1500,9 @@ void jni_call_add_draped_line_method (
         (jint)npts
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_z);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_z);
 
     return;
 }
@@ -1563,36 +1553,36 @@ void jni_call_add_extended_centerline_method (
         return;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
         y
     );
 
-    j_z = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_z = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_z == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_z,
         0,
         npts,
@@ -1602,9 +1592,9 @@ void jni_call_add_extended_centerline_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddExtendedCenterlineMethodID,
         j_x,
         j_y,
@@ -1612,9 +1602,9 @@ void jni_call_add_extended_centerline_method (
         (jint)npts
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_z);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_z);
 
     return;
 }
@@ -1666,36 +1656,36 @@ void jni_call_add_work_poly_method (
         return;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
         y
     );
 
-    j_z = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_z = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_z == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_z,
         0,
         npts,
@@ -1705,9 +1695,9 @@ void jni_call_add_work_poly_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddWorkPolyMethodID,
         j_x,
         j_y,
@@ -1715,9 +1705,9 @@ void jni_call_add_work_poly_method (
         (jint)npts
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_z);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_z);
 
     return;
 }
@@ -1766,9 +1756,9 @@ void jni_call_add_poly_label_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddPolyLabelMethodID,
         (jdouble)x,
         (jdouble)y,
@@ -1906,54 +1896,54 @@ void jni_call_add_poly_tmesh_method (
 /*
  * Put the nodes into java arrays.
  */
-    j_xnode = (*JavaEnv)->NewDoubleArray (JavaEnv, numnode);
+    j_xnode = (*jenv)->NewDoubleArray (jenv, numnode);
     if (j_xnode == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_xnode,
         0,
         numnode,
         xnode
     );
 
-    j_ynode = (*JavaEnv)->NewDoubleArray (JavaEnv, numnode);
+    j_ynode = (*jenv)->NewDoubleArray (jenv, numnode);
     if (j_ynode == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_ynode,
         0,
         numnode,
         ynode
     );
 
-    j_znode = (*JavaEnv)->NewDoubleArray (JavaEnv, numnode);
+    j_znode = (*jenv)->NewDoubleArray (jenv, numnode);
     if (j_znode == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_znode,
         0,
         numnode,
         znode
     );
 
-    j_nodeflags = (*JavaEnv)->NewIntArray (JavaEnv, numnode);
+    j_nodeflags = (*jenv)->NewIntArray (jenv, numnode);
     if (j_nodeflags == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_nodeflags,
         0,
         numnode,
@@ -1965,90 +1955,90 @@ void jni_call_add_poly_tmesh_method (
 /*
  * Put the edges into java arrays.
  */
-    j_n1edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_n1edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_n1edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_n1edge,
         0,
         numedge,
         jn1edge
     );
 
-    j_n2edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_n2edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_n2edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_n2edge,
         0,
         numedge,
         jn2edge
     );
 
-    j_t1edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_t1edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_t1edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_t1edge,
         0,
         numedge,
         jt1edge
     );
 
-    j_t2edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_t2edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_t2edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_t2edge,
         0,
         numedge,
         jt2edge
     );
 
-    j_edgeflags = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_edgeflags = (*jenv)->NewIntArray (jenv, numedge);
     if (j_edgeflags == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_edgeflags,
         0,
         numedge,
@@ -2060,90 +2050,90 @@ void jni_call_add_poly_tmesh_method (
 /*
  * Put the triangles into java arrays.
  */
-    j_e1tri = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_e1tri = (*jenv)->NewIntArray (jenv, numtri);
     if (j_e1tri == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_e1tri,
         0,
         numtri,
         je1tri
     );
 
-    j_e2tri = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_e2tri = (*jenv)->NewIntArray (jenv, numtri);
     if (j_e2tri == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_e1tri);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_e2tri,
         0,
         numtri,
         je2tri
     );
 
-    j_e3tri = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_e3tri = (*jenv)->NewIntArray (jenv, numtri);
     if (j_e3tri == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_e1tri);
+        (*jenv)->DeleteLocalRef (jenv, j_e2tri);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_e3tri,
         0,
         numtri,
         je3tri
     );
 
-    j_triflags = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_triflags = (*jenv)->NewIntArray (jenv, numtri);
     if (j_triflags == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e3tri);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_e1tri);
+        (*jenv)->DeleteLocalRef (jenv, j_e2tri);
+        (*jenv)->DeleteLocalRef (jenv, j_e3tri);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_triflags,
         0,
         numtri,
@@ -2155,9 +2145,9 @@ void jni_call_add_poly_tmesh_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddPolyTmeshMethodID,
         (jint)pnum,
         j_xnode,
@@ -2181,19 +2171,19 @@ void jni_call_add_poly_tmesh_method (
 /*
  * Delete the local java arrays.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e3tri);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_triflags);
+    (*jenv)->DeleteLocalRef (jenv, j_xnode);
+    (*jenv)->DeleteLocalRef (jenv, j_ynode);
+    (*jenv)->DeleteLocalRef (jenv, j_znode);
+    (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+    (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+    (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+    (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+    (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+    (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+    (*jenv)->DeleteLocalRef (jenv, j_e1tri);
+    (*jenv)->DeleteLocalRef (jenv, j_e2tri);
+    (*jenv)->DeleteLocalRef (jenv, j_e3tri);
+    (*jenv)->DeleteLocalRef (jenv, j_triflags);
 
     return;
 
@@ -2255,9 +2245,9 @@ void jni_call_set_vert_baseline_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         SetVertBaselineMethodID,
         (jdouble)c1,
         (jdouble)c2,
@@ -2318,36 +2308,36 @@ void jni_call_add_corrected_centerline_method (
         return;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
         y
     );
 
-    j_z = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_z = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_z == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_z,
         0,
         npts,
@@ -2357,9 +2347,9 @@ void jni_call_add_corrected_centerline_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddCorrectedCenterlineMethodID,
         j_x,
         j_y,
@@ -2367,9 +2357,9 @@ void jni_call_add_corrected_centerline_method (
         (jint)npts
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_z);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_z);
 
     return;
 }
@@ -2420,36 +2410,36 @@ void jni_call_add_drape_line_method (
         return;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
         y
     );
 
-    j_z = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_z = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_z == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_z,
         0,
         npts,
@@ -2459,9 +2449,9 @@ void jni_call_add_drape_line_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddDrapeLineMethodID,
         j_x,
         j_y,
@@ -2469,9 +2459,9 @@ void jni_call_add_drape_line_method (
         (jint)npts
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_z);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_z);
 
     return;
 }
@@ -2524,36 +2514,36 @@ void jni_call_add_patch_points_method (
         return;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
         y
     );
 
-    j_z = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_z = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_z == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_z,
         0,
         npts,
@@ -2563,9 +2553,9 @@ void jni_call_add_patch_points_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         CopyPatchPointsMethodID,
         (jint)patchid,
         j_x,
@@ -2574,9 +2564,9 @@ void jni_call_add_patch_points_method (
         (jint)npts
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_z);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_z);
 
     return;
 }
@@ -2632,36 +2622,36 @@ void jni_call_add_border_segment_method (
         return;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
         y
     );
 
-    j_z = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_z = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_z == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_z,
         0,
         npts,
@@ -2671,9 +2661,9 @@ void jni_call_add_border_segment_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddBorderSegmentMethodID,
         j_x,
         j_y,
@@ -2683,9 +2673,9 @@ void jni_call_add_border_segment_method (
         (jint)direction
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_z);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_z);
 
     return;
 }
@@ -2722,9 +2712,9 @@ void jni_call_start_proto_patch_method (
         return;
     }
 
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         StartProtoPatchMethodID,
         (jint)id);
 
@@ -2761,9 +2751,9 @@ void jni_call_end_proto_patch_method (
         return;
     }
 
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         EndProtoPatchMethodID,
         (jint)id);
 
@@ -2818,36 +2808,36 @@ void jni_call_add_patch_line_method (
         return;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
         y
     );
 
-    j_z = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_z = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_z == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_z,
         0,
         npts,
@@ -2857,9 +2847,9 @@ void jni_call_add_patch_line_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddPatchLineMethodID,
         j_x,
         j_y,
@@ -2868,9 +2858,9 @@ void jni_call_add_patch_line_method (
         (jint)flag
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_z);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_z);
 
     return;
 }
@@ -2916,25 +2906,25 @@ int jni_call_set_outline_method (
         return -1;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return -1;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
+        (*jenv)->DeleteLocalRef (jenv, j_x);
         return -1;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
@@ -2944,17 +2934,17 @@ int jni_call_set_outline_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         SetOutlineMethodID,
         j_x,
         j_y,
         (jint)npts
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
 
     return 1;
 }
@@ -3004,39 +2994,39 @@ int jni_call_set_outline3d_method (
         return -1;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return -1;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
+        (*jenv)->DeleteLocalRef (jenv, j_x);
         return -1;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
         y
     );
 
-    j_z = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_z = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_z == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
+        (*jenv)->DeleteLocalRef (jenv, j_x);
+        (*jenv)->DeleteLocalRef (jenv, j_y);
         return -1;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_z,
         0,
         npts,
@@ -3046,9 +3036,9 @@ int jni_call_set_outline3d_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         SetOutline3DMethodID,
         j_x,
         j_y,
@@ -3056,9 +3046,9 @@ int jni_call_set_outline3d_method (
         (jint)npts
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_z);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_z);
 
     return 1;
 }
@@ -3115,36 +3105,36 @@ void jni_call_add_proto_patch_contact_line_method (
         return;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
         y
     );
 
-    j_z = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_z = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_z == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_z,
         0,
         npts,
@@ -3154,9 +3144,9 @@ void jni_call_add_proto_patch_contact_line_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddProtoPatchContactLineMethodID,
         j_x,
         j_y,
@@ -3166,9 +3156,9 @@ void jni_call_add_proto_patch_contact_line_method (
         (jint)patchid2
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_z);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_z);
 
     return;
 }
@@ -3220,36 +3210,36 @@ void jni_call_add_draped_points_method (
         return;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
         y
     );
 
-    j_z = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_z = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_z == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_z,
         0,
         npts,
@@ -3259,9 +3249,9 @@ void jni_call_add_draped_points_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddDrapedPointsMethodID,
         j_x,
         j_y,
@@ -3269,9 +3259,9 @@ void jni_call_add_draped_points_method (
         (jint)npts
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_z);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_z);
 
     return;
 }
@@ -3333,25 +3323,25 @@ void jni_call_add_native_tindex_result_method (
 /*
  * Put the triangles into java arrays.
  */
-    j_tmeshid = (*JavaEnv)->NewIntArray (JavaEnv, nresult);
+    j_tmeshid = (*jenv)->NewIntArray (jenv, nresult);
     if (j_tmeshid == NULL) {
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_tmeshid,
         0,
         nresult,
         jtmeshid
     );
 
-    j_trinum = (*JavaEnv)->NewIntArray (JavaEnv, nresult);
+    j_trinum = (*jenv)->NewIntArray (jenv, nresult);
     if (j_trinum == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_tmeshid);
+        (*jenv)->DeleteLocalRef (jenv, j_tmeshid);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_trinum,
         0,
         nresult,
@@ -3363,9 +3353,9 @@ void jni_call_add_native_tindex_result_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddNativeTindexResultMethodID,
         j_tmeshid,
         j_trinum,
@@ -3375,8 +3365,8 @@ void jni_call_add_native_tindex_result_method (
 /*
  * Delete the local java arrays.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_tmeshid);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_trinum);
+    (*jenv)->DeleteLocalRef (jenv, j_tmeshid);
+    (*jenv)->DeleteLocalRef (jenv, j_trinum);
 
     return;
 
@@ -3445,7 +3435,6 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendStaticC
     }
  */
 
-    j_expect_return = j_expect_return;
     cls = cls;
 
 /*
@@ -3687,36 +3676,36 @@ void jni_call_add_split_line_method (
         return;
     }
 
-    j_x = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_x = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_x == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_x,
         0,
         npts,
         x
     );
 
-    j_y = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_y = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_y == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_y,
         0,
         npts,
         y
     );
 
-    j_z = (*JavaEnv)->NewDoubleArray (JavaEnv, (jsize)npts);
+    j_z = (*jenv)->NewDoubleArray (jenv, (jsize)npts);
     if (j_z == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_z,
         0,
         npts,
@@ -3726,9 +3715,9 @@ void jni_call_add_split_line_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddSplitLineMethodID,
         j_x,
         j_y,
@@ -3738,9 +3727,9 @@ void jni_call_add_split_line_method (
         (jint)patchid2
     );
 
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_x);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_y);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_z);
+    (*jenv)->DeleteLocalRef (jenv, j_x);
+    (*jenv)->DeleteLocalRef (jenv, j_y);
+    (*jenv)->DeleteLocalRef (jenv, j_z);
 
     return;
 }
@@ -3789,9 +3778,9 @@ void jni_call_add_fault_major_minor_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddFaultMajorMinorMethodID,
         j_id,
         j_major
@@ -3930,54 +3919,54 @@ void jni_call_add_native_at_tri_mesh_method (
 /*
  * Put the nodes into java arrays.
  */
-    j_xnode = (*JavaEnv)->NewDoubleArray (JavaEnv, numnode);
+    j_xnode = (*jenv)->NewDoubleArray (jenv, numnode);
     if (j_xnode == NULL) {
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_xnode,
         0,
         numnode,
         xnode
     );
 
-    j_ynode = (*JavaEnv)->NewDoubleArray (JavaEnv, numnode);
+    j_ynode = (*jenv)->NewDoubleArray (jenv, numnode);
     if (j_ynode == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_ynode,
         0,
         numnode,
         ynode
     );
 
-    j_znode = (*JavaEnv)->NewDoubleArray (JavaEnv, numnode);
+    j_znode = (*jenv)->NewDoubleArray (jenv, numnode);
     if (j_znode == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
         return;
     }
-    (*JavaEnv)->SetDoubleArrayRegion (
-        JavaEnv,
+    (*jenv)->SetDoubleArrayRegion (
+        jenv,
         j_znode,
         0,
         numnode,
         znode
     );
 
-    j_nodeflags = (*JavaEnv)->NewIntArray (JavaEnv, numnode);
+    j_nodeflags = (*jenv)->NewIntArray (jenv, numnode);
     if (j_nodeflags == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_nodeflags,
         0,
         numnode,
@@ -3989,90 +3978,90 @@ void jni_call_add_native_at_tri_mesh_method (
 /*
  * Put the edges into java arrays.
  */
-    j_n1edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_n1edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_n1edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_n1edge,
         0,
         numedge,
         jn1edge
     );
 
-    j_n2edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_n2edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_n2edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_n2edge,
         0,
         numedge,
         jn2edge
     );
 
-    j_t1edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_t1edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_t1edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_t1edge,
         0,
         numedge,
         jt1edge
     );
 
-    j_t2edge = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_t2edge = (*jenv)->NewIntArray (jenv, numedge);
     if (j_t2edge == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_t2edge,
         0,
         numedge,
         jt2edge
     );
 
-    j_edgeflags = (*JavaEnv)->NewIntArray (JavaEnv, numedge);
+    j_edgeflags = (*jenv)->NewIntArray (jenv, numedge);
     if (j_edgeflags == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_edgeflags,
         0,
         numedge,
@@ -4084,90 +4073,90 @@ void jni_call_add_native_at_tri_mesh_method (
 /*
  * Put the triangles into java arrays.
  */
-    j_e1tri = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_e1tri = (*jenv)->NewIntArray (jenv, numtri);
     if (j_e1tri == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_e1tri,
         0,
         numtri,
         je1tri
     );
 
-    j_e2tri = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_e2tri = (*jenv)->NewIntArray (jenv, numtri);
     if (j_e2tri == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_e1tri);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_e2tri,
         0,
         numtri,
         je2tri
     );
 
-    j_e3tri = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_e3tri = (*jenv)->NewIntArray (jenv, numtri);
     if (j_e3tri == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_e1tri);
+        (*jenv)->DeleteLocalRef (jenv, j_e2tri);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_e3tri,
         0,
         numtri,
         je3tri
     );
 
-    j_triflags = (*JavaEnv)->NewIntArray (JavaEnv, numtri);
+    j_triflags = (*jenv)->NewIntArray (jenv, numtri);
     if (j_triflags == NULL) {
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
-        (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e3tri);
+        (*jenv)->DeleteLocalRef (jenv, j_xnode);
+        (*jenv)->DeleteLocalRef (jenv, j_ynode);
+        (*jenv)->DeleteLocalRef (jenv, j_znode);
+        (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+        (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+        (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+        (*jenv)->DeleteLocalRef (jenv, j_e1tri);
+        (*jenv)->DeleteLocalRef (jenv, j_e2tri);
+        (*jenv)->DeleteLocalRef (jenv, j_e3tri);
         return;
     }
-    (*JavaEnv)->SetIntArrayRegion (
-        JavaEnv,
+    (*jenv)->SetIntArrayRegion (
+        jenv,
         j_triflags,
         0,
         numtri,
@@ -4179,9 +4168,9 @@ void jni_call_add_native_at_tri_mesh_method (
 /*
  * Call the java object's method.
  */
-    (*JavaEnv)->CallVoidMethod (
-        JavaEnv,
-        JavaObj,
+    (*jenv)->CallVoidMethod (
+        jenv,
+        jobj,
         AddNativeAtTriMeshMethodID,
         j_xnode,
         j_ynode,
@@ -4204,19 +4193,19 @@ void jni_call_add_native_at_tri_mesh_method (
 /*
  * Delete the local java arrays.
  */
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_xnode);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_ynode);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_znode);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_nodeflags);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n1edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_n2edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t1edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_t2edge);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_edgeflags);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e1tri);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e2tri);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_e3tri);
-    (*JavaEnv)->DeleteLocalRef (JavaEnv, j_triflags);
+    (*jenv)->DeleteLocalRef (jenv, j_xnode);
+    (*jenv)->DeleteLocalRef (jenv, j_ynode);
+    (*jenv)->DeleteLocalRef (jenv, j_znode);
+    (*jenv)->DeleteLocalRef (jenv, j_nodeflags);
+    (*jenv)->DeleteLocalRef (jenv, j_n1edge);
+    (*jenv)->DeleteLocalRef (jenv, j_n2edge);
+    (*jenv)->DeleteLocalRef (jenv, j_t1edge);
+    (*jenv)->DeleteLocalRef (jenv, j_t2edge);
+    (*jenv)->DeleteLocalRef (jenv, j_edgeflags);
+    (*jenv)->DeleteLocalRef (jenv, j_e1tri);
+    (*jenv)->DeleteLocalRef (jenv, j_e2tri);
+    (*jenv)->DeleteLocalRef (jenv, j_e3tri);
+    (*jenv)->DeleteLocalRef (jenv, j_triflags);
 
     return;
 
