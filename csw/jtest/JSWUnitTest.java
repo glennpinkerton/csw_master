@@ -33,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
@@ -156,10 +157,10 @@ catch (Exception e) {
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation (screenSize.width - 250, 50);
+        setLocation (screenSize.width - 280, 50);
 
         setTitle ("JSurfaceWorks Unit Test");
-        setSize (200, 400);
+        setSize (250, 400);
         setResizable (false);
         Container contentPane = getContentPane ();
         contentPane.setLayout (new GridLayout(15,1));
@@ -175,16 +176,44 @@ catch (Exception e) {
         JButton grid_10_button = new JButton (nphint + " Point Grid");
         grid_10_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                Grid10Frame frame = new Grid10Frame (nphint, false);
-                frame.setVisible (true);
+                Grid10Frame gf = new Grid10Frame (nphint, false);
+                Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
+                SwingUtilities.invokeLater (run_frame);
+                //frame.populateDlist ();
+                //frame.setVisible (true);
+          }
+        });
+
+        JButton large_grid_10_button = new JButton (10 * nphint + " Point Grid");
+        large_grid_10_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                Grid10Frame gf = new Grid10Frame (10 * nphint, false);
+                Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
+                SwingUtilities.invokeLater (run_frame);
+                //frame.populateDlist ();
+                //frame.setVisible (true);
           }
         });
 
         JButton grid_sm_button = new JButton ("Smooth Grid");
         grid_sm_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                Grid10Frame frame = new Grid10Frame (nphint, true);
-                frame.setVisible (true);
+                Grid10Frame gf = new Grid10Frame (nphint, true);
+                Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
+                SwingUtilities.invokeLater (run_frame);
+                //frame.populateDlist ();
+                //frame.setVisible (true);
+          }
+        });
+
+        JButton grid_large_sm_button = new JButton ("Large Smooth Grid");
+        grid_large_sm_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                Grid10Frame gf = new Grid10Frame (10 * nphint, true);
+                Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
+                SwingUtilities.invokeLater (run_frame);
+                //frame.populateDlist ();
+                //frame.setVisible (true);
           }
         });
 
@@ -271,7 +300,9 @@ catch (Exception e) {
 
         contentPane.add (trimesh_10_button);
         contentPane.add (grid_10_button);
+        contentPane.add (large_grid_10_button);
         contentPane.add (grid_sm_button);
+        contentPane.add (grid_large_sm_button);
         contentPane.add (trimesh_file_button);
         contentPane.add (divide_file_button);
         contentPane.add (grid_file_button);
@@ -388,14 +419,91 @@ class TriMesh10Frame extends JDLFrame
 
 };
 
+
+
+/*
+ * Class for testing HugeFrame stuff in separate threads.
+ */
+class GFWorker extends SwingWorker<Integer, Void> {
+
+    Grid10Frame    gf = null;
+
+    GFWorker (Grid10Frame  gfin)
+    {
+         gf = gfin;
+    }
+
+    protected Integer doInBackground () {
+System.out.println ();
+System.out.println ("GFWorker do in background");
+System.out.flush ();
+        gf.populateDlist ();
+        return 0;
+    }
+
+    protected void done () {
+System.out.println ("GFWorker done");
+System.out.flush ();
+        gf.setVisible (true);
+    }
+
+}
+
+
+
+/**
+ * This class has a runnable that first populates the specified
+ * HugeFrame object.  After this object has been populated, the
+ * frame is made visible, which triggers the drawing of the objects
+ * previously set via the populateDlist method.
+ */
+class Grid10FrameRunnable implements Runnable {
+
+    Grid10Frame    gf;
+
+    public Grid10FrameRunnable (Grid10Frame gfin) {gf = gfin;}
+
+    public void run () {
+
+// Don't use threads for now.  Still working on it for surfaceworks.
+
+//      String  tflag = System.getenv ("CSW_DONT_USE_THREADS");
+String tflag = "1";
+
+      if (tflag == null) {
+        GFWorker gfw = new GFWorker (gf);
+        gfw.execute ();
+      }
+      else {
+        gf.populateDlist ();
+        gf.setVisible (true);
+      }
+
+    }
+
+}
+
+
+
+
 class Grid10Frame extends JDLFrame
 {
 
     private static final long serialVersionUID = 1L;
 
+    private int      nphint = 0;
+    private boolean  smooth_flag = false;
+
     public Grid10Frame (int nphint, boolean smooth_flag)
     {
         super ();
+        this.nphint = nphint;
+        this.smooth_flag = smooth_flag;
+    }
+
+
+    public void populateDlist ()
+    {
 
         JSurfaceWorks      sw;
         Random             random;
@@ -615,8 +723,7 @@ class Grid10Frame extends JDLFrame
 
         double  scl = 100.0 / (zvmax - zvmin);
         for (int i=0; i<np; i++) {
-            double dd2 = random.nextDouble () - .5;
-            z[i] = (z[i] - zvmin) * scl + dd2;
+            z[i] = (z[i] - zvmin) * scl;
         }
 
     }

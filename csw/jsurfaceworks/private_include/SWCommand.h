@@ -120,6 +120,8 @@ extern "C" {
 #include <stdio.h>
 
 long sw_process_command (
+    void    *v_jenv,
+    void    *v_jobj,
     int               command_id,
     long              threadid,
     int               *ilist,

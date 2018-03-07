@@ -1186,6 +1186,8 @@ int PATCHSplit::ps_CalcSplit (int id, double age)
     if (DebugState != 0) {
         for (i=0; i<NumFcenter; i++) {
             jni_call_add_corrected_centerline_method (
+                v_jenv,
+                v_jobj,
                 Fcenter[i].x,
                 Fcenter[i].y,
                 Fcenter[i].z,
@@ -1267,6 +1269,8 @@ int PATCHSplit::ps_CalcSplit (int id, double age)
     if (DebugState != 0) {
         for (i=0; i<NumFcenter; i++) {
             jni_call_add_extended_centerline_method (
+                v_jenv,
+                v_jobj,
                 Fcenter[i].x,
                 Fcenter[i].y,
                 Fcenter[i].z,
@@ -1664,6 +1668,8 @@ int PATCHSplit::ExtendCenterlines (void)
         if (fp->lock1 == 1  &&  fp->lock2 == 1) {
             if (DebugState != 0) {
                 jni_call_add_extended_centerline_method (
+                    v_jenv,
+                    v_jobj,
                     fp->x, fp->y, fp->z, fp->npts);
             }
 
@@ -3195,6 +3201,8 @@ int PATCHSplit::BuildWorkPolygons (void)
         for (i=0; i<npoly; i++) {
             wp1 = WorkPolyList + i;
             jni_call_add_work_poly_method (
+                v_jenv,
+                v_jobj,
                 wp1->x, wp1->y, wp1->z, wp1->npts);
         }
     }
@@ -4147,7 +4155,10 @@ void PATCHSplit::SendBackProtoPatches (void)
 
         patch = PatchList + i;
 
-        jni_call_start_proto_patch_method (patch->patchid);
+        jni_call_start_proto_patch_method (
+            v_jenv,
+            v_jobj,
+            patch->patchid);
 
         vert_SetBaseline (
             patch->sgpdata[0],
@@ -4159,7 +4170,7 @@ void PATCHSplit::SendBackProtoPatches (void)
             patch->sgpflag,
             gvert
         );
-        vert_SendBackBaseline (gvert);
+        vert_SendBackBaseline (v_jenv, v_jobj, gvert);
         SendBackProtoTriMesh (
                          patch->nodes,
                          patch->num_nodes,
@@ -4171,6 +4182,8 @@ void PATCHSplit::SendBackProtoPatches (void)
         for (j=0; j<patch->numBorderList; j++) {
             bseg = patch->borderList + j;
             jni_call_add_border_segment_method (
+                v_jenv,
+                v_jobj,
                 bseg->x,
                 bseg->y,
                 bseg->z,
@@ -4182,6 +4195,8 @@ void PATCHSplit::SendBackProtoPatches (void)
         for (j=0; j<patch->numLineList; j++) {
             bline = patch->lineList + j;
             jni_call_add_patch_line_method (
+                v_jenv,
+                v_jobj,
                 bline->x,
                 bline->y,
                 bline->z,
@@ -4190,13 +4205,18 @@ void PATCHSplit::SendBackProtoPatches (void)
         }
 
         jni_call_add_patch_points_method (
+            v_jenv,
+            v_jobj,
             patch->patchid,
             patch->x,
             patch->y,
             patch->z,
             patch->npts);
 
-        jni_call_end_proto_patch_method (patch->patchid);
+        jni_call_end_proto_patch_method (
+            v_jenv,
+            v_jobj,
+            patch->patchid);
 
     }
 
@@ -4219,7 +4239,10 @@ int PATCHSplit::SendBackFaultMajorMinor (void)
         id = fp->fault_id;
         major = fp->major;
 
-        jni_call_add_fault_major_minor_method (id, major);
+        jni_call_add_fault_major_minor_method (
+            v_jenv,
+            v_jobj,
+            id, major);
     }
 
     return 1;
@@ -4362,6 +4385,8 @@ int PATCHSplit::SendBackProtoTriMesh
  */
     jni_call_add_tri_mesh_method
     (
+        v_jenv,
+        v_jobj,
         xnode,
         ynode,
         znode,
@@ -4406,6 +4431,8 @@ void PATCHSplit::SendBackProtoPatchContactLines (void)
     for (ido=0; ido<NumProtoContactLines; ido++) {
         cl = ProtoContactLines + ido;
         jni_call_add_proto_patch_contact_line_method (
+            v_jenv,
+            v_jobj,
             cl->x,
             cl->y,
             cl->z,
@@ -4433,6 +4460,8 @@ void PATCHSplit::SendBackSplitLines (void)
     for (ido=0; ido<NumSplitLines; ido++) {
         cl = SplitLines + ido;
         jni_call_add_split_line_method (
+            v_jenv,
+            v_jobj,
             cl->x,
             cl->y,
             cl->z,

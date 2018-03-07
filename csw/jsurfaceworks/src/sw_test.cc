@@ -166,6 +166,7 @@ int main (int argc, char *argv[])
                 }
 
                 sw_process_command (
+                    NULL, NULL,
                     command_id,
                     SINGLE_THREAD_ID,
                     ilist,
@@ -216,6 +217,7 @@ int main (int argc, char *argv[])
                 }
 
                 sw_process_command (
+                    NULL, NULL,
                     command_id,
                     SINGLE_THREAD_ID,
                     ilist,
@@ -266,6 +268,7 @@ int main (int argc, char *argv[])
                 }
 
                 sw_process_command (
+                    NULL, NULL,
                     command_id,
                     SINGLE_THREAD_ID,
                     ilist,
@@ -321,6 +324,7 @@ int main (int argc, char *argv[])
                 }
 
                 sw_process_command (
+                    NULL, NULL,
                     command_id,
                     SINGLE_THREAD_ID,
                     ilist,
@@ -370,6 +374,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -454,6 +459,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -536,6 +542,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -598,6 +605,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -644,6 +652,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -663,6 +672,7 @@ int main (int argc, char *argv[])
            case SW_CLEAR_DRAPE_CACHE:
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -681,6 +691,7 @@ int main (int argc, char *argv[])
            case SW_CALC_DRAPED_LINES:
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -699,6 +710,7 @@ int main (int argc, char *argv[])
            case SW_CALC_DRAPED_POINTS:
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -728,6 +740,7 @@ int main (int argc, char *argv[])
                );
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -760,6 +773,7 @@ int main (int argc, char *argv[])
                );
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -779,6 +793,7 @@ int main (int argc, char *argv[])
            case SW_PS_CALC_LINES_FOR_SPLITTING:
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -797,6 +812,7 @@ int main (int argc, char *argv[])
            case SW_PS_CLEAR_ALL_DATA:
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -815,6 +831,7 @@ int main (int argc, char *argv[])
            case SW_PS_CLEAR_HORIZON_DATA:
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -867,6 +884,7 @@ int main (int argc, char *argv[])
                 }
 
                 sw_process_command (
+                    NULL, NULL,
                     command_id,
                     SINGLE_THREAD_ID,
                     ilist,
@@ -925,6 +943,7 @@ int main (int argc, char *argv[])
                 }
 
                 sw_process_command (
+                    NULL, NULL,
                     command_id,
                     SINGLE_THREAD_ID,
                     ilist,
@@ -975,6 +994,7 @@ int main (int argc, char *argv[])
                 }
 
                 sw_process_command (
+                    NULL, NULL,
                     command_id,
                     SINGLE_THREAD_ID,
                     ilist,
@@ -1018,6 +1038,7 @@ int main (int argc, char *argv[])
                 }
 
                 sw_process_command (
+                    NULL, NULL,
                     command_id,
                     SINGLE_THREAD_ID,
                     ilist,
@@ -1063,6 +1084,7 @@ int main (int argc, char *argv[])
                 );
 
                 sw_process_command (
+                    NULL, NULL,
                     command_id,
                     SINGLE_THREAD_ID,
                     ilist,
@@ -1128,6 +1150,7 @@ int main (int argc, char *argv[])
                 }
 
                 sw_process_command (
+                    NULL, NULL,
                     command_id,
                     SINGLE_THREAD_ID,
                     ilist,
@@ -1235,6 +1258,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1258,6 +1282,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1283,6 +1308,7 @@ int main (int argc, char *argv[])
                sscanf (inbuff, "%li", llist);
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1342,6 +1368,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1388,6 +1415,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1488,6 +1516,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1606,6 +1635,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1643,6 +1673,7 @@ int main (int argc, char *argv[])
                 }
 
                 sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1691,6 +1722,7 @@ int main (int argc, char *argv[])
                 }
 
                 sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1724,6 +1756,7 @@ int main (int argc, char *argv[])
                        );
 
                 sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1757,6 +1790,7 @@ int main (int argc, char *argv[])
                         ilist+1);
 
                 sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1776,6 +1810,7 @@ int main (int argc, char *argv[])
             case SW_REMOVE_ALL_TRI_INDEXES:
 
                 sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1862,6 +1897,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1890,6 +1926,7 @@ int main (int argc, char *argv[])
                    ilist);
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1918,6 +1955,7 @@ int main (int argc, char *argv[])
                    dlist);
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -1936,6 +1974,7 @@ int main (int argc, char *argv[])
            case SW_PS_GET_SEALED_INPUT:
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2023,6 +2062,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2071,6 +2111,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2154,6 +2195,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2236,6 +2278,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2265,6 +2308,7 @@ int main (int argc, char *argv[])
                );
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2347,6 +2391,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2429,6 +2474,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2530,6 +2576,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2561,6 +2608,7 @@ int main (int argc, char *argv[])
                );
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2578,6 +2626,7 @@ int main (int argc, char *argv[])
            case SW_PS_CONNECT_FAULTS:
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2639,6 +2688,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2725,6 +2775,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2773,6 +2824,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2833,6 +2885,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2897,6 +2950,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2933,6 +2987,7 @@ int main (int argc, char *argv[])
                );
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2964,6 +3019,7 @@ int main (int argc, char *argv[])
                );
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -2998,6 +3054,7 @@ int main (int argc, char *argv[])
                );
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -3043,6 +3100,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -3061,6 +3119,7 @@ int main (int argc, char *argv[])
                end_flag = 0;
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -3105,6 +3164,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -3161,6 +3221,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -3190,6 +3251,7 @@ int main (int argc, char *argv[])
                );
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -3206,6 +3268,7 @@ int main (int argc, char *argv[])
            case SW_BATCH_1D_MESHER_CLEAR_ALL_DATA:
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -3237,6 +3300,7 @@ int main (int argc, char *argv[])
                );
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -3266,6 +3330,7 @@ int main (int argc, char *argv[])
                );
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -3282,6 +3347,7 @@ int main (int argc, char *argv[])
            case SW_PS_CLEAR_ALL_1D_DATA:
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -3384,6 +3450,7 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                     SINGLE_THREAD_ID,
                    ilist,
@@ -3450,6 +3517,7 @@ int main (int argc, char *argv[])
                 }
 
                 sw_process_command (
+                    NULL, NULL,
                     command_id,
                     SINGLE_THREAD_ID,
                     ilist,
@@ -3468,6 +3536,7 @@ int main (int argc, char *argv[])
             case SW_CALC_AT_TRI_MESH:
 
                sw_process_command (
+                    NULL, NULL,
                    command_id,
                    SINGLE_THREAD_ID,
                    ilist,

@@ -1733,6 +1733,9 @@ class GridTest extends JDLFrame
 
 
 
+/*
+ * Class for testing HugeFrame stuff in separate threads.
+ */
 class HFWorker extends SwingWorker<Integer, Void> {
 
     HugeFrame    hf = null;
@@ -1769,14 +1772,22 @@ class HugeFrameRunnable implements Runnable {
 
     public void run () {
 
-// uncomment for threads
-  //      HFWorker hfw = new HFWorker (hf);
-  //      hfw.execute ();
+//  For now, always use threads here
+//  When the surfaceworks thread stuff is working,
+//  I will use the environment variable for turning
+//  threads on and off both here and surfaceworks
 
+//      String  tflag = System.getenv ("CSW_DONT_USE_THREADS");
+String tflag = null;
 
-// comment for threads
+      if (tflag == null) {
+        HFWorker hfw = new HFWorker (hf);
+        hfw.execute ();
+      }
+      else {
         hf.populateDlist ();
         hf.setVisible (true);
+      }
 
     }
 

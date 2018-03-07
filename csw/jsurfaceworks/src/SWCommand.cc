@@ -93,6 +93,8 @@ extern "C" {
  ***************************************************************************
 */
 long sw_process_command (
+    void    *v_jenv,
+    void    *v_jobj,
     int           command_id,
     long          threadid,
     int           *ilist,
@@ -136,6 +138,7 @@ long sw_process_command (
     if (psplit == NULL) {
         assert (false);
     }
+    psplit->SetJNIPtrs (v_jenv, v_jobj);
 
     GRDVert       *gvert = ThreadGuard::GetGrdVert (threadid);
     if (gvert == NULL) {
@@ -165,6 +168,7 @@ long sw_process_command (
     if (swcalc == NULL) {
          assert (false);
     }
+    swcalc->SetJNIPtrs (v_jenv, v_jobj);
 
     psplit->SetGrdAPIPtr (grdapi);
     swcalc->SetGrdAPIPtr (grdapi);
@@ -1956,6 +1960,8 @@ long sw_process_command (
 
             istat = (long)
             vert_CalcBaselineFromJava (
+                v_jenv,
+                v_jobj,
                 ddata,
                 ddata+ilist[0],
                 ddata+2*ilist[0],

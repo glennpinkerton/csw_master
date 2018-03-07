@@ -16,11 +16,15 @@
   #endif
 
     void jni_call_set_error_message_method (
+        void  *v_jenv,
+        void  *v_jobj,
         char *message,
         int  errnum
     );
 
     void jni_call_store_tri_mesh_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double const *xnode,
         double const *ynode,
         double const *znode,
@@ -40,6 +44,8 @@
     );
 
     void jni_call_add_tri_mesh_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double *xnodes,
         double *ynodes,
         double *znodes,
@@ -59,6 +65,8 @@
     );
 
     void jni_call_add_native_at_tri_mesh_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double *xnodes,
         double *ynodes,
         double *znodes,
@@ -78,6 +86,8 @@
     );
 
     void jni_call_add_native_ndp_value_method (
+        void  *v_jenv,
+        void  *v_jobj,
         int             id,
         signed char     *v1,
         signed char     *v2,
@@ -90,6 +100,8 @@
         int             npts);
 
     void jni_call_add_grid_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double *data,
         double *derror,
         char *mask,
@@ -103,6 +115,8 @@
     );
 
     void jni_call_add_draped_line_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double *x,
         double *y,
         double *z,
@@ -110,6 +124,8 @@
     );
 
     void jni_call_add_draped_points_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double *x,
         double *y,
         double *z,
@@ -117,6 +133,8 @@
     );
 
     void jni_call_add_corrected_centerline_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double *x,
         double *y,
         double *z,
@@ -124,6 +142,8 @@
     );
 
     void jni_call_add_extended_centerline_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double *x,
         double *y,
         double *z,
@@ -131,6 +151,8 @@
     );
 
     void jni_call_add_work_poly_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double *x,
         double *y,
         double *z,
@@ -138,6 +160,8 @@
     );
 
     void jni_call_add_proto_patch_contact_line_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double *x,
         double *y,
         double *z,
@@ -147,6 +171,8 @@
     );
 
     void jni_call_add_split_line_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double *x,
         double *y,
         double *z,
@@ -156,6 +182,8 @@
     );
 
     void jni_call_add_drape_line_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double *x,
         double *y,
         double *z,
@@ -163,12 +191,16 @@
     );
 
     void jni_call_add_poly_label_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double x,
         double y,
         int label
     );
 
     void jni_call_add_poly_tmesh_method (
+        void  *v_jenv,
+        void  *v_jobj,
         int    polygon_number,
         double *xnodes,
         double *ynodes,
@@ -189,6 +221,8 @@
     );
 
     void jni_call_set_vert_baseline_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double    c1,
         double    c2,
         double    c3,
@@ -198,9 +232,17 @@
         int       iflag
     );
 
-    void jni_call_start_proto_patch_method (int id);
-    void jni_call_end_proto_patch_method (int id);
+    void jni_call_start_proto_patch_method (
+        void  *v_jenv,
+        void  *v_jobj,
+        int id);
+    void jni_call_end_proto_patch_method (
+        void  *v_jenv,
+        void  *v_jobj,
+        int id);
     void jni_call_add_border_segment_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double    *x,
         double    *y,
         double    *z,
@@ -208,12 +250,16 @@
         int       type,
         int       direction);
     void jni_call_add_patch_points_method (
+        void  *v_jenv,
+        void  *v_jobj,
         int       patchid,
         double    *x,
         double    *y,
         double    *z,
         int       npts);
     void jni_call_add_patch_line_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double    *x,
         double    *y,
         double    *z,
@@ -221,22 +267,30 @@
         int       flag);
 
     int jni_call_set_outline_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double    *x,
         double    *y,
         int       npts);
 
     int jni_call_set_outline3d_method (
+        void  *v_jenv,
+        void  *v_jobj,
         double    *x,
         double    *y,
         double    *z,
         int       npts);
 
     void jni_call_add_native_tindex_result_method (
+        void  *v_jenv,
+        void  *v_jobj,
         int         *tmeshid,
         int         *trinum,
         int         nresult);
 
     void jni_call_add_fault_major_minor_method (
+        void  *v_jenv,
+        void  *v_jobj,
         int         id,
         int         major);
 

@@ -29,6 +29,8 @@
  * Calculate the baseline and send the results back to the Java side.
  */
 int vert_CalcBaselineFromJava (
+    void      *v_jenv,
+    void      *v_jobj,
     double    *xpts,
     double    *ypts,
     double    *zpts,
@@ -59,6 +61,7 @@ int vert_CalcBaselineFromJava (
     }
 
     jni_call_set_vert_baseline_method (
+        v_jenv, v_jobj,
         c1, c2, c3, x0, y0, z0, istat);
 
     return 1;
@@ -66,7 +69,10 @@ int vert_CalcBaselineFromJava (
 }
 
 
-void vert_SendBackBaseline (GRDVert &gvert)
+void vert_SendBackBaseline (
+    void  *v_jenv,
+    void  *v_jobj,
+    GRDVert &gvert)
 {
     double         c1, c2, c3, x0, y0, z0;
     int            use;
@@ -77,6 +83,7 @@ void vert_SendBackBaseline (GRDVert &gvert)
     vert_GetBaseline (&c1, &c2, &c3, &x0, &y0, &z0, &use, gvert);
 
     jni_call_set_vert_baseline_method (
+        v_jenv, v_jobj,
         c1, c2, c3, x0, y0, z0, use);
 
     return;
