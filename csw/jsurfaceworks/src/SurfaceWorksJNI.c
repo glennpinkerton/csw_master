@@ -1,4 +1,3 @@
-
 /*
          ************************************************
          *                                              *
@@ -50,31 +49,6 @@ csw_jsurfaceworks_src_JSurfaceWorksBase_MAX_LIST_ARRAY
 /*
  * Set static file variables.
  */
-static jmethodID StoreTriMeshMethodID = NULL;
-static jmethodID AddTriMeshMethodID = NULL;
-static jmethodID AddGridMethodID = NULL;
-static jmethodID AddDrapedLineMethodID = NULL;
-static jmethodID AddDrapedPointsMethodID = NULL;
-static jmethodID AddExtendedCenterlineMethodID = NULL;
-static jmethodID AddCorrectedCenterlineMethodID = NULL;
-static jmethodID AddWorkPolyMethodID = NULL;
-static jmethodID AddProtoPatchContactLineMethodID = NULL;
-static jmethodID AddSplitLineMethodID = NULL;
-static jmethodID AddDrapeLineMethodID = NULL;
-static jmethodID AddPolyLabelMethodID = NULL;
-static jmethodID AddPolyTmeshMethodID = NULL;
-static jmethodID SetVertBaselineMethodID = NULL;
-static jmethodID CopyPatchPointsMethodID = NULL;
-static jmethodID SetOutlineMethodID = NULL;
-static jmethodID SetOutline3DMethodID = NULL;
-static jmethodID AddPatchLineMethodID = NULL;
-static jmethodID AddBorderSegmentMethodID = NULL;
-static jmethodID StartProtoPatchMethodID = NULL;
-static jmethodID EndProtoPatchMethodID = NULL;
-static jmethodID AddNativeTindexResultMethodID = NULL;
-static jmethodID AddFaultMajorMinorMethodID = NULL;
-static jmethodID AddNativeAtTriMeshMethodID = NULL;
-
 static JNIEnv         *JavaEnv = NULL;
 static jobject        JavaObj = NULL;
 
@@ -148,8 +122,6 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
     jint    j_tid
    )
 {
-    jclass           cls;
-
     jint             *idata;
     float            *fdata;
     double           *ddata;
@@ -168,232 +140,18 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
     long             *llist2;
     int              i, lsize;
 
-    threadid = (int)j_tid;
+    void          *v_jenv = (void *)jnienv;
+    void          *v_jobj = (void *)jobj;
 
-/*
- *  This block of code can be uncommented to enable debug of
- *  this code when called from java.  The DebugBreak function
- *  is only available under microsloth.
-#ifdef _GUI_MSWIN_
-    static int       first = 1;
-    if (first) {
-        first = 0;
-        DebugBreak ();
-    }
-#endif
- */
+    threadid = (int)j_tid;
 
     expect_return = (int)j_expect_return;
 
 /*
  * Find the Java class methods if this message expects returned data.
  */
-    StoreTriMeshMethodID = NULL;
-    AddTriMeshMethodID = NULL;
-    AddGridMethodID = NULL;
-    AddDrapedLineMethodID = NULL;
-    AddDrapedPointsMethodID = NULL;
-    AddExtendedCenterlineMethodID = NULL;
-    AddCorrectedCenterlineMethodID = NULL;
-    AddWorkPolyMethodID = NULL;
-    AddProtoPatchContactLineMethodID = NULL;
-    AddSplitLineMethodID = NULL;
-    AddDrapeLineMethodID = NULL;
-    AddPolyLabelMethodID = NULL;
-    SetVertBaselineMethodID = NULL;
-    CopyPatchPointsMethodID = NULL;
-    SetOutlineMethodID = NULL;
-    SetOutline3DMethodID = NULL;
-    AddPatchLineMethodID = NULL;
-    AddBorderSegmentMethodID = NULL;
-    StartProtoPatchMethodID = NULL;
-    EndProtoPatchMethodID = NULL;
-    AddNativeTindexResultMethodID = NULL;
-    AddFaultMajorMinorMethodID = NULL;
-    AddNativeAtTriMeshMethodID = NULL;
 
     if (expect_return) {
-
-        cls = (*jnienv)->GetObjectClass (jnienv, jobj);
-
-        StoreTriMeshMethodID = (*jnienv)->GetMethodID (jnienv, cls, "storeTriMesh",
-                                         "([D[D[D[I[I[I[I[I[I[I[I[I[I)V");
-        if (StoreTriMeshMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddTriMeshMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addNativeTriMesh",
-                                         "([D[D[D[II[I[I[I[I[II[I[I[I[II)V");
-        if (AddTriMeshMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddGridMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addNativeGrid",
-                                         "([D[D[BIIDDDDI)V");
-        if (AddGridMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddDrapedLineMethodID =
-            (*jnienv)->GetMethodID (jnienv, cls, "addNativeDrapedLine",
-                                         "([D[D[DI)V");
-        if (AddDrapedLineMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddDrapedPointsMethodID =
-            (*jnienv)->GetMethodID (jnienv, cls, "addNativeDrapedPoints",
-                                         "([D[D[DI)V");
-        if (AddDrapedLineMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddExtendedCenterlineMethodID =
-            (*jnienv)->GetMethodID (jnienv, cls, "addExtendedCenterline",
-                                         "([D[D[DI)V");
-        if (AddExtendedCenterlineMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddCorrectedCenterlineMethodID =
-            (*jnienv)->GetMethodID (jnienv, cls, "addCorrectedCenterline",
-                                         "([D[D[DI)V");
-        if (AddCorrectedCenterlineMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddWorkPolyMethodID =
-            (*jnienv)->GetMethodID (jnienv, cls, "addWorkPoly",
-                                         "([D[D[DI)V");
-        if (AddWorkPolyMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddProtoPatchContactLineMethodID =
-            (*jnienv)->GetMethodID (jnienv, cls, "addProtoPatchContactLine",
-                                         "([D[D[DIII)V");
-        if (AddProtoPatchContactLineMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddSplitLineMethodID =
-            (*jnienv)->GetMethodID (jnienv, cls, "addSplitLine",
-                                         "([D[D[DIII)V");
-        if (AddSplitLineMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddDrapeLineMethodID =
-            (*jnienv)->GetMethodID (jnienv, cls, "addDrapeLine",
-                                         "([D[D[DI)V");
-        if (AddDrapeLineMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddPolyLabelMethodID =
-            (*jnienv)->GetMethodID (jnienv, cls, "addPolyLabel",
-                                         "(DDI)V");
-        if (AddPolyLabelMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        SetVertBaselineMethodID =
-            (*jnienv)->GetMethodID (jnienv, cls, "setVertBaseline",
-                                         "(DDDDDDI)V");
-        if (SetVertBaselineMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddPolyTmeshMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addPolyTmesh",
-                                         "(I[D[D[D[II[I[I[I[I[II[I[I[I[II)V");
-        if (AddPolyTmeshMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        CopyPatchPointsMethodID = (*jnienv)->GetMethodID (jnienv, cls, "copyPatchPoints",
-                                           "(I[D[D[DI)V");
-        if (CopyPatchPointsMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        SetOutlineMethodID = (*jnienv)->GetMethodID (jnienv, cls, "setOutline",
-                              "([D[DI)V");
-        if (SetOutlineMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        SetOutline3DMethodID = (*jnienv)->GetMethodID (jnienv, cls, "setOutline",
-                              "([D[D[DI)V");
-        if (SetOutline3DMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddPatchLineMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addPatchLine",
-                                           "([D[D[DII)V");
-        if (AddPatchLineMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddBorderSegmentMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addBorderSegment",
-                                           "([D[D[DIII)V");
-        if (AddBorderSegmentMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        StartProtoPatchMethodID = (*jnienv)->GetMethodID (jnienv, cls, "startProtoPatch",
-                                           "(I)V");
-        if (StartProtoPatchMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        EndProtoPatchMethodID = (*jnienv)->GetMethodID (jnienv, cls, "endProtoPatch",
-                                           "(I)V");
-        if (EndProtoPatchMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddNativeTindexResultMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addNativeTindexResult",
-                                           "([I[II)V");
-        if (AddNativeTindexResultMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddFaultMajorMinorMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addFaultMajorMinor",
-                                           "(II)V");
-        if (AddFaultMajorMinorMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
-        AddNativeAtTriMeshMethodID = (*jnienv)->GetMethodID (jnienv, cls, "addNativeAtTriMesh",
-                                        "([D[D[D[II[I[I[I[I[II[I[I[I[II)V");
-        if (AddNativeAtTriMeshMethodID == NULL) {
-            printf("Method not found at %s:%i\n", __FILE__, __LINE__);
-            return -1;
-        }
-
 
         JavaEnv = jnienv;
         JavaObj = jobj;
@@ -482,7 +240,8 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
  */
 #if INT_MAX == 2147483647
     status =
-    sw_process_command (command_id,
+    sw_process_command (v_jenv, v_jobj,
+                        command_id,
                         threadid,
                         (int *)ilist,
                         llist2,
@@ -527,7 +286,8 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
 
     if (ibad == 0) {
         status =
-        sw_process_command (command_id,
+        sw_process_command (v_jenv, v_jobj,
+                            command_id,
                             threadid,
                             ilist2,
                             llist2,
@@ -585,17 +345,6 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
 
 }
 
-
-/*
- * Set an error message back on the java side.
- */
-void jni_call_set_error_message_method (
-    char *message,
-    int  errnum)
-{
-    message = message;
-    errnum = errnum;
-}
 
 /*------------------------------------------------------------------------*/
 
@@ -657,6 +406,8 @@ static void write_store_tri_mesh (
 
 
 void jni_call_store_tri_mesh_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double const *xnode,
     double const *ynode,
     double const *znode,
@@ -722,6 +473,17 @@ void jni_call_store_tri_mesh_method (
             numtri);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID StoreTriMeshMethodID = (*jenv)->GetMethodID (jenv, cls, "storeTriMesh",
+                                         "([D[D[D[I[I[I[I[I[I[I[I[I[I)V");
     if (StoreTriMeshMethodID == NULL) {
         return;
     }
@@ -1096,6 +858,8 @@ static void write_add_tri_mesh (
 
 
 void jni_call_add_tri_mesh_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double      *xnode,
     double      *ynode,
     double      *znode,
@@ -1161,6 +925,17 @@ void jni_call_add_tri_mesh_method (
             numtri);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddTriMeshMethodID = (*jenv)->GetMethodID (jenv, cls, "addNativeTriMesh",
+                                         "([D[D[D[II[I[I[I[I[II[I[I[I[II)V");
     if (AddTriMeshMethodID == NULL) {
         return;
     }
@@ -1520,6 +1295,8 @@ static void write_add_grid (
 
 
 void jni_call_add_grid_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *data,
     double *derror,
     char *mask,
@@ -1550,6 +1327,17 @@ void jni_call_add_grid_method (
             npts);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddGridMethodID = (*jenv)->GetMethodID (jenv, cls, "addNativeGrid",
+                                         "([D[D[BIIDDDDI)V");
     if (AddGridMethodID == NULL) {
         return;
     }
@@ -1638,6 +1426,8 @@ static void write_add_draped_line (
 
 
 void jni_call_add_draped_line_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *x,
     double *y,
     double *z,
@@ -1655,6 +1445,18 @@ void jni_call_add_draped_line_method (
             npts);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddDrapedLineMethodID =
+            (*jenv)->GetMethodID (jenv, cls, "addNativeDrapedLine",
+                                         "([D[D[DI)V");
     if (AddDrapedLineMethodID == NULL) {
         return;
     }
@@ -1726,6 +1528,8 @@ static void write_add_extended_centerline (
 }
 
 void jni_call_add_extended_centerline_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *x,
     double *y,
     double *z,
@@ -1743,6 +1547,18 @@ void jni_call_add_extended_centerline_method (
             npts);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddExtendedCenterlineMethodID =
+            (*jenv)->GetMethodID (jenv, cls, "addExtendedCenterline",
+                                         "([D[D[DI)V");
     if (AddExtendedCenterlineMethodID == NULL) {
         return;
     }
@@ -1815,6 +1631,8 @@ static void write_add_work_poly (
 }
 
 void jni_call_add_work_poly_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *x,
     double *y,
     double *z,
@@ -1832,6 +1650,18 @@ void jni_call_add_work_poly_method (
             npts);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddWorkPolyMethodID =
+            (*jenv)->GetMethodID (jenv, cls, "addWorkPoly",
+                                         "([D[D[DI)V");
     if (AddWorkPolyMethodID == NULL) {
         return;
     }
@@ -1903,6 +1733,8 @@ void write_add_poly_label (
 }
 
 void jni_call_add_poly_label_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double x,
     double y,
     int label)
@@ -1915,6 +1747,18 @@ void jni_call_add_poly_label_method (
             label);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddPolyLabelMethodID =
+            (*jenv)->GetMethodID (jenv, cls, "addPolyLabel",
+                                         "(DDI)V");
     if (AddPolyLabelMethodID == NULL) {
         return;
     }
@@ -1958,6 +1802,8 @@ static void write_add_poly_tmesh (
 }
 
 void jni_call_add_poly_tmesh_method (
+    void  *v_jenv,
+    void  *v_jobj,
     int         pnum,
     double      *xnode,
     double      *ynode,
@@ -2025,6 +1871,17 @@ void jni_call_add_poly_tmesh_method (
             numtri);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddPolyTmeshMethodID = (*jenv)->GetMethodID (jenv, cls, "addPolyTmesh",
+                                         "(I[D[D[D[II[I[I[I[I[II[I[I[I[II)V");
     if (AddPolyTmeshMethodID == NULL) {
         return;
     }
@@ -2357,6 +2214,8 @@ static void write_set_vert_baseline (
 
 
 void jni_call_set_vert_baseline_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double c1,
     double c2,
     double c3,
@@ -2377,6 +2236,18 @@ void jni_call_set_vert_baseline_method (
             flag);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID SetVertBaselineMethodID =
+            (*jenv)->GetMethodID (jenv, cls, "setVertBaseline",
+                                         "(DDDDDDI)V");
     if (SetVertBaselineMethodID == NULL) {
         return;
     }
@@ -2412,6 +2283,8 @@ static void write_add_corrected_centerline (
 }
 
 void jni_call_add_corrected_centerline_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *x,
     double *y,
     double *z,
@@ -2429,6 +2302,18 @@ void jni_call_add_corrected_centerline_method (
             npts);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddCorrectedCenterlineMethodID =
+            (*jenv)->GetMethodID (jenv, cls, "addCorrectedCenterline",
+                                         "([D[D[DI)V");
     if (AddCorrectedCenterlineMethodID == NULL) {
         return;
     }
@@ -2500,6 +2385,8 @@ static void write_add_drape_line (
 }
 
 void jni_call_add_drape_line_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *x,
     double *y,
     double *z,
@@ -2517,6 +2404,18 @@ void jni_call_add_drape_line_method (
             npts);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddDrapeLineMethodID =
+            (*jenv)->GetMethodID (jenv, cls, "addDrapeLine",
+                                         "([D[D[DI)V");
     if (AddDrapeLineMethodID == NULL) {
         return;
     }
@@ -2589,6 +2488,8 @@ static void write_add_patch_points (
 }
 
 void jni_call_add_patch_points_method (
+    void  *v_jenv,
+    void  *v_jobj,
     int    patchid,
     double *x,
     double *y,
@@ -2608,6 +2509,17 @@ void jni_call_add_patch_points_method (
             npts);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID CopyPatchPointsMethodID = (*jenv)->GetMethodID (jenv, cls, "copyPatchPoints",
+                                           "(I[D[D[DI)V");
     if (CopyPatchPointsMethodID == NULL) {
         return;
     }
@@ -2682,6 +2594,8 @@ static void write_add_border_segment (
 }
 
 void jni_call_add_border_segment_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *x,
     double *y,
     double *z,
@@ -2703,6 +2617,17 @@ void jni_call_add_border_segment_method (
             direction);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddBorderSegmentMethodID = (*jenv)->GetMethodID
+        (jenv, cls, "addBorderSegment", "([D[D[DIII)V");
     if (AddBorderSegmentMethodID == NULL) {
         return;
     }
@@ -2771,13 +2696,28 @@ void write_start_proto_patch (int id)
 {
 }
 
-void jni_call_start_proto_patch_method (int id)
+void jni_call_start_proto_patch_method (
+    void  *v_jenv,
+    void  *v_jobj,
+    int   id
+)
 {
 
     if (primfile != NULL) {
         write_start_proto_patch (id);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID StartProtoPatchMethodID =
+        (*jenv)->GetMethodID (jenv, cls, "startProtoPatch", "(I)V");
     if (StartProtoPatchMethodID == NULL) {
         return;
     }
@@ -2797,12 +2737,26 @@ static void write_end_proto_patch (int id)
 {
 }
 
-void jni_call_end_proto_patch_method (int id)
+void jni_call_end_proto_patch_method (
+    void  *v_jenv,
+    void  *v_jobj,
+    int id)
 {
     if (primfile != NULL) {
         write_end_proto_patch (id);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID EndProtoPatchMethodID =
+        (*jenv)->GetMethodID (jenv, cls, "endProtoPatch", "(I)V");
     if (EndProtoPatchMethodID == NULL) {
         return;
     }
@@ -2828,6 +2782,8 @@ static void write_add_patch_line (
 }
 
 void jni_call_add_patch_line_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *x,
     double *y,
     double *z,
@@ -2847,6 +2803,17 @@ void jni_call_add_patch_line_method (
             flag);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddPatchLineMethodID = (*jenv)->GetMethodID (jenv, cls, "addPatchLine",
+                                           "([D[D[DII)V");
     if (AddPatchLineMethodID == NULL) {
         return;
     }
@@ -2918,6 +2885,8 @@ static void write_set_outline (
 }
 
 int jni_call_set_outline_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *x,
     double *y,
     int npts)
@@ -2932,6 +2901,17 @@ int jni_call_set_outline_method (
             npts);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return 1;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID SetOutlineMethodID = (*jenv)->GetMethodID (jenv, cls, "setOutline",
+                              "([D[DI)V");
     if (SetOutlineMethodID == NULL) {
         return -1;
     }
@@ -2990,6 +2970,8 @@ static void write_set_outline3d (
 }
 
 int jni_call_set_outline3d_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *x,
     double *y,
     double *z,
@@ -3007,6 +2989,17 @@ int jni_call_set_outline3d_method (
             npts);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return 1;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID SetOutline3DMethodID = (*jenv)->GetMethodID (jenv, cls, "setOutline",
+                              "([D[D[DI)V");
     if (SetOutline3DMethodID == NULL) {
         return -1;
     }
@@ -3083,6 +3076,8 @@ static void write_add_proto_patch_contact_line (
 }
 
 void jni_call_add_proto_patch_contact_line_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *x,
     double *y,
     double *z,
@@ -3104,6 +3099,18 @@ void jni_call_add_proto_patch_contact_line_method (
             patchid2);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddProtoPatchContactLineMethodID =
+            (*jenv)->GetMethodID (jenv, cls, "addProtoPatchContactLine",
+                                         "([D[D[DIII)V");
     if (AddProtoPatchContactLineMethodID == NULL) {
         return;
     }
@@ -3178,6 +3185,8 @@ static void write_add_draped_points (
 }
 
 void jni_call_add_draped_points_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *x,
     double *y,
     double *z,
@@ -3195,6 +3204,18 @@ void jni_call_add_draped_points_method (
             npts);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddDrapedPointsMethodID =
+            (*jenv)->GetMethodID (jenv, cls, "addNativeDrapedPoints",
+                                         "([D[D[DI)V");
     if (AddDrapedPointsMethodID == NULL) {
         return;
     }
@@ -3265,6 +3286,8 @@ static void write_add_native_tindex_result (
 }
 
 void jni_call_add_native_tindex_result_method (
+    void  *v_jenv,
+    void  *v_jobj,
     int         *tmeshid,
     int         *trinum,
     int         nresult)
@@ -3282,6 +3305,18 @@ void jni_call_add_native_tindex_result_method (
             nresult);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddNativeTindexResultMethodID =
+            (*jenv)->GetMethodID (jenv, cls, "addNativeTindexResult",
+                                           "([I[II)V");
     if (AddNativeTindexResultMethodID == NULL) {
         return;
     }
@@ -3395,6 +3430,9 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendStaticC
     long             *llist2;
     int              i, lsize;
 
+    void    *v_jenv = (void *)jnienv;
+    void    *v_jobj = NULL;
+
     threadid = (int)j_tid;
 
 /*
@@ -3492,7 +3530,8 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendStaticC
  */
 #if INT_MAX == 2147483647
     status =
-    sw_process_command (command_id,
+    sw_process_command (v_jenv, v_jobj,
+                        command_id,
                         threadid,
                         (int *)ilist,
                         llist2,
@@ -3537,7 +3576,8 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendStaticC
 
     if (ibad == 0) {
         status =
-        sw_process_command (command_id,
+        sw_process_command (v_jenv, v_jobj,
+                            command_id,
                             threadid,
                             ilist2,
                             llist2,
@@ -3608,6 +3648,8 @@ static void write_add_split_line (
 }
 
 void jni_call_add_split_line_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double *x,
     double *y,
     double *z,
@@ -3629,6 +3671,18 @@ void jni_call_add_split_line_method (
             patchid2);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddSplitLineMethodID =
+            (*jenv)->GetMethodID (jenv, cls, "addSplitLine",
+                                         "([D[D[DIII)V");
     if (AddSplitLineMethodID == NULL) {
         return;
     }
@@ -3700,6 +3754,8 @@ static void write_add_fault_major_minor (
 }
 
 void jni_call_add_fault_major_minor_method (
+    void  *v_jenv,
+    void  *v_jobj,
     int         id,
     int         major)
 {
@@ -3712,6 +3768,17 @@ void jni_call_add_fault_major_minor_method (
             major);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddFaultMajorMinorMethodID =
+        (*jenv)->GetMethodID (jenv, cls, "addFaultMajorMinor", "(II)V");
     if (AddFaultMajorMinorMethodID == NULL) {
         return;
     }
@@ -3758,6 +3825,8 @@ static void write_add_native_at_tri_mesh (
 }
 
 void jni_call_add_native_at_tri_mesh_method (
+    void  *v_jenv,
+    void  *v_jobj,
     double      *xnode,
     double      *ynode,
     double      *znode,
@@ -3823,6 +3892,18 @@ void jni_call_add_native_at_tri_mesh_method (
             numtri);
     }
 
+    if (v_jenv == NULL  ||  v_jobj == NULL) {
+        return;
+    }
+
+    JNIEnv *jenv = (JNIEnv *)v_jenv;
+    jobject jobj = (jobject)v_jobj;
+
+    jclass cls = (*jenv)->GetObjectClass (jenv, jobj);
+
+    jmethodID AddNativeAtTriMeshMethodID =
+        (*jenv)->GetMethodID (jenv, cls, "addNativeAtTriMesh",
+          "([D[D[D[II[I[I[I[I[II[I[I[I[II)V");
     if (AddNativeAtTriMeshMethodID == NULL) {
         return;
     }

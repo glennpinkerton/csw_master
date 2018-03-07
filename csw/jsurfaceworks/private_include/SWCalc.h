@@ -67,6 +67,8 @@ class SWCalc
     CSWGrdTriangle   gridtri;
     CSWPolyUtils     polyutils;
     
+    void       *v_jenv = NULL;
+    void       *v_jobj = NULL;
 
 
   public:
@@ -76,6 +78,11 @@ class SWCalc
 
     void SetGrdAPIPtr (CSWGrdAPI *p) {
         grdapi_ptr = p;
+    }
+
+    void SetJNIPtrs (void *env, void *obj) {
+        v_jenv = env;
+        v_jobj = obj;
     }
 
   private:

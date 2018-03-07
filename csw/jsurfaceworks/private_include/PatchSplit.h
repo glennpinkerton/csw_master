@@ -179,6 +179,9 @@ class PATCHSplit
 
     CSWGrdAPI      *grdapi_ptr = NULL;
 
+    void    *v_jenv = NULL;
+    void    *v_jobj = NULL;
+
   public:
 
     PATCHSplit () {};
@@ -186,6 +189,11 @@ class PATCHSplit
 
     void SetGrdAPIPtr (CSWGrdAPI *p) {
         grdapi_ptr = p;
+    }
+
+    void SetJNIPtrs (void *env, void *obj) {
+        v_jenv = env;
+        v_jobj = obj;
     }
 
   private:

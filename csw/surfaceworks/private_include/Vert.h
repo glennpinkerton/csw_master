@@ -37,6 +37,8 @@ extern "C"
 
 
 int vert_CalcBaselineFromJava (
+    void    *v_jenv,
+    void    *v_jobj,
     double       *xpts,
     double       *ypts,
     double       *zpts,
@@ -81,7 +83,10 @@ void vert_SetBaseline (
     GRDVert      &gvert
 );
 
-void vert_SendBackBaseline (GRDVert &gvert);
+void vert_SendBackBaseline (
+    void    *v_jenv,
+    void    *v_jobj,
+    GRDVert &gvert);
 
 int vert_GetFlag (GRDVert &gvert);
 

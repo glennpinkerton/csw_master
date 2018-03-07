@@ -77,7 +77,6 @@ void SWCalc::sw_SetModelBounds (
 
 
 
-
 /*-----------------------------------------------------------------*/
 
 /*
@@ -771,7 +770,7 @@ int SWCalc::sw_CalcTriMesh (
         vert_UnconvertPoints (xline, yline, zline, ntotvert, gvert);
         vert_UnconvertPoints (xbounds, ybounds, zbounds, nbounds, gvert);
 
-        vert_SendBackBaseline (gvert);
+        vert_SendBackBaseline (v_jenv, v_jobj, gvert);
 
     /*
      * Convert the trimesh to arrays and send them back to the java side.
@@ -831,6 +830,8 @@ int SWCalc::SendBackVbase (int vused, double *vbase)
 {
     jni_call_set_vert_baseline_method
     (
+        v_jenv,
+        v_jobj,
         vbase[0],
         vbase[1],
         vbase[2],
@@ -962,6 +963,8 @@ int SWCalc::SendBackTriMesh
  */
     jni_call_add_tri_mesh_method
     (
+        v_jenv,
+        v_jobj,
         xnode,
         ynode,
         znode,
@@ -1093,6 +1096,9 @@ int SWCalc::sw_CalcGrid (
             nrow /= 10;
         }
     }
+
+printf ("ncol = %d  nrow = %d\n", ncol, nrow);
+fflush (stdout);
 
     if (grid_geometry != NULL) {
         ncol = grid_geometry->ncol;
@@ -1279,6 +1285,8 @@ int SWCalc::SendBackGrid (
  */
     jni_call_add_grid_method
     (
+        v_jenv,
+        v_jobj,
         ddata,
         derror,
         mask,
@@ -1580,6 +1588,8 @@ int SWCalc::sw_CalcDrapedLines (void)
     n = 0;
     for (i=0; i<nout; i++) {
         jni_call_add_draped_line_method (
+            v_jenv,
+            v_jobj,
             xout+n,
             yout+n,
             zout+n,
@@ -1687,11 +1697,15 @@ int SWCalc::sw_ConvertNodeTrimesh (
         triangles, num_triangles);
     if (istat == 1) {
         jni_call_set_vert_baseline_method (
+            v_jenv,
+            v_jobj,
             VBC1, VBC2, VBC3, VBX0,
             VBY0, VBZ0, VBFlag);
     }
     else {
         jni_call_set_vert_baseline_method (
+            v_jenv,
+            v_jobj,
             1.e30, 1.e30, 1.e30, 1.e30,
             1.e30, 1.e30, 0);
     }
@@ -2365,7 +2379,7 @@ int SWCalc::sw_ExtendFaultFromJava (
 /*
  * Convert the trimesh to arrays and send them back to the java side.
  */
-    vert_SendBackBaseline (gvert);
+    vert_SendBackBaseline (v_jenv, v_jobj, gvert);
     istat =
     SendBackTriMesh (nodes, num_nodes,
                      edges, num_edges,
@@ -3216,7 +3230,10 @@ int SWCalc::SendBackPointOutline (
     int istat;
 
     istat =
-    jni_call_set_outline_method (xpoly, ypoly, npoly);
+    jni_call_set_outline_method (
+        v_jenv,
+        v_jobj,
+        xpoly, ypoly, npoly);
 
     return istat;
 }
@@ -3541,6 +3558,8 @@ int SWCalc::sw_CalcTriMeshOutline (
     }
 
     jni_call_set_outline3d_method (
+        v_jenv,
+        v_jobj,
         xout, yout, zout, nvout[0]);
 
     csw_Free (xout);
@@ -4210,7 +4229,7 @@ int SWCalc::sw_CalcExactTriMesh (
         vert_UnconvertPoints (xline, yline, zline, ntot, gvert);
         vert_UnconvertPoints (xbounds, ybounds, zbounds, nbounds, gvert);
 
-        vert_SendBackBaseline (gvert);
+        vert_SendBackBaseline (v_jenv, v_jobj, gvert);
 
     /*
      * Convert the trimesh to arrays and send them back to the java side.
@@ -5119,6 +5138,8 @@ int SWCalc::sw_CalcDrapedPoints (void)
     vert_UnconvertPoints (xout, yout, zout, nout, gvert);
 
     jni_call_add_draped_points_method (
+        v_jenv,
+        v_jobj,
         xout,
         yout,
         zout,
