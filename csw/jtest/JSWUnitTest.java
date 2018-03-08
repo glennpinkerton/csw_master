@@ -182,10 +182,10 @@ catch (Exception e) {
           }
         });
 
-        JButton large_grid_10_button = new JButton (20 * nphint + " Point Grid");
+        JButton large_grid_10_button = new JButton (10 * nphint + " Point Grid");
         large_grid_10_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                Grid10Frame gf = new Grid10Frame (20 * nphint, false);
+                Grid10Frame gf = new Grid10Frame (10 * nphint, false);
                 Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
                 SwingUtilities.invokeLater (run_frame);
           }
@@ -203,7 +203,7 @@ catch (Exception e) {
         JButton grid_large_sm_button = new JButton ("Large Smooth Grid");
         grid_large_sm_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                Grid10Frame gf = new Grid10Frame (20 * nphint, true);
+                Grid10Frame gf = new Grid10Frame (10 * nphint, true);
                 Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
                 SwingUtilities.invokeLater (run_frame);
           }
