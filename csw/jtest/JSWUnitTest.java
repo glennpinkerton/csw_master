@@ -179,8 +179,6 @@ catch (Exception e) {
                 Grid10Frame gf = new Grid10Frame (nphint, false);
                 Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
                 SwingUtilities.invokeLater (run_frame);
-                //frame.populateDlist ();
-                //frame.setVisible (true);
           }
         });
 
@@ -190,8 +188,6 @@ catch (Exception e) {
                 Grid10Frame gf = new Grid10Frame (10 * nphint, false);
                 Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
                 SwingUtilities.invokeLater (run_frame);
-                //frame.populateDlist ();
-                //frame.setVisible (true);
           }
         });
 
@@ -201,8 +197,6 @@ catch (Exception e) {
                 Grid10Frame gf = new Grid10Frame (nphint, true);
                 Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
                 SwingUtilities.invokeLater (run_frame);
-                //frame.populateDlist ();
-                //frame.setVisible (true);
           }
         });
 
@@ -212,8 +206,6 @@ catch (Exception e) {
                 Grid10Frame gf = new Grid10Frame (10 * nphint, true);
                 Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
                 SwingUtilities.invokeLater (run_frame);
-                //frame.populateDlist ();
-                //frame.setVisible (true);
           }
         });
 
@@ -434,16 +426,11 @@ class GFWorker extends SwingWorker<Integer, Void> {
     }
 
     protected Integer doInBackground () {
-System.out.println ();
-System.out.println ("GFWorker do in background");
-System.out.flush ();
         gf.populateDlist ();
         return 0;
     }
 
     protected void done () {
-System.out.println ("GFWorker done");
-System.out.flush ();
         gf.setVisible (true);
     }
 
@@ -467,14 +454,15 @@ class Grid10FrameRunnable implements Runnable {
 
 // Don't use threads for now.  Still working on it for surfaceworks.
 
-//      String  tflag = System.getenv ("CSW_DONT_USE_THREADS");
-String tflag = "1";
+      String  tflag = System.getenv ("CSW_DONT_USE_THREADS");
 
-      if (tflag == null) {
+      if (tflag == null  ||  tflag.isEmpty()) {
         GFWorker gfw = new GFWorker (gf);
         gfw.execute ();
       }
       else {
+System.out.println ("JSW not using threads");
+System.out.flush ();
         gf.populateDlist ();
         gf.setVisible (true);
       }
@@ -537,12 +525,13 @@ class Grid10Frame extends JDLFrame
 
         if (smooth_flag) {
             generate_smooth_xyz (x, y, z, np,
-                                 200.0, 150.0);
+                                 200.0, 200.0);
         }
         else {
           for (i=0; i<np; i++) {
+
             x[i] = random.nextDouble () * 200.0;
-            y[i] = random.nextDouble () * 150.0;
+            y[i] = random.nextDouble () * 200.0;
             z[i] = random.nextDouble ();
             if (z[i] > .7) {
                 z[i] *= z[i];
@@ -567,7 +556,7 @@ class Grid10Frame extends JDLFrame
         );
 
         dl.beginPlot ("grid test" + np,
-                      0.0, 0.0, 200.0, 100.0);
+                      0.0, 0.0, 20.0, 20.0);
         dl.setColor (5, 5, 5);
 
         dl.setFrameClip (1);
@@ -575,26 +564,7 @@ class Grid10Frame extends JDLFrame
                        0.0,
                        0.0,
                        200.0,
-                       100.0,
-                       0.0,
-                       0.0,
-                       200.0,
-                       100.0,
-                       0.0,
-                       0.0,
-                       200.0,
-                       100.0,
-                       1,
-                       0,
-                       0,
-                       DLConst.FRAME_LABEL_ALL_SIDES_BORDER,
-                       null,
-                       null,
-                       null,
-                       DLConst.FRAME_NO_ATTACH,
-                       0.0,
-                       0.0,
-                       0);
+                       200.0);
 
         DLSurfaceProperties dlp = new DLSurfaceProperties ();
         dlp.setShowNodes (true);

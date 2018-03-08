@@ -32,7 +32,7 @@
 #include <csw/jsurfaceworks/private_include/SWCommand.h>
 #include <csw/surfaceworks/private_include/Vert.h>
 
-#define _SW_DEBUG_LOG_FILE_     1
+#define _SW_DEBUG_LOG_FILE_     0
 
 
 /*
@@ -113,8 +113,11 @@ long sw_process_command (
     int           first;
 
     int           nline, nline2, ntot, npts, zflag;
-    int           i, start;
+    int           start;
 
+  #if _SW_DEBUG_LOG_FILE_
+    int           i;
+  #endif
 
     double    *Xline = NULL,
               *Yline = NULL,

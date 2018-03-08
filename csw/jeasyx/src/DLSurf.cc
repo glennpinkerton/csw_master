@@ -627,6 +627,40 @@ int DLSurf::CalcContours (void *vptr, int inum)
 /*--------------------------------------------------------------------------*/
 
 
+
+/*
+ * This function is for debug only.  Uncommentg it if needed.
+static void show_con_limits (COntourOutputRec *contours, int ncontours)
+{
+    int  i, j;
+    CSW_F    xmin = 1.e30;
+    CSW_F    ymin = 1.e30;
+    CSW_F    xmax = -1.e30;
+    CSW_F    ymax = -1.e30;
+    CSW_F    x, y;
+
+    COntourOutputRec   *cp = NULL;
+
+    for (i=0; i<ncontours; i++) {
+        cp = contours + i;
+        for (j=0; j<cp->npts; j++) {
+            x = cp->x[j];
+            y = cp->y[j];
+            if (x < xmin) xmin = x;
+            if (y < ymin) ymin = y;
+            if (x > xmax) xmax = x;
+            if (y > ymax) ymax = y;
+        }
+    }
+
+    printf ("\ncontour limits:  %.2f  %.2f  %.2f  %.2f\n\n", 
+               xmin, ymin, xmax, ymax);
+    fflush (stdout);
+
+}
+*/
+
+
 int DLSurf::CalcContours (void *vptr)
 {
     CDisplayList        *dlist;
@@ -683,6 +717,7 @@ int DLSurf::CalcContours (void *vptr)
             &contours, &ncontours,
             faults, nfaults,
             &calc_options);
+
         if (istat == -1) {
             return -1;
         }
@@ -831,7 +866,7 @@ int DLSurf::CalcImage (void *vptr)
         return -1;
     }
 
-    double  tiny;
+    //double  tiny;
 
   /*
    * If the image is completely outside the frame clip limits,
@@ -858,19 +893,23 @@ int DLSurf::CalcImage (void *vptr)
    * from a regular grid is color filled, the x1, y1t is exactly on the trimesh
    * border, which confuses the inside/outside determination.  If the lower left
    * corner is moved slightly to the outside in this case, things work better.
-   */
     tiny = (gxmax - gxmin + gymax - gymin) / 200.0;
     tiny += xspace + yspace;
     if (x1 < gxmin + xspace) x1 = gxmin - tiny;
     if (y1t < gymin + yspace) y1t = gymin - tiny;
     if (x2 > gxmax - xspace) x2 = gxmax + tiny;
     if (y2 > gymax - yspace) y2 = gymax + tiny;
+   */
+    x1 = gxmin;
+    y1t = gymin;
+    x2 = gxmax;
+    y2 = gymax;
 
     nc = (int)((x2 - x1) / xspace + 1.0);
     nr = (int)((y2 - y1t) / yspace + 1.0);
 
     if (nc * nr < 0) {
-        tiny = gxmin;
+        //tiny = gxmin;
     }
 
     newgrid = (CSW_F *)csw_Malloc (nc * nr * sizeof(CSW_F));
@@ -1048,6 +1087,7 @@ int DLSurf::CalcImage (void *vptr)
 
     if (istat == -1) {
         csw_Free (newgrid);
+        newgrid = NULL;
         return 1;
     }
 

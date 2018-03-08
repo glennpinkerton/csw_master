@@ -1777,14 +1777,15 @@ class HugeFrameRunnable implements Runnable {
 //  I will use the environment variable for turning
 //  threads on and off both here and surfaceworks
 
-//      String  tflag = System.getenv ("CSW_DONT_USE_THREADS");
-String tflag = null;
+      String  tflag = System.getenv ("CSW_DONT_USE_THREADS");
 
-      if (tflag == null) {
+      if (tflag == null  ||  tflag.isEmpty()) {
         HFWorker hfw = new HFWorker (hf);
         hfw.execute ();
       }
       else {
+System.out.println ("JEZX not using threads");
+System.out.flush ();
         hf.populateDlist ();
         hf.setVisible (true);
       }

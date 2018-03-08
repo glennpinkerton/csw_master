@@ -1277,7 +1277,7 @@ MSL
         WorkMargin = (int)margin1;
     }
     if (WorkMargin < 0) {
-        WorkMargin = 2 * Ncoarse;
+        WorkMargin = 4 * Ncoarse;
         xmarg = WorkMargin * Xspace;
         ymarg = WorkMargin * Yspace;
         while (DXmin < x1 - xmarg  ||  DYmin < y1 - ymarg  ||
@@ -1290,6 +1290,9 @@ MSL
             ymarg = WorkMargin * Yspace;
         }
     }
+    if (WorkMargin < Ncoarse) {
+        WorkMargin = Ncoarse;
+    }
 
 /*
     Expand the grid limits used internally so that an integral number of coarse
@@ -1297,6 +1300,8 @@ MSL
     copied to the output grid at the end, with appropriate offsets being
     used in the copy operation.
 */
+WorkMargin = 4 * Ncoarse;
+if (WorkMargin < 16) WorkMargin = 16;
     ismooth = (int) (SmoothingFactor + .5f);
     grd_utils_ptr->grd_expand_limits (x1, y1, x2, y2, ncol, nrow, Ncoarse, WorkMargin,
                        &Xmin, &Ymin, &Xmax, &Ymax,
@@ -1310,10 +1315,10 @@ MSL
     }
 
 /*
-    Make sure the coarse grid is no larger than 64 rows
+    Make sure the coarse grid is no larger than 128 rows
     or columns.
 */
-    while (Nccol > 64  ||  Ncrow > 64) {
+    while (Nccol > 128  ||  Ncrow > 128) {
         Ncoarse *= 2;
         grd_utils_ptr->grd_expand_limits (x1, y1, x2, y2, ncol, nrow, Ncoarse, WorkMargin,
                            &Xmin, &Ymin, &Xmax, &Ymax,

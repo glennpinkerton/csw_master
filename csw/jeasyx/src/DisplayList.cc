@@ -11930,8 +11930,10 @@ void CDisplayList::reclip_frame_contours (int fnum)
      * Clip the contour to the page frame corners.
      */
         gpf_calcdraw_obj.gpf_cliplineprim (xypack, npts,
-                          Fx1, Fy1, Fx2, Fy2,
+                          -1.e10, -1.e10, 1.e10, 1.e10,
+                          //Fx1, Fy1, Fx2, Fy2,
                           xywork2, &ncout, iwork);
+
         csw_Free (xypack);
         xypack = NULL;
 
@@ -12002,7 +12004,7 @@ void CDisplayList::reclip_frame_contours (int fnum)
 
 /*
  *  Add the line primitives, including label gaps and ticks for contours.
- *  These are usually calculated once for each contout and put into the
+ *  These are usually calculated once for each contour and put into the
  *  display list for drawing.
  */
 int CDisplayList::AddContourLine (CSW_F *xpts_in, CSW_F *ypts_in, int npts)
