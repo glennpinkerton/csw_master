@@ -133,6 +133,7 @@ public class JDisplayList extends JDisplayListBase {
     private void new_bdata (int size)
     {
         int     istat = 0;
+        size += 100;
         while (size > BdataMax) {
             BdataMax +=  HUGE_CHUNK;
             istat = 1;
@@ -145,6 +146,7 @@ public class JDisplayList extends JDisplayListBase {
     private void new_sdata (int size)
     {
         int     istat = 0;
+        size += 100;
         while (size > SdataMax) {
             SdataMax +=  HUGE_CHUNK;
             istat = 1;
@@ -157,6 +159,7 @@ public class JDisplayList extends JDisplayListBase {
     private void new_idata (int size)
     {
         int     istat = 0;
+        size += 100;
         while (size > IdataMax) {
             IdataMax +=  HUGE_CHUNK;
             istat = 1;
@@ -169,6 +172,7 @@ public class JDisplayList extends JDisplayListBase {
     private void new_fdata (int size)
     {
         int     istat = 0;
+        size += 100;
         while (size > FdataMax) {
             FdataMax +=  HUGE_CHUNK;
             istat = 1;
@@ -181,6 +185,7 @@ public class JDisplayList extends JDisplayListBase {
     private void new_ddata (int size)
     {
         int     istat = 0;
+        size += 100;
         while (size > DdataMax) {
             DdataMax +=  HUGE_CHUNK;
             istat = 1;
@@ -2889,7 +2894,7 @@ of Font.BOLD|Font.ITALIC.
         Ilist[0] = grid.getNCols ();
         Ilist[1] = grid.getNRows ();
         ntot = Ilist[0] * Ilist[1];
-        new_ddata (ntot);
+        new_ddata (ntot + 10);
         double[] gdata = grid.getNodeZArray ();
 
         Ddata[0] = grid.getXMin ();

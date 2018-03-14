@@ -35,7 +35,7 @@
  *
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  */
-#define _EZX_DEBUG_LOG_FILE_        0
+#define _EZX_DEBUG_LOG_FILE_        1
 
 #include <stdio.h>
 

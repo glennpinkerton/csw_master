@@ -866,8 +866,6 @@ int DLSurf::CalcImage (void *vptr)
         return -1;
     }
 
-    //double  tiny;
-
   /*
    * If the image is completely outside the frame clip limits,
    * do not attempt to draw it.
@@ -893,17 +891,16 @@ int DLSurf::CalcImage (void *vptr)
    * from a regular grid is color filled, the x1, y1t is exactly on the trimesh
    * border, which confuses the inside/outside determination.  If the lower left
    * corner is moved slightly to the outside in this case, things work better.
-    tiny = (gxmax - gxmin + gymax - gymin) / 200.0;
-    tiny += xspace + yspace;
-    if (x1 < gxmin + xspace) x1 = gxmin - tiny;
-    if (y1t < gymin + yspace) y1t = gymin - tiny;
-    if (x2 > gxmax - xspace) x2 = gxmax + tiny;
-    if (y2 > gymax - yspace) y2 = gymax + tiny;
-   */
     x1 = gxmin;
     y1t = gymin;
     x2 = gxmax;
     y2 = gymax;
+   */
+    double tiny = (gxmax - gxmin + gymax - gymin) / 2000.0;
+    if (x1 < gxmin) x1 = gxmin - tiny;
+    if (y1t < gymin) y1t = gymin - tiny;
+    if (x2 > gxmax) x2 = gxmax + tiny;
+    if (y2 > gymax) y2 = gymax + tiny;
 
     nc = (int)((x2 - x1) / xspace + 1.0);
     nr = (int)((y2 - y1t) / yspace + 1.0);

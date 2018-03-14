@@ -12505,6 +12505,9 @@ void CDisplayList::reclip_frame_grid_images (int fnum)
 
     save_current_graphic_attributes ();
 
+printf ("\nin reclip grid images func:  num image = \n" + sf_size);
+fflush (stdout);
+
     for (i=0; i<sf_size; i++) {
 
         grid = sf_data[i];
@@ -12528,6 +12531,9 @@ void CDisplayList::reclip_frame_grid_images (int fnum)
         grid->CalcImage ((void *)this);
 
     }
+
+printf ("finished with reclip grid images func\n");
+fflush (stdout);
 
     unsave_current_graphic_attributes ();
 
@@ -15693,8 +15699,8 @@ void CDisplayList::closest_frame_text (int fnum, CSW_F xin, CSW_F yin,
         return;
     }
 
-//  Using patches to search for "local" text is a bit tricky.
-//  Since text is drawn to be close to the same size on the screen
+//  Using patches to search for "local" text can be a bit tricky.
+//  Since text can be drawn close to the same size on the screen
 //  regardless of drawing scaling or zoom, then a piece of text 
 //  can be outside of the pick aperture.  If there are a small
 //  number of text primitives relative to the number of spatial
