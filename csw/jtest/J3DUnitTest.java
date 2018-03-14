@@ -23,24 +23,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.WindowConstants;
 
-/*
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GLCanvas;
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLDrawable;
-import com.jogamp.opengl.GLDrawableFactory;
-*/
-
-/*
-import net.java.games.jogl.GL;
-import net.java.games.jogl.GLCanvas;
-import net.java.games.jogl.GLCapabilities;
-import net.java.games.jogl.GLDrawable;
-import net.java.games.jogl.GLDrawableFactory;
-import net.java.games.jogl.GLEventListener;
-import net.java.games.jogl.GLU;
-*/
-
 import csw.jutils.src.XYZPoint;
 import csw.jutils.src.XYZNode;
 import csw.jutils.src.XYZPolyline;
@@ -52,20 +34,8 @@ import csw.jsurfaceworks.src.DBPointList;
 import csw.jsurfaceworks.src.JSurfaceWorks;
 import csw.jsurfaceworks.src.TriMesh;
 
-//import org.apache.logging.log4j.Logger;
-//import csw.jutils.src.CSWLogger;
-
 import csw.j3d.src.*;
 
-
-// imprts deemed unused by eclipse
-
-//import java.awt.Frame;
-//import java.awt.Insets;
-//import javax.swing.JCheckBox;
-//import com.jogamp.opengl.GLEventListener;
-//import com.jogamp.opengl.GLU;
-//import csw.jsurfaceworks.src.GridGeometry;
 
 
 /**
@@ -80,13 +50,10 @@ public class J3DUnitTest {
     //private static Logger  logger = CSWLogger.getMyLogger ();
 
     static {
-//        System.loadLibrary ("awt");
         System.loadLibrary ("_csw_all");
         System.loadLibrary ("gluegen-rt");
         System.loadLibrary ("jogl_desktop");
         System.loadLibrary ("jogl_mobile");
-//        System.loadLibrary ("nativewindow_awt");
-//        System.loadLibrary ("nativewindow_x11");
         System.loadLibrary ("newt");
     }
 
@@ -125,13 +92,6 @@ public class J3DUnitTest {
         UnitTestFrame frame = new UnitTestFrame ();
         frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
         frame.setVisible (true);
-
-    // Initialize the translationManager.
-/*
-        TranslationManager.init(
-          new File(System.getProperty("pra.rootdir") + "/lib/mbuilder")
-        );
-*/
 
         ToolTipManager.sharedInstance().
             setLightWeightPopupEnabled (false);
@@ -340,7 +300,7 @@ class SimplestFrame extends JFrame
         tp.setGlobalColor (null);
         //panel.addText (tp);
 
-        addRandomPoints ();
+        //addRandomPoints ();
 
         panel.redrawAll ();
 
