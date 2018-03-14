@@ -43,6 +43,8 @@
 
 FILE      *dfile = NULL;
 
+#define  MAX_DDATA   70000000
+
 
 int main (int argc, char *argv[])
 {
@@ -56,7 +58,7 @@ int main (int argc, char *argv[])
 
     static long      longlist[100];
     static int       ilist[1000];
-    static double    ddata[1000000];
+    static double    ddata[MAX_DDATA + 100];
     static float     fdata[1000000];
     static int       idata[10000000];
     static short int sdata[1000000];
@@ -143,6 +145,7 @@ int main (int argc, char *argv[])
     /*
      * start of huge switch on each command
      */
+        int  ngdata = 0;
         end_flag = 0;
         switch (command_id) {
 
@@ -2025,7 +2028,8 @@ int main (int argc, char *argv[])
                    end_flag = 1;
                    break;
                }
-               strcpy (cdata, inbuff);
+
+               strcpy (cdata, ctmp);
 
                ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
                if (ctmp == NULL) {
@@ -2043,15 +2047,18 @@ int main (int argc, char *argv[])
                    ddata+4
                );
 
+               ngdata = ilist[0] * ilist[1];
                for (i=0; i<ilist[0] * ilist[1]; i++) {
                    ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
                    if (ctmp == NULL) {
                        end_flag = 1;
                        break;
                    }
-                   sscanf (inbuff, "%lf", ddata+i+5);
+                   if (ngdata < MAX_DDATA - 100) {
+                       sscanf (inbuff, "%lf", ddata+i+5);
+                   }
                }
-               if (end_flag == 1) {
+               if (end_flag == 1  ||  ngdata >= MAX_DDATA - 100) {
                    break;
                }
 

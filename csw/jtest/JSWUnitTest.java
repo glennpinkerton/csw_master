@@ -191,6 +191,15 @@ catch (Exception e) {
           }
         });
 
+        JButton huge_grid_10_button = new JButton (100 * nphint + " Point Grid");
+        huge_grid_10_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                Grid10Frame gf = new Grid10Frame (100 * nphint, false);
+                Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
+                SwingUtilities.invokeLater (run_frame);
+          }
+        });
+
         JButton grid_sm_button = new JButton ("Smooth Grid");
         grid_sm_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
@@ -203,7 +212,16 @@ catch (Exception e) {
         JButton grid_large_sm_button = new JButton ("Large Smooth Grid");
         grid_large_sm_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                Grid10Frame gf = new Grid10Frame (10 * nphint, true);
+                Grid10Frame gf = new Grid10Frame (20 * nphint, true);
+                Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
+                SwingUtilities.invokeLater (run_frame);
+          }
+        });
+
+        JButton grid_huge_sm_button = new JButton ("Huge Smooth Grid");
+        grid_huge_sm_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                Grid10Frame gf = new Grid10Frame (100 * nphint, true);
                 Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
                 SwingUtilities.invokeLater (run_frame);
           }
@@ -293,8 +311,10 @@ catch (Exception e) {
         contentPane.add (trimesh_10_button);
         contentPane.add (grid_10_button);
         contentPane.add (large_grid_10_button);
+        contentPane.add (huge_grid_10_button);
         contentPane.add (grid_sm_button);
         contentPane.add (grid_large_sm_button);
+        contentPane.add (grid_huge_sm_button);
         contentPane.add (trimesh_file_button);
         contentPane.add (divide_file_button);
         contentPane.add (grid_file_button);
@@ -426,11 +446,17 @@ class GFWorker extends SwingWorker<Integer, Void> {
     }
 
     protected Integer doInBackground () {
+System.out.println ();
+System.out.println ("enter doInBackground for surf calc");
+System.out.flush ();
         gf.populateDlist ();
         return 0;
     }
 
     protected void done () {
+System.out.println ("enter done for surf calc");
+System.out.println ();
+System.out.flush ();
         gf.setVisible (true);
     }
 
@@ -461,6 +487,7 @@ class Grid10FrameRunnable implements Runnable {
         gfw.execute ();
       }
       else {
+System.out.println ();
 System.out.println ("JSW not using threads");
 System.out.flush ();
         gf.populateDlist ();
@@ -555,6 +582,9 @@ class Grid10Frame extends JDLFrame
             null
         );
 
+System.out.println ("sw grid calc finished");
+System.out.flush ();
+
         dl.beginPlot ("grid test" + np,
                       0.0, 0.0, 20.0, 20.0);
         dl.setColor (5, 5, 5);
@@ -568,6 +598,7 @@ class Grid10Frame extends JDLFrame
 
         DLSurfaceProperties dlp = new DLSurfaceProperties ();
         dlp.setShowNodes (true);
+        //dlp.setShowColorFills (false);
         ColorPalette cpal = new ColorPalette();
         double zmin = grid.getZMin ();
         double zmax = grid.getZMax ();
@@ -577,6 +608,10 @@ class Grid10Frame extends JDLFrame
         dl.addGrid ("test grid 10",
                     grid,
                     dlp);
+
+System.out.println ("sw dl add grid finished");
+System.out.flush ();
+
     }
 
     

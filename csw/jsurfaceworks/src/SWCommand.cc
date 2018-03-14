@@ -32,7 +32,7 @@
 #include <csw/jsurfaceworks/private_include/SWCommand.h>
 #include <csw/surfaceworks/private_include/Vert.h>
 
-#define _SW_DEBUG_LOG_FILE_     0
+#define _SW_DEBUG_LOG_FILE_     1
 
 
 /*

@@ -674,9 +674,11 @@ public class JDisplayListPanel extends JPanel
            */
             if (zoomToRectangleMode == 1  &&  button_1 != 0) {
                 int zflag = zoomStarted;
-                startRectangleZoom (e);
                 if (zflag == 1) {
                     endRectangleZoom (e);
+                }
+                else {
+                    startRectangleZoom (e);
                 }
                 return;
             }

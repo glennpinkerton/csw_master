@@ -11,6 +11,7 @@
 package csw.jtest;
 
 import java.lang.Exception;
+import java.lang.Runtime;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -311,8 +312,6 @@ catch (Exception e) {
                 HugeFrame hf = new HugeFrame (50);
                 HugeFrameRunnable run_frame = new HugeFrameRunnable (hf);
                 SwingUtilities.invokeLater (run_frame);
-                //frame.populateDlist ();
-                //frame.setVisible(true);
           }
         });
 
@@ -322,8 +321,6 @@ catch (Exception e) {
                 HugeFrame hf = new HugeFrame (1000);
                 HugeFrameRunnable run_frame = new HugeFrameRunnable (hf);
                 SwingUtilities.invokeLater (run_frame);
-                //frame.populateDlist ();
-                //frame.setVisible(true);
           }
         });
 
@@ -333,8 +330,6 @@ catch (Exception e) {
                 HugeFrame hf = new HugeFrame (-1);
                 HugeFrameRunnable run_frame = new HugeFrameRunnable (hf);
                 SwingUtilities.invokeLater (run_frame);
-                //frame.populateDlist ();
-                //frame.setVisible(true);
           }
         });
 
@@ -380,6 +375,15 @@ catch (Exception e) {
           }
         });
 
+        JButton huge_grid_button = new JButton ("Huge Grid Test");
+        huge_grid_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                HugeGridTest hg = new HugeGridTest ();
+                HugeGridRunnable run_frame = new HugeGridRunnable (hg);
+                SwingUtilities.invokeLater (run_frame);
+          }
+        });
+
         JButton font_button = new JButton ("Font Test");
         font_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
@@ -414,6 +418,7 @@ catch (Exception e) {
         contentPane.add (frame_layout_button);
         contentPane.add (grid_button);
         contentPane.add (overlap_button);
+        contentPane.add (huge_grid_button);
         contentPane.add (font_button);
         contentPane.add (sync_button);
         contentPane.add (noaspect_button);
@@ -1746,11 +1751,17 @@ class HFWorker extends SwingWorker<Integer, Void> {
     }
 
     protected Integer doInBackground () {
+System.out.println ();
+System.out.println ("Enter ezx do in background");
+System.out.flush ();
         hf.populateDlist ();
         return 0;
     }
 
     protected void done () {
+System.out.println ("Enter ezx done");
+System.out.println ();
+System.out.flush ();
         hf.setVisible (true);
     }
 
@@ -2984,3 +2995,221 @@ class OverlapTest extends JDLFrame
 
     }
 };
+
+class HugeGridTest extends JDLFrame
+{
+    private static final long serialVersionUID = 1L;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
+
+    private static final int  MAX_HUGE = 8000;
+
+    public HugeGridTest ()
+    {
+        super ();
+    }
+
+    public void populateDlist ()
+    {
+
+        double[] gdata;
+        double   dx, dy, dist;
+        int      i, j, k, jstart;
+
+        setTitle ("Huge Grid Test");
+        setSize (900, 700);
+
+        JDisplayList dl = super.getDL ();
+
+        dl.beginPlot ("grid test",
+                      0.0, 0.0, 100.0, 100.0);
+        dl.setColor (5, 5, 5);
+
+        dl.setFrameClip (1);
+        dl.createFrame ("grid test frame",
+                       0.0,
+                       0.0,
+                       100.0,
+                       100.0,
+                       10.0,
+                       10.0,
+                       90.0,
+                       90.0,
+                       0.0,
+                       0.0,
+                       100.0,
+                       100.0,
+                       1,
+                       0,
+                       0,
+                       DLConst.FRAME_LABEL_ALL_SIDES_BORDER,
+                       null,
+                       null,
+                       null,
+                       DLConst.FRAME_NO_ATTACH,
+                       0.0,
+                       0.0,
+                        0);
+
+        Random random = new Random();
+        long seed = 1234579;
+        random.setSeed (seed);
+        double  yspace = .1;
+        double  xspace = .1;
+        double  gmax = -1.e30;
+
+        int    nhuge = 1000;
+        double nfact = 0.0;
+
+        String  tflag = System.getenv ("CSW_NHUGE");
+
+        if (!(tflag == null  ||  tflag.isEmpty())) {
+            try {
+                int  nh = Integer.parseInt (tflag);
+                nhuge = nh;
+            }
+            catch (Throwable ex) {
+            }
+        }
+
+        if (nhuge > MAX_HUGE) nhuge = MAX_HUGE;
+
+long  maxmem = Runtime.getRuntime().maxMemory ();
+long  totmem = Runtime.getRuntime().totalMemory ();
+
+System.out.println ();
+System.out.println ("maxmem = " + maxmem + "   total mem = " + totmem);
+System.out.println ();
+System.out.println ("Huge grid nhuge = " + nhuge);
+System.out.println ();
+System.out.flush ();
+
+        try {
+            gdata = new double[nhuge * nhuge];
+        }
+        catch (Throwable ex) {
+            System.out.println ();
+            System.out.println ("Cannot new the huge grid array");
+            System.out.println (ex.getMessage());
+            System.out.println ();
+            return;
+        }
+
+        for (i=0; i<nhuge; i++) {
+            jstart = i * nhuge;
+            dy = (double)i * yspace;
+            for (j=0; j<nhuge; j++) {
+                k = jstart + j;
+                dx = (double)j * xspace;
+                dist = dx * dx + dy * dy;
+                dist = Math.sqrt (dist);
+                double dnoise = random.nextDouble () - .5;
+                gdata[k] = dist + dnoise * nfact;
+                if (gdata[k] > gmax) gmax = gdata[k];
+            }
+        }
+
+        try {
+          Grid grid = new Grid (
+            gdata,
+            nhuge,
+            nhuge,
+            5.0,
+            5.0,
+            90.0,
+            90.0,
+            0.0,
+            null
+          );
+
+          DLSurfaceProperties dlp = new DLSurfaceProperties ();
+          ColorPalette cpal = new ColorPalette();
+          dl.setImageColors (cpal, 0.0, gmax * 1.01);
+          dl.addGrid ("test huge grid",
+                        grid,
+                        dlp);
+
+          logger.info ("    HugeGridTest populate Finished");
+        }
+        catch (Throwable ex) {
+          System.out.println ("Exception thrown in huge grid calculation and/or display");
+          System.out.println (ex.getMessage());
+          System.out.println ();
+          System.out.flush ();
+          return;
+        }
+
+totmem = Runtime.getRuntime().totalMemory ();
+
+System.out.println ();
+System.out.println ("After add grid total mem = " + totmem);
+System.out.println ();
+System.out.flush ();
+
+    }
+};
+
+/*
+ * Class for running the HugeGridTest stuff in separate threads.
+ */
+class HGWorker extends SwingWorker<Integer, Void> {
+
+    HugeGridTest    hg = null;
+
+    HGWorker (HugeGridTest  hgin)
+    {
+         hg = hgin;
+    }
+
+    protected Integer doInBackground () {
+System.out.println ();
+System.out.println ("Enter huge grid do in background");
+System.out.flush ();
+        hg.populateDlist ();
+        return 0;
+    }
+
+    protected void done () {
+System.out.println ("Enter huge grid done");
+System.out.println ();
+System.out.flush ();
+        hg.setVisible (true);
+    }
+
+}
+
+
+
+/**
+ * This class has a runnable that first populates the specified
+ * HugeFrame object.  After this object has been populated, the
+ * frame is made visible, which triggers the drawing of the objects
+ * previously set via the populateDlist method.
+ */
+class HugeGridRunnable implements Runnable {
+
+    HugeGridTest     hg;
+
+    public HugeGridRunnable (HugeGridTest hgin) {hg = hgin;}
+
+    public void run () {
+
+//  I will use the environment variable for turning
+//  threads on and off both here and surfaceworks
+
+      String  tflag = System.getenv ("CSW_DONT_USE_THREADS");
+
+      if (tflag == null  ||  tflag.isEmpty()) {
+        HGWorker hgw = new HGWorker (hg);
+        hgw.execute ();
+      }
+      else {
+System.out.println ("Huge Grid not using threads");
+System.out.flush ();
+        hg.populateDlist ();
+        hg.setVisible (true);
+      }
+
+    }
+
+}
