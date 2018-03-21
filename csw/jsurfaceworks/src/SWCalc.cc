@@ -1076,7 +1076,6 @@ int SWCalc::sw_CalcGrid (
         gymin = grid_geometry->ymin;
         gxmax = grid_geometry->xmax;
         gymax = grid_geometry->ymax;
-printf ("grid geometry from user\n");
     }
     else {
         gxmin = 1.e30;
@@ -1096,11 +1095,7 @@ printf ("grid geometry from user\n");
             ncol /= 10;
             nrow /= 10;
         }
-printf ("grid geometry from default\n");
     }
-
-printf ("ncol = %d  nrow = %d\n", ncol, nrow);
-fflush (stdout);
 
     if (grid_geometry != NULL) {
         ncol = grid_geometry->ncol;

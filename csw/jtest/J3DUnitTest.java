@@ -47,8 +47,6 @@ import csw.j3d.src.*;
 */
 public class J3DUnitTest {
 
-    //private static Logger  logger = CSWLogger.getMyLogger ();
-
     static {
         System.loadLibrary ("_csw_all");
         System.loadLibrary ("gluegen-rt");
@@ -281,15 +279,6 @@ class SimplestFrame extends JFrame
         color = new Color (0, 0, 255, 200);
         createSurface (-20.0, 0.0, -5.00, 60.0, 50.0, 2.00, color, false);
 
-/*
-        createPlane (Color.green, 0.0, 1.0, 0.0);
-        createPlane (Color.red, 0.0, 0.0, 1.0);
-*/
-
-        //xsurf = -20.0;
-        //ysurf = -20.0;
-        //zsurf = -12.00;
-
         J3DText  tp;
 
         tp = new J3DText ();
@@ -298,15 +287,10 @@ class SimplestFrame extends JFrame
         tp.setTextSize (1.0);
         tp.setText ("Text Line");
         tp.setGlobalColor (null);
-        //panel.addText (tp);
-
-        //addRandomPoints ();
 
         panel.redrawAll ();
 
     }
-
-    //private Frame              parentFrame = null;
 
 
     void createPlane (Color color, double c0, double c1, double c2)
@@ -344,8 +328,6 @@ class SimplestFrame extends JFrame
 
         JSurfaceWorks sw = new JSurfaceWorks ();
 
-        //GridGeometry geom =
-        //new GridGeometry (100, 100, xmin, ymin, xmax, ymax);
 
         TriMesh tmesh = sw.calcTriMesh
         (
@@ -415,8 +397,6 @@ class SimplestFrame extends JFrame
 
         JSurfaceWorks sw = new JSurfaceWorks ();
 
-        //GridGeometry geom =
-        //new GridGeometry (100, 100, xmin, ymin, xmax, ymax);
 
         TriMesh tmesh = sw.calcTriMesh
         (
@@ -485,17 +465,9 @@ class SimplestFrame extends JFrame
     }
 
 
-    //private double xsurf, ysurf, zsurf;
-
 /*----------------------------------------------------------------------------------*/
 
     private J3DFault newFault = null;
-    //private boolean editActive = false;
-
-   //private boolean linePickFlag = true;
-
-    //private static final int NEW_FAULT_PATCH_MODE = 1;
-    //private static final int NEW_HORIZON_PATCH_MODE = 2;
 
 /*----------------------------------------------------------------------------------*/
 
@@ -516,34 +488,7 @@ class SimplestFrame extends JFrame
 
         return;
     }
-/*
-    private void cancelSurfaceEdit ()
-    {
 
-        newFault = null;
-
-        panel.redrawAll ();
-
-        editActive = false;
-
-        return;
-    }
-*/
-    /*
-    private void resetSurfaceEdit ()
-    {
-
-        if (newFault == null) {
-            newFault = new J3DFault ();
-        }
-
-        newFault.setVisible(false);
-
-        panel.redrawAll ();
-
-        return;
-    }
-*/
 /*--------------------------------------------------------------------------*/
 
     public void showEditSurface (boolean draw)
@@ -649,26 +594,6 @@ class SimplestFrame extends JFrame
     }
 
 /*-------------------------------------------------------------------------------*/
-/*
-    private JButton makeJButton (String txt)
-    {
-        JButton       jb;
-        jb = new JButton (txt);
-        jb.setBorderPainted (false);
-        jb.setMargin (new Insets (3, 0, 3, 0));
-        return jb;
-    }
-
-    private JCheckBox makeJCheckBox (String txt, boolean b)
-    {
-        JCheckBox     jb;
-        jb = new JCheckBox (txt, b);
-        jb.setBorderPainted (false);
-        jb.setMargin (new Insets (3, 0, 3, 0));
-        return jb;
-    }
-*/
-/*--------------------------------------------------------------------------------*/
 
 /*
  * Implement the J3DLineEditListener methods.
@@ -812,7 +737,7 @@ class SimplestFrame extends JFrame
 
 /*----------------------------------------------------------------------------------*/
 
-}
+}  // end of SimplestFrame Class
 
 
 /*----------------------------------------------------------------------------------*/
@@ -822,7 +747,6 @@ class TmeshFileFrame extends JFrame
 {
     public static final long     serialVersionUID = 1341046;
 
-    //private String                 fileName;
     private JTextField             tField;
     private JTextField             tField2;
     private JTextField             tField3;
@@ -1026,27 +950,6 @@ class TmeshFileFrame extends JFrame
             hp.setGlobalColor (Color.gray);
             hp.setSurfaceName ("testsurf");
             panel.addHorizonPatch (hp);
-
-        /*
-            tmesh.calcTriangleCenters ();
-            double[] xc = tmesh.getXCenters ();
-            double[] yc = tmesh.getYCenters ();
-            double[] zc = tmesh.getZCenters ();
-            int    nc = tmesh.getNumCenters ();
-
-            J3DText    jt;
-
-            for (int i=0; i<nc; i++) {
-                if (xc[i] < 360000  ||  xc[i] > 375000) continue;
-                if (yc[i] < 7208000  ||  yc[i] > 7232000) continue;
-                jt = new J3DText ();
-                jt.setAnchor (5);
-                jt.setXYZ (xc[i], yc[i], zc[i]);
-                jt.setText (""+i);
-                jt.setGlobalColor (Color.red);
-                panel.addText (jt);
-            }
-          */
         }
 
         DBLineList   dbline;
