@@ -446,17 +446,11 @@ class GFWorker extends SwingWorker<Integer, Void> {
     }
 
     protected Integer doInBackground () {
-System.out.println ();
-System.out.println ("enter doInBackground for surf calc");
-System.out.flush ();
         gf.populateDlist ();
         return 0;
     }
 
     protected void done () {
-System.out.println ("enter done for surf calc");
-System.out.println ();
-System.out.flush ();
         gf.setVisible (true);
     }
 
@@ -582,9 +576,6 @@ class Grid10Frame extends JDLFrame
             null
         );
 
-System.out.println ("sw grid calc finished");
-System.out.flush ();
-
         dl.beginPlot ("grid test" + np,
                       0.0, 0.0, 20.0, 20.0);
         dl.setColor (5, 5, 5);
@@ -608,9 +599,6 @@ System.out.flush ();
         dl.addGrid ("test grid 10",
                     grid,
                     dlp);
-
-System.out.println ("sw dl add grid finished");
-System.out.flush ();
 
     }
 

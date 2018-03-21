@@ -180,7 +180,31 @@ public class JEasyXTest {
          return;
     }
     */
+
+
+    static void showMem (String  msg)
+    {
+
+/*
+        long  maxmem = Runtime.getRuntime().maxMemory ();
+        long  totmem = Runtime.getRuntime().totalMemory ();
+
+        maxmem /= 1000000;
+        totmem /= 1000000;
+
+        System.out.println ();
+        System.out.println ("maxmem = " + maxmem + "   total mem = " + totmem);
+        if (msg != null) {
+            System.out.println (msg);
+        }
+        System.out.println ();
+        System.out.flush ();
+*/
+
+    }
+
 }
+
 
 class JEasyXTestFrame extends JFrame
 {
@@ -1751,17 +1775,11 @@ class HFWorker extends SwingWorker<Integer, Void> {
     }
 
     protected Integer doInBackground () {
-System.out.println ();
-System.out.println ("Enter ezx do in background");
-System.out.flush ();
         hf.populateDlist ();
         return 0;
     }
 
     protected void done () {
-System.out.println ("Enter ezx done");
-System.out.println ();
-System.out.flush ();
         hf.setVisible (true);
     }
 
@@ -3074,22 +3092,14 @@ class HugeGridTest extends JDLFrame
 
         if (nhuge > MAX_HUGE) nhuge = MAX_HUGE;
 
-long  maxmem = Runtime.getRuntime().maxMemory ();
-long  totmem = Runtime.getRuntime().totalMemory ();
-
-System.out.println ();
-System.out.println ("maxmem = " + maxmem + "   total mem = " + totmem);
-System.out.println ();
-System.out.println ("Huge grid nhuge = " + nhuge);
-System.out.println ();
-System.out.flush ();
+        JEasyXTest.showMem ("Start huge grid nhuge = " + nhuge);
 
         try {
             gdata = new double[nhuge * nhuge];
         }
         catch (Throwable ex) {
             System.out.println ();
-            System.out.println ("Cannot new the huge grid array");
+            System.out.println ("Cannot new the huge grid array for nhuge = " + nhuge);
             System.out.println (ex.getMessage());
             System.out.println ();
             return;
@@ -3139,12 +3149,7 @@ System.out.flush ();
           return;
         }
 
-totmem = Runtime.getRuntime().totalMemory ();
-
-System.out.println ();
-System.out.println ("After add grid total mem = " + totmem);
-System.out.println ();
-System.out.flush ();
+        JEasyXTest.showMem ("End huge grid nhuge = " + nhuge);
 
     }
 };
@@ -3162,17 +3167,11 @@ class HGWorker extends SwingWorker<Integer, Void> {
     }
 
     protected Integer doInBackground () {
-System.out.println ();
-System.out.println ("Enter huge grid do in background");
-System.out.flush ();
         hg.populateDlist ();
         return 0;
     }
 
     protected void done () {
-System.out.println ("Enter huge grid done");
-System.out.println ();
-System.out.flush ();
         hg.setVisible (true);
     }
 
@@ -3211,5 +3210,4 @@ System.out.flush ();
       }
 
     }
-
 }

@@ -21,6 +21,9 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <iostream>
+#include <exception>
+
 #include "csw/hlevutils/src/simulate_new.h"
 
 #include "csw/jeasyx/private_include/DisplayList.h"
@@ -1268,6 +1271,11 @@ int CDisplayList::AddLine (double *xptsin, double *yptsin,
             line_prim_list.push_back (lpr);
             next_line = (int)line_prim_list.size() - 1;
         }
+        catch (std::exception &e) {
+            printf ("Exception in line_prim_list pushback\n");
+            std::cout << e.what() << std::endl;
+            return 0;
+        }
         catch (...) {
             printf ("Exception in line_prim_list pushback\n");
             return 0;
@@ -2139,7 +2147,13 @@ int CDisplayList::add_available_contour (int prim_num) {
     try {
         contour_available_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in contour_available_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in contour_available_list pushback\n");
         return -1;
     }
 
@@ -2175,7 +2189,13 @@ int CDisplayList::add_available_contour_line (int prim_num) {
     try {
         contour_line_available_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in contour_line_available_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in contour_line_available_list pushback\n");
         return -1;
     }
 
@@ -2200,7 +2220,13 @@ int CDisplayList::add_available_line (int prim_num) {
     try {
         line_available_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in line_available_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in line_available_list pushback\n");
         return -1;
     }
 
@@ -2237,7 +2263,13 @@ int CDisplayList::add_available_fill (int prim_num) {
     try {
         fill_available_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in fill_available_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in fill_available_list pushback\n");
         return -1;
     }
 
@@ -2274,7 +2306,13 @@ int CDisplayList::add_available_text (int prim_num) {
     try {
         text_available_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in text_available_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in text_available_list pushback\n");
         return -1;
     }
 
@@ -2311,7 +2349,13 @@ int CDisplayList::add_available_symb (int prim_num) {
     try {
         symb_available_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in symb_available_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in symb_available_list pushback\n");
         return -1;
     }
 
@@ -2348,7 +2392,13 @@ int CDisplayList::add_available_shape (int prim_num) {
     try {
         shape_available_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in shape_available_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in shape_available_list pushback\n");
         return -1;
     }
 
@@ -2385,7 +2435,13 @@ int CDisplayList::add_available_axis (int prim_num) {
     try {
         axis_available_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in axis_available_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in axis_available_list pushback\n");
         return -1;
     }
 
@@ -2422,7 +2478,13 @@ int CDisplayList::add_available_image (int prim_num) {
     try {
         image_available_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in image_available_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in image_available_list pushback\n");
         return -1;
     }
 
@@ -2496,7 +2558,13 @@ int CDisplayList::add_contour_line_patch_prim (int prim_num)
             contour_line_patch_list.push_back(prim_num);
         }
     }
+    catch (std::exception &e) {
+        printf ("Exception in contour_line_patch_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in contour_line_patch_list pushback\n");
         return -1;
     }
 
@@ -2522,7 +2590,13 @@ int CDisplayList::add_line_patch_prim (int prim_num)
             line_patch_list.push_back(prim_num);
         }
     }
+    catch (std::exception &e) {
+        printf ("Exception in line_patch_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in line_patch_list pushback\n");
         return -1;
     }
 
@@ -2547,7 +2621,13 @@ int CDisplayList::add_fill_patch_prim (int prim_num)
             fill_patch_list.push_back(prim_num);
         }
     }
+    catch (std::exception &e) {
+        printf ("Exception in fill_patch_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in fill_patch_list pushback\n");
         return -1;
     }
 
@@ -2573,7 +2653,13 @@ int CDisplayList::add_text_patch_prim (int prim_num)
             text_patch_list.push_back(prim_num);
         }
     }
+    catch (std::exception &e) {
+        printf ("Exception in text_patch_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in text_patch_list pushback\n");
         return -1;
     }
 
@@ -2599,7 +2685,13 @@ int CDisplayList::add_symb_patch_prim (int prim_num)
             symb_patch_list.push_back(prim_num);
         }
     }
+    catch (std::exception &e) {
+        printf ("Exception in symb_patch_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in symb_patch_list pushback\n");
         return -1;
     }
 
@@ -2626,7 +2718,13 @@ int CDisplayList::add_shape_patch_prim (int prim_num)
             shape_patch_list.push_back(prim_num);
         }
     }
+    catch (std::exception &e) {
+        printf ("Exception in shape_patch_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in shape_patch_list pushback\n");
         return -1;
     }
 
@@ -2923,6 +3021,11 @@ int CDisplayList::AddFill (double *xptsin, double *yptsin,
             ZeroInit (&fpr, sizeof(fpr));
             fill_prim_list.push_back (fpr);
             next_fill = (int)fill_prim_list.size() - 1;
+        }
+        catch (std::exception &e) {
+            printf ("Exception in fill_prim_list pushback\n");
+            std::cout << e.what() << std::endl;
+            return 0;
         }
         catch (...) {
             printf ("Exception in fill_prim_list pushback\n");
@@ -3644,6 +3747,11 @@ int CDisplayList::AddText (double x, double y, double size, double angle,
             text_prim_list.push_back (tpr);
             next_text = (int)text_prim_list.size() - 1;
         }
+        catch (std::exception &e) {
+            printf ("Exception in text_prim_list pushback\n");
+            std::cout << e.what() << std::endl;
+            return 0;
+        }
         catch (...) {
             printf ("Exception in text_prim_list pushback\n");
             return 0;
@@ -4359,6 +4467,11 @@ int CDisplayList::AddSymb (double x, double y, double size, double angle,
             symb_prim_list.push_back (spr);
             next_symb = (int)symb_prim_list.size() - 1;
         }
+        catch (std::exception &e) {
+            printf ("Exception in symb_prim_list pushback\n");
+            std::cout << e.what() << std::endl;
+            return 0;
+        }
         catch (...) {
             printf ("Exception in symb_prim_list pushback\n");
             return 0;
@@ -4926,6 +5039,11 @@ int CDisplayList::AddShape (int shape_type,
             ZeroInit (&hpr, sizeof(hpr));
             shape_prim_list.push_back (hpr);
             next_shape = (int)shape_prim_list.size() - 1;
+        }
+        catch (std::exception &e) {
+            printf ("Exception in shape_prim_list pushback\n");
+            std::cout << e.what() << std::endl;
+            return 0;
         }
         catch (...) {
             printf ("Exception in shape_prim_list pushback\n");
@@ -7390,7 +7508,13 @@ void CDisplayList::AddSelectableObject (int object_index)
         SNF;
         dls = new DLSelectable ();
     }
+    catch (std::exception &e) {
+        printf ("Exception in DLSelectable new\n");
+        std::cout << e.what() << std::endl;
+        dls = NULL;
+    }
     catch (...) {
+        printf ("Exception in DLSelectable new\n");
         dls = NULL;
     }
     selectable_object_list[object_index] = dls;
@@ -8130,6 +8254,11 @@ int CDisplayList::AddColorImage (unsigned char *red,
             ZeroInit (&ipr, sizeof(ipr));
             image_prim_list.push_back (ipr);
             next_image = (int)image_prim_list.size() - 1;
+        }
+        catch (std::exception &e) {
+            printf ("Exception in image_prim_list pushback\n");
+            std::cout << e.what() << std::endl;
+            return -1;
         }
         catch (...) {
             printf ("Exception in image_prim_list pushback\n");
@@ -11135,7 +11264,14 @@ int CDisplayList::AddContour (
         SNF;
         dlc = new DLContour ();
     }
+    catch (std::exception &e) {
+        printf ("Exception in new DLContour\n");
+        std::cout << e.what() << std::endl;
+        dlc = NULL;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in new DLContour\n");
         dlc = NULL;
         return -1;
     }
@@ -11154,7 +11290,13 @@ int CDisplayList::AddContour (
         try {
             contour_list.push_back (dlc);
         }
+        catch (std::exception &e) {
+            printf ("Exception in contour_list pushback\n");
+            std::cout << e.what() << std::endl;
+            return -1;
+        }
         catch (...) {
+            printf ("Exception in contour_list pushback\n");
             return -1;
         }
         nextprim = contour_list.size() - 1;
@@ -11221,7 +11363,14 @@ int CDisplayList::AddGrid (
         SNF;
         dlg = new DLSurf ();
     }
+    catch (std::exception &e) {
+        printf ("Exception in new DLSurf\n");
+        std::cout << e.what() << std::endl;
+        dlg = NULL;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in new DLSurf\n");
         dlg = NULL;
         return -1;
     }
@@ -11229,7 +11378,13 @@ int CDisplayList::AddGrid (
     try {
         surf_list.push_back (dlg);
     }
+    catch (std::exception &e) {
+        printf ("Exception in surf_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in surf_list pushback\n");
         return -1;
     }
 
@@ -11856,7 +12011,20 @@ void CDisplayList::reclip_frame_contours (int fnum)
             SNF;
             page_con = new DLContour ();
         }
+        catch (std::bad_alloc &e) {
+            printf ("Exception in new DLContour for page_con\n");
+            std::cout << e.what() << std::endl;
+            page_con = NULL;
+            break;
+        }
+        catch (std::exception &e) {
+            printf ("Exception in new DLContour for page_con\n");
+            std::cout << e.what() << std::endl;
+            page_con = NULL;
+            continue;
+        }
         catch (...) {
+            printf ("Exception in new DLContour for page_con\n");
             page_con = NULL;
             continue;
         }
@@ -12045,6 +12213,11 @@ int CDisplayList::AddContourLine (CSW_F *xpts_in, CSW_F *ypts_in, int npts)
             ZeroInit (&cpr, sizeof(cpr));
             contour_line_prim_list.push_back (cpr);
             next_line = (int)contour_line_prim_list.size() - 1;
+        }
+        catch (std::exception &e) {
+            printf ("Exception in contour_line_prim_list pushback\n");
+            std::cout << e.what() << std::endl;
+            return -1;
         }
         catch (...) {
             printf ("Exception in contour_line_prim_list pushback\n");
@@ -12394,6 +12567,11 @@ int CDisplayList::AddGridColorImage (int fnum,
             image_prim_list.push_back (ipr);
             next_image = (int)image_prim_list.size() - 1;
         }
+        catch (std::exception &e) {
+            printf ("Exception in image_prim_list pushback\n");
+            std::cout << e.what() << std::endl;
+            return -1;
+        }
         catch (...) {
             printf ("Exception in image_prim_list pushback\n");
             return -1;
@@ -12505,9 +12683,6 @@ void CDisplayList::reclip_frame_grid_images (int fnum)
 
     save_current_graphic_attributes ();
 
-printf ("\nin reclip grid images func:  num image = \n" + sf_size);
-fflush (stdout);
-
     for (i=0; i<sf_size; i++) {
 
         grid = sf_data[i];
@@ -12531,9 +12706,6 @@ fflush (stdout);
         grid->CalcImage ((void *)this);
 
     }
-
-printf ("finished with reclip grid images func\n");
-fflush (stdout);
 
     unsave_current_graphic_attributes ();
 
@@ -12593,7 +12765,14 @@ int CDisplayList::AddTriMesh (
         dlg = new DLSurf ();
         surf_list.push_back (dlg);
     }
+    catch (std::exception &e) {
+        printf ("Exception in surf_list pushback\n");
+        std::cout << e.what() << std::endl;
+        dlg = NULL;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in surf_list pushback\n");
         dlg = NULL;
         return -1;
     }
@@ -17618,7 +17797,20 @@ void CDisplayList::reclip_and_draw_selected_contours (DLSelectable *dls)
             SNF;
             page_con = new DLContour ();
         }
+        catch (std::bad_alloc &e) {
+            printf ("Exception in new DLContour for page_con\n");
+            std::cout << e.what() << std::endl;
+            page_con = NULL;
+            break;
+        }
+        catch (std::exception &e) {
+            printf ("Exception in new DLContour for page_con\n");
+            std::cout << e.what() << std::endl;
+            page_con = NULL;
+            continue;
+        }
         catch (...) {
+            printf ("Exception in new DLContour for page_con\n");
             page_con = NULL;
             continue;
         }
@@ -18029,6 +18221,11 @@ int CDisplayList::AddAxis (
             ZeroInit (&apr, sizeof(apr));
             axis_prim_list.push_back (apr);
             next_axis = (int)axis_prim_list.size() - 1;
+        }
+        catch (std::exception &e) {
+            printf ("Exception in axis_prim_list pushback\n");
+            std::cout << e.what() << std::endl;
+            return 0;
         }
         catch (...) {
             printf ("Exception in axis_prim_list pushback\n");
@@ -20137,7 +20334,13 @@ int CDisplayList::add_hidden_contour (int prim_num) {
     try {
         contour_hidden_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in contour_hidden_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in contour_hidden_list pushback\n");
         return -1;
     }
 
@@ -20157,7 +20360,13 @@ int CDisplayList::add_hidden_line (int prim_num) {
     try {
         line_hidden_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in line_hidden_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in line_hidden_list pushback\n");
         return -1;
     }
 
@@ -20177,7 +20386,13 @@ int CDisplayList::add_hidden_fill (int prim_num) {
     try {
         fill_hidden_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in fill_hidden_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in fill_hidden_list pushback\n");
         return -1;
     }
 
@@ -20197,7 +20412,13 @@ int CDisplayList::add_hidden_text (int prim_num) {
     try {
         text_hidden_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in text_hidden_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in text_hidden_list pushback\n");
         return -1;
     }
 
@@ -20217,7 +20438,13 @@ int CDisplayList::add_hidden_symb (int prim_num) {
     try {
         symb_hidden_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in symb_hidden_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in symb_hidden_list pushback\n");
         return -1;
     }
 
@@ -20237,7 +20464,13 @@ int CDisplayList::add_hidden_shape (int prim_num) {
     try {
         shape_hidden_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in shape_hidden_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in shape_hidden_list pushback\n");
         return -1;
     }
 
@@ -20257,7 +20490,13 @@ int CDisplayList::add_hidden_axis (int prim_num) {
     try {
         axis_hidden_list.push_back (prim_num);
     }
+    catch (std::exception &e) {
+        printf ("Exception in axis_hidden_list pushback\n");
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
     catch (...) {
+        printf ("Exception in axis_hidden_list pushback\n");
         return -1;
     }
 
