@@ -29,6 +29,8 @@ typedef struct {
 class CanvasManager
 {
 
+    int      ifile = 0;
+
   public:
 
     CanvasManager () {};

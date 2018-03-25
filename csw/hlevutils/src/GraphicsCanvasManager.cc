@@ -66,7 +66,8 @@ int CanvasManager::CreateGraphicsCanvas ()
         cptr = cl_data + i;
         if (cptr->dlist == NULL) {
             try {
-                cptr->dlist = new CDisplayList (i);
+                cptr->dlist = new CDisplayList (i, ifile);
+                ifile++;
             }
             catch (...) {
                 printf ("\n*****  caught new exception creating display list  *****\n\n");
@@ -101,7 +102,8 @@ int CanvasManager::CreateGraphicsCanvas ()
     cptr = cl_data + cl_size - 1;
 
     try {
-        cptr->dlist = new CDisplayList (cl_size - 1);
+        cptr->dlist = new CDisplayList (cl_size - 1, ifile);
+        ifile++;
     }
     catch (...) {
         printf ("\n*****  caught new exception on display list  *****\n\n");
