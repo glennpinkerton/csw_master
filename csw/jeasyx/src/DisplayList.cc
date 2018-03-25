@@ -61,9 +61,28 @@ void CDisplayList::ZeroInit (T p, int n) {
 /*
  * Constructor
  */
-CDisplayList::CDisplayList(int index)
+CDisplayList::CDisplayList(int index, int ifile)
 {
     int          i;
+
+// Open the playback log file if needed.  This log is meant to stay
+// open for the lifetime of the CDisplayList, so it is not manually
+// closed.  The ofstream destructor will close it when the CDisplayList
+// is deleted.
+
+#ifdef _EZX_DEBUG_LOG_FILE_
+    std::string pbf_name = "csw/jtest/pbfile_" + std::to_string(ifile)+".txt";
+    try {
+        pbfile.open (pbf_name);
+        if (pbfile.is_open() == false) {
+            std::cout << "pbfile open failed" << std::endl;
+        }
+    }
+    catch (std::exception &e) {
+        std::cout << "Exception opening playback log file " << pbf_name << std::endl;
+        std::cout << e.what() << std::endl;
+    }
+#endif
 
     gtx_drawprim_obj.SetEZXJavaPtr (&ezx_java_obj);
 
@@ -21599,3 +21618,26 @@ void CDisplayList::unconvert_frame_dist (int fnum, CSW_F *dist)
 
     return;
 }
+
+
+
+void CDisplayList::OutputForPlayback (const char *lfline) {
+
+#ifdef _EZX_DEBUG_LOG_FILE_
+        try {
+            if (pbfile.is_open()) {
+                if (lfline != NULL) {
+                    std::string pbstr;
+                    pbstr.append (lfline);
+                    pbfile << pbstr;
+                }
+            }
+        }
+        catch (std::exception &e) {
+            std::cout << "Exception in OutputForPlayback" << std::endl;
+            std::cout << e.what() << std::endl;
+        }
+#endif
+
+    };
+

@@ -23,6 +23,11 @@
  */
 #include <stdio.h>
 #include <vector>
+#include <string>
+
+#include <exception>
+#include <iostream>
+#include <fstream>
 
 #include <csw/utils/private_include/gpf_calcdraw.h>
 #include <csw/utils/private_include/gpf_spline.h>
@@ -51,9 +56,27 @@
 #include <csw/jeasyx/private_include/gtx_frinfoP.h>
 #include <csw/jeasyx/private_include/gtx_layerP.h>
 
+/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ *
+ * NOTE THAT THIS FLAG SHOULD **NEVER** BE SET TO 1 FOR
+ * ANYTHING OTHER THAN DEBUGGING CODE
+ *
+ * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ */
+#ifndef _EZX_DEBUG_LOG_FILE_
+#define _EZX_DEBUG_LOG_FILE_        1
+#endif
+
 #ifndef _DISPLAYLIST_H_
 #define _DISPLAYLIST_H_
 
+/*
+ * This debug flag is the mechanism used for debugging the
+ * native side of the 2d graphics code.  Eventually, this
+ * will be set to zero, but for the first several usages
+ * from application programmers, I will keep it set at 1 so
+ * I can debug native code problems that come up.
+ */
 #define _BIG_CHUNK_SIZE_            100
 #define _MEDIUM_CHUNK_SIZE_         100
 #define _SMALL_CHUNK_SIZE_          10
@@ -77,12 +100,14 @@ private:
     CSWPolyUtils   ply_utils_obj;
     GTXDrawPrim    gtx_drawprim_obj;
 
+    std::ofstream  pbfile;
+
 
 public:
 
     EZXJavaArea    ezx_java_obj;
 
-    CDisplayList(int index);
+    CDisplayList(int index, int ifile);
     CDisplayList (const CDisplayList &old);
     CDisplayList &operator=(const CDisplayList &old);
     virtual ~CDisplayList();
@@ -93,6 +118,8 @@ public:
     {
          ezx_java_obj.SetJNIPtrs (v_jenv_in, v_jobj_in);
     }
+
+    void OutputForPlayback (const char *lfline);
 
   /*
    * Set and get various boundary stuff

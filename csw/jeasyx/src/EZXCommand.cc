@@ -34,12 +34,11 @@
  * ANYTHING OTHER THAN DEBUGGING CODE
  *
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- */
 #define _EZX_DEBUG_LOG_FILE_        1
+ */
 
 #include <stdio.h>
 
-//#include "csw/jeasyx/private_include/DisplayListJNI.h"
 #include "csw/jeasyx/private_include/DisplayList.h"
 #include "csw/jeasyx/private_include/EZXCommand.h"
 #include "csw/jeasyx/private_include/EZXJavaArea.h"
@@ -55,6 +54,12 @@
 
 #include <csw/utils/private_include/TextBounds.h>
 
+
+// The DLF macro is used to write a separate playback log file for
+// each display list object.  This keeps the playback commands from
+// being scrambled in concurrent thread situations.
+
+#define DLF if (dlist) dlist->OutputForPlayback(LogFileLine);
 
 
 /*
@@ -170,13 +175,16 @@ int ezx_process_command (
     if (command_id == GTX_DELETEWINDOW) {
 
       #if _EZX_DEBUG_LOG_FILE_
+        dlist = canvas_manager_ptr->GetDisplayList (dlist_index);
+
         if (LogFile) {
             if (command_id < GTX_OPEN_LOG_FILE  ||
                 command_id > GTX_CLOSE_LOG_FILE) {
                 sprintf (LogFileLine, "\ncommand=%d\n", command_id);
-                fputs (LogFileLine, LogFile);
+                DLF
                 sprintf (LogFileLine, "%d\n", ilist[0]);
-                fputs (LogFileLine, LogFile);
+                DLF
+                dlist = NULL;
             }
         }
       #endif
@@ -197,7 +205,7 @@ int ezx_process_command (
             command_id > GTX_CLOSE_LOG_FILE) {
             sprintf (LogFileLine, "\ncommand=%d %d\n",
                      command_id, dlist_index);
-            fputs (LogFileLine, LogFile);
+            DLF
         }
     }
 #endif
@@ -213,17 +221,9 @@ int ezx_process_command (
     dlist = canvas_manager_ptr->GetDisplayList (dlist_index);
 
     if (dlist == NULL) {
-        if (LogFile == NULL) {
-            java_num = ezx_create_new_dlist_data ();
-            dlist = canvas_manager_ptr->GetDisplayList (java_num);
-            if (dlist == NULL) {
-                printf ("\ncannot create native display list  java_num = %ld\n\n",
-                         java_num);
-                fflush (stdout);
-                return -1;
-            }
-        }
-        else {
+        java_num = ezx_create_new_dlist_data ();
+        dlist = canvas_manager_ptr->GetDisplayList (java_num);
+        if (dlist == NULL) {
             printf ("\ncannot create native display list  java_num = %ld\n\n",
                      java_num);
             fflush (stdout);
@@ -239,6 +239,7 @@ int ezx_process_command (
 
     primnum = -1;
 
+
 /*
  * This giant switch statement processes each command.
  * If we get this far, the dlist pointer is valid.
@@ -253,7 +254,7 @@ int ezx_process_command (
           #if _EZX_DEBUG_LOG_FILE_
             if (LogFile) {
                 sprintf (LogFileLine, "\n##// %s\n", cdata);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -333,7 +334,7 @@ int ezx_process_command (
             if (LogFile) {
                 strcpy (LogFileLine, cdata);
                 strcat (LogFileLine, "\n");
-                fputs (LogFileLine, LogFile);
+                DLF
                 sprintf (LogFileLine,
                          "%d %d %d %ld %.15e %.15e %.15e %.15e\n",
                          new_dlindex,
@@ -345,7 +346,7 @@ int ezx_process_command (
                          ddata[2],
                          ddata[3]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -377,7 +378,7 @@ int ezx_process_command (
                          ilist[0],
                          ilist[1]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -411,7 +412,7 @@ int ezx_process_command (
                          ddata[3],
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -447,7 +448,7 @@ int ezx_process_command (
                          "%.15e\n",
                          ddata[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -487,7 +488,7 @@ int ezx_process_command (
             if (LogFile) {
                 strcpy (LogFileLine, cdata);
                 strcat (LogFileLine, "\n");
-                fputs (LogFileLine, LogFile);
+                DLF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e\n",
                          ddata[0],
@@ -495,7 +496,7 @@ int ezx_process_command (
                          ddata[2],
                          ddata[3]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e\n",
                          ddata[4],
@@ -503,7 +504,7 @@ int ezx_process_command (
                          ddata[6],
                          ddata[7]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e %.15e %.15e\n",
                          ddata[8],
@@ -513,7 +514,7 @@ int ezx_process_command (
                          ddata[12],
                          ddata[13]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
                 sprintf (LogFileLine,
                          "%d %d %d %d %d %d %d\n",
                          ilist[0],
@@ -524,7 +525,7 @@ int ezx_process_command (
                          ilist[5],
                          ilist[6]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -593,7 +594,7 @@ int ezx_process_command (
                     strcpy (LogFileLine, cdata);
                 }
                 strcat (LogFileLine, "\n");
-                fputs (LogFileLine, LogFile);
+                DLF
                 sprintf (LogFileLine,
                          "%d %d %d %d %d %d %d %d %d %d %d %d\n",
                          ilist[0],
@@ -608,7 +609,7 @@ int ezx_process_command (
                          ilist[9],
                          ilist[10],
                          ilist[11]);
-                fputs (LogFileLine, LogFile);
+                DLF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e\n",
                          ddata[0],
@@ -621,7 +622,7 @@ int ezx_process_command (
                          ddata[7],
                          ddata[8],
                          ddata[9]);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -682,7 +683,7 @@ int ezx_process_command (
             if (LogFile) {
                 strcpy (LogFileLine, cdata);
                 strcat (LogFileLine, "\n");
-                fputs (LogFileLine, LogFile);
+                DLF
                 sprintf (LogFileLine,
                          "%d %d %d %d %d %d %d %d %d %d %d %d\n",
                          ilist[0],
@@ -697,14 +698,14 @@ int ezx_process_command (
                          ilist[9],
                          ilist[10],
                          ilist[11]);
-                fputs (LogFileLine, LogFile);
+                DLF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e\n",
                          ddata[0],
                          ddata[1],
                          ddata[2],
                          ddata[3]);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -745,7 +746,7 @@ int ezx_process_command (
             if (LogFile) {
                 strcpy (LogFileLine, cdata);
                 strcat (LogFileLine, "\n");
-                fputs (LogFileLine, LogFile);
+                DLF
                 sprintf (LogFileLine,
                          "%d %.15e %.15e %.15e %.15e\n",
                          ilist[0],
@@ -753,7 +754,7 @@ int ezx_process_command (
                          ddata[1],
                          ddata[2],
                          ddata[3]);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -788,7 +789,7 @@ int ezx_process_command (
                          ilist[3],
                          ilist[4],
                          ilist[5]);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -821,7 +822,7 @@ int ezx_process_command (
                          ilist[2],
                          ilist[3],
                          ilist[4]);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -846,7 +847,7 @@ int ezx_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -867,7 +868,7 @@ int ezx_process_command (
                          "%s\n",
                          cdata
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e\n",
                          ddata[0],
@@ -875,7 +876,7 @@ int ezx_process_command (
                          ddata[2],
                          ddata[3]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -901,7 +902,7 @@ int ezx_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -920,7 +921,7 @@ int ezx_process_command (
             if (LogFile) {
                 strcpy (LogFileLine, cdata);
                 strcat (LogFileLine, "\n");
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -948,7 +949,7 @@ int ezx_process_command (
                          ilist[3],
                          ilist[4]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1031,7 +1032,7 @@ int ezx_process_command (
                          ilist[2],
                          ilist[3]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1062,7 +1063,7 @@ int ezx_process_command (
                          ilist[2],
                          ilist[3]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1088,7 +1089,7 @@ int ezx_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1113,13 +1114,13 @@ int ezx_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
                 for (i=0; i<ilist[0]; i++) {
                     sprintf (LogFileLine,
                              "%.15e %.15e\n",
                              ddata[i],
                              ddata[ilist[0]+i]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
             }
           #endif
@@ -1145,7 +1146,7 @@ int ezx_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1176,19 +1177,19 @@ int ezx_process_command (
                          ilist[1],
                          ilist[2]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
                 for (i=0; i<ilist[0]; i++) {
                     sprintf (LogFileLine,
                              "%d\n",
                              idata[i]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
                 for (i=0; i<ilist[1]; i++) {
                     sprintf (LogFileLine,
                              "%.15e %.15e\n",
                              ddata[i],
                              ddata[ilist[1] + i]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
             }
           #endif
@@ -1226,7 +1227,7 @@ int ezx_process_command (
                          ddata[3],
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1253,7 +1254,7 @@ int ezx_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1285,10 +1286,10 @@ int ezx_process_command (
                          ddata[2],
                          ddata[3]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
                 strcpy (LogFileLine, cdata);
                 strcat (LogFileLine, "\n");
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1332,7 +1333,7 @@ int ezx_process_command (
                          ilist[0],
                          ilist[1]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1372,7 +1373,7 @@ int ezx_process_command (
                          ddata[6],
                          ddata[7]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1437,7 +1438,7 @@ int ezx_process_command (
                           ddata[2],
                           ddata[3]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
                 ntot = ilist[1] * ilist[2];
                 if (ilist[0] == 0) {
                     for (i=0; i<ntot; i++) {
@@ -1448,7 +1449,7 @@ int ezx_process_command (
                                  bdata[i+2*ntot],
                                  bdata[i+3*ntot]
                                 );
-                        fputs (LogFileLine, LogFile);
+                        DLF
                     }
                 }
                 else if (ilist[0] == 1) {
@@ -1457,7 +1458,7 @@ int ezx_process_command (
                                  "%.15e\n",
                                  ddata[i]
                                 );
-                        fputs (LogFileLine, LogFile);
+                        DLF
                     }
                 }
                 else if (ilist[0] == 2) {
@@ -1466,7 +1467,7 @@ int ezx_process_command (
                                  "%.15e\n",
                                  fdata[i]
                                 );
-                        fputs (LogFileLine, LogFile);
+                        DLF
                     }
                 }
                 else if (ilist[0] == 3) {
@@ -1475,7 +1476,7 @@ int ezx_process_command (
                                  "%d\n",
                                  idata[i]
                                 );
-                        fputs (LogFileLine, LogFile);
+                        DLF
                     }
                 }
                 else if (ilist[0] == 4) {
@@ -1484,7 +1485,7 @@ int ezx_process_command (
                                  "%hd\n",
                                  sdata[i]
                                 );
-                        fputs (LogFileLine, LogFile);
+                        DLF
                     }
                 }
                 else if (ilist[0] == 5) {
@@ -1493,7 +1494,7 @@ int ezx_process_command (
                                  "%hd\n",
                                  bdata[i]
                                 );
-                        fputs (LogFileLine, LogFile);
+                        DLF
                     }
                 }
             }
@@ -1598,7 +1599,7 @@ int ezx_process_command (
                          ilist[0],
                          ddata[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1621,7 +1622,7 @@ int ezx_process_command (
                          ilist[0],
                          ddata[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1642,7 +1643,7 @@ int ezx_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1662,7 +1663,7 @@ int ezx_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1682,7 +1683,7 @@ int ezx_process_command (
                          "%.15e\n",
                          ddata[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1702,7 +1703,7 @@ int ezx_process_command (
                          "%.15e\n",
                          ddata[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1722,7 +1723,7 @@ int ezx_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1744,7 +1745,7 @@ int ezx_process_command (
                          ddata[0],
                          ddata[1]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1772,13 +1773,13 @@ int ezx_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
                 for (i=0; i<n; i++) {
                     sprintf (LogFileLine,
                              "%.15e %.15e %d %d %d %d\n",
                              ddata[i], ddata[n+i],
                              idata[i], idata[n+i], idata[2*n+i], idata[3*n+i]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
             }
           #endif
@@ -1799,7 +1800,7 @@ int ezx_process_command (
             if (LogFile) {
                 strcpy (LogFileLine, cdata);
                 strcat (LogFileLine, "\n");
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1828,7 +1829,7 @@ int ezx_process_command (
                          ilist[3],
                          ilist[4]
                         );
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1851,7 +1852,7 @@ int ezx_process_command (
             if (LogFile) {
                 strcpy (LogFileLine, cdata);
                 strcat (LogFileLine, "\n");
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1869,7 +1870,7 @@ int ezx_process_command (
             if (LogFile) {
                 strcpy (LogFileLine, cdata);
                 strcat (LogFileLine, "\n");
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -1923,11 +1924,11 @@ int ezx_process_command (
             if (LogFile) {
                 for (i=0; i<45; i++) {
                     sprintf (LogFileLine, "%d\n", idata[i]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
                 for (i=0; i<23; i++) {
                     sprintf (LogFileLine, "%.15e\n", ddata[i]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
             }
           #endif
@@ -1947,12 +1948,12 @@ int ezx_process_command (
                          "%d %d\n",
                          ilist[0],
                          ilist[1]);
-                fputs (LogFileLine, LogFile);
+                DLF
                 for (i=0; i<ilist[0]; i++) {
                     sprintf (LogFileLine,
                              "%d\n",
                              idata[i]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
                 for (i=0; i<ilist[1]; i++) {
                     sprintf (LogFileLine,
@@ -1960,7 +1961,7 @@ int ezx_process_command (
                              ddata[i],
                              ddata[i+ilist[1]],
                              ddata[i+2*ilist[1]]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
             }
           #endif
@@ -2002,14 +2003,14 @@ int ezx_process_command (
             if (LogFile) {
                 strcpy (LogFileLine, cdata);
                 strcat (LogFileLine, "\n");
-                fputs (LogFileLine, LogFile);
+                DLF
 
                 sprintf (LogFileLine,
                          "%d %d %d\n",
                          ilist[0],
                          ilist[1],
                          ilist[2]);
-                fputs (LogFileLine, LogFile);
+                DLF
 
                 n = ilist[0];
                 for (i=0; i<n; i++) {
@@ -2019,7 +2020,7 @@ int ezx_process_command (
                              ddata[i+n],
                              ddata[i+2*n],
                              idata[i]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
                 nstart = n;
                 n = ilist[1];
@@ -2031,7 +2032,7 @@ int ezx_process_command (
                              idata[nstart + 2 * n + i],
                              idata[nstart + 3 * n + i],
                              idata[nstart + 4 * n + i]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
 
                 nstart += 5 * n;
@@ -2043,7 +2044,7 @@ int ezx_process_command (
                              idata[nstart + n + i],
                              idata[nstart + 2 * n + i],
                              idata[nstart + 3 * n + i]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
 
             }
@@ -2087,14 +2088,14 @@ int ezx_process_command (
                 sprintf (LogFileLine, "%d %d\n",
                          ilist[0],
                          ilist[1]);
-                fputs (LogFileLine, LogFile);
+                DLF
                 for (i=0; i<ilist[0]; i++) {
                     sprintf (LogFileLine, "%d\n", idata[i]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
                 for (i=0; i<ilist[1]*2; i++) {
                     sprintf (LogFileLine, "%.15e\n", ddata[i]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
             }
           #endif
@@ -2125,7 +2126,7 @@ int ezx_process_command (
             if (LogFile) {
                 strcpy (LogFileLine, cdata);
                 strcat (LogFileLine, "\n");
-                fputs (LogFileLine, LogFile);
+                DLF
 
                 sprintf (LogFileLine,
                          "%d %d %.15e %.15e %.15e %.15e %.15e\n",
@@ -2136,14 +2137,14 @@ int ezx_process_command (
                          ddata[2],
                          ddata[3],
                          ddata[4]);
-                fputs (LogFileLine, LogFile);
+                DLF
 
                 n = ilist[0] * ilist[1];
                 for (i=0; i<n; i++) {
                     sprintf (LogFileLine,
                              "%.15e\n",
                              ddata[i+5]);
-                    fputs (LogFileLine, LogFile);
+                    DLF
                 }
             }
           #endif
@@ -2179,7 +2180,7 @@ int ezx_process_command (
                          ilist[0],
                          ilist[1],
                          ilist[2]);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -2208,7 +2209,7 @@ int ezx_process_command (
                          ilist[0],
                          ilist[1],
                          ilist[2]);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -2239,7 +2240,7 @@ int ezx_process_command (
                          ilist[0],
                          ilist[1],
                          ilist[2]);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -2263,7 +2264,7 @@ int ezx_process_command (
                 sprintf (LogFileLine,
                          "%d\n",
                          ilist[0]);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -2284,7 +2285,7 @@ int ezx_process_command (
                 sprintf (LogFileLine,
                          "%d\n",
                          ilist[0]);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -2305,7 +2306,7 @@ int ezx_process_command (
                 sprintf (LogFileLine,
                          "%d\n",
                          ilist[0]);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
@@ -2328,7 +2329,7 @@ int ezx_process_command (
                          "%d %d\n",
                          ilist[0],
                          ilist[1]);
-                fputs (LogFileLine, LogFile);
+                DLF
             }
           #endif
 
