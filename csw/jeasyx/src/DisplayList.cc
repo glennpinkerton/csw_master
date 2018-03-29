@@ -71,16 +71,19 @@ CDisplayList::CDisplayList(int index, int ifile)
 // is deleted.
 
 #ifdef _EZX_DEBUG_LOG_FILE_
-    std::string pbf_name = "csw/jtest/pbfile_" + std::to_string(ifile)+".txt";
-    try {
-        pbfile.open (pbf_name);
-        if (pbfile.is_open() == false) {
-            std::cout << "pbfile open failed" << std::endl;
+    char *pbenv = getenv ("CSW_DONT_WRITE_PLAYBACK");
+    if (pbenv == NULL) {
+        std::string pbf_name = "csw/jtest/pbfile_" + std::to_string(ifile)+".txt";
+        try {
+            pbfile.open (pbf_name);
+            if (pbfile.is_open() == false) {
+                std::cout << "pbfile open failed" << std::endl;
+            }
         }
-    }
-    catch (std::exception &e) {
-        std::cout << "Exception opening playback log file " << pbf_name << std::endl;
-        std::cout << e.what() << std::endl;
+        catch (std::exception &e) {
+            std::cout << "Exception opening playback log file " << pbf_name << std::endl;
+            std::cout << e.what() << std::endl;
+        }
     }
 #endif
 

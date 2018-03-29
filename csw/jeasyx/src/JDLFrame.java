@@ -16,6 +16,8 @@ import java.lang.Exception;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -69,6 +71,8 @@ public class JDLFrame extends JFrame {
         init (type);
     }
 
+    JEasyXGraphicsPanel  gpanel = null;
+    JDisplayListPanel dpanel = null;
 
 /**
  *  Called by constructors to do the work of initializing the specified
@@ -81,13 +85,13 @@ public class JDLFrame extends JFrame {
         setResizable (true);
 
         if (type == FRAME_WITH_TOOLBAR) {
-          JEasyXGraphicsPanel gpanel = new JEasyXGraphicsPanel (BorderLayout.NORTH);
+          gpanel = new JEasyXGraphicsPanel (BorderLayout.NORTH);
           Container contentPane = getContentPane ();
           contentPane.add (gpanel);
           dl = gpanel.getDisplayList ();
         }
         else {
-          JDisplayListPanel dpanel = new JDisplayListPanel ();
+          dpanel = new JDisplayListPanel ();
           Container contentPane = getContentPane ();
           contentPane.add (dpanel);
           dl = dpanel.getDisplayList ();
@@ -98,6 +102,17 @@ public class JDLFrame extends JFrame {
         long  nid = 0;
 
         JDLFrameList.addFrame (nid, this);
+
+        addWindowListener (new WindowAdapter () {
+            public void windowDeactivated (WindowEvent e) {
+                if (dpanel != null) {
+                    dpanel.forceZoomQuit ();
+                }
+                else if (gpanel != null) {
+                    gpanel.forceZoomQuit ();
+                }
+            }
+        });
 
     }
 

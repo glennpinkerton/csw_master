@@ -48,6 +48,8 @@ int main (int argc, char *argv[])
     argc = argc;
     argv = argv;
 
+    setenv ("CSW_DONT_WRITE_PLAYBACK", "1", 1);
+
     bool  btest_mode = false;
     char  tfname[200];
 
@@ -3572,6 +3574,8 @@ int main (int argc, char *argv[])
     }
 
     fprintf (stdout, "SurfaceWorks native test completed.\n");
+
+    unsetenv ("CSW_DONT_WRITE_PLAYBACK");
 
     return 0;
 

@@ -95,6 +95,7 @@ EXE_LIBS=\
   $(CSW_PARENT)/csw/lib/jsurf.a \
   $(CSW_PARENT)/csw/lib/jeasyx.a \
   $(CSW_PARENT)/csw/lib/hlutil.a \
+  $(CSW_PARENT)/csw/lib/jsurf.a \
   $(CSW_PARENT)/csw/lib/jeasyx.a \
   $(CSW_PARENT)/csw/lib/surf.a \
   $(CSW_PARENT)/csw/lib/utils.a

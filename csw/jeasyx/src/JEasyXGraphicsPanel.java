@@ -379,6 +379,12 @@ public class JEasyXGraphicsPanel extends JPanel {
     return graphPanel;
   }
 
+  public void forceZoomQuit ()
+  {
+    graphPanel.resetModes ();
+  }
+
+
 /*---------------------------------------------------------------------------*/
 
   /**

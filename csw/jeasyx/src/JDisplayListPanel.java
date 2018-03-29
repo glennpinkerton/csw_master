@@ -108,6 +108,22 @@ public class JDisplayListPanel extends JPanel
         return dlist;
     }
 
+
+/**
+ This method is called when the top level frame is about to
+ become inactive.  This can happen when another frame is made
+ visible on top of this panel's top level frame.  If this happens
+ while the user is selecting a zoom rectangle or while the user
+ is moving the mouse in a pan action, the zoom or pan action is
+ cancelled.
+*/
+    public void forceZoomQuit ()
+    {
+        if (zoomStarted != 0  ||  panStarted != 0) {
+            resetModes ();
+        }
+    }
+
 /*---------------------------------------------------------------------------*/
 
     void startPanMode ()

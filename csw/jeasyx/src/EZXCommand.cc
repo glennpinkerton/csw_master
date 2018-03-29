@@ -111,13 +111,8 @@ int ezx_process_command (
     int nrow;
     int n, nstart;
 
-    FILE  *LogFile = NULL;
-
     auto fscope = [&]()
     {
-        if (LogFile) {
-            fflush (LogFile);
-        }
     };
     CSWScopeGuard func_scope_guard (fscope);
 
@@ -142,23 +137,8 @@ int ezx_process_command (
      */
 #if _EZX_DEBUG_LOG_FILE_
 
-    LogFile = ThreadGuard::GetEZLogFile (9999);
-    if (command_id == GTX_OPEN_LOG_FILE) {
-        if (LogFile == NULL) {
-            LogFile = fopen (cdata, "wb");
-        }
-        ThreadGuard::SetEZLogFile (9999, LogFile);
-        return 1;
-    }
+    bool LogFile = true;
 
-    if (command_id ==  GTX_CLOSE_LOG_FILE) {
-        if (LogFile) {
-            fclose (LogFile);
-            LogFile = NULL;
-            ThreadGuard::SetEZLogFile (9999, NULL);
-        }
-        return 1;
-    }
 #else
     if (command_id == GTX_OPEN_LOG_FILE) {
         return 1;

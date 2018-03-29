@@ -47,6 +47,8 @@ namespace ThreadGuard
     std::map <long, FILE*> sw_log_file_map;
     std::map <long, FILE*> ez_log_file_map;
 
+    int  ifile = 0;
+
 }  // end of ThreadGuard namespace
 
 
@@ -366,7 +368,8 @@ SWCalc  *ThreadGuard::GetSWCalc (long jside_id)
         if (sw == NULL) {
             try {
                 SNF;
-                sw = new SWCalc ();
+                sw = new SWCalc (ThreadGuard::ifile);
+                ThreadGuard::ifile++;
             }
             catch (...) {
                 printf ("\n***** Exception from new in GetSWCalc *****\n\n");
@@ -380,7 +383,8 @@ SWCalc  *ThreadGuard::GetSWCalc (long jside_id)
 
     try {
         SNF;
-        sw = new SWCalc ();
+        sw = new SWCalc (ThreadGuard::ifile);
+        ThreadGuard::ifile++;
     }
     catch (...) {
         printf ("\n***** Exception from new in GetSWCalc *****\n\n");

@@ -5,3 +5,18 @@ lpath=/usr/java/jdk1.8.0_152/jre/lib/amd64
 echo
 cd $CSW_PARENT
 java -Xmx2g -Djava.library.path=$CSW_PARENT/csw/lib  csw.jtest.$@
+
+cd csw/jtest
+
+if [ -e "pbfile_0.txt" ]
+then
+  cat pb*.txt > utest.ezx
+  rm -f pb*.txt
+fi
+
+if [ -e "swfile_0.txt" ]
+then
+  cat sw*.txt > utest.sw
+  rm -f sw*.txt
+fi
+
