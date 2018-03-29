@@ -13,6 +13,8 @@
 #ifndef _SW_CALC_H_
 #define _SW_CALC_H_
 
+#include <fstream>
+
 #include <csw/surfaceworks/include/grid_api.h>
 #include <csw/surfaceworks/private_include/grd_triangle_class.h>
 #include <csw/surfaceworks/private_include/Vert.h>
@@ -70,10 +72,12 @@ class SWCalc
     void       *v_jenv = NULL;
     void       *v_jobj = NULL;
 
+    std::ofstream   pbfile;
+
 
   public:
 
-    SWCalc () {};
+    SWCalc (int ifile);
     ~SWCalc () {};
 
     void SetGrdAPIPtr (CSWGrdAPI *p) {
@@ -205,6 +209,8 @@ class SWCalc
 
 
   public:
+
+    void OutputForPlayback (const char *lfline);
 
     void free_drape_lines (void);
     void free_drape_points (void);

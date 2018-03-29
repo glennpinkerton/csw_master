@@ -28,6 +28,8 @@ JAVA_SRC=\
  DLZoomPanAdapter.java\
  DLZoomPanListener.java\
  FontUtils.java\
+ JDLFrame.java\
+ JDLFrameList.java\
  JDisplayList.java\
  JDisplayListPanel.java\
  JDLEditListener.java\
@@ -63,6 +65,8 @@ JAVA_CLASSES=\
  DLZoomPanAdapter.class\
  DLZoomPanListener.class\
  FontUtils.class\
+ JDLFrame.class\
+ JDLFrameList.class\
  JDisplayList.class\
  JDisplayListPanel.class\
  JDLEditListener.class\
@@ -106,7 +110,7 @@ LIB_FILE=$(LIB_PREFIX)jeasyx$(LIB_SUFFIX)
 SHL_FILE=$(SHARED_LIB_PREFIX)_csw_all$(SHARED_LIB_SUFFIX)
 SHL_BOOT=shr_lib_link$(OBJ_SUFFIX)
 
-SHL_LIBS=\
+#SHL_LIBS=\
  $(LIB_FILE)\
  $(CSW_LIBS)\
  $(OTHER_LIBS)
@@ -120,7 +124,17 @@ EXE_OBJS=\
 EXE_FILE=\
  ezx_test$(EXE_SUFFIX)
 
-EXE_LIBS=$(SHL_LIBS)
+#EXE_LIBS=$(SHL_LIBS)
+
+EXE_LIBS=\
+  $(CSW_PARENT)/csw/lib/jsurf.a \
+  $(CSW_PARENT)/csw/lib/jeasyx.a \
+  $(CSW_PARENT)/csw/lib/hlutil.a \
+  $(CSW_PARENT)/csw/lib/jsurf.a \
+  $(CSW_PARENT)/csw/lib/jeasyx.a \
+  $(CSW_PARENT)/csw/lib/surf.a \
+  $(CSW_PARENT)/csw/lib/utils.a
+
 
 all: prog
 

@@ -30,6 +30,7 @@
 
  ***************************************************************************
 */
+#include <stdlib.h>
 #include <stdio.h>
 
 #include "csw/jeasyx/private_include/EZXCommand.h"
@@ -67,6 +68,8 @@ int main (int argc, char *argv[])
 
     argc = argc;
     argv = argv;
+
+    setenv ("CSW_DONT_WRITE_PLAYBACK", "1", 1);
 
     bool  btest_mode = false;
     char  tfname[200];
@@ -2291,6 +2294,8 @@ int main (int argc, char *argv[])
     if (dfile != NULL) {
         fclose (dfile);
     }
+
+//    unsetenv ("CSW_DONT_WRITE_PLAYBACK");
 
     return 1;
 

@@ -10,6 +10,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <iostream>
 
 #ifndef PRIVATE_HEADERS_OK
 #define PRIVATE_HEADERS_OK
@@ -29,9 +30,67 @@
 #include "csw/utils/private_include/ply_protoP.h"
 
 
+#define _SW_DEBUG_LOG_FILE_ 1
 
 
 /*-----------------------------------------------------------------*/
+
+
+/*
+ * Constructor has an int parametger to use in opening a unique (for the
+ * java virtual machine calling this) file name for playback testing.
+ */
+
+SWCalc::SWCalc (int ifile)
+{
+
+// Open the playback log file if needed.  This log is meant to stay
+// open for the lifetime of the SWCalc object, so it is not manually
+// closed.  The ofstream destructor will close it when the SWCalc
+// object is deleted.
+
+#ifdef _SW_DEBUG_LOG_FILE_
+    char *pbenv = getenv ("CSW_DONT_WRITE_PLAYBACK");
+    if (pbenv == NULL) {
+        std::string pbf_name = "csw/jtest/swfile_" + std::to_string(ifile)+".txt";
+        try {
+            pbfile.open (pbf_name);
+            if (pbfile.is_open() == false) {
+                std::cout << "pbfile open failed" << std::endl;
+            }
+        }
+        catch (std::exception &e) {
+            std::cout << "Exception opening playback log file " << pbf_name << std::endl;
+            std::cout << e.what() << std::endl;
+        }
+    }
+#endif
+
+}
+
+
+void SWCalc::OutputForPlayback (const char *lfline) {
+
+#ifdef _SW_DEBUG_LOG_FILE_
+        try {
+            if (pbfile.is_open()) {
+                if (lfline != NULL) {
+                    std::string pbstr;
+                    pbstr.append (lfline);
+                    pbfile << pbstr;
+                }
+            }
+        }
+        catch (std::exception &e) {
+            std::cout << "Exception in OutputForPlayback" << std::endl;
+            std::cout << e.what() << std::endl;
+        }
+#endif
+
+    };
+
+
+
 
 /*
  * Specify the bounds of the model.  This must be done prior to

@@ -191,10 +191,10 @@ catch (Exception e) {
           }
         });
 
-        JButton huge_grid_10_button = new JButton (100 * nphint + " Point Grid");
+        JButton huge_grid_10_button = new JButton (80 * nphint + " Point Grid");
         huge_grid_10_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                Grid10Frame gf = new Grid10Frame (100 * nphint, false);
+                Grid10Frame gf = new Grid10Frame (80 * nphint, false);
                 Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
                 SwingUtilities.invokeLater (run_frame);
           }
@@ -588,7 +588,9 @@ class Grid10Frame extends JDLFrame
                        200.0);
 
         DLSurfaceProperties dlp = new DLSurfaceProperties ();
-        dlp.setShowNodes (true);
+        if (np < 2000) {
+            dlp.setShowNodes (true);
+        }
         //dlp.setShowColorFills (false);
         ColorPalette cpal = new ColorPalette();
         double zmin = grid.getZMin ();

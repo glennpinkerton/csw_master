@@ -34,6 +34,12 @@
 
 #define _SW_DEBUG_LOG_FILE_     1
 
+// The DLSF macro is used to write a separate playback log file for
+// each display list object.  This keeps the playback commands from
+// being scrambled in concurrent thread situations.
+
+#define DLSF if (swcalc) swcalc->OutputForPlayback(LogFileLine);
+
 
 /*
  * Macros to clean up lines, points, etc.
@@ -186,34 +192,8 @@ long sw_process_command (
     start = start;
 
   #if _SW_DEBUG_LOG_FILE_
-    FILE *LogFile = ThreadGuard::GetSWLogFile (threadid);
-    FILE *SaveLogFile = ThreadGuard::GetSWSaveLogFile (threadid);
+    bool LogFile = true;
     char LogFileLine[1000];
-    if (command_id == SW_OPEN_LOG_FILE) {
-
-        if (LogFile  ||  SaveLogFile) {
-            return 1;
-        }
-        LogFile = fopen (cdata, "wb");
-        if (LogFile == NULL) {
-            return -1;
-        }
-        SaveLogFile = NULL;
-        ThreadGuard::SetSWLogFiles (threadid, LogFile, SaveLogFile);
-        return 1;
-    }
-    if (command_id == SW_PAUSE_LOG_FILE) {
-        SaveLogFile = LogFile;
-        LogFile = NULL;
-        ThreadGuard::SetSWLogFiles (threadid, LogFile, SaveLogFile);
-        return 1;
-    }
-    if (command_id == SW_RESTART_LOG_FILE) {
-        LogFile = SaveLogFile;
-        SaveLogFile = NULL;
-        ThreadGuard::SetSWLogFiles (threadid, LogFile, SaveLogFile);
-        return 1;
-    }
   #else
     if (command_id == SW_OPEN_LOG_FILE) {
         return 1;
@@ -229,8 +209,7 @@ long sw_process_command (
   #if _SW_DEBUG_LOG_FILE_
     if (LogFile) {
         sprintf (LogFileLine, "command=%d\n", command_id);
-        fputs (LogFileLine, LogFile);
-        fflush (LogFile);
+        DLSF
     }
   #endif
 
@@ -262,7 +241,6 @@ long sw_process_command (
         case SW_SET_LINES:
 
           printf ("in SW_SET_LINES section of command processer\n");
-          fflush (stdout);
 
           #if _SW_DEBUG_LOG_FILE_
             if (LogFile) {
@@ -272,7 +250,7 @@ long sw_process_command (
                          ilist[1],
                          ilist[2]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nline; i++) {
                     sprintf (LogFileLine,
@@ -280,7 +258,7 @@ long sw_process_command (
                              idata[i],
                              idata[nline+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 npts = ilist[1];
                 for (i=0; i<npts; i++) {
@@ -290,7 +268,7 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -302,7 +280,6 @@ long sw_process_command (
             zflag = ilist[2];
             if (nline < 1  ||  ntot < 2) {
                 printf ("nline or ntot bad\n");
-                fflush (stdout);
                 break;
             }
 
@@ -322,7 +299,6 @@ long sw_process_command (
                 Npline == NULL) {
                 free_lines;
                 printf ("bad csw_Malloc nline = %d\n", nline);
-                fflush (stdout);
                 break;
             }
 
@@ -356,7 +332,7 @@ long sw_process_command (
                          ilist[0],
                          ilist[1]
                         );
-                fputs (LogFileLine, LogFile);
+                DLSF
                 npts = ilist[0];
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
@@ -365,7 +341,7 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs (LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -426,7 +402,7 @@ long sw_process_command (
                          ddata[3],
                          ddata[4],
                          ddata[5]);
-                fputs (LogFileLine, LogFile);
+                DLSF
             }
           #endif
 
@@ -461,7 +437,7 @@ long sw_process_command (
                          ddata[3],
                          ddata[4],
                          ddata[5]);
-                fputs (LogFileLine, LogFile);
+                DLSF
             }
           #endif
 
@@ -490,7 +466,7 @@ long sw_process_command (
                          ilist[0],
                          dlist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLSF
                 npts = ilist[0];
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
@@ -498,9 +474,8 @@ long sw_process_command (
                              ddata[i],
                              ddata[npts+i]
                             );
-                    fputs (LogFileLine, LogFile);
+                    DLSF
                 }
-                fflush (LogFile);
             }
           #endif
 
@@ -537,7 +512,7 @@ long sw_process_command (
                          ilist[2],
                          ilist[3]
                         );
-                fputs (LogFileLine, LogFile);
+                DLSF
                 npts = ilist[0];
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
@@ -546,9 +521,8 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs (LogFileLine, LogFile);
+                    DLSF
                 }
-                fflush (LogFile);
             }
           #endif
 
@@ -607,7 +581,7 @@ long sw_process_command (
                          ilist[2],
                          ilist[3]
                         );
-                fputs (LogFileLine, LogFile);
+                DLSF
                 npts = ilist[0];
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
@@ -616,9 +590,8 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs (LogFileLine, LogFile);
+                    DLSF
                 }
-                fflush (LogFile);
             }
           #endif
 
@@ -698,7 +671,7 @@ long sw_process_command (
                          ilist[10],
                          ilist[11]
                         );
-                fputs (LogFileLine, LogFile);
+                DLSF
                 sprintf (LogFileLine,
                          "%f %f %f %f %f %f\n",
                          ddata[0],
@@ -708,7 +681,7 @@ long sw_process_command (
                          ddata[4],
                          ddata[5]
                         );
-                fputs (LogFileLine, LogFile);
+                DLSF
             }
           #endif
 
@@ -760,7 +733,7 @@ long sw_process_command (
                          ddata[2],
                          ddata[3]
                         );
-                fputs (LogFileLine, LogFile);
+                DLSF
             }
           #endif
 
@@ -793,12 +766,13 @@ long sw_process_command (
         case SW_CALC_GRID:
 
           #if _SW_DEBUG_LOG_FILE_
+
             if (LogFile) {
                 sprintf (LogFileLine,
                          "%d\n",
                          ilist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLSF
                 npts = ilist[0];
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
@@ -807,7 +781,7 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs (LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -862,7 +836,7 @@ long sw_process_command (
                          ilist[1],
                          ilist[2]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nline; i++) {
                     sprintf (LogFileLine,
@@ -870,7 +844,7 @@ long sw_process_command (
                              idata[i],
                              idata[nline+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 npts = ilist[1];
                 for (i=0; i<npts; i++) {
@@ -880,7 +854,7 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -944,7 +918,7 @@ long sw_process_command (
                          "%d\n",
                          ilist[1]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 npts = ilist[1];
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
@@ -953,7 +927,7 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -1000,7 +974,7 @@ long sw_process_command (
                          ilist[1],
                          ilist[2]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -1009,7 +983,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -1019,7 +993,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -1028,7 +1002,7 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -1072,7 +1046,7 @@ long sw_process_command (
                          ilist[3],
                          ilist[4]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -1081,7 +1055,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -1091,7 +1065,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -1100,7 +1074,7 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -1151,7 +1125,7 @@ long sw_process_command (
                          ilist[5],
                          dlist[6]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -1160,7 +1134,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -1170,7 +1144,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -1179,10 +1153,9 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
-            fflush (LogFile);
           #endif
 
             istat = (long) psplit->ps_SetSedimentSurface (
@@ -1231,7 +1204,7 @@ long sw_process_command (
                          ilist[5],
                          dlist[6]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -1240,7 +1213,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -1250,7 +1223,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -1259,10 +1232,9 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
-            fflush (LogFile);
           #endif
 
             istat = (long) psplit->ps_SetModelBottom (
@@ -1310,7 +1282,7 @@ long sw_process_command (
                          ilist[5],
                          dlist[6]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -1319,7 +1291,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -1329,7 +1301,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -1338,9 +1310,8 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
-                fflush (LogFile);
             }
           #endif
 
@@ -1373,8 +1344,7 @@ long sw_process_command (
                 sprintf (LogFileLine,
                          "%d\n",
                          ilist[0]);
-                fputs (LogFileLine, LogFile);
-                fflush (LogFile);
+                DLSF
             }
           #endif
 
@@ -1393,8 +1363,7 @@ long sw_process_command (
                 sprintf (LogFileLine,
                          "%.15e\n",
                          dlist[0]);
-                fputs (LogFileLine, LogFile);
-                fflush (LogFile);
+                DLSF
             }
           #endif
 
@@ -1451,7 +1420,7 @@ long sw_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
             }
           #endif
 
@@ -1489,7 +1458,7 @@ long sw_process_command (
                          "%f\n",
                          ddata[0]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
             }
           #endif
 
@@ -1526,7 +1495,7 @@ long sw_process_command (
                          dlist[0],
                          dlist[1]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
             }
           #endif
 
@@ -1562,7 +1531,7 @@ long sw_process_command (
                          ilist[2],
                          ilist[3]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 npts = ilist[0];
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
@@ -1571,7 +1540,7 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -1608,7 +1577,7 @@ long sw_process_command (
                          ilist[0],
                          ilist[1]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 npts = ilist[0];
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
@@ -1617,7 +1586,7 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -1682,7 +1651,7 @@ long sw_process_command (
                          ilist[6],
                          ilist[7]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e\n",
                          dlist[0],
@@ -1694,7 +1663,7 @@ long sw_process_command (
                          dlist[6],
                          dlist[7]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -1703,7 +1672,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -1713,7 +1682,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -1722,7 +1691,7 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 n0 = nnode * 3;
                 for (i=0; i<nline2; i++) {
@@ -1732,7 +1701,7 @@ long sw_process_command (
                               ddata[n0+nline2+i],
                               ddata[n0+2*nline2+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -1808,7 +1777,7 @@ long sw_process_command (
                          ilist[4],
                          ilist[5]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e\n",
                          dlist[0],
@@ -1820,7 +1789,7 @@ long sw_process_command (
                          dlist[6],
                          dlist[7]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -1829,7 +1798,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -1839,7 +1808,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -1848,7 +1817,7 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -1897,7 +1866,7 @@ long sw_process_command (
                          ilist[1],
                          ilist[2]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 npts = ilist[0];
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
@@ -1906,7 +1875,7 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -1947,7 +1916,7 @@ long sw_process_command (
                          ilist[0],
                          ilist[1]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 npts = ilist[0];
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
@@ -1956,7 +1925,7 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -1993,7 +1962,7 @@ long sw_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e %.15e %.15e\n",
                          ddata[0],
@@ -2003,7 +1972,7 @@ long sw_process_command (
                          ddata[4],
                          ddata[5]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
             }
           #endif
 
@@ -2044,7 +2013,7 @@ long sw_process_command (
                          ilist[0],
                          ilist[1]
                         );
-                fputs (LogFileLine, LogFile);
+                DLSF
                 npts = ilist[0];
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
@@ -2053,7 +2022,7 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs (LogFileLine, LogFile);
+                    DLSF
                 }
                 npts = ilist[1];
                 for (i=0; i<npts; i++) {
@@ -2063,9 +2032,8 @@ long sw_process_command (
                              idata[npts+i],
                              idata[2*npts+i]
                             );
-                    fputs (LogFileLine, LogFile);
+                    DLSF
                 }
-                fflush (LogFile);
             }
           #endif
 
@@ -2119,8 +2087,9 @@ long sw_process_command (
 
           #if _SW_DEBUG_LOG_FILE_
             if (LogFile) {
-                fputs (cdata, LogFile);
-                fputs ("\n", LogFile);
+                DLSF
+                sprintf (LogFileLine, "\n");
+                DLSF
                 sprintf (LogFileLine,
                          "%d %d %d %d %d\n",
                          ilist[0],
@@ -2129,7 +2098,7 @@ long sw_process_command (
                          ilist[3],
                          ilist[4]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e %.15e %.15e\n",
                          dlist[0],
@@ -2139,7 +2108,7 @@ long sw_process_command (
                          dlist[4],
                          dlist[5]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -2148,7 +2117,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -2158,7 +2127,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -2167,7 +2136,7 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -2202,10 +2171,12 @@ long sw_process_command (
 
           #if _SW_DEBUG_LOG_FILE_
             if (LogFile) {
-                fputs (cdata, LogFile);
-                fputs ("\n", LogFile);
+                strcpy (LogFileLine, cdata);
+                DLSF
+                sprintf (LogFileLine, "\n");
+                DLSF
                 sprintf (LogFileLine, "%li", llist[0]);
-                fputs (LogFileLine, LogFile);
+                DLSF
             }
           #endif
 
@@ -2222,8 +2193,10 @@ long sw_process_command (
 
           #if _SW_DEBUG_LOG_FILE_
             if (LogFile) {
-                fputs (cdata, LogFile);
-                fputs ("\n", LogFile);
+                strcpy (LogFileLine, cdata);
+                DLSF
+                strcpy (LogFileLine, "\n");
+                DLSF
             }
           #endif
 
@@ -2252,7 +2225,7 @@ long sw_process_command (
                          ilist[0],
                          dlist[0]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
                              "%.15e %.15e %.15e\n",
@@ -2260,7 +2233,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -2297,7 +2270,7 @@ long sw_process_command (
                          ilist[0],
                          ilist[1]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e %.15e\n",
                          dlist[0],
@@ -2306,14 +2279,14 @@ long sw_process_command (
                          dlist[3],
                          dlist[4]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nnode = ilist[0] * ilist[1];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
                              "%.15e\n",
                              ddata[i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -2361,14 +2334,14 @@ long sw_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
                              "%.15e %.15e\n",
                              ddata[i],
                              ddata[npts+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -2401,21 +2374,21 @@ long sw_process_command (
                          "%d\n",
                          ilist[0]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e\n",
                          dlist[0],
                          dlist[1],
                          dlist[2]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
                              "%.15e %.15e\n",
                              ddata[i],
                              ddata[npts+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -2455,7 +2428,7 @@ long sw_process_command (
                          ilist[1],
                          dlist[0]
                         );
-                fputs (LogFileLine, LogFile);
+                DLSF
                 npts = ilist[0];
                 for (i=0; i<npts; i++) {
                     sprintf (LogFileLine,
@@ -2463,7 +2436,7 @@ long sw_process_command (
                              ddata[i],
                              ddata[npts+i]
                             );
-                    fputs (LogFileLine, LogFile);
+                    DLSF
                 }
                 n0 = npts * 2;
                 npts = ilist[1];
@@ -2473,9 +2446,8 @@ long sw_process_command (
                              ddata[i+n0],
                              ddata[npts+i+n0]
                             );
-                    fputs (LogFileLine, LogFile);
+                    DLSF
                 }
-                fflush (LogFile);
             }
           #endif
 
@@ -2505,7 +2477,7 @@ long sw_process_command (
                          ilist[0],
                          ilist[1]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
             }
           #endif
 
@@ -2538,7 +2510,7 @@ long sw_process_command (
                          "%.15e\n",
                          dlist[0]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
             }
           #endif
 
@@ -2589,7 +2561,7 @@ long sw_process_command (
                          ilist[1],
                          ilist[2]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -2598,7 +2570,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -2608,7 +2580,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -2617,7 +2589,7 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -2665,7 +2637,7 @@ long sw_process_command (
                          ilist[1],
                          ilist[2]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -2674,7 +2646,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -2684,7 +2656,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -2693,7 +2665,7 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -2742,7 +2714,7 @@ long sw_process_command (
                          ilist[1],
                          ilist[2]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -2751,7 +2723,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -2761,7 +2733,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -2770,7 +2742,7 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -2806,7 +2778,7 @@ long sw_process_command (
                          "%.15e %.15e %.15e\n",
                          dlist[0], dlist[1], dlist[2]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
             }
           #endif
 
@@ -2842,7 +2814,7 @@ long sw_process_command (
                          ilist[1],
                          ilist[2]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -2851,7 +2823,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -2861,7 +2833,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -2870,7 +2842,7 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -2924,7 +2896,7 @@ long sw_process_command (
                          ilist[4],
                          ilist[5]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e %.15e %.15e\n",
                          dlist[0],
@@ -2934,7 +2906,7 @@ long sw_process_command (
                          dlist[4],
                          dlist[5]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -2943,7 +2915,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -2953,7 +2925,7 @@ long sw_process_command (
                              idata[2*nedge+i],
                              idata[3*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -2962,7 +2934,7 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -3035,7 +3007,7 @@ long sw_process_command (
                          ilist[4],
                          ilist[5]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 sprintf (LogFileLine,
                          "%.15e %.15e %.15e %.15e %.15e %.15e\n",
                          dlist[0],
@@ -3045,7 +3017,7 @@ long sw_process_command (
                          dlist[4],
                          dlist[5]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nnode; i++) {
                     sprintf (LogFileLine,
@@ -3054,7 +3026,7 @@ long sw_process_command (
                              ddata[nnode+i],
                              ddata[2*nnode+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<nedge; i++) {
                     sprintf (LogFileLine,
@@ -3065,7 +3037,7 @@ long sw_process_command (
                              idata[3*nedge+i],
                              idata[4*nedge+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 for (i=0; i<ntri; i++) {
                     sprintf (LogFileLine,
@@ -3074,7 +3046,7 @@ long sw_process_command (
                              idata[n0+ntri+i],
                              idata[n0+2*ntri+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -3127,7 +3099,7 @@ long sw_process_command (
                          ilist[1],
                          ilist[2]
                         );
-                fputs(LogFileLine, LogFile);
+                DLSF
                 nline = ilist[0];
                 for (i=0; i<nline; i++) {
                     sprintf (LogFileLine,
@@ -3135,7 +3107,7 @@ long sw_process_command (
                              idata[i],
                              idata[nline+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
                 npts = ilist[1];
                 for (i=0; i<npts; i++) {
@@ -3145,7 +3117,7 @@ long sw_process_command (
                              ddata[npts+i],
                              ddata[2*npts+i]
                             );
-                    fputs(LogFileLine, LogFile);
+                    DLSF
                 }
             }
           #endif
@@ -3181,12 +3153,6 @@ long sw_process_command (
             break;
 
     }  /* end of giant switch statement */
-
-  #if _SW_DEBUG_LOG_FILE_
-    if (LogFile) {
-        fflush (LogFile);
-    }
-  #endif
 
     return istat;
 }
