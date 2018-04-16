@@ -36,6 +36,7 @@
 #include "csw/surfaceworks/include/grid_api.h"
 #include "csw/surfaceworks/include/contour_api.h"
 #include "csw/utils/private_include/ply_protoP.h"
+#include "csw/utils/private_include/csw_scope.h"
 
 
 /*  constants for the file  */
@@ -615,21 +616,10 @@ int DLSurf::SetImageBands (
 
 /*--------------------------------------------------------------------------*/
 
-int DLSurf::CalcContours (void *vptr, int inum)
-{
-    int istat;
-
-    tmesh_num = inum;
-    istat = CalcContours (vptr);
-    return istat;
-}
-
-/*--------------------------------------------------------------------------*/
-
 
 
 /*
- * This function is for debug only.  Uncommentg it if needed.
+ * This function is for debug only.  Uncomment it if needed.
 static void show_con_limits (COntourOutputRec *contours, int ncontours)
 {
     int  i, j;
@@ -661,12 +651,31 @@ static void show_con_limits (COntourOutputRec *contours, int ncontours)
 */
 
 
+/*--------------------------------------------------------------------------*/
+
+int DLSurf::CalcContours (void *vptr, int inum)
+{
+    int istat;
+
+    tmesh_num = inum;
+    istat = CalcContours (vptr);
+    return istat;
+}
+
+
 int DLSurf::CalcContours (void *vptr)
 {
     CDisplayList        *dlist;
     int                 i, istat;
-    COntourOutputRec    *contours;
+    COntourOutputRec    *contours = NULL;
     int                 ncontours;
+
+    auto fscope = [&]()
+    {
+        conapi_obj.con_FreeContours (contours, ncontours);
+    };
+    CSWScopeGuard func_scope_guard (fscope);
+
 
     if (conprop.showContours == 0) {
         return 1;
@@ -680,6 +689,7 @@ int DLSurf::CalcContours (void *vptr)
         return -1;
     }
     dlist = (CDisplayList *)vptr;
+
     dlist->SetFrameNum (frame_num);
 
     contours = NULL;
@@ -689,14 +699,45 @@ int DLSurf::CalcContours (void *vptr)
  * If this surface has a grid as its master data, calculate
  * the contours from the grid.
  */
-    if (data != NULL) {
+
+    int  ncc = ncol;
+    int  nrr = nrow;
+    CSW_F  *cdata = data;
+
+    if (cdata != NULL) {
+
+        while (ncc * nrr > 200000) {
+            ncc /= 2;
+            nrr /= 2;
+            if (ncc < 2) ncc = 2;
+            if (nrr < 2) nrr = 2;
+        }
+
+        if (ncc < ncol  ||  nrr < nrow) {
+            int  istat =
+            grdapi_obj.grd_ResampleGrid 
+                (data, NULL, ncol, nrow,
+                 gxmin, gymin, gxmax, gymax,
+                 NULL, 0,
+                 ncdata, NULL, ncc, nrr, 
+                 gxmin, gymin, gxmax, gymax,
+                 GRD_BILINEAR);
+            if (istat != -1) {
+                cdata = ncdata;
+            }
+            else {
+                cdata = data;
+                ncc = ncol;
+                nrr = nrow;
+            }
+        }
 
         if (grid_zscale_needed == 1) {
             double sfact = zscale / last_zscale;
             if (sfact < 0.9999  || sfact > 1.0001) {
-                for (i=0; i<ncol*nrow; i++) {
-                    if (data[i] >= 1.e20) continue;
-                    data[i] *= (CSW_F)sfact;
+                for (i=0; i<ncc*nrr; i++) {
+                    if (cdata[i] >= 1.e20) continue;
+                    cdata[i] *= (CSW_F)sfact;
                 }
             }
             grid_zscale_needed = 0;
@@ -711,7 +752,7 @@ int DLSurf::CalcContours (void *vptr)
         }
 
         istat = conapi_obj.con_CalcContoursFromDouble (
-            data, ncol, nrow,
+            cdata, ncc, nrr,
             gxmin, gymin, gxmax, gymax,
             0.0,  /* unknown scale */
             &contours, &ncontours,
@@ -728,11 +769,11 @@ int DLSurf::CalcContours (void *vptr)
  * the contours from the trimesh.
  */
     else if (nodes != NULL  &&  edges != NULL  &&  triangles != NULL) {
-
         if (cnodes == NULL) {
             cnodes = (NOdeStruct *)csw_Malloc (num_nodes * sizeof(NOdeStruct));
             cedges = (EDgeStruct *)csw_Malloc (num_edges * sizeof(EDgeStruct));
-            ctriangles = (TRiangleStruct *)csw_Malloc (num_triangles * sizeof(TRiangleStruct));
+            ctriangles = (TRiangleStruct *)
+              csw_Malloc (num_triangles * sizeof(TRiangleStruct));
             if (cnodes == NULL  ||  cedges == NULL  ||  ctriangles == NULL) {
                 csw_Free (cnodes);
                 csw_Free (cedges);
@@ -742,7 +783,8 @@ int DLSurf::CalcContours (void *vptr)
 
             memcpy (cnodes, nodes, num_nodes * sizeof(NOdeStruct));
             memcpy (cedges, edges, num_edges * sizeof(EDgeStruct));
-            memcpy (ctriangles, triangles, num_triangles * sizeof(TRiangleStruct));
+            memcpy (ctriangles,
+                    triangles, num_triangles * sizeof(TRiangleStruct));
             cnum_nodes = num_nodes;
             cnum_edges = num_edges;
             cnum_triangles = num_triangles;
@@ -795,24 +837,25 @@ int DLSurf::CalcContours (void *vptr)
         if (istat == -1) {
             return -1;
         }
-
     }
 
     if (contours == NULL  ||  ncontours < 1) {
         return 0;
     }
 
+/*
+printf ("\nadding contours  ncontours = %d\n", ncontours);
+printf ("dlist ptr = %p\n", dlist);
+fflush (stdout);
+*/
+
     for (i=0; i<ncontours; i++) {
+//printf ("adding contour number %d\n", i);
+//fflush (stdout);
         dlist->AddContour (contours+i,
                            index_num,
                            image_id);
     }
-
-/*
- * Copies of the contours are added to the display list,
- * so the originals need to be csw_Freed here.
- */
-    conapi_obj.con_FreeContours (contours, ncontours);
 
     return 1;
 

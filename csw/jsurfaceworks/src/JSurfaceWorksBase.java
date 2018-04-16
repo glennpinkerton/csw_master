@@ -31,9 +31,10 @@ import csw.jutils.src.XYZPolyline;
 
 public class JSurfaceWorksBase {
 
-    private int    initial_tid;
+    int    nativeID = -1;
 
-    JSurfaceWorksBase () {initial_tid = Thread.currentThread().hashCode();};
+
+    JSurfaceWorksBase () {};
 
     protected void finalize() throws Throwable {
       super.finalize();
@@ -58,43 +59,6 @@ public class JSurfaceWorksBase {
 
 /*--------------------------------------------------------------------------*/
 
-    protected synchronized void endThread (int tid)
-    {
-/*
-        long status =
-        sendCommand (
-            SW_END_THREAD,
-            0,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            tid);
-*/
-    }
-
-    protected synchronized void endThread ()
-    {
-        //int    tid = Thread.currentThread().hashCode();
-
-/*
-        long status =
-        sendCommand (
-            SW_END_THREAD,
-            0,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            tid);
-*/
-    }
 
 /*--------------------------------------------------------------------------*/
 
@@ -107,7 +71,11 @@ public class JSurfaceWorksBase {
         int[]       ilist
     )
     {
+        if (nativeID < 0) return -1;
+
         int    tid = Thread.currentThread().hashCode();
+
+        tid = nativeID;
 
         long status =
         sendCommand (
@@ -136,6 +104,7 @@ public class JSurfaceWorksBase {
    */
     protected static long sendStaticNativeCommand (
         int         command_id,
+        int         nativeID,
         int         expect_return,
         int[]       ilist,
         double[]    ddata
@@ -146,6 +115,8 @@ public class JSurfaceWorksBase {
         }
 
         int    tid = Thread.currentThread().hashCode();
+
+        tid = nativeID;
 
         long status =
         sendStaticCommand (
@@ -179,6 +150,8 @@ public class JSurfaceWorksBase {
     {
         int    tid = Thread.currentThread().hashCode();
 
+        tid = nativeID;
+
         long status =
         sendCommand (
             command_id,
@@ -210,6 +183,8 @@ public class JSurfaceWorksBase {
     )
     {
         int    tid = Thread.currentThread().hashCode();
+
+        tid = nativeID;
 
         long status =
         sendCommand (
@@ -247,6 +222,8 @@ public class JSurfaceWorksBase {
     )
     {
         int    tid = Thread.currentThread().hashCode();
+
+        tid = nativeID;
 
         long status =
         sendCommand (

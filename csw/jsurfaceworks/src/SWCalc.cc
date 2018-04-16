@@ -79,6 +79,9 @@ void SWCalc::OutputForPlayback (const char *lfline) {
                     pbstr.append (lfline);
                     pbfile << pbstr;
                 }
+                else {
+                    pbfile.flush ();
+                }
             }
         }
         catch (std::exception &e) {
@@ -700,20 +703,23 @@ int SWCalc::sw_CalcTriMesh (
         ysav = yline2;
         zsav = zline2;
 
-        istat =
-        ResampleConstraintLines (
-            &xline2, &yline2, &zline2,
-            npline2, NULL, nline2, avspace);
-        csw_Free (xsav);
-        csw_Free (ysav);
-        csw_Free (zsav);
-        xsav = ysav = zsav = NULL;
+        if (xline2 != NULL  &&  npline2 != NULL  &&
+            nline2 > 0) {
+          istat =
+          ResampleConstraintLines (
+              &xline2, &yline2, &zline2,
+              npline2, NULL, nline2, avspace);
+          csw_Free (xsav);
+          csw_Free (ysav);
+          csw_Free (zsav);
+          xsav = ysav = zsav = NULL;
 
-        sprintf (fcname, "constraint_%d.xyz", FileID);
-        WriteConstraintLines (fcname,
-                              xline2, yline2, zline2,
-                              npline2, nline2);
-        FileID++;
+          sprintf (fcname, "constraint_%d.xyz", FileID);
+          WriteConstraintLines (fcname,
+                                xline2, yline2, zline2,
+                                npline2, nline2);
+          FileID++;
+        }
 
     /*
      * Calculate the trimesh from the grid.
@@ -1096,6 +1102,7 @@ void SWCalc::ConvertGridCalcOptions (
  * to the java side.
  */
 int SWCalc::sw_CalcGrid (
+    int    grsmooth,
     double *xpts,
     double *ypts,
     double *zpts,
@@ -1116,14 +1123,27 @@ int SWCalc::sw_CalcGrid (
     int              istat, ncomp;
     double           gxmin, gymin, gxmax, gymax;
     int              ncol, nrow;
-    CSW_F            *gdata;
-    CSW_F            *zerr;
-    char             *mask;
+    CSW_F            *gdata = NULL;
+    CSW_F            *zerr = NULL;
+    CSW_F            *rsgrid = NULL;
+    char             *rsmask = NULL;
+    char             *mask = NULL;
 
-    FAultLineStruct  *flist;
+    FAultLineStruct  *flist = NULL;
     int              nflist;
 
     GRidCalcOptions  options;
+
+    auto fscope = [&]()
+    {
+        csw_Free (gdata);
+        csw_Free (mask);
+        csw_Free (zerr);
+        csw_Free (rsgrid);
+        csw_Free (rsmask);
+        csw_Free (flist);
+    };
+    CSWScopeGuard func_scope_guard (fscope);
 
 /*
  * Get or calculate the grid geometry.
@@ -1188,14 +1208,11 @@ int SWCalc::sw_CalcGrid (
 
     mask = (char *)calloc (1, ncol * nrow * sizeof(char));
     if (mask == NULL) {
-        csw_Free (gdata);
         return -1;
     }
 
     zerr = (CSW_F *)calloc (1, npts * sizeof(CSW_F));
     if (zerr == NULL) {
-        csw_Free (gdata);
-        csw_Free (mask);
         return -1;
     }
 
@@ -1212,9 +1229,6 @@ int SWCalc::sw_CalcGrid (
              npline, linetypes, nline,
              &flist, &nflist);
         if (istat == -1) {
-            csw_Free (gdata);
-            csw_Free (mask);
-            csw_Free (zerr);
             return -1;
         }
     }
@@ -1225,23 +1239,63 @@ int SWCalc::sw_CalcGrid (
     ConvertGridCalcOptions (grid_options,
                             &options);
 
+    CSW_F *gdc = gdata;
+    char  *gdm = mask;
+
+    int  n20 = 0;
+    double  gxmarg = 0.0;
+    double  gymarg = 0.0;
+    if (grsmooth > 0) {
+        n20 = (ncol + nrow) / 20;
+        if (n20 < 8) n20 = 8;
+        gxmarg = (gxmax - gxmin) / 10.0;
+        gymarg = (gymax - gymin) / 10.0;
+        int  nrs = (ncol + n20) * (nrow + n20);
+        rsgrid = (CSW_F *)csw_Malloc (nrs * sizeof(CSW_F));
+        if (rsgrid == NULL) return -1;
+        rsmask = (char *)csw_Malloc (nrs * sizeof(char));
+        if (rsmask == NULL) return -1;
+        gdc = rsgrid;
+        gdm = rsmask;
+    }
+
 /*
  * Calculate the grid.
  */
     istat = grdapi_ptr->grd_CalcGridFromDouble
         (xpts, ypts, zpts, NULL, npts,
-         gdata, mask, NULL,
-         ncol, nrow,
-         gxmin, gymin, gxmax, gymax,
+         gdc, gdm, NULL,
+         ncol + n20, nrow + n20,
+         gxmin - gxmarg, gymin - gymarg,
+         gxmax + gxmarg, gymax + gymarg,
          flist, nflist,
          &options);
+    if (grsmooth > 0) {
+        grsmooth++;
+        if (grsmooth > 9) grsmooth = 9;
+        int rstat =
+        grdapi_ptr->grd_SmoothGrid 
+            (gdc, ncol + n20, nrow + n20, grsmooth,
+             flist, nflist,
+             gxmin - gxmarg, gymin - gymarg,
+             gxmax + gxmarg, gymax + gymarg,
+             -1.e30, 1.e30, NULL);
+        if (rstat == -1) return -1;
+        rstat =
+        grdapi_ptr->grd_ResampleGrid
+            (gdc, gdm, ncol + n20, nrow + n20,
+             gxmin - gxmarg, gymin - gymarg,
+             gxmax + gxmarg, gymax + gymarg,
+             flist, nflist,
+             gdata, mask, ncol, nrow,
+             gxmin, gymin, gxmax, gymax,
+             GRD_BILINEAR);
+        if (rstat == -1) return -1;
+    }
     grdapi_ptr->grd_FreeFaultLineStructs (flist, nflist);
     flist = NULL;
     nflist = 0;
     if (istat == -1) {
-        csw_Free (gdata);
-        csw_Free (mask);
-            csw_Free (zerr);
         return -1;
     }
 
@@ -1257,9 +1311,6 @@ int SWCalc::sw_CalcGrid (
                                      GRD_OUTSIDE_POLYGON,
                                      xbounds, ybounds, 1, &nbounds, &ncomp);
         if (istat == -1) {
-            csw_Free (gdata);
-            csw_Free (mask);
-            csw_Free (zerr);
             return -1;
         }
     }
@@ -1275,10 +1326,6 @@ int SWCalc::sw_CalcGrid (
         zerr,
         npts,
         mask);
-
-    csw_Free (gdata);
-    csw_Free (mask);
-    csw_Free (zerr);
 
     return istat;
 }
@@ -1299,7 +1346,14 @@ int SWCalc::SendBackGrid (
 )
 {
     int           i, ntot;
-    double        *ddata, *derror;
+    double        *ddata = NULL, *derror = NULL;
+
+    auto fscope = [&]()
+    {
+        csw_Free (ddata);
+        csw_Free (derror);
+    };
+    CSWScopeGuard func_scope_guard (fscope);
 
 /*
  * If the double data cannot be allocated, it is an error.
@@ -1354,12 +1408,6 @@ int SWCalc::SendBackGrid (
         (double)ymax,
         npts
     );
-
-/*
- * Free the arrays.
- */
-    csw_Free (ddata);
-    csw_Free (derror);
 
     return 1;
 
@@ -2501,10 +2549,16 @@ int SWCalc::sw_GridToTriMesh (
         return -1;
     }
 
+int nbad = 0;
+
     ntot = ncol * nrow;
     for (i=0; i<ntot; i++) {
         zt = gdata[i];
         if (zt < -1.e20  ||  zt > 1.e20) {
+if (nbad < 10) {
+printf ("bad node in grid to trimesh\n");
+nbad++;
+}
             zt = 1.e30;
         }
         grid[i] = (CSW_F)zt;

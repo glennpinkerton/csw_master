@@ -145,10 +145,6 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
     threadid = (int)j_tid;
 
 /*
- * Find the Java class methods if this message expects returned data.
- */
-
-/*
  * If the int type is not a 32 bit signed integer, a conversion
  * from jint to int will be needed.  If the int is smaller than
  * a 32 bit signed then don't even compile since there will be

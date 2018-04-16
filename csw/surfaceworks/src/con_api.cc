@@ -1955,6 +1955,7 @@ int CSWContourApi::con_SmoothTriMesh (
     TRiangleStruct  **tris,  int *numtris,
     int             sfact)
 {
+
     int istat;
 
     istat =

@@ -39,8 +39,14 @@
  * Empty constructor
  */
 
-DLContour::DLContour ()
+DLContour::DLContour (GTXDrawPrim *dp)
 {
+
+    if (dp == NULL) {
+        assert (false);
+    }
+
+    gtx_drawprim_ptr = dp;
 
   /*
    * Initialize public data.
@@ -69,6 +75,8 @@ DLContour::DLContour ()
 
 DLContour::~DLContour ()
 {
+    gtx_drawprim_ptr = NULL;
+
     if (crec != NULL) {
         conapi_obj.con_FreeContours (crec, 1);
     }
@@ -383,7 +391,7 @@ int DLContour::drawContourDirect (
         gpf_packxy2 (lp->x, lp->y, lp->npts,
                      xy);
         dlist->AddContourLine (lp->x, lp->y, lp->npts);
-        gtx_drawprim_obj.gtx_cliplineprim(xy,
+        gtx_drawprim_ptr->gtx_cliplineprim(xy,
                          lp->npts,
                          0, /* line smoothing flag */
                          (CSW_F)thick,
@@ -433,7 +441,7 @@ int DLContour::drawContourDirect (
                     gpf_packxy2 (lp->x, lp->y, lp->npts,
                                  xy);
                     dlist->AddContourLine (lp->x, lp->y, lp->npts);
-                    gtx_drawprim_obj.gtx_cliplineprim(xy,
+                    gtx_drawprim_ptr->gtx_cliplineprim(xy,
                                      lp->npts,
                                      0, /* line smoothing flag */
                                      (CSW_F)thick,

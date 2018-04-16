@@ -1446,13 +1446,13 @@ int CSWGrdTriangle::grd_grid_to_equilateral_trimesh
 
   ****************************************************************************
 
-    This is the top level function used to calculate a triangular mesh given
+  This is the top level function used to calculate a triangular mesh given
   a list of x, y, z points and optionally, a list of x, y, z constraint line
   vertices.  The function returns lists of NOdeStructs, EDgeStructs and
   TRiangleStructs.  (These are defined in csw/surfaceworks/private_include/
   grd_triangleP.h).  The number of structures of each type is also returned.
 
-    The x, y, z points are simply separate arrays of double values for each
+  The x, y, z points are simply separate arrays of double values for each
   coordinate.  The lines are passed in "packed" format.  The vertices for each
   separate line are put into separate xline, yline, and zline arrays.  The
   number of points is put in the linepoints array.  Thus, if the first 3 lines
@@ -1463,7 +1463,8 @@ int CSWGrdTriangle::grd_grid_to_equilateral_trimesh
 
 */
 
-int CSWGrdTriangle::grd_calc_trimesh (double *xpts, double *ypts, double *zpts, int npts,
+int CSWGrdTriangle::grd_calc_trimesh
+                     (double *xpts, double *ypts, double *zpts, int npts,
                       double *xlinesin, double *ylinesin, double *zlinesin,
                       int *linepointsin, int *lineflagsin, int nlinesin,
                       NOdeStruct **nodes_out, EDgeStruct **edges_out,
@@ -8889,7 +8890,8 @@ int CSWGrdTriangle::grd_calc_grid_from_trimesh (NOdeStruct *nodes, int numnodes,
 
 */
 
-int CSWGrdTriangle::grd_calc_trimesh_bounding_box (NOdeStruct *nodes, int numnodes,
+int CSWGrdTriangle::grd_calc_trimesh_bounding_box
+                                  (NOdeStruct *nodes, int numnodes,
                                    EDgeStruct *edges, int numedges,
                                    TRiangleStruct *triangles, int numtriangles,
                                    double *xmin, double *ymin,
@@ -28997,7 +28999,8 @@ int CSWGrdTriangle::SmoothTrimeshUsingGrid (int sfact, double avlen)
  * 1.e30 and also those nodes topologically adjacent.
  */
     nfedge = 0;
-    for (i=0; i<NumEdges; i++) {
+    if (faults != NULL  &&  nfaults > 0) {
+      for (i=0; i<NumEdges; i++) {
         eptr = EdgeList + i;
         if (eptr->deleted == 1) continue;
         if (eptr->tri2 >= 0) continue;
@@ -29041,6 +29044,7 @@ int CSWGrdTriangle::SmoothTrimeshUsingGrid (int sfact, double avlen)
             }
         }
         nfedge++;
+      }
     }
 
     CleanupTriNormals ();
@@ -31027,7 +31031,7 @@ int CSWGrdTriangle::grd_FillNullValues (CSW_F *grid, int ncol, int nrow,
 /*
  *******************************************************************************
 
-               g r d _ C a l c T r i M e s h F r o m G r i d
+            g r d _ c a l c _ t r i _ m e s h _ f r o m _ g r i d
 
  *******************************************************************************
 
@@ -31035,7 +31039,8 @@ int CSWGrdTriangle::grd_FillNullValues (CSW_F *grid, int ncol, int nrow,
 
 */
 
-int CSWGrdTriangle::grd_calc_tri_mesh_from_grid (CSW_F *grid, int nc, int nr,
+int CSWGrdTriangle::grd_calc_tri_mesh_from_grid
+                            (CSW_F *grid, int nc, int nr,
                              double x1, double y1, double x2, double y2,
                              double *xlines, double *ylines, double *zlines,
                              int *linepoints, int *linetypesin, int nlines,
@@ -31120,4 +31125,4 @@ int CSWGrdTriangle::grd_calc_tri_mesh_from_grid (CSW_F *grid, int nc, int nr,
 
     return istat;
 
-}  /* end of grd_CalcTriMeshFromGrid function */
+}  /* end of grd_calc_tri_mesh_from_grid function */

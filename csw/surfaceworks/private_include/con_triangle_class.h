@@ -79,6 +79,7 @@ class CSWConTriangle
     double              *XconWork {NULL},
                         *YconWork {NULL};
     int                 NumConWork {0};
+    int                 MaxConWork {0};
     double              *ZvalSave {NULL};
     double              ZvalAdjust {0.0};
     double              Zmin {0.0},

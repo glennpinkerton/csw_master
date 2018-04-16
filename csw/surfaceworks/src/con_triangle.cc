@@ -588,6 +588,7 @@ int CSWConTriangle::con_contours_from_trimesh
     }
     YconWork = XconWork + numedges;
     NumConWork = 0;
+    MaxConWork = numedges;
     ZvalSave = (double *)csw_Malloc (numnodes * sizeof(double));
     if (!ZvalSave) {
         return -1;
@@ -888,6 +889,7 @@ int CSWConTriangle::TraceSingleContour (EDgeStruct *estart)
 
     first = 1;
     for (;;) {
+
         if (next < 0) break;
         exitedge = FindExitEdge (enow, TriangleList + next);
         if (exitedge == NULL) {
@@ -1152,10 +1154,6 @@ int CSWConTriangle::OutputContourLine (void)
                          NodeList, NumNodes,
                          (char *)"contour.tri");
     }
-
-
-
-
 
     return 1;
 

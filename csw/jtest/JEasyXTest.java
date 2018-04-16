@@ -112,9 +112,6 @@ public class JEasyXTest {
             }
         }
 
-        String  playback_file_name = cpar + "/csw/jtest/utest.ezx";
-
-        JDisplayList.openLogFile (playback_file_name);
         JEasyXTestFrame frame = new JEasyXTestFrame ();
         frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
 
@@ -185,7 +182,6 @@ public class JEasyXTest {
     static void showMem (String  msg)
     {
 
-/*
         long  maxmem = Runtime.getRuntime().maxMemory ();
         long  totmem = Runtime.getRuntime().totalMemory ();
 
@@ -199,7 +195,6 @@ public class JEasyXTest {
         }
         System.out.println ();
         System.out.flush ();
-*/
 
     }
 
@@ -1801,20 +1796,22 @@ class HugeFrameRunnable implements Runnable {
 
     public void run () {
 
-//  For now, always use threads here
-//  When the surfaceworks thread stuff is working,
-//  I will use the environment variable for turning
-//  threads on and off both here and surfaceworks
-
       String  tflag = System.getenv ("CSW_DONT_USE_THREADS");
 
       if (tflag == null  ||  tflag.isEmpty()) {
+
+try {
+Thread.sleep (100);
+}
+catch (Throwable e) {
+}
+
+        JEasyXTest.showMem ("Just before huge frame thread start.");
+
         HFWorker hfw = new HFWorker (hf);
         hfw.execute ();
       }
       else {
-System.out.println ("JEZX not using threads");
-System.out.flush ();
         hf.populateDlist ();
         hf.setVisible (true);
       }
@@ -3203,11 +3200,10 @@ class HugeGridRunnable implements Runnable {
         hgw.execute ();
       }
       else {
-System.out.println ("Huge Grid not using threads");
-System.out.flush ();
         hg.populateDlist ();
         hg.setVisible (true);
       }
 
     }
 }
+

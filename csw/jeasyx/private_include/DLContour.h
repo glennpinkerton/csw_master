@@ -102,11 +102,12 @@ class DLContour {
 
     CSWContourApi       conapi_obj;
     GPFFont             gpf_font_obj;
-    GTXDrawPrim         gtx_drawprim_obj;
+
+    GTXDrawPrim         *gtx_drawprim_ptr = NULL;
 
   public:
 
-    DLContour ();
+    DLContour (GTXDrawPrim *dp);
     ~DLContour ();
 
     int                 grid_index;
@@ -130,7 +131,7 @@ class DLContour {
                      DLContourProperties *dlprop,
                      void *vptr);
 
-    int SetCrec (COntourOutputRec *cout);
+    int SetCrec (COntourOutputRec *crec);
     COntourOutputRec *GetCrec (void);
     void GetContourPoints (CSW_F **xpts, CSW_F **ypts, int *npts);
 

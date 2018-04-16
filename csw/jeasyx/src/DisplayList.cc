@@ -11256,6 +11256,8 @@ int CDisplayList::PanFrame (int frame_num,
 
 }
 
+
+
 int CDisplayList::AddContour (
     COntourOutputRec *crec,
     int    grid_index,
@@ -11265,7 +11267,7 @@ int CDisplayList::AddContour (
     DLSurf    *grid;
     int       nextprim;
 
-    if (grid_index < 0) {
+    if (grid_index < 0  ||  crec == NULL) {
         return 0;
     }
 
@@ -11284,7 +11286,7 @@ int CDisplayList::AddContour (
 
     try {
         SNF;
-        dlc = new DLContour ();
+        dlc = new DLContour (&gtx_drawprim_obj);
     }
     catch (std::exception &e) {
         printf ("Exception in new DLContour\n");
@@ -11683,6 +11685,7 @@ void CDisplayList::recalc_surfaces (void)
                 continue;
             }
             if (grid->needs_recalc == 1) {
+
                 delete_surf_contours (i);
                 delete_surf_contour_lines (i);
                 delete_grid_prims (i);
@@ -12031,7 +12034,7 @@ void CDisplayList::reclip_frame_contours (int fnum)
 
         try {
             SNF;
-            page_con = new DLContour ();
+            page_con = new DLContour (&gtx_drawprim_obj);
         }
         catch (std::bad_alloc &e) {
             printf ("Exception in new DLContour for page_con\n");
@@ -12192,6 +12195,7 @@ void CDisplayList::reclip_frame_contours (int fnum)
 
 
 
+
 /*
  *  Add the line primitives, including label gaps and ticks for contours.
  *  These are usually calculated once for each contour and put into the
@@ -12210,6 +12214,13 @@ int CDisplayList::AddContourLine (CSW_F *xpts_in, CSW_F *ypts_in, int npts)
     {
         if (!bsuccess) {
             csw_Free (xypack);
+            if (lptr != NULL) {
+                if (lptr->xypts != xypack) {
+                    csw_Free (lptr->xypts);
+                }
+                lptr->xypts = NULL;
+                lptr->deleted_flag = 1;
+            }
         }
     };
     CSWScopeGuard  func_scope_guard (fscope);
@@ -17817,7 +17828,7 @@ void CDisplayList::reclip_and_draw_selected_contours (DLSelectable *dls)
 
         try {
             SNF;
-            page_con = new DLContour ();
+            page_con = new DLContour (&gtx_drawprim_obj);
         }
         catch (std::bad_alloc &e) {
             printf ("Exception in new DLContour for page_con\n");
@@ -21505,6 +21516,11 @@ int CDisplayList::CalcLineBounds (LInePrim *lptr)
     if (lptr == NULL) {
         return -1;
     }
+
+    lptr->xmin = 1.e30;
+    lptr->ymin = 1.e30;
+    lptr->xmax = -1.e30;
+    lptr->ymax = -1.e30;
 
     npts = lptr->npts;
     xypts = lptr->xypts;

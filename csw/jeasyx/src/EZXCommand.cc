@@ -60,6 +60,7 @@
 // being scrambled in concurrent thread situations.
 
 #define DLF if (dlist) dlist->OutputForPlayback(LogFileLine);
+#define DLF2 if (dlist) dlist->OutputForPlayback(NULL);
 
 
 /*
@@ -113,6 +114,7 @@ int ezx_process_command (
 
     auto fscope = [&]()
     {
+        DLF2
     };
     CSWScopeGuard func_scope_guard (fscope);
 
@@ -174,23 +176,6 @@ int ezx_process_command (
         return istat;
     }
 
-/*
- * if command logging is active, and if the command is not
- * to open or close the log file, write the command= line
- * to the log file.
- */
-#if _EZX_DEBUG_LOG_FILE_
-    if (LogFile) {
-        if (command_id < GTX_OPEN_LOG_FILE  ||
-            command_id > GTX_CLOSE_LOG_FILE) {
-            sprintf (LogFileLine, "\ncommand=%d %d\n",
-                     command_id, dlist_index);
-            DLF
-        }
-    }
-#endif
-
-
 
     long java_num = dlist_index;
 
@@ -218,6 +203,23 @@ int ezx_process_command (
     native_dlist_id = java_num;
 
     primnum = -1;
+
+/*
+ * if command logging is active, and if the command is not
+ * to open or close the log file, write the command= line
+ * to the log file.
+ */
+#if _EZX_DEBUG_LOG_FILE_
+    if (LogFile) {
+        if (command_id < GTX_OPEN_LOG_FILE  ||
+            command_id > GTX_CLOSE_LOG_FILE) {
+            sprintf (LogFileLine, "\ncommand=%d %d\n",
+                     command_id, dlist_index);
+            DLF
+        }
+    }
+#endif
+
 
 
 /*
