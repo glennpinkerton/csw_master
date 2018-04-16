@@ -11,6 +11,8 @@
 package csw.jtest;
 
 import java.lang.Math;
+import java.lang.Runtime;
+import java.lang.Exception;
 
 import java.awt.Toolkit;
 import java.awt.BorderLayout;
@@ -117,6 +119,30 @@ public class JSWUnitTest {
 
     }
 
+
+    static void showMem (String  msg)
+    {
+
+        long  maxmem = Runtime.getRuntime().maxMemory ();
+        long  totmem = Runtime.getRuntime().totalMemory ();
+
+        maxmem /= 1000000;
+        totmem /= 1000000;
+        long freemem = maxmem - totmem;
+
+        System.out.println ();
+        System.out.println ("maxmem = " + maxmem + "   total mem = " + totmem +
+                            "    free mem = " + freemem);
+        if (msg != null) {
+            System.out.println (msg);
+        }
+        System.out.println ();
+        System.out.flush ();
+
+    }
+
+
+
 }
 
 class JSWUnitTestFrame extends JFrame
@@ -150,9 +176,6 @@ catch (Exception e) {
 
         String  ezx_playback_file_name = cpar + "/csw/jtest/utest.ezx";
         String  sw_playback_file_name = cpar + "/csw/jtest/utest.sw";
-
-        JDisplayList.openLogFile (ezx_playback_file_name);
-        JSurfaceWorks.openLogFile (sw_playback_file_name);
 
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -191,14 +214,35 @@ catch (Exception e) {
           }
         });
 
-        JButton huge_grid_10_button = new JButton (80 * nphint + " Point Grid");
-        huge_grid_10_button.addActionListener(new ActionListener() {
+        JButton large_nsgrid_10_button = new JButton (10 * nphint + " Point Grid Unsmoothed");
+        large_nsgrid_10_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                Grid10Frame gf = new Grid10Frame (80 * nphint, false);
+                Grid10Frame gf = new Grid10Frame (10 * nphint, false);
+                gf.forceNoSmooth ();
                 Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
                 SwingUtilities.invokeLater (run_frame);
           }
         });
+
+        JButton huge_grid_10_button = new JButton (150 * nphint + " Point Grid");
+        huge_grid_10_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                Grid10Frame gf = new Grid10Frame (150 * nphint, false);
+                Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
+                SwingUtilities.invokeLater (run_frame);
+          }
+        });
+
+        JButton huge_nsgrid_10_button = new JButton (150 * nphint + " Point Grid Unsmoothed");
+        huge_nsgrid_10_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                Grid10Frame gf = new Grid10Frame (150 * nphint, false);
+                gf.forceNoSmooth ();
+                Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
+                SwingUtilities.invokeLater (run_frame);
+          }
+        });
+
 
         JButton grid_sm_button = new JButton ("Smooth Grid");
         grid_sm_button.addActionListener(new ActionListener() {
@@ -311,18 +355,20 @@ catch (Exception e) {
         contentPane.add (trimesh_10_button);
         contentPane.add (grid_10_button);
         contentPane.add (large_grid_10_button);
+        contentPane.add (large_nsgrid_10_button);
         contentPane.add (huge_grid_10_button);
+        contentPane.add (huge_nsgrid_10_button);
         contentPane.add (grid_sm_button);
         contentPane.add (grid_large_sm_button);
         contentPane.add (grid_huge_sm_button);
-        contentPane.add (trimesh_file_button);
-        contentPane.add (divide_file_button);
-        contentPane.add (grid_file_button);
-        contentPane.add (tmesh_fileio_button);
-        contentPane.add (tmesh_contour_button);
-        contentPane.add (pt_file_button);
-        contentPane.add (bug_file_button);
-        contentPane.add (resample_button);
+//        contentPane.add (trimesh_file_button);
+//        contentPane.add (divide_file_button);
+//        contentPane.add (grid_file_button);
+//        contentPane.add (tmesh_fileio_button);
+//        contentPane.add (tmesh_contour_button);
+//        contentPane.add (pt_file_button);
+//        contentPane.add (bug_file_button);
+//        contentPane.add (resample_button);
     }
 
 }
@@ -356,11 +402,24 @@ class TriMesh10Frame extends JDLFrame
 
         sw = new JSurfaceWorks (dl_id);
 
-        x = new double[np];
-        y = new double[np];
-        z = new double[np];
+        x = new double[np + 4];
+        y = new double[np + 4];
+        z = new double[np + 4];
 
-        for (i=0; i<np; i++) {
+        x[0] = random.nextDouble () * 1.0;
+        y[0] = random.nextDouble () * 1.0;
+        z[0] = random.nextDouble () * 50.0;
+        x[1] = random.nextDouble () * 1.0 + 99.0;
+        y[1] = random.nextDouble () * 1.0;
+        z[1] = random.nextDouble () * 50.0;
+        x[2] = random.nextDouble () * 1.0;
+        y[2] = random.nextDouble () * 1.0 + 99.0;
+        z[2] = random.nextDouble () * 50.0;
+        x[3] = random.nextDouble () * 1.0 + 99.0;
+        y[3] = random.nextDouble () * 1.0 + 99.0;
+        z[3] = random.nextDouble () * 50.0;
+
+        for (i=4; i<np+4; i++) {
             x[i] = random.nextDouble () * 100.0;
             y[i] = random.nextDouble () * 100.0;
             z[i] = random.nextDouble () * 50.0;
@@ -423,6 +482,7 @@ class TriMesh10Frame extends JDLFrame
         double ztiny = (zmax - zmin) / 100.0;
         dl.setImageColors (cpal, zmin-ztiny, zmax+ztiny);
 
+
         dl.addTriMesh ("test trimesh " + np,
                        tmesh,
                        dlp);
@@ -451,6 +511,7 @@ class GFWorker extends SwingWorker<Integer, Void> {
     }
 
     protected void done () {
+JSWUnitTest.showMem ("in thread done");
         gf.setVisible (true);
     }
 
@@ -472,18 +533,32 @@ class Grid10FrameRunnable implements Runnable {
 
     public void run () {
 
-// Don't use threads for now.  Still working on it for surfaceworks.
+// Don't use threads if environment variable specifies no threads
 
       String  tflag = System.getenv ("CSW_DONT_USE_THREADS");
 
       if (tflag == null  ||  tflag.isEmpty()) {
+
+// When the multi thread test gui starts several threads very quickly,
+// some times the calculations get very slow.  I suspect there may be
+// thread resource contention at work.  As an experiment I sleep a bit
+// prior to creating and executing each thread.  The bigger the task
+// (more points hinted) then the longer the sleep.  This idea is
+// purely experimental.  If the slow execution stioll happens some times,
+// I will remove this sleep code.
+try {
+int  snp = gf.getNumHint ();
+long ls = snp / 1000;
+if (ls < 10) ls = 10;
+if (ls > 100) ls = 100;
+Thread.sleep (ls);
+}
+catch (Throwable e) {
+}
         GFWorker gfw = new GFWorker (gf);
         gfw.execute ();
       }
       else {
-System.out.println ();
-System.out.println ("JSW not using threads");
-System.out.flush ();
         gf.populateDlist ();
         gf.setVisible (true);
       }
@@ -502,12 +577,20 @@ class Grid10Frame extends JDLFrame
 
     private int      nphint = 0;
     private boolean  smooth_flag = false;
+    private boolean  force_no_smooth = false;
 
     public Grid10Frame (int nphint, boolean smooth_flag)
     {
         super ();
         this.nphint = nphint;
         this.smooth_flag = smooth_flag;
+    }
+
+    public int getNumHint () {return nphint;}
+
+
+    public void forceNoSmooth () {
+        force_no_smooth = true;
     }
 
 
@@ -528,6 +611,9 @@ class Grid10Frame extends JDLFrame
         if (np < 1) np = 1;
 
         setTitle ("Grid Test " + np);
+        if (force_no_smooth) {
+            setTitle ("Grid Test No Smooth " + np);
+        }
         setSize (900, 700);
         setResizable (true);
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
@@ -551,8 +637,8 @@ class Grid10Frame extends JDLFrame
         else {
           for (i=0; i<np; i++) {
 
-            x[i] = random.nextDouble () * 200.0;
-            y[i] = random.nextDouble () * 200.0;
+            x[i] = random.nextDouble () * 240.0;
+            y[i] = random.nextDouble () * 240.0;
             z[i] = random.nextDouble ();
             if (z[i] > .7) {
                 z[i] *= z[i];
@@ -573,7 +659,8 @@ class Grid10Frame extends JDLFrame
             null,
             null,
             null,
-            null
+            null,
+            force_no_smooth
         );
 
         dl.beginPlot ("grid test" + np,
@@ -595,7 +682,10 @@ class Grid10Frame extends JDLFrame
         ColorPalette cpal = new ColorPalette();
         double zmin = grid.getZMin ();
         double zmax = grid.getZMax ();
-        double ztiny = (zmax - zmin) / 100.0;
+        double ztiny = 0.0;
+
+        ztiny = (zmax - zmin) / 100.0;
+
         dl.setImageColors (cpal, zmin-ztiny, zmax+ztiny);
 
         dl.addGrid ("test grid 10",
@@ -685,7 +775,7 @@ class Grid10Frame extends JDLFrame
             dy *= dy;
             dz = z3 * z3;
             dd = dx + dy + dz;
-            zval += (2.0 / dd);
+            zval += (1.0 / dd);
 
             dx = xt - x4;
             dy = yt - y4;
@@ -693,7 +783,7 @@ class Grid10Frame extends JDLFrame
             dy *= dy;
             dz = z4 * z4;
             dd = dx + dy + dz;
-            zval += (2.0 / dd);
+            zval += (0.5 / dd);
 
             dx = xt - x5;
             dy = yt - y5;
@@ -701,7 +791,7 @@ class Grid10Frame extends JDLFrame
             dy *= dy;
             dz = z5 * z5;
             dd = dx + dy + dz;
-            zval += (2.0 / dd);
+            zval += (3.0 / dd);
 
             dx = xt - x6;
             dy = yt - y6;
@@ -709,7 +799,39 @@ class Grid10Frame extends JDLFrame
             dy *= dy;
             dz = z6 * z6;
             dd = dx + dy + dz;
-            zval += (5.0 / dd);
+            zval += (2.0 / dd);
+
+            dx = xt - x1;
+            dy = yt - y6;
+            dx *= dx;
+            dy *= dy;
+            dz = z6 * z6 / 4.0;
+            dd = dx + dy + dz;
+            zval += (.4 / dd);
+
+            dx = xt - x6;
+            dy = yt - y1;
+            dx *= dx;
+            dy *= dy;
+            dz = z1 * z1 / 4.0;
+            dd = dx + dy + dz;
+            zval += (.3 / dd);
+
+            dx = xt - x2;
+            dy = yt - y5;
+            dx *= dx;
+            dy *= dy;
+            dz = z2 * z2 / 4.0;
+            dd = dx + dy + dz;
+            zval += (.2 / dd);
+
+            dx = xt - x5;
+            dy = yt - y2;
+            dx *= dx;
+            dy *= dy;
+            dz = z5 * z5 / 4.0;
+            dd = dx + dy + dz;
+            zval += (.5 / dd);
 
             if (zval < zvmin) zvmin = zval;
             if (zval > zvmax) zvmax = zval;
@@ -1655,7 +1777,7 @@ class PFileFrame extends JFrame
 
         GridGeometry geom = new GridGeometry (50, 50, 0.0, 0.0, 100.0, 100.0);
         CSWGrid grid = jsw.calcGrid (xPoints, yPoints, zPoints, nPoints,
-                                     faultList, null, geom, null);
+                                     faultList, null, geom, null, false);
 
         if (grid == null) {
             System.out.println ("null grid returned from calcGrid");

@@ -25,6 +25,8 @@
 #include <string.h>
 #include <assert.h>
 
+#include "csw/utils/private_include/csw_scope.h"
+
 #include <csw/hlevutils/src/ThreadGuard.h>
 
 #include <csw/jsurfaceworks/private_include/PatchSplit.h>
@@ -39,6 +41,7 @@
 // being scrambled in concurrent thread situations.
 
 #define DLSF if (swcalc) swcalc->OutputForPlayback(LogFileLine);
+#define DLSF2 if (swcalc) swcalc->OutputForPlayback(NULL);
 
 
 /*
@@ -143,6 +146,15 @@ long sw_process_command (
     SWGridGeometryStruct    *GridGeometry = NULL;
     SWGridOptionsStruct     *GridOptions = NULL;
 
+    SWCalc        *swcalc = NULL;
+
+    auto fscope = [&]()
+    {
+        DLSF2
+    };
+    CSWScopeGuard func_scope_guard (fscope);
+
+
     PATCHSplit    *psplit = ThreadGuard::GetPatchSplit (threadid);
     if (psplit == NULL) {
         assert (false);
@@ -151,6 +163,7 @@ long sw_process_command (
 
     GRDVert       *gvert = ThreadGuard::GetGrdVert (threadid);
     if (gvert == NULL) {
+
         long  istat = ThreadGuard::CreateGrdVert (threadid);
         if (istat == -1) {
             assert (false);
@@ -163,6 +176,7 @@ long sw_process_command (
 
     CSWGrdAPI     *grdapi = ThreadGuard::GetGrdAPI (threadid);
     if (grdapi == NULL) {
+
         long  istat = ThreadGuard::CreateGrdAPI (threadid);
         if (istat == -1) {
             assert (false);
@@ -173,7 +187,7 @@ long sw_process_command (
         }
     }
 
-    SWCalc        *swcalc = ThreadGuard::GetSWCalc (threadid);
+    swcalc = ThreadGuard::GetSWCalc (threadid);
     if (swcalc == NULL) {
          assert (false);
     }
@@ -759,6 +773,7 @@ long sw_process_command (
      * as well as the points specified now.
      *
      *  ilist[0] has npts
+     *  ilist[1] has smooth factor
      *  ddata[0 to npts-1] has the x coordinates
      *  ddata[npts to 2*npts-1] has the y coordinates
      *  ddata[2*npts to 3*npts-1] has the z coordinates
@@ -769,8 +784,9 @@ long sw_process_command (
 
             if (LogFile) {
                 sprintf (LogFileLine,
-                         "%d\n",
-                         ilist[0]
+                         "%d %d\n",
+                         ilist[0],
+                         ilist[1]
                         );
                 DLSF
                 npts = ilist[0];
@@ -786,8 +802,8 @@ long sw_process_command (
             }
           #endif
 
-            npts = ilist[0];
             istat = (long) swcalc->sw_CalcGrid (
+                ilist[1],
                 ddata,
                 ddata+npts,
                 ddata+npts*2,

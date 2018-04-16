@@ -291,6 +291,7 @@ class CSWGrdAPI
                       CSW_Float, CSW_Float, CSW_Float, CSW_Float,
                       FAultLineStruct*, int,
                       GRidCalcOptions *);
+    void grd_SetNoisyDataFlag (int ndf);
     int grd_SetCalcOption (int, int, CSW_Float);
     int grd_SetCalcOptions (GRidCalcOptions *);
     int grd_DefaultCalcOptions (GRidCalcOptions *);

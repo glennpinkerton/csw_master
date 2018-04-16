@@ -331,6 +331,7 @@ class SWCalc
         double     zvalue);
     
     int sw_CalcGrid (
+        int    gsmooth,
         double *xpts,
         double *ypts,
         double *zpts,

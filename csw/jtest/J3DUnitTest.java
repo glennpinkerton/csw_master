@@ -85,8 +85,6 @@ public class J3DUnitTest {
 
         String  playback_file_name = cpar + "/csw/jtest/utest.j3d";
 
-        JSurfaceWorks.openLogFile (playback_file_name);
-
         UnitTestFrame frame = new UnitTestFrame ();
         frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
         frame.setVisible (true);

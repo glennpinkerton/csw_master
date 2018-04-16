@@ -80,6 +80,13 @@ int CSWGrdAPI::grd_SetCalcOption (int tag, int ival, CSW_F fval)
 
 
 
+void CSWGrdAPI::grd_SetNoisyDataFlag (int ndf) {
+    grd_calc_obj.grd_set_noisy_data_flag (ndf);
+}
+
+
+
+
 /*
   ****************************************************************
 
@@ -1635,12 +1642,13 @@ int CSWGrdAPI::grd_Version (char *buff)
 
 */
 
-int CSWGrdAPI::grd_CalcGridFromDouble (double *x, double *y, double *z, CSW_F *error, int npts,
-                            CSW_F *grid, char *mask, char **report,
-                            int ncol, int nrow,
-                            double x1, double y1, double x2, double y2,
-                            FAultLineStruct *faults, int nfaults,
-                            GRidCalcOptions *options)
+int CSWGrdAPI::grd_CalcGridFromDouble
+                 (double *x, double *y, double *z, CSW_F *error, int npts,
+                  CSW_F *grid, char *mask, char **report,
+                  int ncol, int nrow,
+                  double x1, double y1, double x2, double y2,
+                  FAultLineStruct *faults, int nfaults,
+                  GRidCalcOptions *options)
 {
     int  istat = 0;
 

@@ -680,8 +680,6 @@ int CSWGrdCalc::grd_calc_grid
     }
 
 /*
- * Bug 9489
- *
  * Check for bad values on x, y and z data.  This check is based on allowing
  * a map to stretch from pole to pole in millimeters, which would be 10 billion
  * millimeters and then adding a couple of orders of magnitude for good measure.
@@ -883,14 +881,10 @@ int CSWGrdCalc::grd_calc_grid
     if (OutsideBoundaryMargin < 1) OutsideBoundaryMargin = 1;
 
   /*
-   * Bug 9356
-   *
    * Previously, if the inside boundary margin was less than 2, the default value
    * of 10 was used.  Now, any InsideBoundaryMargin value 1 or greater is accepted.
    * Values less than 2 will make ugly maps, but that is the application code's
    * responsibility to avoid if it chooses to do so.
-   *
-   * G. Pinkerton  10/6/2004
    */
     if (InsideBoundaryMargin < 1) InsideBoundaryMargin = 1;
 
@@ -1678,7 +1672,7 @@ if (WorkMargin < 16) WorkMargin = 16;
     Use the trend surface for coarse nodes
     very far from data points.
 */
-    if (FlatGridFlag == 0) AssignTrendNodes ();
+    if (FlatGridFlag == 0  &&  NoisyDataFlag == 0) AssignTrendNodes ();
 
 /*
     Assign elevations to all perimeter nodes that
@@ -2186,14 +2180,17 @@ int CSWGrdCalc::SetupDataTable (int zflag, int first)
 {
     int            *lastpoint = NULL, icc, icr, ic, ir, idx, izc, izr,
                    i, nmax, ncells, nmean, zeroflag;
+    int            idxc;
     CSW_F          x1, y1, x2, y2, xspacec, yspacec;
     CSW_F          xt, yt;
+    CSW_F          *bin_min = NULL, *bin_max = NULL;
 
     bool      bsuccess = false;
 
     auto fscope = [&]()
     {
         csw_Free (lastpoint);
+        csw_Free (bin_min);
         if (bsuccess == false) {
             FreeMem ();
         }
@@ -2288,6 +2285,23 @@ MSL
     memset ((char *)ZeroCoarse, 0, Nccol*Ncrow*sizeof(char));
 
 /*
+  Allocate and initialize the nosy data bins (min and max in each bin).
+*/
+    bool bnoise = false;
+    if (NoisyDataFlag == 0) {
+      bin_min = (CSW_F *)csw_Malloc (Nccol * Ncrow * 2 * sizeof(CSW_F));
+      if (bin_min == NULL) {
+        return -1;
+      }
+      bin_max = bin_min + Nccol * Ncrow;
+      for (i=0; i<Nccol * Ncrow; i++) {
+        bin_min[i] = 1.e30;
+        bin_max[i] = -1.e30;
+      }
+      bnoise = true;
+    }
+
+/*
     build the data table and link list
 */
     Zmin = 1.e30f;
@@ -2333,10 +2347,8 @@ MSL
         If the zeroflag is set, no zero or very near zero
         values are indexed.
     */
-        if (true) {
-            if (zeroflag == 1  &&  Zdata[i] <= 0.0f) {
-                continue;
-            }
+        if (zeroflag == 1  &&  Zdata[i] <= 0.0f) {
+            continue;
         }
 
         if (Xdata[i] < Xmin  ||  Xdata[i] > Xmax  ||
@@ -2353,20 +2365,18 @@ MSL
             continue;
         }
 
-        if (true) {
-            if (Zdata[i] < Zmin) {
-                Zmin = Zdata[i];
-                Rxmin = Xdata[i];
-                Rymin = Ydata[i];
-            }
-            if (Zdata[i] > Zmax) {
-                Zmax = Zdata[i];
-                Rxmax = Xdata[i];
-                Rymax = Ydata[i];
-            }
-            Zmean += Zdata[i];
-            nmean++;
+        if (Zdata[i] < Zmin) {
+            Zmin = Zdata[i];
+            Rxmin = Xdata[i];
+            Rymin = Ydata[i];
         }
+        if (Zdata[i] > Zmax) {
+            Zmax = Zdata[i];
+            Rxmax = Xdata[i];
+            Rymax = Ydata[i];
+        }
+        Zmean += Zdata[i];
+        nmean++;
 
     /*
         which detail grid cell holds the point
@@ -2403,7 +2413,8 @@ MSL
     */
         icc = ic / Ncoarse;
         icr = ir / Ncoarse;
-        *(Icoarse + icc + Nccol * icr) = 1;
+        idxc = Nccol * icr + icc;
+        *(Icoarse + idxc) = 1;
 
     /*
         Set the detail grid data table and link list
@@ -2419,6 +2430,45 @@ MSL
             LinkList[i] = -1;
         }
         lastpoint[idx] = i;
+
+    /*
+       Update the bin min and max values.
+    */
+        if (bnoise) {
+          CSW_F  zt = Zdata[i];
+          if (zt < 1.e20  &&  zt > -1.e20) {
+            if (zt < bin_min[idxc]) bin_min[idxc] = zt;
+            if (zt > bin_max[idxc]) bin_max[idxc] = zt;
+          }
+        }
+
+    }
+
+/*
+ * Check if data are noisy.  This is pretty much empirical.
+ */
+    if (bnoise && Zmax > Zmin) {
+      CSW_F zt;
+      int ng4 = 0;
+      CSW_F  zr4 = (Zmax - Zmin) / 3.0;
+      for (i=0; i<Nccol*Ncrow; i++) {
+        if (bin_min[i] < bin_max[i]) {
+          zt = bin_max[i] - bin_min[i];
+          if (zt > zr4) {
+            ng4++;
+          }
+        }
+      }
+      if (ng4 > Nccol * Ncrow / 10) {
+        CSW_F  nprat = (CSW_F)Ndata / 100000.0;
+        if (nprat > 1.5) nprat = 1.5;
+        if (nprat < .05) nprat = .05;
+        CSW_F  drat = (CSW_F)ng4 / (CSW_F)(Nccol * Ncrow);
+        NoisyDataFlag = (int)(drat * 10.0 * nprat + 1.5);
+      }
+    }
+    else {
+      if (NoisyDataFlag == 1) NoisyDataFlag = 10;
     }
 
 /*
@@ -3527,6 +3577,10 @@ int CSWGrdCalc::ProcessLocalPoints
         wgtdsq /= StrikePower;
     }
 
+    if (NoisyDataFlag > 1) {
+        wgtdsq *= (CSW_F)NoisyDataFlag;
+    }
+
     wgtdsq *= wgtdsq;
     wgtplane = 0.0;
     wgtplane2 = 0.0;
@@ -3647,9 +3701,6 @@ int CSWGrdCalc::ProcessLocalPoints
             sum /= Zrange;
         }
 
-    /*
-     * NEWCODE  valplane_pct usage started on 12/10/04
-     */
         valplane_pct = sum2;
         if (valplane_pct < 0.01) valplane_pct = 0.01;
         zpct = ZPCT_BASE * nquad;
@@ -3671,6 +3722,9 @@ int CSWGrdCalc::ProcessLocalPoints
             wgtplane = 1.0f / (CSW_F)(5 - nquad);
         }
         wgtplane *= (CSW_F)plane_only_wgt;
+        if (NoisyDataFlag > 1) {
+            wgtplane /= (CSW_F)NoisyDataFlag;
+        }
         wgtplane *= wgtplane;
         if (sum2 <= zpct  &&  nquad == 4) {
             *value = (valplane * wgtplane + valdsq) / (wgtplane + 1);
@@ -4233,7 +4287,7 @@ int CSWGrdCalc::HalfPlaneSwitch
 
   ****************************************************************
 
-    Calculate elevations for coarse grid nodes where the node has
+  Calculate elevations for coarse grid nodes where the node has
   a local data set sufficient for the purpose.
 
 */
@@ -4245,13 +4299,6 @@ int CSWGrdCalc::CalcLocalNodes (void)
                   nc2, nmin, cf, fcrit, smallmult, ic, jc, kc, tmult;
     CSW_F         value;
     int           do_write;
-
-/*
- * !!!! debug only.
-    FILE          *fptr;
-    double        xt, yt;
-    char          line[200];
- */
 
 /*
     Set some private class variables and search range
@@ -7350,11 +7397,11 @@ int CSWGrdCalc::FitBestTrendSurface (void)
 
   ****************************************************************
 
-    Smooth a previously calculated grid.  The smoothing factor is
+  Smooth a previously calculated grid.  The smoothing factor is
   qualitative.  A factor of 1 appears to have little smoothing.  A
   factor of 9 has a lot of smoothing.
 
-    If the output grid is NULL, the smoothed data will overwrite
+  If the output grid is NULL, the smoothed data will overwrite
   the input.  If output smgrid is not null, the function allocates
   space for the smoothed output.
 
@@ -7371,8 +7418,9 @@ int CSWGrdCalc::grd_smooth_grid
              i1, i2, j1, j2, residflag;
     int      lightflag;
     int      ncout, nrout, skip;
-    CSW_F    *xrow = NULL, *yrow = NULL, xmin, ymin, xmax, ymax,
-             pivot, sum1, sum2, fsm;
+    CSW_F    *xrow = NULL, *yrow = NULL,
+             xmin, ymin, xmax, ymax,
+             pivot, sum1, sum2;
     CSW_F    *smg = NULL, *fwork = NULL, *fwork2 = NULL;
     CSW_F    zmin, zmax, zrange, zt, zt2, smfact2;
     CSW_F    *gwork3 = NULL;
@@ -7614,18 +7662,20 @@ MSL
     }
 
     memcpy (gwork3, grid, ncol*nrow*sizeof(CSW_F));
-    MovingAverage (gwork3, ncol, nrow, smfact, lightflag);
 
 /*
-    Calculate a coarse interval for the grid so that five coarse
-    intervals is about 50 percent of the grid width and height for
-    the maximum smoothing.  Lesser amounts of smoothing are done
-    by reducing the size of the coarse interval.
+  Calculate a coarse interval for the grid.  The coarse interval
+  is larger for large rsmoothing factors and for larger grids.
 */
-    fsm = 10.0f - (CSW_F)smfact;
-    fsm = (CSW_F)pow ((double)fsm, (double)(0.75f));
-    fsm = (ncol + nrow) / (5.0f * fsm);
-    nc = (int)(fsm / 4 + .5f);
+    nc = (int) ((double)(ncol + nrow) / 50 + .5);
+
+    if (nc > 64) nc = 64;
+    else if (nc > 32) nc = 32;
+    else if (nc > 16) nc = 16;
+    else if (nc > 8) nc = 8;
+    else if (nc > 4) nc = 4;
+    else if (nc > 2) nc = 2;
+    else nc = 1;
 
     if (lightflag) nc /= 2;
 
@@ -7636,6 +7686,24 @@ MSL
     }
 
     if (nc < 1) nc = 1;
+
+/*
+  More moving average and spike removal passes for large grids.
+*/
+    int   nma = smfact / 2 + 1;
+    if (ncol * nrow > 100000) nma++;
+    if (ncol * nrow > 1000000) nma++;
+
+    int  nsr = nma;
+    if (nsr < 2) nsr = 2;
+
+    for (i=0; i<nsr; i++) {
+        RemoveSpikes (gwork3, ncol, nrow, smfact, nc);
+    }
+
+    for (i=0; i<nma; i++) {
+        MovingAverage (gwork3, ncol, nrow, smfact, 0);
+    }
 
 /*
  * If the coarse interval is less than 2,
@@ -7658,6 +7726,22 @@ MSL
         return 1;
     }
 
+    if (NoisyDataFlag > 0) {
+        int  nmado = smfact / 2;
+        if (nmado < 2) nmado = 2;
+        for (i=0; i<nmado; i++) {
+            MovingAverage (gwork3, ncol, nrow, smfact, lightflag);
+            for (j=0; j<ncol*nrow; j++) {
+              if (gwork3[j] < 1.e20) {
+                if (gwork3[j] < minval) gwork3[j] = minval;
+                if (gwork3[j] > maxval) gwork3[j] = maxval;
+              }
+            }
+        }
+        memcpy (smg, gwork3, ncol * nrow * sizeof(CSW_F)); /*lint !e669 !e670*/
+        return 1;
+    }
+
     if (nc > 500) nc = 500;
 
 /*
@@ -7669,13 +7753,13 @@ MSL
     }
 
 /*
-    Allocate work grids that have room for margins of at least
-    two coarse intervals on all sides of the grid to be smoothed.
+    Allocate work grids that have room for margins of two
+    coarse intervals on all sides of the grid to be smoothed.
     This requires 5 times the coarse interval more nodes in each
     dimension of the work grids.
 */
-    nncol = (ncol - 1) / nc * nc + 5 * nc + 1;
-    nnrow = (nrow - 1) / nc * nc + 5 * nc + 1;
+    nncol = (ncol - 1) / nc * nc + 5 * nc;
+    nnrow = (nrow - 1) / nc * nc + 5 * nc;
 MSL
     GGwork1 = (CSW_F *)csw_Malloc (nncol*nnrow*2*sizeof(CSW_F));
     if (!GGwork1) {
@@ -7688,7 +7772,7 @@ MSL
     Allocate space for bicubic interpolation x and y arrays.
 */
 MSL
-    xrow = (CSW_F *)csw_Malloc (nncol * 2 * sizeof(CSW_F));
+    xrow = (CSW_F *)csw_Malloc (nncol * 3 * sizeof(CSW_F));
     if (!xrow) {
         grd_utils_ptr->grd_set_err (1);
         return -1;
@@ -7715,79 +7799,296 @@ MSL
 */
     endrow = (nrow - 1) / nc * nc + nc2;
     endcol = (ncol - 1) / nc * nc + nc2;
+//    endrow = nrow / nc * nc + nc2;
+//    endcol = ncol / nc * nc + nc2;
+
+    CSW_F  tz1 = 0.0;
+    CSW_F  tz2 = 0.0;
+    CSW_F  tz3 = 0.0;
+
+    CSW_F  tz = 0.0;
+
+    CSW_F  dnoise = (CSW_F)NoisyDataFlag;
 
 /*
     Fill in the left and right margins at the coarse interval.
 */
     for (i = nc2; i <= endrow; i+=nc) {
         noff = i * nncol;
-        GGwork1[noff] = 2.0f * GGwork1[noff+nc2] - GGwork1[noff+nc4];
-        GGwork1[noff+nc] = 2.0f * GGwork1[noff+nc2] - GGwork1[noff+nc3];
-        GGwork1[noff+endcol+nc3] = 2.0f * GGwork1[noff+endcol] - GGwork1[noff+endcol-nc3];
-        GGwork1[noff+endcol+nc2] = 2.0f * GGwork1[noff+endcol] - GGwork1[noff+endcol-nc2];
-        GGwork1[noff+endcol+nc] = 2.0f * GGwork1[noff+endcol] - GGwork1[noff+endcol-nc];
+        sum1 = 0.0;
+        sum2 = 0.0;
+        for (ii=i-nc; ii<=i+nc; ii+=nc) {
+            if (ii >= nc2  &&  ii <= endrow) {
+                int  iin = ii * nncol;
+                for (jj=nc2; jj<=nc3; jj+=nc) {
+                    sum1 += GGwork1[iin+jj];
+                    sum2++;
+                }
+            }
+        }
+        pivot = sum1 / sum2;
+        sum1 = 0.0;
+        sum2 = 0.0;
+        for (ii=i-nc; ii<=i+nc; ii+=nc) {
+            if (ii >= nc2  &&  ii <= endrow) {
+                int  iin = ii * nncol;
+                for (jj=nc3; jj<=nc4; jj+=nc) {
+                    sum1 += GGwork1[iin+jj];
+                    sum2++;
+                }
+            }
+        }
+        tz1 = sum1 / sum2;
+        tz2 = 2.0 * pivot - tz1;
+        GGwork1[noff+nc] = (tz2 + pivot * dnoise) / (1.0 + dnoise);
+        tz2 = GGwork1[noff+nc];
+        tz = 2.0 * tz2 - pivot;
+        GGwork1[noff] = (tz + tz2 * dnoise) / (1.0 + dnoise);
+
+        sum1 = 0.0;
+        sum2 = 0.0;
+        for (ii=i-nc; ii<=i+nc; ii+=nc) {
+            if (ii >= nc2  &&  ii <= endrow) {
+                int  iin = ii * nncol;
+                for (jj=endcol-nc; jj<=endcol; jj+=nc) {
+                    sum1 += GGwork1[iin+jj];
+                    sum2++;
+                }
+            }
+        }
+        pivot = sum1 / sum2;
+        sum1 = 0.0;
+        sum2 = 0.0;
+        for (ii=i-nc; ii<=i+nc; ii+=nc) {
+            if (ii >= nc2  &&  ii <= endrow) {
+                int  iin = ii * nncol;
+                for (jj=endcol-nc2; jj<=endcol-nc; jj+=nc) {
+                    sum1 += GGwork1[iin+jj];
+                    sum2++;
+                }
+            }
+        }
+        tz1 = sum1 / sum2;
+        tz2 = 2.0 * pivot - tz1;
+        GGwork1[noff+endcol+nc] = (tz2 + pivot * dnoise) / (1.0 + dnoise);
+        tz2 = GGwork1[noff+endcol+nc];
+        tz3 = 2.0 * tz2 - pivot;
+        GGwork1[noff+endcol+nc2] = (tz3 + tz2 * dnoise) / (1.0 + dnoise);
+        tz3 = GGwork1[noff+endcol+nc2];
+        tz = 2.0 * tz3 - tz2;
+        GGwork1[noff+endcol+nc3] = (tz + tz3 * dnoise) / (1.0 + dnoise);
+
     }
 
 /*
-    Fill in the top and bottom margins at the coarse interval.
+    Fill in the bottom and top margins at the coarse interval.
 */
     for (j=nc2; j<=endcol; j+=nc) {
-        GGwork1[j] = 2.0f * GGwork1[j+nc2*nncol] - GGwork1[j+nc4*nncol];
-        GGwork1[j+nc*nncol] = 2.0f * GGwork1[j+nc2*nncol] - GGwork1[j+nc3*nncol];
-        GGwork1[j+(endrow+nc3)*nncol] = 2.0f * GGwork1[j+endrow*nncol] - GGwork1[j+(endrow-nc3)*nncol];
-        GGwork1[j+(endrow+nc2)*nncol] = 2.0f * GGwork1[j+endrow*nncol] - GGwork1[j+(endrow-nc2)*nncol];
-        GGwork1[j+(endrow+nc)*nncol] = 2.0f * GGwork1[j+endrow*nncol] - GGwork1[j+(endrow-nc)*nncol];
+
+  // bottom
+        sum1 = 0.0;
+        sum2 = 0.0;
+        for (jj=j-nc; jj<=j+nc; jj+=nc) {
+            if (jj >= nc2  &&  jj <= endcol) {
+                for (ii=nc2; ii<=nc3; ii+=nc) {
+                    int  iin = ii * nncol;
+                    sum1 += GGwork1[iin+jj];
+                    sum2++;
+                }
+            }
+        }
+        pivot = sum1 / sum2;
+        sum1 = 0.0;
+        sum2 = 0.0;
+        for (jj=j-nc; jj<=j+nc; jj+=nc) {
+            if (jj >= nc2  &&  jj <= endcol) {
+                for (ii=nc3; ii<=nc4; ii+=nc) {
+                    int  iin = ii * nncol;
+                    sum1 += GGwork1[iin+jj];
+                    sum2++;
+                }
+            }
+        }
+        tz1 = sum1 / sum2;
+        tz2 = 2.0 * pivot - tz1;
+        noff = nc2 * nncol;
+        GGwork1[nc*nncol+j] = (tz2 + pivot * dnoise) / (1.0 + dnoise);
+        tz2 = GGwork1[nc*nncol+j];
+        tz = 2.0 * tz2 - pivot;
+        GGwork1[j] = (tz + tz2 * dnoise) / (1.0 + dnoise);
+
+    // top
+        sum1 = 0.0;
+        sum2 = 0.0;
+        for (jj=j-nc; jj<=j+nc; jj+=nc) {
+            if (jj >= nc2  &&  jj <= endcol) {
+                for (ii=endrow-nc2; ii<=endrow; ii+=nc) {
+                    int  iin = ii * nncol;
+                    sum1 += GGwork1[iin+jj];
+                    sum2++;
+                }
+            }
+        }
+        pivot = sum1 / sum2;
+        sum1 = 0.0;
+        sum2 = 0.0;
+        for (jj=j-nc; jj<=j+nc; jj+=nc) {
+            if (jj >= nc2  &&  jj <= endcol) {
+                for (ii=endrow-nc3; ii<=endrow-nc; ii+=nc) {
+                    int  iin = ii * nncol;
+                    sum1 += GGwork1[iin+jj];
+                    sum2++;
+                }
+            }
+        }
+        tz1 = sum1 / sum2;
+        tz2 = 2.0 * pivot - tz1;
+        noff = (endrow + nc) * nncol;
+        GGwork1[noff+j] = (tz2 + pivot * dnoise) / (1.0 + dnoise);
+        tz2 = GGwork1[noff+j];
+        tz3 = 2.0 * tz2 - pivot;
+        noff = (endrow + nc2) * nncol;
+        GGwork1[noff+j] = (tz3 + tz2 * dnoise) / (1.0 + dnoise);
+        tz3 = GGwork1[noff+j];
+        noff = (endrow + nc3) * nncol;
+        tz = 2.0 * tz3 - tz2;
+        GGwork1[noff+j] = (tz + tz3 * dnoise) / (1.0 + dnoise);
     }
+
+    CSW_F   xbl[9], ybl[9], zbl[9];
+    CSW_F   blbox[4];
+
+    CSWGrdUtils  gutils;
 
 /*
     Fill in bottom left corner.
 */
-    pivot = 2.0f * GGwork1[nc2*nncol+nc2];
-    GGwork1[0] = pivot - GGwork1[nc4*nncol+nc4];
-    GGwork1[nc] = pivot - GGwork1[nc4*nncol+nc3];
-    GGwork1[nc*nncol] = pivot - GGwork1[nc3*nncol+nc4];
-    GGwork1[nc*nncol+nc] = pivot - GGwork1[nc3*nncol+nc3];
+    xbl[0] = 0;
+    xbl[1] = nc;
+    xbl[2] = 0;
+    xbl[3] = nc;
+    ybl[0] = 0;
+    ybl[1] = 0;
+    ybl[2] = nc;
+    ybl[3] = nc;
+    blbox[1] = GGwork1[nc2];
+    blbox[2] = GGwork1[nc2 * nncol];
+    blbox[3] = GGwork1[nc2*nncol + nc2];
+    pivot = 2.0 * blbox[3];
+    tz1 = pivot - GGwork1[nc4*nncol+nc4];
+    blbox[0] = tz1;
+
+    gutils.grd_bilin_interp
+       (xbl, ybl, zbl, 4,
+        blbox, 2, 2, 1,
+        0, 0, nc2, nc2);
+    
+    GGwork1[0] = zbl[0];
+    GGwork1[nc] = zbl[1];
+    GGwork1[nc*nncol] = zbl[2];
+    GGwork1[nc*nncol + nc] = zbl[3];
 
 /*
     Fill in bottom right corner.
 */
-    pivot = 2.0f * GGwork1[nc2*nncol+endcol];
-    GGwork1[endcol+nc] = pivot  - GGwork1[nc4*nncol+endcol-nc];
-    GGwork1[endcol+nc2] = pivot - GGwork1[nc4*nncol+endcol-nc2];
-    GGwork1[endcol+nc3] = pivot - GGwork1[nc4*nncol+endcol-nc3];
-    GGwork1[nc*nncol+endcol+nc] = pivot - GGwork1[nc3*nncol+endcol-nc];
-    GGwork1[nc*nncol+endcol+nc2] = pivot - GGwork1[nc3*nncol+endcol-nc2];
-    GGwork1[nc*nncol+endcol+nc3] = pivot - GGwork1[nc3*nncol+endcol-nc3];
+    xbl[0] = nc;
+    xbl[1] = nc2;
+    xbl[2] = nc3;
+    xbl[3] = nc;
+    xbl[4] = nc2;
+    xbl[5] = nc3;
+    ybl[0] = 0;
+    ybl[1] = 0;
+    ybl[2] = 0;
+    ybl[3] = nc;
+    ybl[4] = nc;
+    ybl[5] = nc;
+    blbox[0] = GGwork1[endcol];
+    blbox[2] = GGwork1[nc2*nncol+endcol];
+    blbox[3] = GGwork1[nc2*nncol+endcol+nc3];
+    pivot = 2.0 * blbox[2];
+    tz1 = pivot - GGwork1[nc4*nncol+endcol-nc3];
+    blbox[1] = tz1;
 
+    gutils.grd_bilin_interp
+       (xbl, ybl, zbl, 6,
+        blbox, 2, 2, 1,
+        0, 0, nc3, nc2);
+
+    GGwork1[endcol+nc] = zbl[0];
+    GGwork1[endcol+nc2] = zbl[1];
+    GGwork1[endcol+nc3] = zbl[2];
+    GGwork1[nc*nncol+endcol+nc] = zbl[3];
+    GGwork1[nc*nncol+endcol+nc2] = zbl[4];
+    GGwork1[nc*nncol+endcol+nc3] = zbl[5];
+    
 /*
     Fill in top left corner.
 */
-    pivot = 2.0f * GGwork1[endrow*nncol+nc2];
-    GGwork1[(endrow+nc)*nncol] = pivot - GGwork1[(endrow-nc)*nncol+nc4];
-    GGwork1[(endrow+nc)*nncol+nc] = pivot - GGwork1[(endrow-nc)*nncol+nc3];
-    GGwork1[(endrow+nc2)*nncol] = pivot - GGwork1[(endrow-nc2)*nncol+nc4];
-    GGwork1[(endrow+nc2)*nncol+nc] = pivot - GGwork1[(endrow-nc2)*nncol+nc3];
-    GGwork1[(endrow+nc3)*nncol] = pivot - GGwork1[(endrow-nc3)*nncol+nc4];
-    GGwork1[(endrow+nc3)*nncol+nc] = pivot - GGwork1[(endrow-nc3)*nncol+nc3];
+    xbl[0] = 0;
+    xbl[1] = nc;
+    xbl[2] = 0;
+    xbl[3] = nc;
+    ybl[0] = nc;
+    ybl[1] = nc;
+    ybl[2] = nc2;
+    ybl[3] = nc2;
+    blbox[0] = GGwork1[endrow*nncol];
+    blbox[1] = GGwork1[endrow*nncol+nc2];
+    blbox[3] = GGwork1[(endrow+nc2)*nncol+nc2];
+    pivot = 2.0 * blbox[1];
+    tz1 = pivot - GGwork1[(endrow-nc2)*nncol+nc4];
+    blbox[2] = tz1;
+
+    gutils.grd_bilin_interp
+       (xbl, ybl, zbl, 4,
+        blbox, 2, 2, 1,
+        0, 0, nc2, nc2);
+    
+    GGwork1[(endrow+nc)*nncol] = zbl[0];
+    GGwork1[(endrow+nc)*nncol+nc] = zbl[1];
+    GGwork1[(endrow+nc2)*nncol] = zbl[2];
+    GGwork1[(endrow+nc2)*nncol+nc] = zbl[3];
 
 /*
     Fill in top right corner.
 */
-    pivot = 2.0f * GGwork1[endrow*nncol+endcol];
-    GGwork1[(endrow+nc)*nncol+endcol+nc] = pivot - GGwork1[(endrow-nc)*nncol+endcol-nc];
-    GGwork1[(endrow+nc)*nncol+endcol+nc2] = pivot - GGwork1[(endrow-nc)*nncol+endcol-nc2];
-    GGwork1[(endrow+nc)*nncol+endcol+nc3] = pivot - GGwork1[(endrow-nc)*nncol+endcol-nc3];
-    GGwork1[(endrow+nc2)*nncol+endcol+nc] = pivot - GGwork1[(endrow-nc2)*nncol+endcol-nc];
-    GGwork1[(endrow+nc2)*nncol+endcol+nc2] = pivot - GGwork1[(endrow-nc2)*nncol+endcol-nc2];
-    GGwork1[(endrow+nc2)*nncol+endcol+nc3] = pivot - GGwork1[(endrow-nc2)*nncol+endcol-nc3];
-    GGwork1[(endrow+nc3)*nncol+endcol+nc] = pivot - GGwork1[(endrow-nc3)*nncol+endcol-nc];
-    GGwork1[(endrow+nc3)*nncol+endcol+nc2] = pivot - GGwork1[(endrow-nc3)*nncol+endcol-nc2];
-    GGwork1[(endrow+nc3)*nncol+endcol+nc3] = pivot - GGwork1[(endrow-nc3)*nncol+endcol-nc3];
+    xbl[0] = nc;
+    xbl[1] = nc2;
+    xbl[2] = nc3;
+    xbl[3] = nc;
+    xbl[4] = nc2;
+    xbl[5] = nc3;
+    ybl[0] = nc;
+    ybl[1] = nc;
+    ybl[2] = nc;
+    ybl[3] = nc2;
+    ybl[4] = nc2;
+    ybl[5] = nc2;
+    blbox[0] = GGwork1[endrow*nncol+endcol];
+    blbox[1] = GGwork1[endrow*nncol+endcol+nc3];
+    blbox[2] = GGwork1[(endrow+nc2)*nncol+endcol];
+    pivot = 2.0 * blbox[0];
+    tz1 = pivot - GGwork1[(endrow-nc2)*nncol+endcol-nc3];
+    blbox[3] = tz1;
 
+    gutils.grd_bilin_interp
+       (xbl, ybl, zbl, 6,
+        blbox, 2, 2, 1,
+        0, 0, nc3, nc2);
+
+    GGwork1[(endrow+nc)*nncol+endcol+nc] = zbl[0];
+    GGwork1[(endrow+nc)*nncol+endcol+nc2] = zbl[1];
+    GGwork1[(endrow+nc)*nncol+endcol+nc3] = zbl[2];
+    GGwork1[(endrow+nc2)*nncol+endcol+nc] = zbl[3];
+    GGwork1[(endrow+nc2)*nncol+endcol+nc2] = zbl[4];
+    GGwork1[(endrow+nc2)*nncol+endcol+nc3] = zbl[5];
+ 
 /*
     Smooth the coarse nodes using a 3 by 3 moving average operator with equal
     weight at each operator point.  The results are stored in GGwork2.
 */
+    double  dsf = (double) smfact;
     for (i=0; i<nnrow; i+=nc) {
 
         noff = i * nncol;
@@ -7813,6 +8114,7 @@ MSL
                     sum2++;
                 }
             }
+
         /*
          * If plateau smoothing was specified, any nodes in
          * the original at or outside the plateau limits are
@@ -7823,10 +8125,11 @@ MSL
                 GGwork2[noff+j] = GGwork1[noff+j];
             }
             else {
-                GGwork2[noff+j] = sum1 / sum2;
+                GGwork2[noff+j] = 
+                  (GGwork1[noff+j] + dsf * sum1 / sum2) / (1.0 + dsf);
                 if (lightflag  &&  GGwork1[noff+j] < 1.e20) {
                     GGwork2[noff+j] += GGwork1[noff+j];
-                    GGwork2[noff+j] /= 2.0f;
+                    GGwork2[noff+j] /= 2.0;
                 }
             }
         }
@@ -7837,8 +8140,8 @@ MSL
     in Grid2 to fill in all the remaining nodes.  The results are
     put back into GGwork1.
 */
-    xmin = 0.0f;
-    ymin = 0.0f;
+    xmin = 0.0;
+    ymin = 0.0;
     xmax = (CSW_F)(nncol-1);
     ymax = (CSW_F)(nnrow-1);
 
@@ -7848,7 +8151,8 @@ MSL
             xrow[j] = (CSW_F)j;
             yrow[j] = (CSW_F)i;
         }
-        istat = grd_utils_ptr->grd_bicub_interp (xrow, yrow, GGwork1+noff, nncol, 0.0f,
+        istat = grd_utils_ptr->grd_bicub_interp
+                         (xrow, yrow, GGwork1+noff, nncol, 0.0f,
                           GGwork2, nncol, nnrow, nc,
                           xmin, ymin, xmax, ymax,
                           -1, -1);
@@ -13205,7 +13509,7 @@ void CSWGrdCalc::MovingAverage
     CSWScopeGuard func_scope_guard (fscope);
 
 
-    if (grid == NULL  ||  ncol < 2  ||  nrow < 2) {
+    if (grid == NULL  ||  ncol < 5  ||  nrow < 5) {
         return;
     }
 
@@ -13227,8 +13531,8 @@ void CSWGrdCalc::MovingAverage
         if (j2 > ncol-1) j2 = ncol-1;
         k = offset + j;
 
-        sum1 = 0;
-        sum2 = 0;
+        sum1 = 0.0;
+        sum2 = 0.0;
         for (ii=i1; ii<=i2; ii++) {
           offset2 = ii * ncol;
           for (jj=j1; jj<=j2; jj++) {
@@ -13240,7 +13544,7 @@ void CSWGrdCalc::MovingAverage
           }
         }
 
-        if (sum2 <= 0.0) {
+        if (sum2 < 0.1) {
           gw[k] = grid[k];
         }
         else {
@@ -13842,4 +14146,135 @@ int CSWGrdCalc::grd_set_conformable_surface_from_double
     return 1;
 
 }  /*  end of function grd_SetConformableSurfaceFromDouble  */
+
+
+/*---------------------------------------------------------------------------------*/
+
+void CSWGrdCalc::RemoveSpikes
+     (CSW_F *grid, int ncol, int nrow, int smfact, int nc)
+{
+    int           i, j, k, ii, jj, kk, i1, i2, j1, j2;
+    int           offset, offset2;
+    CSW_F         sum1, sum2, *gw = NULL;
+    CSW_F         zmin, zmax, zt, zr;
+    CSW_F         smult = 1.0;
+    CSW_F         smult2 = 1.0;
+    CSW_F         zrange;
+
+    auto fscope = [&]()
+    {
+        csw_Free (gw);
+    };
+    CSWScopeGuard func_scope_guard (fscope);
+
+
+    if (grid == NULL  ||  ncol < 2  ||  nrow < 2  ||  smfact < 1) {
+        return;
+    }
+
+    gw = (CSW_F *)csw_Malloc (ncol * nrow * sizeof(CSW_F));
+    if (gw == NULL) {
+      return;
+    }
+
+    zmin = 1.e30;
+    zmax = -1.e30;
+    for (i=0; i<ncol * nrow; i++) {
+        zt = grid[i];
+        if (zt < 1.e20) {
+            if (zt < zmin) zmin = zt;
+            if (zt > zmax) zmax = zt;
+        }
+    }
+    if (zmin > zmax) {
+        return;
+    }
+
+    zrange = zmax - zmin;
+    if (zrange <= 0.0) {
+        return;
+    }
+
+    zrange /= 40.0;
+    smult = 2.0 / (CSW_F)smfact;
+
+if (nrow * ncol > 250000) {
+zrange *= .75;
+smult *= .75;
+}
+zrange *= .75;
+smult *= .75;
+smult2 = 1.0;
+
+double sm2;
+int  nc2 = nc * 2;
+bool iedge, jedge;
+
+    for (i=0; i<nrow; i++) {
+      i1 = i - 1;
+      i2 = i + 1;
+      if (i1 < 0) i1 = 0;
+      if (i2 > nrow-1) i2 = nrow - 1;
+      iedge = false;
+      if (i1 < nc2  ||  i2 > nrow - nc2) iedge = true;
+      offset = i * ncol;
+      for (j=0; j<ncol; j++) {
+        j1 = j - 1;
+        j2 = j + 1;
+        if (j1 < 0) j1 = 0;
+        if (j2 > ncol-1) j2 = ncol-1;
+        jedge = false;
+        if (j1 < nc2  ||  j2 > ncol - nc2) jedge = true;
+        k = offset + j;
+
+        sum1 = 0.0;
+        sum2 = 0.0;
+        zmin = 1.e30;
+        zmax = -1.e30;
+        for (ii=i1; ii<=i2; ii++) {
+          offset2 = ii * ncol;
+          for (jj=j1; jj<=j2; jj++) {
+            kk = offset2 + jj;
+            if (kk == k) continue;
+            zt = grid[kk];
+            if (zt < 1.e20) {
+              sum1 += zt;
+              sum2++;
+              if (zt < zmin) zmin = zt;
+              if (zt > zmax) zmax = zt;
+            }
+          }
+        }
+
+        if (sum2 < 2.1) {
+          gw[k] = grid[k];
+        }
+        else {
+          sm2 = smult2;
+          if (iedge  ||  jedge) {
+              sm2 = .5;
+          }
+          zr = fabs (grid[k] - sum1 / sum2);
+          zt = zmax - zmin;
+          if (zr > sm2 * smult * zt  &&  zr >= sm2 * zrange) {
+              gw[k] = sum1 / sum2;
+          }
+          else {
+              gw[k] = grid[k];
+          }
+        }
+      }
+    }
+
+    memcpy (grid, gw, ncol * nrow * sizeof(CSW_F));
+
+    return;
+
+}
+
+
+void CSWGrdCalc::grd_set_noisy_data_flag (int ndf) {
+      NoisyDataFlag = 0;
+      if (ndf != 0) NoisyDataFlag = 1;
+};
 

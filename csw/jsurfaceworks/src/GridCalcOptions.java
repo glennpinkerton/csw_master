@@ -2,7 +2,7 @@
 /*
          ************************************************
          *                                              *
-         *    Copyright (1997-2007) Glenn Pinkerton.    *
+         *    Copyright (1997-2017) Glenn Pinkerton.    *
          *    All rights reserved.                      *
          *                                              *
          ************************************************
@@ -40,6 +40,7 @@ public class GridCalcOptions {
   boolean userSpecifiedMinValue;
   boolean userSpecifiedMaxValue;
   int directionalFlag;
+  int noisyDataFlag = 0;
 
 /*------------------------------------------------------------------------*/
 

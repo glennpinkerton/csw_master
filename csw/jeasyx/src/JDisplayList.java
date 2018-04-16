@@ -3238,54 +3238,6 @@ of Font.BOLD|Font.ITALIC.
 /*-------------------------------------------------------------*/
 
   /**
-  Static method to open the log file on the native side.  The log file can be
-  played back by a native only utility program to debug problems.
-  It is ok to keep calls to this method in production code, because the log file
-  will be ignored on the native side if the code is compiled for production only.
-  <p>
-  The log file will be opened the first time you call this method and subsequent
-  calls will be ignored.  Also, the log file is done on the native side.  The first
-  call to this will cause logging of all commands for all display lists.  This is
-  exactly what is needed for debugging via native only playback of the log file.
-  You should always open the log file as soon as you get a JDisplayList object.
-  That way you are assured that all commands will be logged.
-  <p>
-  If the file specified exists, it will be overwritten.
-  <p>
-  Returns 1 if the log file is open.  Returns -1 if an error occurred opening the file.
-  @param filename Name of the new log file.
-  */
-    public static int openLogFile (String filename)
-    {
-        if (filename == null) {
-            return -1;
-        }
-
-        int threadid = Thread.currentThread().hashCode();
-
-        int status =
-        JDisplayList.sendStaticCommand (
-            -1,
-            GTX_OPEN_LOG_FILE,
-            threadid,
-            null,
-            null,
-            filename,
-            null,
-            null,
-            null,
-            null,
-            null,
-            0
-        );
-
-        return status;
-
-    }
-
-/*-------------------------------------------------------------*/
-
-  /**
   Set an opaque color used for subsequent polygon fill patterns.  This is only
   used if you have specified a fill pattern via the {@link #setFillPattern}
   method.   The valid range for each color coordinate is 0 to 255.

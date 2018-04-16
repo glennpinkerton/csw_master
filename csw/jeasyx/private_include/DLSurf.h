@@ -60,6 +60,8 @@ class DLSurf {
     int              needs_recalc;
     int              needs_rotation;
 
+    double           ncdata[201000];
+
     DLContourProperties conprop;
 
     void SetSurfaceID (int id);

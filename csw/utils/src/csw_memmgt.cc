@@ -99,6 +99,10 @@ void *csw_Realloc (void *ptr, int size)
 
 void *csw_Malloc (int size)
 {
+    if (size <= 0) {
+        return NULL;
+    }
+
     void *ptr = malloc (size);
     return ptr;
 }

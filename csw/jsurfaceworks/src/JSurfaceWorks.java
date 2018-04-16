@@ -163,8 +163,6 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
     int          IdataMax = HUGE_CHUNK;
     int          DdataMax = HUGE_CHUNK;
 
-    int          nativeID = -1;
-
 
 /**
  *  Two constructors are provided.  The "default" constructor takes
@@ -225,66 +223,7 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
 
 /*-------------------------------------------------------------*/
 
-    static public long openLogFile (String fileName)
-    {
-
-        if (fileName == null) {
-            return -1;
-        }
-
-        JSurfaceWorks jsw = new JSurfaceWorks ();
-
-        long status =
-        jsw.sendNativeCommand (SW_OPEN_LOG_FILE,
-                     0,
-                     null,
-                     null,
-                     null,
-                     fileName,
-                     null,
-                     null,
-                     null);
-        //isPaused = false;
-
-        //jsw.endThread ();
-
-        return status;
-    }
-
-
-    public void pauseLogging ()
-    {
-        sendNativeCommand (SW_PAUSE_LOG_FILE,
-                     0,
-                     null,
-                     null,
-                     null,
-                     null,
-                     null,
-                     null,
-                     null);
-       // isPaused = true;
-        return;
-    }
-
-    public void restartLogging ()
-    {
-        sendNativeCommand (SW_RESTART_LOG_FILE,
-                     0,
-                     null,
-                     null,
-                     null,
-                     null,
-                     null,
-                     null,
-                     null);
-        //isPaused = false;
-        return;
-    }
-
-/*-------------------------------------------------------------*/
-
-    static public void setModelBounds (
+    public void setModelBounds (
         double      xmin,
         double      ymin,
         double      zmin,
@@ -309,8 +248,6 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
             null,
             data);
 
-        //jsw.endThread ();
-
         return;
 
     }
@@ -318,7 +255,7 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
 
 /*-------------------------------------------------------------*/
 
-    static public void psSetModelBounds (
+    public void psSetModelBounds (
         double      xmin,
         double      ymin,
         double      zmin,
@@ -343,15 +280,13 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
             null,
             data);
 
-        //jsw.endThread ();
-
         return;
 
     }
 
 /*-------------------------------------------------------------*/
 
-    static public void setModelBounds (
+    public void setModelBounds (
         Bounds3D         sp)
     {
         double[] data = new double[6];
@@ -390,15 +325,13 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
             null,
             data);
 
-        //jsw.endThread ();
-
         return;
 
     }
 
 /*-------------------------------------------------------------*/
 
-    static public void psSetModelBounds (
+    public void psSetModelBounds (
         Bounds3D         sp)
     {
         double[] data = new double[6];
@@ -436,8 +369,6 @@ public class JSurfaceWorks extends JSurfaceWorksBase {
             0,
             null,
             data);
-
-        //jsw.endThread ();
 
         return;
 
@@ -964,9 +895,17 @@ set to false if the trimesh is for anything else.
         ArrayList<XYZPolyline> faults,
         TriMeshConstraint boundary,
         GridGeometry gridGeometry,
-        GridCalcOptions gridOptions)
+        GridCalcOptions gridOptions,
+        boolean  force_no_smooth)
     {
 
+        int grsmooth = 0;
+            if (force_no_smooth == false) {
+            if (numPoints > 100) grsmooth = numPoints / 5000 + 1;
+            grsmooth = (int) (Math.sqrt((double)grsmooth) + .5);
+            grsmooth = (int) (Math.sqrt((double)grsmooth) + .5);
+        }
+       
     /*
      * Check some obvious errors.
      */
@@ -1172,6 +1111,7 @@ set to false if the trimesh is for anything else.
      * Send the calculate grid command.
      */
         Ilist[0] = numPoints;
+        Ilist[1] = grsmooth;
         newDdata (numPoints * 3);
         for (int i=0; i<numPoints; i++) {
             Ddata[i] = xPoints[i];
@@ -1224,6 +1164,7 @@ set to false if the trimesh is for anything else.
         Ilist[11] = 0;
         if (op.stepFlag) Ilist[11] = 1;
         Ilist[12] = 0;
+        Ilist[13] = op.noisyDataFlag;
 
         Ddata[0] = op.minValue;
         Ddata[1] = op.maxValue;
@@ -1267,7 +1208,7 @@ set to false if the trimesh is for anything else.
 
 /*---------------------------------------------------------*/
 
-    static private long          lastDrapedTriMesh = 0;
+    private long          lastDrapedTriMesh = 0;
 
 /*---------------------------------------------------------*/
 
@@ -1323,8 +1264,6 @@ set to false if the trimesh is for anything else.
                            ilist,
                            ddata);
 
-        //jsw.endThread ();
-
         return (int)istat;
     }
 
@@ -1333,6 +1272,7 @@ set to false if the trimesh is for anything else.
 
     static private class FinalizedTmeshID {
         public int id1, id2;
+        public int nativeID;
     }
 
     static ArrayList<FinalizedTmeshID>    finalizedTriMeshList = 
@@ -1345,7 +1285,8 @@ set to false if the trimesh is for anything else.
    * needs to complete before that thread is switched out.  Therefore,
    * this method is declared as synchronized.
    */
-    static public synchronized void addFinalizedTriMesh (TriMesh tmesh)
+    static public synchronized void addFinalizedTriMesh
+        (TriMesh tmesh)
     {
         FinalizedTmeshID tmid = new FinalizedTmeshID ();
 
@@ -1360,6 +1301,7 @@ set to false if the trimesh is for anything else.
 
         tmid.id1 = id1;
         tmid.id2 = id2;
+        tmid.nativeID = tmesh.getNativeID ();
 
         finalizedTriMeshList.add (tmid);
 
@@ -1401,6 +1343,8 @@ set to false if the trimesh is for anything else.
 
         int size = finalizedTriMeshList.size ();
 
+        int nid = 0;
+
         for (int i=0; i<size; i++) {
 
             FinalizedTmeshID tm = finalizedTriMeshList.get (i);
@@ -1412,6 +1356,7 @@ set to false if the trimesh is for anything else.
             ilist[1] = tm.id2;
 
             JSurfaceWorks.sendStaticNativeCommand (SW_REMOVE_TRI_INDEX,
+                           nid,
                            0,
                            ilist,
                            ddata);
@@ -1446,8 +1391,6 @@ set to false if the trimesh is for anything else.
                            0,
                            ilist,
                            ddata);
-        //jsw.endThread ();
-
         return;
     }
 
@@ -4517,8 +4460,6 @@ or set to false if the trimesh will be used for anything else.
 
         JSurfaceWorks jsw = new JSurfaceWorks ();
         jsw.calcDrapedPoints ((TriMesh)null, (ArrayList<XYZPolyline>)null);
-        //jsw.endThread ();
-
 
         return;
     }
@@ -5603,15 +5544,19 @@ or set to false if the trimesh will be used for anything else.
         ddata = new double[2];
 
         int size = finalized3DIndexList.size ();
+        int nid = 0;
+
         for (int i=0; i<size; i++) {
             tmid = finalized3DIndexList.get (i);
             ilist[0] = tmid.id1;
             ilist[1] = tmid.id2;
 
             sendStaticNativeCommand (SW_DELETE_3D_TINDEX,
-                                           0,
-                                           ilist,
-                                           ddata);
+                                     //nativeID,
+                                     0,
+                                     0,
+                                     ilist,
+                                     ddata);
         }
 
         cleanup3DPending = false;

@@ -989,7 +989,6 @@ pmsg ("  "+cubeOutline.getXArray()[i]+" "+cubeOutline.getYArray()[i]);
      */
         jsw = new JSurfaceWorks ();
         jsw.setGrazingValue (2.0);
-        jsw.pauseLogging ();
 
     /*
      * Set the text position filter in the jgl object to this
@@ -1109,7 +1108,6 @@ pmsg ("  "+cubeOutline.getXArray()[i]+" "+cubeOutline.getYArray()[i]);
         jgl.SetDrawDepthTest (1);
         jgl.setTextPositionFilter (null);
 
-        jsw.restartLogging ();
         jsw = null;
 
     }

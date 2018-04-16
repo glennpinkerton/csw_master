@@ -830,7 +830,7 @@ int CSWGrdUtils::grd_xyz_from_grid
 
   ****************************************************************
 
-    Reduce the number of points in a data set by averaging points that
+  Reduce the number of points in a data set by averaging points that
   are near each other.
 
 */
@@ -1078,11 +1078,11 @@ int CSWGrdUtils::grd_get_err (void)
 
   ****************************************************************
 
-    Use bilinear interpolation on surrounding grid nodes to
+  Use bilinear interpolation on surrounding grid nodes to
   estimate the elevation at a set of x, y points. If a point is
   outside of the grid, it is set to 1.e30f.
 
-    On success, 1 is returned.  If npts is less than 1 or if the
+  On success, 1 is returned.  If npts is less than 1 or if the
   minimum x or y is greater than or equal to the corresponding
   maximum, -1 is returned.
 
@@ -1101,6 +1101,7 @@ int CSWGrdUtils::grd_bilin_interp
 /*
     check for obvious errors
 */
+    if (ncol < 2  ||  nrow < 2) return -1;
     if (npts < 1) return -1;
     if (xmax <= xmin  ||  ymax <= ymin) return -1;
 
@@ -1113,6 +1114,8 @@ int CSWGrdUtils::grd_bilin_interp
 
     grid = gridin;
 
+    bool  bn22 = (ncol == 2  &&  nrow == 2);
+
 /*
     loop through the points and interpolate.
     any points outside the grid are set to
@@ -1123,25 +1126,32 @@ int CSWGrdUtils::grd_bilin_interp
     /*
         set to null value if outside the grid.
     */
-        if (x[i] < xmin - tiny  ||  x[i] > xmax + tiny  ||
+        if (!bn22) {
+          if (x[i] < xmin - tiny  ||  x[i] > xmax + tiny  ||
             y[i] < ymin - tiny  ||  y[i] > ymax + tiny) {
             z[i] = 1.e30f;
             continue;
+          }
         }
 
     /*
         calculate column (j) and row (k) of the lower
         left corner of the grid cell that contains the point.
     */
-        onnode = FindBestColumnAndRow (
+        if (!bn22) {
+          onnode = FindBestColumnAndRow (
             (double)x[i], (double)y[i],
             grid, ncol, nrow, nskip,
             xmin, ymin, xsp2, ysp2,
             &j, &k);
-
-        if (onnode) {
+          if (onnode) {
             z[i] = *(grid + ncol * k + j);
             continue;
+          }
+        }
+        else {
+            j = 0;
+            k = 0;
         }
 
     /*
@@ -1155,6 +1165,11 @@ int CSWGrdUtils::grd_bilin_interp
         z2 = *(grid + i1 + nskip);
         z3 = *(grid + i2);
         z4 = *(grid + i2 + nskip);
+
+        if (z1 > 1.e19) z1 = 1.e30;
+        if (z2 > 1.e19) z2 = 1.e30;
+        if (z3 > 1.e19) z3 = 1.e30;
+        if (z4 > 1.e19) z4 = 1.e30;
 
         if (z1 > 1.e19  ||  z2 > 1.e19  ||  z3 > 1.e19  ||  z4 > 1.e19) {
             z[i] = 1.e30f;
@@ -1183,12 +1198,12 @@ int CSWGrdUtils::grd_bilin_interp
         double_z = zt1 + (zt2 - zt1) * ypct;
 
         /*
-		 * Prevent floating-point invalid operation when putting a small
+         * Prevent floating-point invalid operation when putting a small
          * number back into the float variable.
          */
         if (-Z_ABSOLUTE_TINY < double_z && double_z < Z_ABSOLUTE_TINY) {
             double_z = 0.0;
-		}
+        }
         z[i] = (CSW_F) double_z;
     }
 

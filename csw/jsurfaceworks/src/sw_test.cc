@@ -337,7 +337,6 @@ int main (int argc, char *argv[])
                     fdata,
                     ddata
                 );
-
                 break;
 
        /*----------------------------------------------------------------*/
@@ -351,8 +350,9 @@ int main (int argc, char *argv[])
                }
                sscanf (
                    inbuff,
-                   "%d",
-                   ilist+0
+                   "%d %d",
+                   ilist+0,
+                   ilist+1
                );
 
                npts = ilist[0];
@@ -376,9 +376,9 @@ int main (int argc, char *argv[])
                }
 
                sw_process_command (
-                    NULL, NULL,
+                   NULL, NULL,
                    command_id,
-                    SINGLE_THREAD_ID,
+                   SINGLE_THREAD_ID,
                    ilist,
                    llist,
                    dlist,

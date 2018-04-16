@@ -297,6 +297,7 @@ public class JDisplayListPanel extends JPanel
 
         g2d = (Graphics2D)g;
 
+/*
         x = dlist.getDeviceViewportXorigin ();
         y = dlist.getDeviceViewportYorigin ();
         width = dlist.getDeviceViewportWidth ();
@@ -308,11 +309,12 @@ public class JDisplayListPanel extends JPanel
             width = getWidth ();
             height = getHeight ();
         }
+*/
 
-            x = 0;
-            y = 0;
-            width = getWidth ();
-            height = getHeight ();
+        x = 0;
+        y = 0;
+        width = getWidth ();
+        height = getHeight ();
 
         dlist.drawToDevice (g2d, x, y, width, height);
 

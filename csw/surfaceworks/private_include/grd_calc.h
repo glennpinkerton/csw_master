@@ -323,6 +323,7 @@ class CSWGrdCalc
                       EmptyRegionFlag {1},
                       WorkMargin {-1},
                       StepGridFlag {0};
+    int               NoisyDataFlag = 0;
     CSW_F             MaxSearchDistance {1.e30f};
     int               MaxNodeDistance {100000};
 
@@ -471,10 +472,14 @@ class CSWGrdCalc
 
     void              MovingAverage (CSW_F *grid, int ncol, int nrow,
                                      int smfact, int lightflag);
+    void              RemoveSpikes (CSW_F *grid, int ncol, int nrow,
+                                     int smfact, int nc);
 
 
 
   public:
+
+    void grd_set_noisy_data_flag (int ndf);
 
     int grd_set_conformable_surface_from_double
                           (CSW_F *grid, int ncol, int nrow,

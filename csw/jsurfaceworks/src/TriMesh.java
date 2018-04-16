@@ -19,7 +19,8 @@ import java.io.IOException;
 */
 public class TriMesh {
 
-	private static long StaticID = 0;
+  private static long StaticID = 0;
+  private int    nativeID = -1;
 
 /*
  * Arrays with node by node information.
@@ -30,7 +31,6 @@ public class TriMesh {
   private int[] nodeFlagArray;
   private int numNodes;
 
-  private int      atType = -1;
 
 /*
  * Arrays with edge by edge information.
@@ -84,6 +84,15 @@ public class TriMesh {
     externalGrid = false;
   }
 
+/**
+ Create an empty trimesh object with the specified native resources ID.
+*/
+  public TriMesh (int nid) {
+    nativeID = nid;
+    externalTsurf = false;
+    externalGrid = false;
+  }
+
   /**
    * Construct a new TriMesh based on an existing one, with zs offset
    * a certain amount (negative zs offset above, positive below).
@@ -92,15 +101,20 @@ public class TriMesh {
    * @param zOffset offset value for z array
    */
   public TriMesh(TriMesh triMesh, double zOffset) {
+
     if (triMesh == null)
       throw new IllegalArgumentException("triMesh is null");
+
     // first copy the entire trimesh to the new one
     copyFrom(triMesh);
+
     // now loop through z array and offset the values
     for (int index=0; index<nodeZArray.length; index++) {
       nodeZArray[index] += zOffset;
     }
+
   }
+
 
   /**
    * Copy Constructor
@@ -112,23 +126,6 @@ public class TriMesh {
     // first copy the entire trimesh to the new one
     copyFrom(triMesh);
   }
-
-/*-------------------------------------------------------------------------------*/
-
-/**
- Set the attribute type to allow the cached attributes per
- node to be used again if possible.
-*/
-  public void setAtType (int ival)
-  {
-    atType = ival;
-  }
-
-  public int getAtType ()
-  {
-    return atType;
-  }
-
 
 /*-------------------------------------------------------------------------------*/
 
@@ -833,6 +830,7 @@ public class TriMesh {
  and cause a program crash.
  */
   protected void finalize() throws Throwable {
+
     JSurfaceWorks.addFinalizedTriMesh (this);
     super.finalize();
   }
@@ -917,12 +915,21 @@ public class TriMesh {
     jsw.writeTextTriMeshFile(this, "java_tmesh.tri");
   }
 
+  public int getNativeID ()
+  {
+    return nativeID;
+  }
 
-    public long getUniqueID ()
-	{
-		StaticID++;
-		return StaticID;
-	}
+
+  public long getUniqueID ()
+  {
+
+    synchronized (this.getClass()) {
+      StaticID++;
+    }
+
+    return StaticID;
+  }
 
 
 /*---------------------------------------------------------------------*/
