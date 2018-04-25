@@ -37,9 +37,9 @@
 
 /*  define some macros for the file  */
 
-#define MAXPOLYCOMP          100
-#define MAXWORKSIZE          2000
-#define MAXWORKSIZE2         4000
+#define MAXPOLYCOMP          10
+#define MAXWORKSIZE          200
+#define MAXWORKSIZE2         400
 #define MAXTEXTLEN           256
 #define HOLEFLAG             1.e19f
 

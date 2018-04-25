@@ -41,7 +41,6 @@ class GPFSpline
   public:
 
     GPFSpline () {};
-    ~GPFSpline () {};
 
   private:
 

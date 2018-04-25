@@ -57,7 +57,6 @@ class CSWPolyCutline
 
     int InsertAHole (double *xp, double *yp, int nnin,
                      double *xhole, double *yhole, int nholein, int *nnout);
-    int NullWorkspace (void);
 
 
   public:
@@ -67,9 +66,6 @@ class CSWPolyCutline
     {
     };
 
-    int ply_AddCutLines2 (CSW_F *xyin, int nin,
-                          CSW_F **xyout, int *nout, int *ipout,
-                          int maxpoly, int *memflag);
     int ply_AddCutLines (double *xin, double *yin, int ncompin, int *nptsin,
                          double *xout, double *yout, int *npolyout, int *nptsout);
 

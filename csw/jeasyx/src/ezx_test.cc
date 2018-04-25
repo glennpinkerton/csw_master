@@ -119,6 +119,8 @@ int main (int argc, char *argv[])
         }
     }
 
+    csw_InitMemCount ();
+
     for (;;) {
 
         ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
@@ -2296,6 +2298,8 @@ int main (int argc, char *argv[])
     }
 
 //    unsetenv ("CSW_DONT_WRITE_PLAYBACK");
+
+    csw_ShowMemCount ();
 
     return 1;
 

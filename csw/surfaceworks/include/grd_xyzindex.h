@@ -10,7 +10,7 @@
 
 /*
  * Define the interface for the XYZIndex3D class.  The
- * body of the class is in grd_xyzindex.cc, in the ..\src
+ * body of the class is in grd_xyzindex.cc, in the ../src
  * directory.
  */
 
@@ -33,6 +33,20 @@ class XYZIndex3D
                 double zmax);
 
     virtual ~XYZIndex3D ();
+
+
+// Objects of this class are not meant to be copied or moved.
+
+  private:
+
+    XYZIndex3D (const XYZIndex3D &other) {};
+    const XYZIndex3D &operator= (const XYZIndex3D &other) {return *this;};
+    
+    XYZIndex3D (const XYZIndex3D &&other) {};
+    const XYZIndex3D &operator= (const XYZIndex3D &&other) {return *this;};
+
+  public:
+    
 
     int SetGeometry (double xmin,
                      double ymin,

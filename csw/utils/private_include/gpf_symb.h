@@ -72,7 +72,6 @@ class GPFSymbol
   public:
 
     GPFSymbol () {};
-    ~GPFSymbol () {};
 
 
   private:

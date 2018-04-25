@@ -54,12 +54,14 @@ SurfaceGroupPlane::SurfaceGroupPlane (SurfaceGroupPlane *sptr)
     copy_from_pointer (sptr);
 }
 
-SurfaceGroupPlane::SurfaceGroupPlane (SurfaceGroupPlane const & src)
+
+/*
+SurfaceGroupPlane::SurfaceGroupPlane (SurfaceGroupPlane const &src)
 {
     copy_from_reference (src);
 }
 
-SurfaceGroupPlane const & SurfaceGroupPlane::operator = (SurfaceGroupPlane const & src)
+SurfaceGroupPlane const& SurfaceGroupPlane::operator= (SurfaceGroupPlane const &src)
 {
     if (&src == this) {
         return (*this);
@@ -69,6 +71,8 @@ SurfaceGroupPlane const & SurfaceGroupPlane::operator = (SurfaceGroupPlane const
 
     return (*this);
 }
+*/
+
 
 void SurfaceGroupPlane::copy_from_pointer (SurfaceGroupPlane *sptr)
 {

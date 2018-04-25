@@ -155,13 +155,11 @@ class JSWUnitTestFrame extends JFrame
     {
         nphint = nph;
 
-/*
 try {
 int idum = System.in.read();
 }
 catch (Exception e) {
 }
-*/
 
 
         String   cpar = System.getenv ("CSW_PARENT");
@@ -390,6 +388,7 @@ class TriMesh10Frame extends JDLFrame
 
         random = new Random();
         long  ctw = System.currentTimeMillis ();
+//ctw = 12345;
         random.setSeed (ctw);
         int np = random.nextInt(nphint) + nphint / 2;
         if (np < 3) np = 3;

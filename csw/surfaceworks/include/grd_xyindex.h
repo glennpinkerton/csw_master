@@ -26,6 +26,19 @@ class XYIndex2D
 
     virtual ~XYIndex2D ();
 
+
+// Objects of class not meant to be copied or moved.
+
+  private:
+
+    XYIndex2D (const XYIndex2D &other) {};
+    const XYIndex2D &operator= (const XYIndex2D &other) {return *this;};
+    XYIndex2D (const XYIndex2D &&other) {};
+    const XYIndex2D &operator= (const XYIndex2D &&other) {return *this;};
+
+
+  public:
+
     int SetGeometry (double xmin,
                      double ymin,
                      double xmax,

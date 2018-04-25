@@ -43,7 +43,6 @@
 #include "csw/utils/private_include/ply_calc.h"
 #include "csw/utils/private_include/ply_graph.h"
 
-#include "csw/utils/private_include/csw_memmgt.h"
 #include "csw/utils/private_include/csw_scope.h"
 
 
@@ -155,7 +154,16 @@ int CSWPolyCalc::ply_CalcIntersect (CSWErrNum &err_obj,
 
     CSWPolyUtils    ply_utils_obj;
     CSWPolyDrivers  ply_drivers_obj;
-    CSWMemmgt       csw_mem_obj;
+
+    auto fscope = [&]() 
+    {
+        csw_Free (extrax);
+        csw_Free (extraholes);
+        csw_Free (choles);
+        csw_Free (xps);
+        csw_Free (xmins);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
     if (maxcomp < 2) {
         err_obj.csw_SetErrNum (PLY_WORKSIZE);
@@ -187,7 +195,7 @@ int CSWPolyCalc::ply_CalcIntersect (CSWErrNum &err_obj,
     maxextra = maxpts;
     maxextraholes = (maxcomp + maxhole) * 2;
 
-    extrax = (double *)csw_mem_obj.csw_StackMalloc (4 * maxextra * sizeof(double));
+    extrax = (double *)csw_Malloc (4 * maxextra * sizeof(double));
     if (!extrax) {
         err_obj.csw_SetErrNum (PLY_BADMALLOC);
         return -1;
@@ -196,14 +204,14 @@ int CSWPolyCalc::ply_CalcIntersect (CSWErrNum &err_obj,
     exout = extray + maxpts;
     eyout = extrax + maxpts;
 
-    extraholes = (int *)csw_mem_obj.csw_StackMalloc (2 * maxextraholes * sizeof(int));
+    extraholes = (int *)csw_Malloc (2 * maxextraholes * sizeof(int));
     if (!extraholes) {
         err_obj.csw_SetErrNum (PLY_BADMALLOC);
         return -1;
     }
     exhout = extraholes + maxextraholes;
 
-    cxnestin = (double *)csw_mem_obj.csw_StackMalloc (8 * maxpts * sizeof(double));
+    cxnestin = (double *)csw_Malloc (8 * maxpts * sizeof(double));
     if (!cxnestin) {
         err_obj.csw_SetErrNum (PLY_BADMALLOC);
         return -1;
@@ -216,7 +224,7 @@ int CSWPolyCalc::ply_CalcIntersect (CSWErrNum &err_obj,
     sxnestout = synestin + maxpts;
     synestout = sxnestout + maxpts;
 
-    choles = (int *)csw_mem_obj.csw_StackMalloc (4 * maxhole * sizeof(int));
+    choles = (int *)csw_Malloc (4 * maxhole * sizeof(int));
     if (!choles) {
         err_obj.csw_SetErrNum (PLY_BADMALLOC);
         return -1;
@@ -228,7 +236,7 @@ int CSWPolyCalc::ply_CalcIntersect (CSWErrNum &err_obj,
     dxout = xout;
     dyout = yout;
 
-    xps = (double **)csw_mem_obj.csw_StackMalloc (4 * maxhole * sizeof(double));
+    xps = (double **)csw_Malloc (4 * maxhole * sizeof(double));
     if (!xps) {
         err_obj.csw_SetErrNum (PLY_BADMALLOC);
         return -1;
@@ -237,7 +245,7 @@ int CSWPolyCalc::ply_CalcIntersect (CSWErrNum &err_obj,
     xpc = yps + maxhole;
     ypc = xpc + maxhole;
 
-    xmins = (double *)csw_mem_obj.csw_StackMalloc (8 * maxhole * sizeof(double));
+    xmins = (double *)csw_Malloc (8 * maxhole * sizeof(double));
     if (!xmins) {
         err_obj.csw_SetErrNum (PLY_BADMALLOC);
         return -1;
@@ -588,8 +596,6 @@ int CSWPolyCalc::ply_CalcIntersect (CSWErrNum &err_obj,
 
     *npout = ncomptotal;
 
-/*  workspace memory is csw_Freed by the csw_mem_obj destructor.  */
-
     return 1;
 
 }  /*  end of function ply_CalcIntersect  */
@@ -675,21 +681,22 @@ int CSWPolyCalc::ply_CalcXor (CSWErrNum &err_obj,
     double         *xwork, *ywork, x1, y1, x2, y2, w1;
     int            *iwork;
 
-//  Heap memory is allocated with the csw_mem_obj.  Upon return
-//  from this function or scope loss from an exception throw,
-//  the object is deleted and its destructor csw_Frees all memory
-//  allocated.
-    CSWMemmgt      csw_mem_obj;
+    auto fscope = [&]() 
+    {
+        csw_Free (iwork);
+        csw_Free (xwork);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
 /*  allocate memory for work arrays  */
 
-    iwork = (int *)csw_mem_obj.csw_StackMalloc (maxhole * sizeof(int));
+    iwork = (int *)csw_Malloc (maxhole * sizeof(int));
     if (!iwork) {
         err_obj.csw_SetErrNum (PLY_BADMALLOC);
         return -1;
     }
 
-    xwork = (double *)csw_mem_obj.csw_StackMalloc (maxpts * 2 * sizeof(double));
+    xwork = (double *)csw_Malloc (maxpts * 2 * sizeof(double));
     if (!xwork) {
         err_obj.csw_SetErrNum (PLY_BADMALLOC);
         return -1;
@@ -1226,11 +1233,12 @@ int CSWPolyCalc::ply_CalcIntersect1 (CSWErrNum &err_obj,
 
 */
 
-int CSWPolyCalc::ply_ClipPlineToArea (int flag, double *xp, double *yp, int *ic, int ncin,
-                         double *xvc, double *yvc, int *ivc, int nvc,
-                         double *xline, double *yline, int nline,
-                         double *xout, double *yout, int *iout, int *nout,
-                         int maxpts, int maxcomps)
+int CSWPolyCalc::ply_ClipPlineToArea (
+               int flag, double *xp, double *yp, int *ic, int ncin,
+               double *xvc, double *yvc, int *ivc, int nvc,
+               double *xline, double *yline, int nline,
+               double *xout, double *yout, int *iout, int *nout,
+               int maxpts, int maxcomps)
 {
     double       **xpw, **ypw, **xpvw, **ypvw;
     int          nt=0, n, i, istat, jstat, n2=0, k, nwmax;
@@ -1242,7 +1250,17 @@ int CSWPolyCalc::ply_ClipPlineToArea (int flag, double *xp, double *yp, int *ic,
 
     CSWPolyUtils  ply_utils_obj;
     CSWPolyTraverse  ply_traverse_obj;
-    CSWMemmgt      csw_mem_obj;
+
+
+    auto fscope = [&]() 
+    {
+        csw_Free (xpw);
+        csw_Free (xpnest);
+        csw_Free (ipnest);
+        csw_Free (xpvw);
+        csw_Free (xw);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
 /*
  * Initialize output in case of an error.
@@ -1255,10 +1273,6 @@ int CSWPolyCalc::ply_ClipPlineToArea (int flag, double *xp, double *yp, int *ic,
         return -1;
     }
 
-/*
- * A better way to fix bug 9853 is to return a status of -1
- * if the xline, yline or nline parameters are illegal.
- */
     if (xline == NULL  ||  yline == NULL  ||  nline < 2) {
         return -1;
     }
@@ -1266,7 +1280,7 @@ int CSWPolyCalc::ply_ClipPlineToArea (int flag, double *xp, double *yp, int *ic,
 /*
     allocate work space memory
 */
-    xpw = (double **)csw_mem_obj.csw_StackMalloc (nc * 2 * sizeof (double *));
+    xpw = (double **)csw_Malloc (nc * 2 * sizeof (double *));
     if (!xpw) {
         return -1;
     }
@@ -1282,19 +1296,19 @@ int CSWPolyCalc::ply_ClipPlineToArea (int flag, double *xp, double *yp, int *ic,
     ncn = nc + 2;
     npn = n + 10;
 
-    xpnest = (double *)csw_mem_obj.csw_StackMalloc (npn * 2 * sizeof (double));
+    xpnest = (double *)csw_Malloc (npn * 2 * sizeof (double));
     if (!xpnest) {
         return -1;
     }
     ypnest = xpnest + npn;
 
-    ipnest = (int *)csw_mem_obj.csw_StackMalloc (ncn * 2 * sizeof(int));
+    ipnest = (int *)csw_Malloc (ncn * 2 * sizeof(int));
     if (!ipnest) {
         return -1;
     }
     jpnest = ipnest + ncn;
 
-    xpvw = (double **)csw_mem_obj.csw_StackMalloc (nvc * 2 * sizeof (double *));
+    xpvw = (double **)csw_Malloc (nvc * 2 * sizeof (double *));
     if (!xpvw) {
         return -1;
     }
@@ -1308,7 +1322,7 @@ int CSWPolyCalc::ply_ClipPlineToArea (int flag, double *xp, double *yp, int *ic,
     }
 
     nwmax = maxpts;
-    xw = (double *)csw_mem_obj.csw_StackMalloc (2 * nwmax * sizeof(double));
+    xw = (double *)csw_Malloc (2 * nwmax * sizeof(double));
     if (!xw) {
         return -1;
     }
@@ -1527,11 +1541,13 @@ int CSWPolyCalc::ply_ClipToBox1 (CSWErrNum &err_obj,
     CSW_F       x11, y11, x22, y22, xc[5], yc[5];
     int         *ncout = NULL, *nhout = NULL, npout;
 
+
     auto fscope = [&]() 
     {
         csw_Free (ncout);
     };
     CSWScopeGuard  func_scope_guard (fscope);
+
 
     if (x1_in < x2_in) {
         x1 = x1_in;
@@ -1676,20 +1692,28 @@ int CSWPolyCalc::ProcessExtra (CSWErrNum &err_obj,
      double *xout, double *yout, int *hout, int *cout)
 {
 
-    double         **xpc, **ypc, **xps, **yps,
-                   *xminc, *yminc, *xmaxc, *ymaxc,
-                   *xmins, *ymins, *xmaxs, *ymaxs,
+    double         **xpc = NULL, **ypc = NULL, **xps = NULL, **yps = NULL,
+                   *xminc = NULL, *yminc = NULL, *xmaxc = NULL, *ymaxc = NULL,
+                   *xmins = NULL, *ymins = NULL, *xmaxs = NULL, *ymaxs = NULL,
                    sx1, sy1, sx2, sy2, cx1, cy1, cx2, cy2, xt,
-                   *cxnow, *cynow, *sxnow, *synow,
-                   *xoutnow, *youtnow;
-    int            cnparts, snparts, i, j, k, istat, *sintfound,
+                   *cxnow = NULL, *cynow = NULL, *sxnow = NULL, *synow = NULL,
+                   *xoutnow = NULL, *youtnow = NULL;
+    int            cnparts, snparts, i, j, k, istat, *sintfound = NULL,
                    nhc, n1, chanc, ntotout, ntothout,
-                   *chnow, *shnow, npoutnow, nctotal, ntmp1, ntmp2,
-                   m, mm, l, coffset, *icoutnow, *ihoutnow;
+                   *chnow = NULL, *shnow = NULL, npoutnow, nctotal, ntmp1, ntmp2,
+                   m, mm, l, coffset, *icoutnow = NULL, *ihoutnow = NULL;
 
     CSWPolyUtils   ply_utils_obj;
     CSWPolyDrivers  ply_drivers_obj;
-    CSWMemmgt      csw_mem_obj;
+
+    auto fscope = [&]() 
+    {
+        csw_Free (xpc);
+        csw_Free (xminc);
+        csw_Free (icoutnow);
+        csw_Free (sintfound);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
     *cout = 0;
 
@@ -1701,7 +1725,7 @@ int CSWPolyCalc::ProcessExtra (CSWErrNum &err_obj,
         nhc += icompc[i];
     }
 
-    xpc = (double **)csw_mem_obj.csw_StackMalloc ((nhc + ns) * 2 * sizeof(double *));
+    xpc = (double **)csw_Malloc ((nhc + ns) * 2 * sizeof(double *));
     if (!xpc) {
         return -1;
     }
@@ -1709,7 +1733,7 @@ int CSWPolyCalc::ProcessExtra (CSWErrNum &err_obj,
     xps = ypc + nhc;
     yps = xps + ns;
 
-    xminc = (double *)csw_mem_obj.csw_StackMalloc ((nhc + ns) * 4 * sizeof(double));
+    xminc = (double *)csw_Malloc ((nhc + ns) * 4 * sizeof(double));
     if (!xminc) {
         return -1;
     }
@@ -1723,12 +1747,12 @@ int CSWPolyCalc::ProcessExtra (CSWErrNum &err_obj,
 
     i = (nhc + ns) * 10;
     if (i < 100) i = 1000;
-    icoutnow = (int *)csw_mem_obj.csw_StackMalloc (i * sizeof(int));
+    icoutnow = (int *)csw_Malloc (i * sizeof(int));
     if (!icoutnow) {
         return -1;
     }
 
-    sintfound = (int *)csw_mem_obj.csw_StackMalloc (ns * sizeof(int));
+    sintfound = (int *)csw_Malloc (ns * sizeof(int));
     if (!sintfound) {
         return -1;
     }

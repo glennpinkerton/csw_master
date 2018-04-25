@@ -81,6 +81,16 @@
 #  define CSW_FLOAT_ZERO 1.e-18f
 #endif
 
+
+
+
+/*
+ *  !!!! Never check in with the _MEMCOUNT_ defined.
+ *       Always comment it out.
+ */
+
+//#define _MEMCOUNT_ 1
+
 /*
     union for packing a 2 byte int into a
     2 byte character string
@@ -160,6 +170,9 @@ typedef union {
         void *csw_Realloc (void *p, int size);
         void *csw_Calloc (int size);
         void csw_Free (void *p);
+
+        void csw_InitMemCount ();
+        void csw_ShowMemCount ();
 
 
     /*

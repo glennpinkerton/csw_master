@@ -38,7 +38,6 @@
 #include "csw/utils/private_include/ply_utils.h"
 #include "csw/utils/private_include/ply_traverse.h"
 #include "csw/utils/private_include/ply_cutline.h"
-#include "csw/utils/private_include/csw_memmgt.h"
 #include "csw/utils/private_include/csw_scope.h"
 
 /*
@@ -48,201 +47,7 @@
 #define MAXHOLES               1000
 
 
-/*
-  ****************************************************************
 
-                 p l y _ A d d C u t L i n e s 2
-
-  ****************************************************************
-
-  function name:    ply_AddCutLines2       (int)
-
-  call sequence:    ply_AddCutLines2 (xyin, nin, xyout, nout, ipout, memflag)
-
-  purpose:          This function rearranges the points in a complex
-                    polygon so that all holes are connected to the 
-                    main component with cut lines.  This function 
-                    converts the polygon to double precision and calls
-                    ply_AddCutLines.
-
-  return value:     status code
-
-                    -1 = memory allocation error
-                     1 = normal successful completion
-
-  calling parameters:
-
-    xyin        r    CSW_F*    Array of x,y polygon points with hole flags
-                               embedded into it.
-    nin         r    int       Number of points in xyin
-    xyout       w    CSW_F**   Returned pointer to xy array with cut lines
-    nout        w    int*      Number of polygons in xyout.
-    ipout       w    int*      Array of number of points per output polygon.
-    maxpoly     r    int       Size of the ipout array.
-    memflag     w    int*      Flag for whether the xyout pointer may be csw_Freed.
-                               0 = Do not csw_Free xyout memory
-                               1 = xyout memory may be csw_Freed
-
-*/
-
-int CSWPolyCutline::ply_AddCutLines2 (CSW_F *xyin, int nin, 
-                      CSW_F **xyout, int *nout, int *ipout, 
-                      int maxpoly, int *memflag)
-{
-    int          i, j, k, n2, n, npout;
-    double       *dx1 = NULL, *dy1 = NULL, *dx2 = NULL, *dy2 = NULL;
-    CSW_F        *xy = NULL, *xyw1 = NULL,
-                 *xyp1[MAXHOLES], *xyt = NULL, *xy2[2];
-    int          istat, iholes[MAXHOLES], nholes, 
-                 iclip[MAXHOLES], mflg1;
-
-    CSWMemmgt    csw_mem_obj;
-    GPFCalcdraw  calcdraw_obj;
-
-/*
-    return input if less than 3 points
-*/
-    if (nin < 3) {
-        xyout[0] = xyin;
-        *nout = 1;
-        ipout[0] = nin;
-        *memflag = 0;
-        return 1;
-    }
-
-/*
-    allocate work space for clipping
-*/
-    n2 = nin * 4;
-    if (n2 < 1000) n2 = 1000;
-    xyw1 = (CSW_F *)csw_Malloc (n2 * 3 * sizeof(CSW_F));
-    if (!xyw1) {
-        return -1;
-    }
-
-/*
-    separate polygon holes
-*/
-
-    istat = calcdraw_obj.gpf_polyholesep (xyin, nin, 1.e18f, MAXHOLES,
-                             xyp1, &nholes, iholes);
-    if (istat == -1) {
-        csw_Free (xyw1);
-        return -1;
-    }
-
-/*
-    combine holes into component array
-*/
-    n = 0;
-    for (i=0; i<nholes; i++) {
-        k = 0;
-        xyt = xyp1[i];
-        for (j=0; j<iholes[i]; j++) {
-            xyw1[n] = xyt[k];
-            n++;
-            k++;
-            xyw1[n] = xyt[k];
-            n++;
-            k++;
-        }
-    }
-
-/*
-    separate input components into x and y
-*/
-    istat = gpf_xyseparate (xyw1, n/2, xy2, &mflg1);
-    csw_Free (xyw1);
-    if (istat == -1) {
-        return -1;
-    }
-
-/*
-    convert to double arrays
-*/
-    n2 = n / 2 + nholes * 2 + 10;
-
-    dx1 = (double *)csw_mem_obj.csw_StackMalloc (4 * n2 * sizeof(double));
-    if (!dx1) {
-        if (mflg1) {
-            csw_Free (xy2[0]);
-            csw_Free (xy2[1]);
-        }
-        NullWorkspace ();
-        return -1;
-    }
-    n /= 2;
-    dy1 = dx1 + n2;
-    dx2 = dy1 + n2;
-    dy2 = dx2 + n2;
-
-    for (i=0; i<n; i++) {
-        dx1[i] = (double)xy2[0][i];
-        dy1[i] = (double)xy2[1][i];
-    }
-
-    if (mflg1) {
-        csw_Free (xy2[0]);
-        csw_Free (xy2[1]);
-    }
-
-/*
-    add the cut lines using the double arrays
-*/
-    istat = ply_AddCutLines (dx1, dy1, nholes, iholes,
-                             dx2, dy2, &npout, iclip);
-    if (istat == -1) {
-        NullWorkspace ();
-        return -1;
-    }
-
-/*
-    allocate output CSW_F array
-*/
-    n = 0;
-    for (i=0; i<npout; i++) {
-        n += iclip[i];
-    }
-
-    n += 10;
-
-    *xyout = (CSW_F *)csw_Malloc (n * 2 * sizeof(CSW_F));
-    if (!*xyout) {
-        NullWorkspace ();
-        return -1;
-    }
-
-/*
-    copy data back into output CSW_F arrays
-*/
-    n = 0;
-    xy = *xyout;
-    if (npout > maxpoly) {
-        npout = maxpoly;
-    }
-
-    for (i=0; i<npout; i++) {
-        ipout[i] = iclip[i];
-        for (j=0; j<iclip[i]; j++) {
-            *xy = (CSW_F)dx2[n];
-            xy++;
-            *xy = (CSW_F)dy2[n];
-            xy++;
-            n++;
-        }
-    }
-
-    *nout = npout;
-    *memflag = 1;
-
-/*
-    csw_Free work space memory
-*/
-    NullWorkspace ();
-
-    return 1;
-
-}  /*  end of function ply_AddCutLines2  */
 
 
 /*
@@ -266,8 +71,9 @@ int CSWPolyCutline::ply_AddCutLines2 (CSW_F *xyin, int nin,
 
 */
 
-int CSWPolyCutline::ply_AddCutLines (double *xin, double *yin, int ncompin, int *nptsin,
-                     double *xout, double *yout, int *npolyout, int *nptsout)
+int CSWPolyCutline::ply_AddCutLines
+         (double *xin, double *yin, int ncompin, int *nptsin,
+          double *xout, double *yout, int *npolyout, int *nptsout)
 {
     int           ncomp, nmem1, nmem2, i, ii, jj,
                   *iw1 = NULL, *iw2 = NULL, nestpoly, istat,
@@ -278,7 +84,21 @@ int CSWPolyCutline::ply_AddCutLines (double *xin, double *yin, int ncompin, int 
                   *xp = NULL, *yp = NULL, xt;
 
     CSWPolyUtils  ply_utils_obj;
-    CSWMemmgt     csw_mem_obj;
+
+    auto fscope = [&]()
+    {
+        csw_Free (xw1);
+        csw_Free (iw1);
+        csw_Free (XHoles);
+
+        XHoles = NULL;
+        YHoles = NULL;
+        Tmp = NULL;
+        IHoles = NULL;
+        NHoles = 0;
+
+    };
+    CSWScopeGuard func_scope_guard (fscope);
 
     ncomp = ncompin;
 
@@ -296,9 +116,8 @@ int CSWPolyCutline::ply_AddCutLines (double *xin, double *yin, int ncompin, int 
     nmem1 += 10;
     nmem2 = nmem1 * 3 + 10 * ncomp;
     
-    xw1 = (double *)csw_mem_obj.csw_StackMalloc (nmem2 * sizeof(double));
+    xw1 = (double *)csw_Malloc (nmem2 * sizeof(double));
     if (!xw1) {
-        NullWorkspace ();
         return -1;
     }
 
@@ -311,9 +130,8 @@ int CSWPolyCutline::ply_AddCutLines (double *xin, double *yin, int ncompin, int 
     nmem1 = ncomp * 2 + 10;
     nmem2 = nmem1 * 3 + 10;
     
-    iw1 = (int *)csw_mem_obj.csw_StackMalloc (nmem2 * sizeof(int));
+    iw1 = (int *)csw_Malloc (nmem2 * sizeof(int));
     if (!iw1) {
-        NullWorkspace ();
         return -1;
     }
 
@@ -322,9 +140,8 @@ int CSWPolyCutline::ply_AddCutLines (double *xin, double *yin, int ncompin, int 
     nmemholes = nmem1;
 
     nmem2 = nmem1 * 2 + 10;
-    XHoles = (double **)csw_mem_obj.csw_StackMalloc (nmem2 * sizeof(double *));
+    XHoles = (double **)csw_Malloc (nmem2 * sizeof(double *));
     if (!XHoles) {
-        NullWorkspace ();
         return -1;
     }
     YHoles = XHoles + nmem1;
@@ -347,7 +164,6 @@ int CSWPolyCutline::ply_AddCutLines (double *xin, double *yin, int ncompin, int 
                          xw1, yw1, &nestpoly, iw1, iw2);
 
     if (istat == -1  ||  istat == 1  ||  istat == 3) {
-        NullWorkspace ();
         return -1;
     }
 
@@ -461,7 +277,6 @@ int CSWPolyCutline::ply_AddCutLines (double *xin, double *yin, int ncompin, int 
                 }
             }
             if (ntimes > nc) {
-                NullWorkspace ();
                 return -1;
             }
             ntimes++;
@@ -484,7 +299,6 @@ int CSWPolyCutline::ply_AddCutLines (double *xin, double *yin, int ncompin, int 
     csw_Free the workspace memory and return success
 */
 
-    NullWorkspace ();
     *npolyout = nestpoly;
 
     return 1;
@@ -658,28 +472,3 @@ FOUND_CUT_LINE:
 
 }  /*  end of InsertAHole function  */
 
-
-
-/*
-  ****************************************************************
-
-                    N u l l W o r k s p a c e
-
-  ****************************************************************
-
-    Reset all of the workspace pointers to NULL.
-
-*/
-
-int CSWPolyCutline::NullWorkspace (void)
-{
-
-    XHoles = NULL;
-    YHoles = NULL;
-    Tmp = NULL;
-    IHoles = NULL;
-    NHoles = 0;
-
-    return 1;
-
-}  /*  end of NullWorkspace function  */

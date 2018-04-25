@@ -36,7 +36,6 @@
 #include "csw/utils/private_include/ply_gridvec.h"
 #include "csw/utils/private_include/ply_drivers.h"
 #include "csw/utils/private_include/ply_compdata.h"
-#include "csw/utils/private_include/csw_memmgt.h"
 #include "csw/utils/private_include/csw_scope.h"
 
 
@@ -170,7 +169,20 @@ int CSWPolyDrivers::ply_intcomps (CSWErrNum &err_obj,
 
     CSWPolyUtils     ply_utils_obj;
     CSWPolyCompdata  ply_compdata_obj;
-    CSWMemmgt        csw_mem_obj;
+
+
+    auto fscope = [&]()
+    {
+        csw_Free (xcomp);
+        csw_Free (ncomp);
+        csw_Free (xr);
+        csw_Free (xhic);
+        csw_Free (nhic);
+        csw_Free (xhr);
+        csw_Free (ihr);
+        csw_Free (xminh);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
     ddum = 0;
     idum = 0;
@@ -205,7 +217,7 @@ int CSWPolyDrivers::ply_intcomps (CSWErrNum &err_obj,
     pdum = (double) nctot;
     istat = ply_utils_obj.ply_parms ('w', "maxhmem", &pdum);
 
-    xcomp = (double **) csw_mem_obj.csw_StackMalloc (nctot * 4 * sizeof(double *));
+    xcomp = (double **) csw_Malloc (nctot * 4 * sizeof(double *));
     if(!xcomp) {
         return -1;
     }
@@ -214,33 +226,33 @@ int CSWPolyDrivers::ply_intcomps (CSWErrNum &err_obj,
     xcc = ycomp + nctot;
     ycc = xcc + nctot;
 
-    ncomp = (int *) csw_mem_obj.csw_StackMalloc (nctot * sizeof(int));
+    ncomp = (int *) csw_Malloc (nctot * sizeof(int));
     if(!ncomp) {
         return -1;
     }
 
-    xr = (double *) csw_mem_obj.csw_StackMalloc ( ntot * 2 * sizeof (double));
+    xr = (double *) csw_Malloc ( ntot * 2 * sizeof (double));
     if(!xr) {
         return -1;
     }
 
     yr = xr + ntot;
 
-    xhic = (double **)csw_mem_obj.csw_StackMalloc (nctot * 2 * sizeof (double *));
+    xhic = (double **)csw_Malloc (nctot * 2 * sizeof (double *));
     if (!xhic) {
         return -1;
     }
 
     yhic = xhic + nctot;
 
-    nhic = (int *)csw_mem_obj.csw_StackMalloc (nctot * 2 * sizeof (int));
+    nhic = (int *)csw_Malloc (nctot * 2 * sizeof (int));
     if (!nhic) {
         return -1;
     }
 
     ncc = nhic + nctot;
 
-    xhr = (double *)csw_mem_obj.csw_StackMalloc (2 * ntot * sizeof (double));
+    xhr = (double *)csw_Malloc (2 * ntot * sizeof (double));
     if (!xhr) {
         return -1;
     }
@@ -250,14 +262,14 @@ int CSWPolyDrivers::ply_intcomps (CSWErrNum &err_obj,
     xhrsav = xhr;
     yhrsav = yhr;
 
-    ihr = (int *)csw_mem_obj.csw_StackMalloc (2 * nctot * sizeof (int));
+    ihr = (int *)csw_Malloc (2 * nctot * sizeof (int));
     if (!ihr) {
         return -1;
     }
     
     ihr2 = ihr + nctot;
 
-    xminh = (double *)csw_mem_obj.csw_StackMalloc (nctot * 4 * sizeof (double));
+    xminh = (double *)csw_Malloc (nctot * 4 * sizeof (double));
     if (!xminh) {
         return -1;
     }
@@ -767,14 +779,16 @@ int CSWPolyDrivers::ply_orcomps (
 
     CSWPolyUtils     ply_utils_obj;
     CSWPolyCompdata  ply_compdata_obj;
-    CSWMemmgt        csw_mem_obj;
 
-/*
     auto fscope = [&]()
-      {
-      };
+    {
+        csw_Free (xcomp);
+        csw_Free (ycomp);
+        csw_Free (ncomp);
+        csw_Free (xr);
+        csw_Free (yr);
+    };
     CSWScopeGuard  func_scope_guard (fscope);
-*/
 
 
     idum = 0;
@@ -812,27 +826,27 @@ int CSWPolyDrivers::ply_orcomps (
     pdum = (double) nctot;
     istat = ply_utils_obj.ply_parms ('w', "maxhmem", &pdum);
 
-    xcomp = (double **) csw_mem_obj.csw_StackMalloc (nctot * sizeof(double *));
+    xcomp = (double **) csw_Malloc (nctot * sizeof(double *));
     if(!xcomp) {
         return -1;
     }
 
-    ycomp = (double **) csw_mem_obj.csw_StackMalloc (nctot * sizeof(double *));
+    ycomp = (double **) csw_Malloc (nctot * sizeof(double *));
     if(!ycomp) {
         return -1;
     }
 
-    ncomp = (int *) csw_mem_obj.csw_StackMalloc (nctot * sizeof(int));
+    ncomp = (int *) csw_Malloc (nctot * sizeof(int));
     if(!ncomp) {
         return -1;
     }
 
-    xr = (double *) csw_mem_obj.csw_StackMalloc (2 * ntot * sizeof (double));
+    xr = (double *) csw_Malloc (2 * ntot * sizeof (double));
     if(!xr) {
         return -1;
     }
 
-    yr = (double *) csw_mem_obj.csw_StackMalloc (2 * ntot * sizeof (double));
+    yr = (double *) csw_Malloc (2 * ntot * sizeof (double));
     if(!yr) {
         return -1;
     }
@@ -1962,27 +1976,35 @@ int CSWPolyDrivers::ply_holint  (
     int           i, j, offset, istat, itemp;
     CList         *iclist, *islist, *iclsav, *islsav;
     CSWPolyUtils  ply_utils_obj;
-    CSWMemmgt     csw_mem_obj;
 
+
+    auto fscope = [&]()
+    {
+        csw_Free (jsloc);
+        csw_Free (jcloc);
+        csw_Free (islist);
+        csw_Free (iclist);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
 /*  allocate memory for local pointers  */
 
-    jsloc = (int *) csw_mem_obj.csw_StackMalloc (ncomps * sizeof(int));
+    jsloc = (int *) csw_Malloc (ncomps * sizeof(int));
     if(!jsloc) {
         return -1;
     }
 
-    jcloc = (int  *) csw_mem_obj.csw_StackMalloc (ncompc * sizeof(int ));
+    jcloc = (int  *) csw_Malloc (ncompc * sizeof(int ));
     if(!jcloc) {
         return -1;
     }
 
-    islist = (CList *) csw_mem_obj.csw_StackMalloc (ncomps * sizeof(CList));
+    islist = (CList *) csw_Malloc (ncomps * sizeof(CList));
     if(!islist) {
         return -1;
     }
 
-    iclist = (CList *) csw_mem_obj.csw_StackMalloc (ncompc * sizeof(CList));
+    iclist = (CList *) csw_Malloc (ncompc * sizeof(CList));
     if(!iclist) {
         return -1;
     }
@@ -2158,16 +2180,26 @@ int CSWPolyDrivers::ply_holunion (
     double      *ex = NULL, *ey = NULL;
     CSWPolyUtils     ply_utils_obj;
     CSWPolyCompdata  ply_compdata_obj;
-    CSWMemmgt        csw_mem_obj;
+
+    auto fscope = [&]()
+    {
+        csw_Free (prec);
+        csw_Free (preca);
+        csw_Free (xtmp);
+        csw_Free (itmp);
+        csw_Free (xst);
+        csw_Free (xmint);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
 /*  allocate memory for polygon records  */
 
-    prec = (POlyrec *)csw_mem_obj.csw_StackMalloc (nh * sizeof (POlyrec));
+    prec = (POlyrec *)csw_Malloc (nh * sizeof (POlyrec));
     if (!prec) {
         return -1;
     }
 
-    preca = (POlyrec **)csw_mem_obj.csw_StackMalloc (nh * sizeof (POlyrec *));
+    preca = (POlyrec **)csw_Malloc (nh * sizeof (POlyrec *));
     if (!preca) {
         return -1;
     }
@@ -2233,7 +2265,7 @@ int CSWPolyDrivers::ply_holunion (
     if (nthol < 20) nthol = 20;
     nbyte = multmem * ntpt * sizeof (double) * 2;
 
-    xtmp = (double *)csw_mem_obj.csw_StackMalloc (nbyte);
+    xtmp = (double *)csw_Malloc (nbyte);
     if (!xtmp) {
         return -1;
     }
@@ -2241,14 +2273,14 @@ int CSWPolyDrivers::ply_holunion (
     noffset = multmem * ntpt;
     ytmp = xtmp + noffset;
 
-    itmp = (int *)csw_mem_obj.csw_StackMalloc (multmem * nthol * sizeof(int *));
+    itmp = (int *)csw_Malloc (multmem * nthol * sizeof(int *));
     if (!itmp) {
         return -1;
     }
 
     nbyte = multmem * nthol * sizeof(double *) * 4;
 
-    xst = (double **)csw_mem_obj.csw_StackMalloc (nbyte);
+    xst = (double **)csw_Malloc (nbyte);
     if (!xst) {
         return -1;
     }
@@ -2259,7 +2291,7 @@ int CSWPolyDrivers::ply_holunion (
     yct = xct + noffset;
 
     nbyte = multmem * nthol * sizeof(double) * 4;
-    xmint = (double *)csw_mem_obj.csw_StackMalloc (nbyte);
+    xmint = (double *)csw_Malloc (nbyte);
     if (!xmint) {
         return -1;
     }

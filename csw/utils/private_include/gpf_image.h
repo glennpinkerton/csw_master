@@ -80,12 +80,15 @@ class GPFImage
   public:
 
     GPFImage () {};
-    ~GPFImage () {};
 
   private:
 
 /*
     Old static file variables become private class variables.
+    Note that the ColorTable and ColorLookup pointers are not
+    persistent across public method calls.  All public methods 
+    that allocate either of these pointers must free the allocations
+    prior to returning.  After the free, set the pointers to NULL.
 */
     IMageColorRec           *ColorTable = NULL;
     int                     *ColorLookup = NULL;
