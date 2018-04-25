@@ -36,7 +36,6 @@
 #include "csw/utils/private_include/ply_utils.h"
 #include "csw/utils/private_include/ply_traverse.h"
 
-#include "csw/utils/private_include/csw_memmgt.h"
 #include "csw/utils/private_include/csw_scope.h"
 
 
@@ -477,7 +476,11 @@ int CSWPolyUtils::ply_grid_set (
                   *work = NULL, dx, dy, tinyarea;
     int           maxmem, i, n1, n2;
 
-    CSWMemmgt     csw_mem_obj;
+    auto fscope = [&]()
+    {
+        csw_Free (work);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
 /*  check for obvious errors  */
 
@@ -488,7 +491,7 @@ int CSWPolyUtils::ply_grid_set (
 
 /*  get memory for work array, return with status = 2 if unsuccessful  */
 
-    work = (double *) csw_mem_obj.csw_StackMalloc(numpoly*sizeof(double));
+    work = (double *) csw_Malloc(numpoly*sizeof(double));
     if (! work)  {
         return 2;
     }
@@ -759,7 +762,15 @@ int CSWPolyUtils::ply_holnest (
                  numout, nstack, rootoff, rootnps, iroot, nstacksav;
     int          nctemp, nout, npts, inps, jnps;
     int          nptemp, nclast;
-    CSWMemmgt     csw_mem_obj;
+
+
+    auto fscope = [&]()
+    {
+        csw_Free (holist);
+        csw_Free (plylist);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
+
 
 /*  if only one component, return a flag of 2  */
 
@@ -776,13 +787,13 @@ int CSWPolyUtils::ply_holnest (
 
 /*  allocate memory for workspace  */
 
-    holist = (HList *) csw_mem_obj.csw_StackMalloc(ncomp * sizeof(HList));
+    holist = (HList *) csw_Malloc(ncomp * sizeof(HList));
     if(!holist) {
         return -1;
     }
     holorg = holist;
 
-    plylist = (PList *) csw_mem_obj.csw_StackMalloc(ncomp * sizeof(PList));
+    plylist = (PList *) csw_Malloc(ncomp * sizeof(PList));
     if(!plylist) {
         return -1;
     }
@@ -1131,8 +1142,6 @@ int CSWPolyUtils::ply_intop (
 {
     int         i;
     double      dx, dy;
-
-    CSWMemmgt     csw_mem_obj;
 
 /*  convert flag to lower case  */
 
@@ -2055,19 +2064,26 @@ int CSWPolyUtils::ply_rotpts (
 {
     double    *xw = NULL, *yw = NULL;
     int       i, iclose, j, npts;
-    CSWMemmgt     csw_mem_obj;
+
+
+    auto fscope = [&]()
+    {
+        csw_Free (xw);
+        csw_Free (yw);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
 
     npts = *nptsin;
 
 /*  allocate work space  */
 
-    xw = (double *)csw_mem_obj.csw_StackMalloc (npts * sizeof (double));
+    xw = (double *)csw_Malloc (npts * sizeof (double));
     if (!xw) {
         return -1;
     }
 
-    yw = (double *)csw_mem_obj.csw_StackMalloc (npts * sizeof (double));
+    yw = (double *)csw_Malloc (npts * sizeof (double));
     if (!yw) {
         return -1;
     }
@@ -5057,10 +5073,11 @@ int CSWPolyUtils::ply_holnestxyz (
                  numout, nstack, rootoff, rootnps, iroot, nstacksav;
     int          nctemp, nout, npts, inps, jnps;
     int          nptemp, nclast;
-    CSWMemmgt     csw_mem_obj;
 
     auto fscope = [&]()
     {
+        csw_Free (holist);
+        csw_Free (plylist);
         MaxPout = 0;
         MaxHout = 0;
     };
@@ -5089,13 +5106,13 @@ int CSWPolyUtils::ply_holnestxyz (
 
 /*  allocate memory for workspace  */
 
-    holist = (HList *) csw_mem_obj.csw_StackMalloc(ncomp * sizeof(HList));
+    holist = (HList *) csw_Malloc(ncomp * sizeof(HList));
     if(!holist) {
         return -1;
     }
     holorg = holist;
 
-    plylist = (PList *) csw_mem_obj.csw_StackMalloc(ncomp * sizeof(PList));
+    plylist = (PList *) csw_Malloc(ncomp * sizeof(PList));
     if(!plylist) {
         return -1;
     }

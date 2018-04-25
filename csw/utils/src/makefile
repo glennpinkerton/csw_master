@@ -13,7 +13,6 @@ LIB_SRC_CC=\
  csw_heap.cc\
  csw_hostname.cc\
  csw_memmgt.cc\
- csw_memmgt_class.cc\
  csw_putenv.cc\
  csw_stread.cc\
  csw_string.cc\
@@ -64,7 +63,6 @@ LIB_OBJS_CC=\
  csw_heap$(OBJ_SUFFIX)\
  csw_hostname$(OBJ_SUFFIX)\
  csw_memmgt$(OBJ_SUFFIX)\
- csw_memmgt_class$(OBJ_SUFFIX)\
  csw_putenv$(OBJ_SUFFIX)\
  csw_stread$(OBJ_SUFFIX)\
  csw_string$(OBJ_SUFFIX)\

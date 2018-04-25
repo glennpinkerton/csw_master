@@ -67,8 +67,6 @@ typedef struct {
 
 
 
-
-
 class GPFLine
 {
 
@@ -76,6 +74,24 @@ class GPFLine
 
     GPFLine () {};
     ~GPFLine () {Cleanup ();};
+
+    GPFLine (const GPFLine &other) {
+        ResetForCopy ();
+    }
+
+    const GPFLine &operator= (const GPFLine &other) {
+        ResetForCopy ();
+        return *this;
+    }
+
+    GPFLine (const GPFLine &&other) {
+        ResetForCopy ();
+    }
+
+    const GPFLine &operator= (const GPFLine &&other) {
+        ResetForCopy ();
+        return *this;
+    }
 
 
   private:
@@ -103,7 +119,9 @@ class GPFLine
     char                   *TextArray = NULL;
     int                    NtextRec = 0;
 
-    int                    Cleanup (void);
+    void                   Cleanup (void);
+    void                   ResetForCopy ();
+
     int                    CalcLineDistances (CSW_F *x, CSW_F *y, int npts);
     int                    CalcLineDashes (CSW_F *x, CSW_F *y, int npts);
     void                   AddDashPoint (CSW_F x, CSW_F y, int flag);

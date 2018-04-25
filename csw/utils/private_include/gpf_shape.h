@@ -42,7 +42,6 @@ class GPFShape
   public:
 
     GPFShape () {};
-    ~GPFShape () {};
 
   private:
 

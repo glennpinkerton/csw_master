@@ -51,9 +51,21 @@ class SurfaceGroupPlane {
 
     SurfaceGroupPlane ();
     SurfaceGroupPlane (SurfaceGroupPlane *sgp);
-    SurfaceGroupPlane (SurfaceGroupPlane const &src);
     virtual ~SurfaceGroupPlane ();
-    SurfaceGroupPlane const & operator = (SurfaceGroupPlane const & src);
+
+
+// Do not allow copy or move
+
+  private:
+
+    SurfaceGroupPlane (SurfaceGroupPlane const &src) {};
+    SurfaceGroupPlane const &operator=
+        (SurfaceGroupPlane const &src) {return *this;};
+    SurfaceGroupPlane (SurfaceGroupPlane const &&src) {};
+    SurfaceGroupPlane const &operator=
+        (SurfaceGroupPlane const &&src) {return *this;};
+
+  public:
 
     void  SetGrdTrianglePtr (CSWGrdTriangle *p) {grd_triangle_ptr = p;};
     void  SetGrdTsurfPtr (CSWGrdTsurf *p) {grd_tsurf_ptr = p;};

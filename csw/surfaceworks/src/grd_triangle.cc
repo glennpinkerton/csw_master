@@ -3929,6 +3929,9 @@ int CSWGrdTriangle::ExpandMem (void)
     NOdeStruct            *nnew;
     int                   size;
 
+printf ("In ExpandMem: %d   %d   %d\n", MaxNodes, MaxEdges, MaxTriangles);
+fflush (stdout);
+
     if (ExpandNodeList != 0) {
         if (NumNodes >= MaxNodes - 10) {
             MaxNodes *= 3;
@@ -4010,6 +4013,9 @@ int CSWGrdTriangle::ExpandMem2 (void)
     TRiangleStruct        *tnew, *tptr;
     NOdeStruct            *nnew, *nptr;
     int                   nsize, oldmax;
+
+printf ("In ExpandMem2: %d   %d   %d\n", MaxNodes, MaxEdges, MaxTriangles);
+fflush (stdout);
 
     if (ExpandNodeList != 0) {
         oldmax = MaxNodes;

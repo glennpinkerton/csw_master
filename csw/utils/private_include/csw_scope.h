@@ -41,7 +41,7 @@ class CSWScopeGuard
 
   private:
 
-    std::function<void()>  func;
+    std::function<void()>  func = NULL;
 
   public:
 
@@ -53,8 +53,37 @@ class CSWScopeGuard
 // specified by the func member.
     ~CSWScopeGuard ()
     {
-        func ();
+        if (func != NULL) {
+            func ();
+        }
     };
+
+//
+// The copy constructor, assignment operator, move constructor
+// and move assignment operator should never be called, explicitly
+// or implicitly.  These are all private and they just set func to NULL
+// in the destination object.  Not completely fool proof, but it takes
+// some intentional work to screw it up.
+//
+  private:
+
+    CSWScopeGuard (const CSWScopeGuard &other) {
+        func = NULL;
+    }
+
+    const CSWScopeGuard &operator= (const CSWScopeGuard &other) {
+        func = NULL;
+        return *this;
+    }
+
+    CSWScopeGuard (const CSWScopeGuard &&other) {
+        func = NULL;
+    }
+
+    const CSWScopeGuard &operator= (const CSWScopeGuard &&other) {
+        func = NULL;
+        return *this;
+    }
 
 
 }; // end of class definition

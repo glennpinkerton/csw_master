@@ -50,7 +50,6 @@
 #include "csw/utils/private_include/ply_patfill.h"
 #include "csw/utils/private_include/ply_calc.h"
 
-#include "csw/utils/private_include/csw_memmgt.h"
 #include "csw/utils/private_include/csw_scope.h"
 
 
@@ -134,7 +133,12 @@ int CSWPolyPatfill::ply_SetupPatFill (CSW_F *xp, CSW_F *yp, int *ic, int nc,
     int            i, n, npts, istat;
     double         *xwork = NULL, *ywork = NULL, dscale;
 
-    CSWMemmgt      csw_mem_obj;
+
+    auto fscope = [&]()
+    {
+        csw_Free (xwork);
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
 
 /*  count points  */
 
@@ -147,7 +151,7 @@ int CSWPolyPatfill::ply_SetupPatFill (CSW_F *xp, CSW_F *yp, int *ic, int nc,
 
 /*  allocate work space  */
 
-    xwork = (double *)csw_mem_obj.csw_StackMalloc (npts * 2 * sizeof(double));
+    xwork = (double *)csw_Malloc (npts * 2 * sizeof(double));
     if (!xwork) {
         return -1;
     }
@@ -212,7 +216,7 @@ int CSWPolyPatfill::ply_SetupPatFill2 (double *xp, double *yp, int *ic, int nc,
                        int patnum, double patscale)
 {
     int            i, j, i1, i2, sum, n, n2, istat,
-                   ix1, iy1, ix2, iy2, *idum = NULL;
+                   ix1, iy1, ix2, iy2;
     int            nv1, nf1, nc1, nd1, iv2, if2;
     int            ncol, nrow, nodes;
     double         *xp1 = NULL, *yp1 = NULL, *xp2 = NULL, *yp2 = NULL;
@@ -221,14 +225,18 @@ int CSWPolyPatfill::ply_SetupPatFill2 (double *xp, double *yp, int *ic, int nc,
     int            t1, t2, t3, t4;
     CSWPolyUtils   ply_utils_obj;
     CSWPolyTiledata  ply_tiledata_obj;
-    CSWMemmgt      csw_mem_obj;
+
 
     auto fscope = [&]()
     {
-        if (CellInside) {
-            csw_Free (CellInside);
-            CellInside = NULL;
-        }
+        csw_Free (xp1);
+        csw_Free (Xvc);
+        Xvc = NULL;
+        csw_Free (Ivc);
+        Ivc = NULL;
+        csw_Free (hgrid);
+        csw_Free (CellInside);
+        CellInside = NULL;
         ply_PattWorkFree ();
         csw_Free (IvecPoly);
         IvecPoly = NULL;
@@ -269,13 +277,8 @@ int CSWPolyPatfill::ply_SetupPatFill2 (double *xp, double *yp, int *ic, int nc,
 
 /*  allocate work space  */
 
-    idum = (int *)csw_mem_obj.csw_StackMalloc (sizeof (int));
-    if (!idum) {
-        return -1;
-    }
-
     n = nc + 1;
-    xp1 = (double *)csw_mem_obj.csw_StackMalloc (n * 4 * sizeof(double));
+    xp1 = (double *)csw_Malloc (n * 4 * sizeof(double));
     if (!xp1) {
         return -1;
     }
@@ -291,14 +294,14 @@ int CSWPolyPatfill::ply_SetupPatFill2 (double *xp, double *yp, int *ic, int nc,
     }
     n *= 4;
 
-    Xvc = (double *)csw_mem_obj.csw_StackMalloc (n * 2 * sizeof(double));
+    Xvc = (double *)csw_Malloc (n * 2 * sizeof(double));
     if (!Xvc) {
         return -1;
     }
     Yvc = Xvc + n;
 
     n /= 2;
-    Ivc = (int *) csw_mem_obj.csw_StackMalloc (2 * n * sizeof(int));
+    Ivc = (int *) csw_Malloc (2 * n * sizeof(int));
     if (!Ivc) {
         return -1;
     }
@@ -346,7 +349,7 @@ int CSWPolyPatfill::ply_SetupPatFill2 (double *xp, double *yp, int *ic, int nc,
     nodes = ncol * nrow;
     nodes += 10;
 
-    hgrid = (char *)csw_mem_obj.csw_StackMalloc (4 * nodes * sizeof(char));
+    hgrid = (char *)csw_Malloc (4 * nodes * sizeof(char));
     if (!hgrid) {
         return -1;
     }
@@ -1673,13 +1676,13 @@ int CSWPolyPatfill::ply_ClipLongTileLines (double *xp, double *yp, int *ic, int 
 int CSWPolyPatfill::ply_setprimscangrids (double *xp, double *yp, int *ic, int nc)
 {
     int             ix1, iy1, ix2, iy2, i, j, i1, i2,
-                    n, ncol, nrow, nodes, *idum = NULL;
+                    n, ncol, nrow, nodes;
     double          csize, *xp1 = NULL, *yp1 = NULL,
                     *xp2 = NULL, *yp2 = NULL,
                     d1, d2, d3, d4;
     int             t1, t2, t3, t4;
     CSWPolyUtils    ply_utils_obj;
-    CSWMemmgt       csw_mem_obj;
+
 
 // lambda expression captures all local variables by reference.
 // Any cleanup needed upon this function going out of scope
@@ -1687,6 +1690,8 @@ int CSWPolyPatfill::ply_setprimscangrids (double *xp, double *yp, int *ic, int n
 // expression.
     auto fscope = [&]()
     {
+        csw_Free (xp1);
+        csw_Free (HgridP);
         HgridP = NULL;
         VgridP = NULL;
         IogridP = NULL;
@@ -1694,17 +1699,10 @@ int CSWPolyPatfill::ply_setprimscangrids (double *xp, double *yp, int *ic, int n
     };
     CSWScopeGuard  func_scope_guard (fscope);
 
-/*  allocate marker pointer for function  */
-
-    idum = (int *)csw_mem_obj.csw_StackMalloc (sizeof(int));
-    if (!idum) {
-        return -1;
-    }
-
 /*  get limits of input polygon  */
 
     n = nc+1;
-    xp1 = (double *)csw_mem_obj.csw_StackMalloc (n * 4 * sizeof(double));
+    xp1 = (double *)csw_Malloc (n * 4 * sizeof(double));
     if (!xp1) {
         return -1;
     }
@@ -1744,7 +1742,7 @@ int CSWPolyPatfill::ply_setprimscangrids (double *xp, double *yp, int *ic, int n
 
 /*  allocate work memory  */
 
-    HgridP = (char *)csw_mem_obj.csw_StackMalloc (4 * nodes * sizeof(char));
+    HgridP = (char *)csw_Malloc (4 * nodes * sizeof(char));
     if (!HgridP) {
         return -1;
     }
@@ -1910,13 +1908,13 @@ int CSWPolyPatfill::ply_GetPattClipSaveFlag (void)
 
   ****************************************************************
 
-    Transfer data from the pattern clip work area to permanent
+  Transfer data from the pattern clip work area to permanent
   allocated memory which will be attached to the polygon structure.
   Returns 1 on success or -1 on allocation failure.  If there are
   no clipped pattern primitives to save, success is returned, but
   a subsequent call to ply_GetPattClipSavePtrs will return NULLs.
 
-    The permanent storage pointers must be retrieved with the Get
+ The permanent storage pointers must be retrieved with the Get
   function before the next call to this function or the storage
   will be lost for the rest of time.
 
@@ -1946,7 +1944,9 @@ int CSWPolyPatfill::ply_TransferClipPrimData (void)
     CSWScopeGuard  func_scope_guard (fscope);
 
     if (CprimPtr) csw_Free (CprimPtr);
+    CprimPtr = NULL;
     if (XcprimPtr) csw_Free (XcprimPtr);
+    XcprimPtr = NULL;
 
 /*  allocate memory for permanent storage  */
 
@@ -2102,7 +2102,6 @@ int CSWPolyPatfill::ply_PattWorkAlloc (int nv1, int nf1, int nc1, int nd1)
 /*  
     first csw_Free any non null pointers to setup data
 */
-
     ply_PattWorkFree ();
 
 /*  vector primitive space  */

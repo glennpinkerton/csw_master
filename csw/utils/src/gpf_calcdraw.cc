@@ -29,7 +29,6 @@
 
 #include "csw/utils/private_include/ply_utils.h"
 #include "csw/utils/private_include/ply_calc.h"
-#include "csw/utils/private_include/csw_memmgt.h"
 #include "csw/utils/private_include/csw_scope.h"
 
 #include "csw/utils/private_include/gpf_utils.h"
@@ -40,12 +39,6 @@
 
 
 /*  define some macros for the file  */
-
-#define MAXPOLYCOMP          100
-#define MAXWORKSIZE          2000
-#define MAXWORKSIZE2         4000
-#define MAXTEXTLEN           256
-#define HOLEFLAG             1.e19f
 
 
 
@@ -196,20 +189,28 @@ int GPFCalcdraw::gpf_transxyline (CSW_F x, CSW_F y, CSW_F angle, CSW_F *xy, int 
 
 */
 
-int GPFCalcdraw::gpf_pcliprect (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F y2_in,
+int GPFCalcdraw::gpf_pcliprect
+                  (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F y2_in,
                    CSW_F *xy, int npts, CSW_F holflg,
                    int maxout, int maxcout,
                    CSW_F *xyout, int *npout, int *nhout, int *icout)
 {
     CSW_F       x1, y1, x2, y2;
-    CSW_F       *xyw, **xywp, *xysav, *xysav2;
-    double      xt, *xw, *yw, *xw2, *yw2, *xwhn, *ywhn;
+    CSW_F       *xyw = NULL, **xywp = NULL, *xysav = NULL, *xysav2 = NULL;
+    double      xt, *xw = NULL, *yw = NULL, *xw2 = NULL, *yw2 = NULL,
+                    *xwhn = NULL, *ywhn = NULL;
     int         nflags, i, j, k, n, n2, ncomp, nptmp, npts2, istat, nptstmp,
-                *nhsav, *icsav, *icomp, *icomp2, *iholes, nestcomp, *ihnest, *icnest;
+                *nhsav = NULL, *icsav = NULL, *icomp = NULL, *icomp2 = NULL,
+                *iholes = NULL, nestcomp, *ihnest = NULL, *icnest = NULL;
     CSW_F       xx1, yy1, xx2, yy2;
 
+    CSW_F       *xyw_orig = NULL, **xywp_orig = NULL;
+    int         *icomp_orig = NULL, *icomp2_orig = NULL,
+                *iholes_orig = NULL;
+    double      *xw_orig = NULL, *yw_orig = NULL,
+                *xw2_orig = NULL, *yw2_orig = NULL;
+
     CSWPolyUtils  ply_utils_obj;
-    CSWMemmgt   csw_mem_obj;
 
 // lambda expression captures all local variables by reference.
 // Any cleanup needed upon this function going out of scope
@@ -217,6 +218,15 @@ int GPFCalcdraw::gpf_pcliprect (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F y2_
 // expression.
     auto fscope = [&]()
     {
+        if (xyw_orig != XYwork) csw_Free (xyw_orig);
+        if (xywp_orig != XYworkp) csw_Free (xywp_orig);
+        if (icomp_orig != Iwork1) csw_Free (icomp_orig);
+        if (icomp2_orig != Iwork2) csw_Free (icomp2_orig);
+        if (iholes_orig != Iwork3) csw_Free (iholes_orig);
+        if (xw_orig != DXwork) csw_Free (xw_orig);
+        if (yw_orig != DYwork) csw_Free (yw_orig);
+        if (xw2_orig != DXwork2) csw_Free (xw2_orig);
+        if (yw2_orig != DYwork2) csw_Free (yw2_orig);
     };
     CSWScopeGuard  func_scope_guard (fscope);
 
@@ -259,8 +269,9 @@ int GPFCalcdraw::gpf_pcliprect (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F y2_
 /*  assign pointers for work arrays, either by allocating
     memory or using file work arrays if possible  */
 
-    if (npts*2 >= MAXWORKSIZE2) {
-        xyw = (CSW_F *)csw_mem_obj.csw_StackMalloc (npts*2*sizeof(CSW_F));
+    //if (npts*2 >= MAXWORKSIZE2) {
+    if (npts*2 >= 0) {
+        xyw = (CSW_F *)csw_Malloc (npts*2*sizeof(CSW_F));
         if (!xyw) {
             return -1;
         }
@@ -268,6 +279,7 @@ int GPFCalcdraw::gpf_pcliprect (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F y2_
     else {
         xyw = XYwork;
     }
+    xyw_orig = xyw;
 
 /*  count the input components  */
 
@@ -283,20 +295,21 @@ int GPFCalcdraw::gpf_pcliprect (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F y2_
 
 /*  allocate memory for component workspace  */
 
-    if (nflags >= MAXPOLYCOMP) {
-        xywp = (CSW_F**)csw_mem_obj.csw_StackMalloc (nflags*sizeof(CSW_F*));
+    //if (nflags >= MAXPOLYCOMP) {
+    if (nflags >= 0) {
+        xywp = (CSW_F**)csw_Malloc (nflags*sizeof(CSW_F*));
         if (!xywp) {
             return -1;
         }
-        icomp = (int*)csw_mem_obj.csw_StackMalloc (nflags * sizeof(int));
+        icomp = (int*)csw_Malloc (nflags * sizeof(int));
         if (!icomp) {
             return -1;
         }
-        icomp2 = (int*     )csw_mem_obj.csw_StackMalloc (nflags * sizeof(int));
+        icomp2 = (int*)csw_Malloc (nflags * sizeof(int));
         if (!icomp2) {
             return -1;
         }
-        iholes = (int*     )csw_mem_obj.csw_StackMalloc (nflags * sizeof(int));
+        iholes = (int*)csw_Malloc (nflags * sizeof(int));
         if (!iholes) {
             return -1;
         }
@@ -308,6 +321,11 @@ int GPFCalcdraw::gpf_pcliprect (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F y2_
         icomp2 = Iwork2;
         iholes = Iwork3;
     }
+
+    xywp_orig = xywp;
+    icomp_orig = icomp;
+    icomp2_orig = icomp2;
+    iholes_orig = iholes;
 
 /*  separate holes into separate components  */
 
@@ -326,20 +344,21 @@ int GPFCalcdraw::gpf_pcliprect (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F y2_
         npts2 += icomp[i];
     }
 
-    if (npts2 >= MAXWORKSIZE) {
-        xw = (double *)csw_mem_obj.csw_StackMalloc (npts2 * sizeof(double));
+    //if (npts2 >= MAXWORKSIZE) {
+    if (npts2 >= 0) {
+        xw = (double *)csw_Malloc (npts2 * sizeof(double));
         if (!xw) {
             return -1;
         }
-        yw = (double *)csw_mem_obj.csw_StackMalloc (npts2 * sizeof(double));
+        yw = (double *)csw_Malloc (npts2 * sizeof(double));
         if (!yw) {
             return -1;
         }
-        xw2 = (double *)csw_mem_obj.csw_StackMalloc (npts2 * sizeof(double));
+        xw2 = (double *)csw_Malloc (npts2 * sizeof(double));
         if (!xw2) {
             return -1;
         }
-        yw2 = (double *)csw_mem_obj.csw_StackMalloc (npts2 * sizeof(double));
+        yw2 = (double *)csw_Malloc (npts2 * sizeof(double));
         if (!yw2) {
             return -1;
         }
@@ -350,6 +369,11 @@ int GPFCalcdraw::gpf_pcliprect (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F y2_
         xw2 = DXwork2;
         yw2 = DYwork2;
     }
+
+    xw_orig = xw;
+    yw_orig = yw;
+    xw2_orig = xw2;
+    yw2_orig = yw2;
 
 /*  unnest multiply nested holes  */
 
@@ -491,19 +515,21 @@ int GPFCalcdraw::gpf_pcliprect (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F y2_
 
 */
 
-int GPFCalcdraw::gpf_polycliprect2 (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F y2_in,
+int GPFCalcdraw::gpf_polycliprect2
+                      (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F y2_in,
                        CSW_F *xypoly, int ncomp, int *icomp, int maxout, int maxcout,
                        CSW_F *xypout, int *npout, int *nhout, int *ipout, int *nptsout)
 {
     CSW_F             x1, y1, x2, y2;
-    double            xclip[5], yclip[5], *xpolys, *ypolys, *dxpout, *dypout;
+    double            xclip[5], yclip[5], *xpolys= NULL, *ypolys = NULL,
+                        *dxpout = NULL, *dypout = NULL;
     int               nclip, iclip[1];
     int               i, j, istat, n, k, n2;
     CSW_F             xt1, yt1, xt2, yt2, *xysav;
 
     CSWErrNum         err_obj;
     CSWPolyCalc       ply_calc_obj;
-    CSWMemmgt         csw_mem_obj;
+
 
 // lambda expression captures all local variables by reference.
 // Any cleanup needed upon this function going out of scope
@@ -511,6 +537,10 @@ int GPFCalcdraw::gpf_polycliprect2 (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F
 // expression.
     auto fscope = [&]()
     {
+        csw_Free (xpolys);
+        csw_Free (ypolys);
+        csw_Free (dxpout);
+        csw_Free (dypout);
     };
     CSWScopeGuard  func_scope_guard (fscope);
 
@@ -565,36 +595,38 @@ int GPFCalcdraw::gpf_polycliprect2 (CSW_F x1_in, CSW_F y1_in, CSW_F x2_in, CSW_F
     for (i=0; i<ncomp; i++) {
         n += icomp[i];
     }
-    if (n < MAXWORKSIZE) {
-        xpolys = DXwork;
-        ypolys = DYwork;
-    }
-    else {
-        xpolys = (double *)csw_mem_obj.csw_StackMalloc (n * sizeof(double));
+    //if (n >= MAXWORKSIZE) {
+    if (n >= 0) {
+        xpolys = (double *)csw_Malloc (n * sizeof(double));
         if (!xpolys) {
             return -1;
         }
-        ypolys = (double *)csw_mem_obj.csw_StackMalloc (n * sizeof(double));
+        ypolys = (double *)csw_Malloc (n * sizeof(double));
         if (!ypolys) {
             return -1;
         }
     }
+    else {
+        xpolys = DXwork;
+        ypolys = DYwork;
+    }
 
 /*  output arrays  */
 
-    if (maxout < MAXWORKSIZE) {
-        dxpout = DXwork2;
-        dypout = DYwork2;
-    }
-    else {
-        dxpout = (double *)csw_mem_obj.csw_StackMalloc (maxout * sizeof(double));
+    //if (maxout >= MAXWORKSIZE) {
+    if (maxout >= 0) {
+        dxpout = (double *)csw_Malloc (maxout * sizeof(double));
         if (!dxpout) {
             return -1;
         }
-        dypout = (double *)csw_mem_obj.csw_StackMalloc (maxout * sizeof(double));
+        dypout = (double *)csw_Malloc (maxout * sizeof(double));
         if (!dypout) {
             return -1;
         }
+    }
+    else {
+        dxpout = DXwork2;
+        dypout = DYwork2;
     }
 
 /*  copy the polygon into double arrays  */
@@ -804,11 +836,14 @@ int GPFCalcdraw::gpf_polyholesep (CSW_F *xy, int npts, CSW_F holflg, int maxout,
 
 */
 
-int GPFCalcdraw::gpf_addholeflags (CSW_F *x, CSW_F *y, int *npts, int ncomp,
+int GPFCalcdraw::gpf_addholeflags
+                     (CSW_F *x, CSW_F *y, int *npts, int ncomp,
                       CSW_F **x1, CSW_F **y1, int *nptotal, int *memflg)
 {
     int        i, j, imax, n;
-    CSW_F      *xt, *yt;
+    CSW_F      *xt = NULL, *yt = NULL;
+
+    bool  bsuccess = false;
 
 // lambda expression captures all local variables by reference.
 // Any cleanup needed upon this function going out of scope
@@ -816,12 +851,19 @@ int GPFCalcdraw::gpf_addholeflags (CSW_F *x, CSW_F *y, int *npts, int ncomp,
 // expression.
     auto fscope = [&]()
     {
+        if (!bsuccess) {
+            csw_Free (xt);
+            csw_Free (yt);
+            x1[0] = NULL;
+            y1[0] = NULL;
+            *nptotal = 0;
+        }
     };
     CSWScopeGuard  func_scope_guard (fscope);
 
 
     if (ncomp < 1) {
-        return 0;
+        return -1;
     }
 
 /*  allocate memory for output  */
@@ -838,13 +880,9 @@ int GPFCalcdraw::gpf_addholeflags (CSW_F *x, CSW_F *y, int *npts, int ncomp,
     }
     yt = (CSW_F *)csw_Malloc (imax * sizeof(CSW_F));
     if (!yt) {
-        csw_Free (xt);
         return -1;
     }
     *memflg = 1;
-
-    x1[0] = xt;
-    y1[0] = yt;
 
 /*  add hole flags  */
 
@@ -868,7 +906,12 @@ int GPFCalcdraw::gpf_addholeflags (CSW_F *x, CSW_F *y, int *npts, int ncomp,
         }
     }
 
+    x1[0] = xt;
+    y1[0] = yt;
     *nptotal = n;
+
+    bsuccess = true;
+
     return 1;
 
 }  /*  end of function gpf_addholeflags  */
@@ -1041,9 +1084,20 @@ int GPFCalcdraw::gpf_cliplineprim (CSW_F *xyin, int nin,
 {
     CSW_F       x1in, y1in, x2in, y2in;
     int         i, n, in1, in2;
-    CSW_F       *xyw, *xywsav, xt, yt, xt2, yt2, x1, y1, x, y;
+    CSW_F       *xyw = NULL, *xywsav = NULL,
+                *xyw_orig = NULL,
+                xt, yt, xt2, yt2, x1, y1, x, y;
 
-    CSWMemmgt   csw_mem_obj;
+    bool   need_free = false;
+
+    auto fscope = [&]()
+    {
+      if (need_free) {
+        csw_Free (xyw_orig);
+      }
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
+
 
     if (x1_in < x2_in) {
         x1in = x1_in;
@@ -1071,15 +1125,19 @@ int GPFCalcdraw::gpf_cliplineprim (CSW_F *xyin, int nin,
 
     *ncout = 0;
 
-    if (nin*5 < MAXWORKSIZE2) {
-        xyw = XYwork;
-    }
-    else {
-        xyw = (CSW_F *)csw_mem_obj.csw_StackMalloc (nin * 5 * sizeof (CSW_F));
+    //if (nin*5 >= MAXWORKSIZE2) {
+    if (nin*5 >= 0) {
+        need_free = true;
+        xyw = (CSW_F *)csw_Malloc (nin * 5 * sizeof (CSW_F));
         if (!xyw) {
             return -1;
         }
     }
+    else {
+        xyw = XYwork;
+    }
+
+    xyw_orig = xyw;
 
 /*  check if the first point is inside or outside  */
 
@@ -1348,16 +1406,6 @@ int GPFCalcdraw::gpf_clipvec2 (CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,
     CSW_F       xt, yt, dx, dy, slope, yint, x, y;
     int         count;
 
-// lambda expression captures all local variables by reference.
-// Any cleanup needed upon this function going out of scope
-// should be done in the body (between curly braces) of the
-// expression.
-    auto fscope = [&]()
-    {
-    };
-    CSWScopeGuard  func_scope_guard (fscope);
-
-
 /*  check for trivial rejection  */
 
     if ((x1>fxmax && x2>fxmax)  ||
@@ -1564,16 +1612,6 @@ int GPFCalcdraw::gpf_addlineclipcomp (CSW_F *xyin, int nin,
 {
     CSW_F      *tmp;
     int        i, n;
-
-// lambda expression captures all local variables by reference.
-// Any cleanup needed upon this function going out of scope
-// should be done in the body (between curly braces) of the
-// expression.
-    auto fscope = [&]()
-    {
-    };
-    CSWScopeGuard  func_scope_guard (fscope);
-
 
     n = 0;
     for (i=0; i<*ncout; i++) {
@@ -1855,9 +1893,11 @@ int GPFCalcdraw::gpf_addcutlines (CSW_F *xyin, int nin,
                      CSW_F **xyout, int *nout, int *memflag)
 {
     int          jout, i, j, mflag, n2, n3, n4, n;
-    CSW_F        *xy, *xyhole,
+    CSW_F        *xy = NULL, *xyhole = NULL,
                  xmin, ymin, xmax, ymax;
     double       dd;
+
+    bool    bsuccess = false;
 
 // lambda expression captures all local variables by reference.
 // Any cleanup needed upon this function going out of scope
@@ -1865,13 +1905,20 @@ int GPFCalcdraw::gpf_addcutlines (CSW_F *xyin, int nin,
 // expression.
     auto fscope = [&]()
     {
+        if (!bsuccess) {
+            csw_Free (xy);
+            xyout[0] = NULL;
+            *nout = 0;
+            *memflag = 0;
+        }
     };
     CSWScopeGuard  func_scope_guard (fscope);
 
 
 /*  allocate memory for cut line version of the polygon  */
 
-    if (nin >= MAXWORKSIZE / 2) {
+    //if (nin >= MAXWORKSIZE / 2) {
+    if (nin >= 0) {
         xy = (CSW_F *)csw_Malloc (nin * 8 * sizeof (CSW_F));
         if (!xy) {
             return -1;
@@ -1901,6 +1948,7 @@ int GPFCalcdraw::gpf_addcutlines (CSW_F *xyin, int nin,
         }
         xyout[0] = xy;
         *nout = nin;
+        bsuccess = true;
         return 1;
     }
 
@@ -1918,7 +1966,9 @@ int GPFCalcdraw::gpf_addcutlines (CSW_F *xyin, int nin,
         *memflag = 0;
         if (mflag) {
             csw_Free (xy);
+            xy = NULL;
         }
+        bsuccess = true;
         return 1;
     }
 
@@ -1946,6 +1996,8 @@ int GPFCalcdraw::gpf_addcutlines (CSW_F *xyin, int nin,
 
     xyout[0] = xy;
     *nout = jout;
+
+    bsuccess = true;
 
     return 1;
 
@@ -1995,6 +2047,10 @@ int GPFCalcdraw::gpf_removecutlines (CSW_F *xin, CSW_F *yin, int ncompin, int *n
             csw_Free (xx);
             csw_Free (yy);
             csw_Free (ic);
+            *xout = NULL;
+            *yout = NULL;
+            *npout = NULL;
+            *ncout = 0;
         }
     };
     CSWScopeGuard  func_scope_guard (fscope);
@@ -2432,16 +2488,6 @@ int GPFCalcdraw::gpf_3pointcircle (CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,
 
     CSWPolyUtils    ply_utils_obj;
 
-// lambda expression captures all local variables by reference.
-// Any cleanup needed upon this function going out of scope
-// should be done in the body (between curly braces) of the
-// expression.
-    auto fscope = [&]()
-    {
-    };
-    CSWScopeGuard  func_scope_guard (fscope);
-
-
 /*
     make sure points are not collinear
 */
@@ -2643,11 +2689,9 @@ int GPFCalcdraw::gpf_cliplineprim_z (CSW_F *xyin, int *zin, int nin,
 {
     CSW_F       x1in, y1in, x2in, y2in;
     int         i, n, in1, in2;
-    CSW_F       *xyw, *xywsav,
+    CSW_F       *xyw = NULL, *xywsav = NULL,
                 xt, yt, xt2, yt2, x1, y1, x, y;
-    int         *zw, *zsav, z;
-
-    CSWMemmgt   csw_mem_obj;
+    int         *zw = NULL, *zsav = NULL, z;
 
 // lambda expression captures all local variables by reference.
 // Any cleanup needed upon this function going out of scope
@@ -2655,6 +2699,8 @@ int GPFCalcdraw::gpf_cliplineprim_z (CSW_F *xyin, int *zin, int nin,
 // expression.
     auto fscope = [&]()
     {
+        csw_Free (xyw);
+        csw_Free (zw);
     };
     CSWScopeGuard  func_scope_guard (fscope);
 
@@ -2684,20 +2730,20 @@ int GPFCalcdraw::gpf_cliplineprim_z (CSW_F *xyin, int *zin, int nin,
 
     *ncout = 0;
 
-    if (nin*5 < MAXWORKSIZE2) {
-        xyw = XYwork;
-        zw = Zwork;
-    }
-    else {
-        xyw = (CSW_F *)csw_mem_obj.csw_StackMalloc (nin * 5 * sizeof(CSW_F));
+    //if (nin*5 >= MAXWORKSIZE2) {
+    if (nin*5 >= 0) {
+        xyw = (CSW_F *)csw_Malloc (nin * 5 * sizeof(CSW_F));
         if (!xyw) {
             return -1;
         }
-        zw = (int *)csw_mem_obj.csw_StackMalloc (nin * 3 * sizeof(int));
+        zw = (int *)csw_Malloc (nin * 3 * sizeof(int));
         if (!zw) {
-            csw_Free (xyw);
             return -1;
         }
+    }
+    else {
+        xyw = XYwork;
+        zw = Zwork;
     }
 
 /*  check if the first point is inside or outside  */
@@ -2861,19 +2907,9 @@ int GPFCalcdraw::gpf_cliplineprim_z (CSW_F *xyin, int *zin, int nin,
 int GPFCalcdraw::gpf_addlineclipcomp_z (CSW_F *xyin, int *zin, int nin,
                            CSW_F *xyout, int *zout, int *ncout, int *icout)
 {
-    CSW_F      *tmp;
-    int        *ztmp;
+    CSW_F      *tmp = NULL;
+    int        *ztmp = NULL;
     int        i, n;
-
-// lambda expression captures all local variables by reference.
-// Any cleanup needed upon this function going out of scope
-// should be done in the body (between curly braces) of the
-// expression.
-    auto fscope = [&]()
-    {
-    };
-    CSWScopeGuard  func_scope_guard (fscope);
-
 
 /*
     update component counts
@@ -2918,13 +2954,16 @@ int GPFCalcdraw::gpf_addlineclipcomp_z (CSW_F *xyin, int *zin, int nin,
 
 */
 
-int GPFCalcdraw::gpf_close_polygon_holes (CSW_F *x, CSW_F *y, int *npts, int ncomp,
+int GPFCalcdraw::gpf_close_polygon_holes
+                            (CSW_F *x, CSW_F *y, int *npts, int ncomp,
                              CSW_F **xout, CSW_F **yout, int **npout)
 {
-    CSW_F         *xx, *yy, x1, y1, x2, y2;
-    int           i, n, nt, ntot, *ic;
+    CSW_F         *xx = NULL, *yy = NULL, x1, y1, x2, y2;
+    int           i, n, nt, ntot, *ic = NULL;
     int           nout, nn, sf;
     double        dd;
+
+    bool  bsuccess = false;
 
 // lambda expression captures all local variables by reference.
 // Any cleanup needed upon this function going out of scope
@@ -2932,6 +2971,14 @@ int GPFCalcdraw::gpf_close_polygon_holes (CSW_F *x, CSW_F *y, int *npts, int nco
 // expression.
     auto fscope = [&]()
     {
+        if (bsuccess == false) {
+            csw_Free (xx);
+            csw_Free (yy);
+            csw_Free (ic);
+            *xout = NULL;
+            *yout = NULL;
+            *npout = NULL;
+        }
     };
     CSWScopeGuard  func_scope_guard (fscope);
 
@@ -2955,13 +3002,10 @@ int GPFCalcdraw::gpf_close_polygon_holes (CSW_F *x, CSW_F *y, int *npts, int nco
     }
     yy = (CSW_F *)csw_Malloc (ntot * sf);
     if (!yy) {
-        csw_Free (xx);
         return -1;
     }
     ic = (int *)csw_Malloc (ncomp * sizeof(int));
     if (!ic) {
-        csw_Free (xx);
-        csw_Free (yy);
         return -1;
     }
 
@@ -2982,6 +3026,8 @@ int GPFCalcdraw::gpf_close_polygon_holes (CSW_F *x, CSW_F *y, int *npts, int nco
             csw_memcpy (xx, x, nt * sf);
             csw_memcpy (yy, y, nt * sf);
             csw_memcpy (ic, npts, ncomp * sizeof(int));
+
+            bsuccess = true;
 
             return 1;
         }
@@ -3019,6 +3065,8 @@ int GPFCalcdraw::gpf_close_polygon_holes (CSW_F *x, CSW_F *y, int *npts, int nco
         n += nn;
     }
 
+    bsuccess = true;
+
     return 1;
 
 }  /*  end of function gpf_close_polygon_holes  */
@@ -3035,16 +3083,6 @@ int GPFCalcdraw::gpf_find_box_corners (CSW_F x, CSW_F y, int anchor,
 {
     double       cang, sang;
     CSW_F        x1, y1, x2, y2, ca, sa;
-
-// lambda expression captures all local variables by reference.
-// Any cleanup needed upon this function going out of scope
-// should be done in the body (between curly braces) of the
-// expression.
-    auto fscope = [&]()
-    {
-    };
-    CSWScopeGuard  func_scope_guard (fscope);
-
 
     switch (anchor) {
 
@@ -3159,16 +3197,6 @@ int GPFCalcdraw::gpf_shortperpbisector (CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,
     double       dx, dy, ax, ay, tiny, dtiny;
     double       xt1, yt1, xt2, yt2;
     double       ang, cang, sang;
-
-// lambda expression captures all local variables by reference.
-// Any cleanup needed upon this function going out of scope
-// should be done in the body (between curly braces) of the
-// expression.
-    auto fscope = [&]()
-    {
-    };
-    CSWScopeGuard  func_scope_guard (fscope);
-
 
     xt1 = x1;
     if (xt1 < 0.0) xt1 = -xt1;

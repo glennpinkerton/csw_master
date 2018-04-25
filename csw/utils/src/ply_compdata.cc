@@ -124,6 +124,24 @@ int CSWPolyCompdata::ply_compfree (void)
 }  /*  end of function ply_compfree  */
 
 
+
+// An object of this class has no reason to be copied, moved
+// copy constructed or move constructed.  As part of making
+// this fairly foolproof, all the funcs to do these things are
+// private and they all call this private method, which sets
+// the internal pointers to NUll just as an original clean
+// construction of the object does.
+
+void CSWPolyCompdata::reset_for_copy (void)
+{
+    comps = NULL;
+    compc = NULL;
+
+    return;
+
+}  /*  end of function reset_for_copy  */
+
+
 /*
 
   ************************************************************

@@ -41,6 +41,14 @@ class CanvasManager
 
     std::vector<GRaphicsCanvasStruct>    CanvasList;
 
+// Do not allow copy or move with this class
+// Compile error should be seen if copy or move is attempted.
+
+    CanvasManager (const CanvasManager &other) {};
+    const CanvasManager &operator= (const CanvasManager &other);
+    CanvasManager (const CanvasManager &&other) {};
+    const CanvasManager &operator= (const CanvasManager &&other);
+
 
   public:
 
