@@ -80,7 +80,6 @@ class CSWGrdConstraint
   public:
 
     CSWGrdConstraint () {};
-    ~CSWGrdConstraint () {};
 
     void SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};
     void SetGrdFileioPtr (CSWGrdFileio *p) {grd_fileio_ptr = p;};

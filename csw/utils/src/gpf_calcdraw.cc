@@ -842,6 +842,7 @@ int GPFCalcdraw::gpf_addholeflags
 {
     int        i, j, imax, n;
     CSW_F      *xt = NULL, *yt = NULL;
+    CSW_F      *xt_orig = NULL, *yt_orig = NULL;
 
     bool  bsuccess = false;
 
@@ -852,8 +853,8 @@ int GPFCalcdraw::gpf_addholeflags
     auto fscope = [&]()
     {
         if (!bsuccess) {
-            csw_Free (xt);
-            csw_Free (yt);
+            csw_Free (xt_orig);
+            csw_Free (yt_orig);
             x1[0] = NULL;
             y1[0] = NULL;
             *nptotal = 0;
@@ -882,6 +883,8 @@ int GPFCalcdraw::gpf_addholeflags
     if (!yt) {
         return -1;
     }
+    xt_orig = xt;
+    yt_orig = yt;
     *memflg = 1;
 
 /*  add hole flags  */
@@ -906,8 +909,8 @@ int GPFCalcdraw::gpf_addholeflags
         }
     }
 
-    x1[0] = xt;
-    y1[0] = yt;
+    x1[0] = xt_orig;
+    y1[0] = yt_orig;
     *nptotal = n;
 
     bsuccess = true;

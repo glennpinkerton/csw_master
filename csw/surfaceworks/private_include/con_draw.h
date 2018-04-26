@@ -69,6 +69,14 @@ class CSWConDraw
 
   private:
 
+// This class is not meant to be copied or moved
+// Thus, these methods are private.
+
+    CSWConDraw (const CSWConDraw &other) {};
+    const CSWConDraw &operator= (const CSWConDraw &other) {return *this;};
+    CSWConDraw (const CSWConDraw &&other) {};
+    const CSWConDraw &operator= (const CSWConDraw &&other) {return *this;};
+
     void FreeWork (void);
 
 /*

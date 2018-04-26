@@ -114,7 +114,6 @@ class CSWGrdCalc
   public:
 
     CSWGrdCalc () {__init();};
-    ~CSWGrdCalc () {};
 
     void  SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};
     void  SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};

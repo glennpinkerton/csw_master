@@ -90,7 +90,6 @@ class CSWGrdFileio
   public:
 
     CSWGrdFileio () {};
-    ~CSWGrdFileio () {};
 
     void   SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};
     void   SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};

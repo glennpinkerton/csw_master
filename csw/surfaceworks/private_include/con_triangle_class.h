@@ -51,7 +51,6 @@ class CSWConTriangle
   public:
 
     CSWConTriangle () {};
-    ~CSWConTriangle () {};
 
     void SetConCalcPtr (CSWConCalc *p) {con_calc_ptr = p;};
     void SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};

@@ -63,7 +63,6 @@ class CSWGrdImage
   public:
 
     CSWGrdImage () {};
-    ~CSWGrdImage () {};
 
     void SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};
     void SetGrdFileioPtr (CSWGrdFileio *p) {grd_fileio_ptr = p;};

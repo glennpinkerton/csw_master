@@ -155,11 +155,16 @@ class JSWUnitTestFrame extends JFrame
     {
         nphint = nph;
 
+
+/*
+ * Possible wait spot to allow a gdb attach to the JVM process.
+ * This can sometimes work for debug of native C/C++ code.
 try {
 int idum = System.in.read();
 }
 catch (Exception e) {
 }
+*/
 
 
         String   cpar = System.getenv ("CSW_PARENT");

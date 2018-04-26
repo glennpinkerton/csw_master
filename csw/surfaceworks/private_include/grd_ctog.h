@@ -70,7 +70,6 @@ class CSWGrdCtog
   public:
 
     CSWGrdCtog () {};
-    ~CSWGrdCtog () {};
 
     void SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};
     void SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};
