@@ -162,6 +162,7 @@ int CSWPolyCalc::ply_CalcIntersect (CSWErrNum &err_obj,
         csw_Free (choles);
         csw_Free (xps);
         csw_Free (xmins);
+        csw_Free (cxnestin);
     };
     CSWScopeGuard  func_scope_guard (fscope);
 

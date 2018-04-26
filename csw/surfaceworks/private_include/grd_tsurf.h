@@ -72,7 +72,6 @@ class CSWGrdTsurf
   public:
 
     CSWGrdTsurf () {};
-    ~CSWGrdTsurf () {};
 
     void  SetGrdFileioPtr (CSWGrdFileio *p) {grd_fileio_ptr = p;};
     void  SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};

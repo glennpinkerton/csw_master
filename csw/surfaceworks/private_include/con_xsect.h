@@ -63,7 +63,6 @@ class CSWConXsect
   public:
 
     CSWConXsect () {};
-    ~CSWConXsect () {};
 
     void SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};
     void SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};

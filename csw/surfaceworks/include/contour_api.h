@@ -151,7 +151,7 @@
       public:
         
         CSWContourApi () {SetContourAPIPtrs ();};
-        ~CSWContourApi () {};
+        //~CSWContourApi () {};
 
         int con_SetCalcOption (int, int, CSW_Float);
         int con_SetCalcOptions (COntourCalcOptions *);

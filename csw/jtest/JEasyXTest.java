@@ -216,8 +216,8 @@ class JEasyXTestFrame extends JFrame
     {
 
 /*
- * Possible wait spot to allow gdb attach to JVM process.
- * Can sometimes work for debug of native C/C++ code.
+ * Possible wait spot to allow a gdb attach to the JVM process.
+ * This can sometimes work for debug of native C/C++ code.
 try {
 int idum = System.in.read();
 }

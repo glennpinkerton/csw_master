@@ -61,7 +61,6 @@ class CSWGrdArith
   public:
 
     CSWGrdArith () {};
-    ~CSWGrdArith () {};
 
     void SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};
     void SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};

@@ -70,7 +70,6 @@ class CSWGrdUtils
   public:
 
     CSWGrdUtils () {};
-    ~CSWGrdUtils () {};
 
     void SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};
     void SetGrdCalcPtr (CSWGrdCalc *p) {grd_calc_ptr = p;};
