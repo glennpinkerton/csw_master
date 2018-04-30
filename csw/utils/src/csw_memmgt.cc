@@ -32,6 +32,7 @@
 
 #ifdef _MEMCOUNT_
   static long int   MemTot = 0;
+  static long int   MemNew = 0;
   static long int   MemAlloc = 0;
   static long int   MemFree = 0;
   static int   msize[500000];
@@ -46,6 +47,7 @@ void csw_ShowMemCount ()
 #ifdef _MEMCOUNT_
   printf ("\nMemTot = %ld\n", MemTot);
   printf ("MemAlloc = %ld\n", MemAlloc);
+  printf ("MemNew = %ld\n", MemNew);
   printf ("MemFree = %ld\n\n", MemFree);
   fflush (stdout);
 #endif
@@ -65,6 +67,15 @@ void csw_InitMemCount ()
 
 
 
+void csw_AddNew (int sz)
+{
+#ifdef _MEMCOUNT_
+  MemNew += sz;
+#endif
+}
+
+
+
 
 
 #ifdef _MEMCOUNT_
@@ -75,7 +86,7 @@ static void AddPtr (void *vp, int size)
   if (!init_done) return;
   MemAlloc += size;
   MemTot += size;
-  csw_ShowMemCount ();
+  //csw_ShowMemCount ();
   for (int i=0; i<maxptr; i++) {
     if (mptrs[i] == NULL) {
       mptrs[i] = vp;
@@ -101,7 +112,7 @@ static void DelPtr (void *vp)
       MemFree += msize[i];
       mptrs[i] = NULL;
       msize[i] = 0;
-      csw_ShowMemCount ();
+      //csw_ShowMemCount ();
       return;
     }
   }

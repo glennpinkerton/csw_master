@@ -89,6 +89,19 @@ class FaultConnect {
   FaultConnect();
   virtual ~FaultConnect();
 
+// Objects of class are not meant to be copied or moved.
+
+  private:
+
+    FaultConnect (const FaultConnect &other) {};
+    const FaultConnect &operator= (const FaultConnect &other) {return *this;};
+    FaultConnect (const FaultConnect &&other) {};
+    const FaultConnect &operator= (const FaultConnect &&other) {return *this;};
+
+
+  public:
+
+
   void SetGrdFileioPtr (CSWGrdFileio *p) {grd_fileio_ptr = p;};
   void SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};
   void SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};

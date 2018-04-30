@@ -394,10 +394,19 @@ catch (Exception e) {
           }
         });
 
-        JButton huge_grid_button = new JButton ("Huge Grid Test");
+        JButton huge_grid_button = new JButton ("Huge Smooth Grid Test");
         huge_grid_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                HugeGridTest hg = new HugeGridTest ();
+                HugeGridTest hg = new HugeGridTest (false);
+                HugeGridRunnable run_frame = new HugeGridRunnable (hg);
+                SwingUtilities.invokeLater (run_frame);
+          }
+        });
+
+        JButton huge_noisy_grid_button = new JButton ("Huge Noisy Grid Test");
+        huge_noisy_grid_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                HugeGridTest hg = new HugeGridTest (true);
                 HugeGridRunnable run_frame = new HugeGridRunnable (hg);
                 SwingUtilities.invokeLater (run_frame);
           }
@@ -438,6 +447,7 @@ catch (Exception e) {
         contentPane.add (grid_button);
         contentPane.add (overlap_button);
         contentPane.add (huge_grid_button);
+        contentPane.add (huge_noisy_grid_button);
         contentPane.add (font_button);
         contentPane.add (sync_button);
         contentPane.add (noaspect_button);
@@ -3019,9 +3029,17 @@ class HugeGridTest extends JDLFrame
 
     private static final int  MAX_HUGE = 8000;
 
+    private   boolean bnoisy = false;
+
     public HugeGridTest ()
     {
         super ();
+    }
+
+    public HugeGridTest (boolean bn)
+    {
+        super ();
+        bnoisy = bn;
     }
 
     public void populateDlist ()
@@ -3031,7 +3049,10 @@ class HugeGridTest extends JDLFrame
         double   dx, dy, dist;
         int      i, j, k, jstart;
 
-        setTitle ("Huge Grid Test");
+        setTitle ("Huge Smooth Grid Test");
+        if (bnoisy) {
+            setTitle ("Huge Noisy Grid Test");
+        }
         setSize (900, 700);
 
         JDisplayList dl = super.getDL ();
@@ -3072,9 +3093,10 @@ class HugeGridTest extends JDLFrame
         double  yspace = .1;
         double  xspace = .1;
         double  gmax = -1.e30;
+        double  gmin = 1.e30;
 
         int    nhuge = 1000;
-        double nfact = 0.0;
+        double nfact = 0.01;
 
         String  tflag = System.getenv ("CSW_NHUGE");
 
@@ -3110,9 +3132,11 @@ class HugeGridTest extends JDLFrame
                 dx = (double)j * xspace;
                 dist = dx * dx + dy * dy;
                 dist = Math.sqrt (dist);
+                if (bnoisy) dist /= (double)nhuge;
                 double dnoise = random.nextDouble () - .5;
                 gdata[k] = dist + dnoise * nfact;
                 if (gdata[k] > gmax) gmax = gdata[k];
+                if (gdata[k] < gmin) gmin = gdata[k];
             }
         }
 
@@ -3131,7 +3155,8 @@ class HugeGridTest extends JDLFrame
 
           DLSurfaceProperties dlp = new DLSurfaceProperties ();
           ColorPalette cpal = new ColorPalette();
-          dl.setImageColors (cpal, 0.0, gmax * 1.01);
+          double mmtiny = (gmax - gmin) / 100.0;
+          dl.setImageColors (cpal, gmin - mmtiny, gmax + mmtiny);
           dl.addGrid ("test huge grid",
                         grid,
                         dlp);
@@ -3145,8 +3170,6 @@ class HugeGridTest extends JDLFrame
           System.out.flush ();
           return;
         }
-
-        JEasyXTest.showMem ("End huge grid nhuge = " + nhuge);
 
     }
 };

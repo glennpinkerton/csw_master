@@ -843,18 +843,15 @@ int DLSurf::CalcContours (void *vptr)
         return 0;
     }
 
-/*
-printf ("\nadding contours  ncontours = %d\n", ncontours);
-printf ("dlist ptr = %p\n", dlist);
-fflush (stdout);
-*/
 
-    for (i=0; i<ncontours; i++) {
-//printf ("adding contour number %d\n", i);
-//fflush (stdout);
+    int  icskip = ncontours / 20000 + 1;
+
+    for (i=0; i<ncontours; i+=icskip) {
+
         dlist->AddContour (contours+i,
                            index_num,
                            image_id);
+
     }
 
     return 1;

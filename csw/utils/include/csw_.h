@@ -173,6 +173,7 @@ typedef union {
 
         void csw_InitMemCount ();
         void csw_ShowMemCount ();
+        void csw_AddNew (int sz);
 
 
     /*

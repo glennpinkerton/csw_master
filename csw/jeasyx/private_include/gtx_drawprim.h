@@ -88,8 +88,16 @@ class GTXDrawPrim
     GTXDrawPrim () {gtx_InitDrawPrim ();};
     ~GTXDrawPrim () {gtx_FreeDrawPrim ();};
 
-    void SetEZXJavaPtr (EZXJavaArea *p) {ezx_java_ptr = p;};
+  private:
 
+    GTXDrawPrim (const GTXDrawPrim &other) {};
+    const GTXDrawPrim &operator= (const GTXDrawPrim &other) {return *this;};
+    GTXDrawPrim (const GTXDrawPrim &&other) {};
+    const GTXDrawPrim &operator= (const GTXDrawPrim &&other) {return *this;};
+
+  public:
+
+    void SetEZXJavaPtr (EZXJavaArea *p) {ezx_java_ptr = p;};
     void SetDlistIndex (int index) {dlist_index = index;};
 
 

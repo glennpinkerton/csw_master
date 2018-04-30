@@ -202,6 +202,21 @@ class SealedModel {
   SealedModel() {SetPadGrdAPI (); init();};
   virtual ~SealedModel() {freeMemory();};
 
+
+// Objects of class not meant to be copied or moved.
+
+  private:
+
+    SealedModel (const SealedModel &other) {};
+    const SealedModel &operator= (const SealedModel &other) {return *this;};
+    SealedModel (const SealedModel &&other) {};
+    const SealedModel &operator= (const SealedModel &&other) {return *this;};
+
+
+  public:
+
+
+
   void setSimSealFlag (int ival);
   int getSimSealFlag (void);
 

@@ -185,7 +185,6 @@ class PATCHSplit
   public:
 
     PATCHSplit () {};
-    ~PATCHSplit () {};
 
     void SetGrdAPIPtr (CSWGrdAPI *p) {
         grdapi_ptr = p;

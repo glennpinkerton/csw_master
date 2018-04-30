@@ -2787,6 +2787,23 @@ of Font.BOLD|Font.ITALIC.
         Idata[43] = p.outlineColor.getAlpha();
         Idata[44] = p.contourSmoothing * 3;
 
+        if (p.contourInterval > 0.0) {
+            double gzmin = grid.getZMin();
+            double gzmax = grid.getZMax();
+            if (gzmin >= gzmax) {
+                p.contourInterval = -1.0;
+            }
+            else {
+                double dz = gzmax - gzmin;
+                if (p.contourMaxValue > p.contourMinValue) {
+                    double dz2 = p.contourMaxValue - p.contourMinValue;
+                    if (dz2 < dz) dz = dz2;
+                }
+                int  nc = (int) (dz / p.contourInterval + .5);
+                if (dz > 100) p.contourInterval = -1.0;
+            }
+        }
+
         Ddata[0] = p.contourMinValue;
         Ddata[1] = p.contourMaxValue;
         Ddata[2] = p.contourInterval;

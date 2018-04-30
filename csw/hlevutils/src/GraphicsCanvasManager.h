@@ -45,9 +45,9 @@ class CanvasManager
 // Compile error should be seen if copy or move is attempted.
 
     CanvasManager (const CanvasManager &other) {};
-    const CanvasManager &operator= (const CanvasManager &other);
+    const CanvasManager &operator= (const CanvasManager &other) {return *this;};
     CanvasManager (const CanvasManager &&other) {};
-    const CanvasManager &operator= (const CanvasManager &&other);
+    const CanvasManager &operator= (const CanvasManager &&other) {return *this;};
 
 
   public:

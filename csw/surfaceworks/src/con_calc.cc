@@ -830,6 +830,7 @@ int CSWConCalc::con_calc_contours
     }
     else {
         grid = gridin;
+        gridin = NULL;
         Ncol = ncol;
         Nrow = nrow;
     }
@@ -1174,6 +1175,8 @@ MSL
 */
     *contours = ContourData;
     *ncont = NconData;
+    ContourData = NULL;
+    NconData = 0;
     ContourInterval = csav;
     FirstContour = firstsav;
     LastContour = lastsav;
@@ -4775,7 +4778,7 @@ MSL
 
   ****************************************************************
 
-    Output contour segments to the ContourData array of structures.
+  Output contour segments to the ContourData array of structures.
   A contour segment is a continuous line between crowded out points.
   Thus, several contour segments can be output with each call to
   this function.
@@ -7715,10 +7718,21 @@ int CSWConCalc::con_resample_for_smoothing
             CSW_F **gridout, char **maskout,
             int *ncolout, int *nrowout)
 {
-    char             *localmask;
-    CSW_F            *localgrid;
+    char             *localmask = NULL;
+    CSW_F            *localgrid = NULL;
     int              nmult, ncol2, nrow2, istat, forceflag;
     int              maxnodes, nmultmax;
+
+    bool             bsuccess = false;
+
+    auto fscope = [&]()
+    {
+        if (bsuccess == false) {
+            csw_Free (localgrid);
+            csw_Free (localmask);
+        }
+    };
+    CSWScopeGuard func_scope_guard (fscope);
 
     CSWGrdFault      grd_fault_obj;
 
@@ -7727,9 +7741,6 @@ int CSWConCalc::con_resample_for_smoothing
         forceflag = 1;
         ncol = -ncol;
     }
-
-    localgrid = NULL;
-    localmask = NULL;
 
     *ncolout = 0;
     *nrowout = 0;
@@ -7783,7 +7794,6 @@ int CSWConCalc::con_resample_for_smoothing
     if (mask  &&  maskout) {
         localmask = (char *)csw_Malloc (ncol2 * nrow2 * sizeof(CSW_F));
         if (!localmask) {
-            csw_Free (localgrid);
             grd_utils_ptr->grd_set_err (1);
             return -1;
         }
@@ -7804,7 +7814,6 @@ int CSWConCalc::con_resample_for_smoothing
                                    x1, y1, x2, y2, GRD_BICUBIC);
     }
     if (istat == -1) {
-        csw_Free (localgrid);
         return -1;
     }
 
@@ -7820,8 +7829,10 @@ int CSWConCalc::con_resample_for_smoothing
     *nrowout = nrow2;
 
     *gridout = localgrid;
+    localgrid = NULL;
     if (maskout) {
         *maskout = localmask;
+        localmask = NULL;
     }
 
 #if DEBUG_WRITE_GRID_FILE
@@ -7831,6 +7842,8 @@ int CSWConCalc::con_resample_for_smoothing
                     (double)x1, (double)y1, (double)x2, (double)y2,
                     GRD_NORMAL_GRID_FILE, NULL, 0);
 #endif
+
+    bsuccess = true;
 
     return 1;
 

@@ -32,6 +32,10 @@ public class Grid {
   double rotationAngle;
   ArrayList<XYZPolyline> faults;
 
+  private double        zmin = 1.e30,
+                        zmax = -1.e30;
+
+
 /*---------------------------------------------------------------------------*/
 
 /**
@@ -147,9 +151,6 @@ public class Grid {
   }
 
 /*-----------------------------------------------------------------------*/
-
-  private double        zmin = 1.e30,
-                        zmax = -1.e30;
 
   private void calcMinMax ()
   {

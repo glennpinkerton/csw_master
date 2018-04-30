@@ -53,7 +53,6 @@ class SurfaceGroupPlane {
     SurfaceGroupPlane (SurfaceGroupPlane *sgp);
     virtual ~SurfaceGroupPlane ();
 
-
 // Do not allow copy or move
 
   private:
