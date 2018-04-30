@@ -103,14 +103,26 @@ private:
     std::ofstream  pbfile;
 
 
-public:
+  public:
 
     EZXJavaArea    ezx_java_obj;
 
     CDisplayList(int index, int ifile);
-    CDisplayList (const CDisplayList &old);
-    CDisplayList &operator=(const CDisplayList &old);
     virtual ~CDisplayList();
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign a DisplayList object.  The 
+// various copy methods are made private to prevent 
+// their use.
+
+  private:
+
+    CDisplayList (const CDisplayList &old) {};
+    const CDisplayList &operator=(const CDisplayList &old) {return *this;};
+    CDisplayList (const CDisplayList &&old) {};
+    const CDisplayList &operator=(const CDisplayList &&old) {return *this;};
+
+  public:
 
     void SetGrdAPIPtr (CSWGrdAPI *p) {grdapi_ptr = p;};
 

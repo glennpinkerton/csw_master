@@ -78,7 +78,6 @@ class SWCalc
   public:
 
     SWCalc (int ifile);
-    ~SWCalc () {};
 
     void SetGrdAPIPtr (CSWGrdAPI *p) {
         grdapi_ptr = p;

@@ -54,7 +54,6 @@ class EZXJavaArea
   public:
 
     EZXJavaArea () {};    
-    ~EZXJavaArea () {};    
 
   private:
 

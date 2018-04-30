@@ -27,7 +27,7 @@ class XYIndex2D
     virtual ~XYIndex2D ();
 
 
-// Objects of class not meant to be copied or moved.
+// Objects of class are not meant to be copied or moved.
 
   private:
 

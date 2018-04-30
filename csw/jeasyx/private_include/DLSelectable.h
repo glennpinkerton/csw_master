@@ -26,6 +26,18 @@ class DLSelectable {
     DLSelectable ();
     ~DLSelectable ();
 
+// Do not allow copys, moves, etc on DLSeletctable objects.  Private
+// methods should prevent the copy stuff.
+
+  private:
+
+    DLSelectable (const DLSelectable &other) {};
+    const DLSelectable &operator= (const DLSelectable &other) {return *this;};
+    DLSelectable (const DLSelectable &&other) {};
+    const DLSelectable &operator= (const DLSelectable &&other) {return *this;};
+
+  public:
+
     int              index_num;
     int              deleted_flag;
 

@@ -475,32 +475,6 @@ CDisplayList::CDisplayList(int index, int ifile)
 
 }
 
-/*
- * If the copy constructor or assignment operator
- * is called, assert for now.
- */
-CDisplayList :: CDisplayList (const CDisplayList &old)
-{
-    if (this == &old) {
-        return;
-    }
-
-    assert (0);
-//    CopyFromOld (old);
-}
-
-
-CDisplayList &CDisplayList :: operator=(const CDisplayList &old)
-{
-    if (this == &old) {
-        return (*this);
-    }
-
-    assert (0);
-//    CopyFromOld (old);
-
-    return (*this);
-}
 
 
 /*

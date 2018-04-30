@@ -38,6 +38,19 @@ class DLSurf {
     DLSurf ();
     ~DLSurf ();
 
+// Do not allow copys, moves, etc of DLSurf objects.  Private
+// methods below are meant to prevent copy or move stuff.
+
+  private:
+
+    DLSurf (const DLSurf &other) {};
+    const DLSurf &operator= (const DLSurf &other) {return *this;};
+    DLSurf (const DLSurf &&other) {};
+    const DLSurf &operator= (const DLSurf &&other) {return *this;};
+    
+
+  public:
+
     int              image_id;
     int              saved_image_id;
     int              index_num;

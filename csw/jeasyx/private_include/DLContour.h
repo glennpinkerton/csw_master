@@ -110,6 +110,19 @@ class DLContour {
     DLContour (GTXDrawPrim *dp);
     ~DLContour ();
 
+// In the jni sheme of things, there is no use for copying, moving,
+// etc of DLContour objects.  The methods to do copy sorts of stuff
+// are made private to prevent copies from happening.
+
+  private: 
+
+    DLContour (const DLContour &other) {};
+    const DLContour &operator= (const DLContour &other) {return *this;};
+    DLContour (const DLContour &&other) {};
+    const DLContour &operator= (const DLContour &&other) {return *this;};
+
+  public:
+
     int                 grid_index;
     int                 image_id;
 

@@ -37,6 +37,17 @@ class CSWTimer
     CSWTimer () {};
     ~CSWTimer () {csw_CloseTimer ();};
 
+// Do not allow copy or move stuff.
+
+  private:
+
+    CSWTimer (const CSWTimer &other) {};
+    const CSWTimer &operator= (const CSWTimer &other) {return *this;};
+    CSWTimer (const CSWTimer &&other) {};
+    const CSWTimer &operator= (const CSWTimer &&other) {return *this;};
+
+  public:
+
     int csw_CpuDisp (void);
     int csw_CpuTime (double *);
     int csw_StartTimer (const char *);
