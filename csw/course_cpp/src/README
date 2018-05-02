@@ -1,0 +1,8 @@
+This directory has some code snipets created in response to the Udemy 
+"Advanced C++" course.  I (Glenn) consider these to be useful references
+for the basic syntax and logic of many C++ features.
+
+This code is not actually a part of the csw libraries.  However, I use
+the same make system to build these snipets, so I have put them here
+under the csw directory and I am saving them in github for backup and
+version control.
