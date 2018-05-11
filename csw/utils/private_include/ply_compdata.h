@@ -61,33 +61,17 @@ class CSWPolyCompdata
     int ply_compclear (int val);
     int ply_compnoop (char cin);
 
-// The copy constructor, assignment operator, move constructor and
-// move assignment operator should never be attempted for this class.
-// To "fool proof" this these methods are private and all they do
-// is initialize the internal pointes in the destination object to NULL.
+//  Do not allow copy or move.
 
+    CSWPolyCompdata (const CSWPolyCompdata &other) = delete; 
+    CSWPolyCompdata (CSWPolyCompdata &&other) = delete;
+    const CSWPolyCompdata &operator= (const CSWPolyCompdata &other) = delete;
+    const CSWPolyCompdata &operator= (CSWPolyCompdata &&other) = delete;
+  
   private:
 
     void reset_for_copy (void);
 
-    CSWPolyCompdata (const CSWPolyCompdata &other) {
-        reset_for_copy ();
-    }
-    
-    CSWPolyCompdata (const CSWPolyCompdata &&other) {
-        reset_for_copy ();
-    }
-
-    const CSWPolyCompdata &operator= (const CSWPolyCompdata &other) {
-        reset_for_copy ();
-        return *this;
-    }
-    
-    const CSWPolyCompdata &operator= (const CSWPolyCompdata &&other) {
-        reset_for_copy ();
-        return *this;
-    }
-    
 
 }; // end of main class definition
 

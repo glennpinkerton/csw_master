@@ -54,20 +54,15 @@ class Spatial3DTriangleIndex
 
     virtual ~Spatial3DTriangleIndex ();
 
+// Objects of this class not meant to be copied or moved.
 
-// Objects of class not meant to be copied or moved.
-
-  private:
-
-    Spatial3DTriangleIndex (const Spatial3DTriangleIndex &other) {};
+    Spatial3DTriangleIndex (const Spatial3DTriangleIndex &other) = delete;
     const Spatial3DTriangleIndex &operator=
-        (const Spatial3DTriangleIndex &other) {return *this;};
-    Spatial3DTriangleIndex (const Spatial3DTriangleIndex &&other) {};
+        (const Spatial3DTriangleIndex &other) = delete;
+    Spatial3DTriangleIndex (Spatial3DTriangleIndex &&other) = delete;
     const Spatial3DTriangleIndex &operator=
-        (const Spatial3DTriangleIndex &&other) {return *this;};
+        (Spatial3DTriangleIndex &&other) = delete;
 
-
-  public:
 
     void  SetGrdTrianglePtr (CSWGrdTriangle *p) {grd_triangle_ptr = p;};
 

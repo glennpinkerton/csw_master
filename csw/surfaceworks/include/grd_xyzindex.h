@@ -37,16 +37,12 @@ class XYZIndex3D
 
 // Objects of this class are not meant to be copied or moved.
 
-  private:
-
-    XYZIndex3D (const XYZIndex3D &other) {};
-    const XYZIndex3D &operator= (const XYZIndex3D &other) {return *this;};
+    XYZIndex3D (const XYZIndex3D &other) = delete;
+    const XYZIndex3D &operator= (const XYZIndex3D &other) = delete;
     
-    XYZIndex3D (const XYZIndex3D &&other) {};
-    const XYZIndex3D &operator= (const XYZIndex3D &&other) {return *this;};
+    XYZIndex3D (const XYZIndex3D &&other) = delete;
+    const XYZIndex3D &operator= (const XYZIndex3D &&other) = delete;
 
-  public:
-    
 
     int SetGeometry (double xmin,
                      double ymin,

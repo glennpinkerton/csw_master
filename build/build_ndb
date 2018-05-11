@@ -1,0 +1,84 @@
+#!/bin/bash
+
+export NODEBUG=1
+
+cd ..
+export CSW_PARENT=$(pwd);
+
+echo
+echo CSW_PARENT auto set to:  $CSW_PARENT
+echo
+echo
+
+echo
+echo   ==== building archive utils
+echo
+cd $CSW_PARENT/csw/utils/src;make clean;make;
+
+echo
+echo   ==== building archive hlevutils
+echo
+cd $CSW_PARENT/csw/hlevutils/src;make clean;make;
+
+echo
+echo   ==== building archive surfaceworks
+echo
+cd $CSW_PARENT/csw/surfaceworks/src;make clean;make;
+
+echo
+echo   ==== building archive jutils
+echo
+cd $CSW_PARENT/csw/jutils/src;make clean;make;
+
+echo
+echo   ==== not building archive jogl
+echo
+#cd $CSW_PARENT/csw/jogl;make clean;make;
+
+echo
+echo   ==== building archive images
+echo
+cd $CSW_PARENT/csw/images;make clean;make;
+
+echo
+echo   ==== building archive uistuff
+echo
+cd $CSW_PARENT/csw/uistuff;make clean;make;
+
+echo
+echo   ==== building archive j3d
+echo
+cd $CSW_PARENT/csw/j3d/src;make clean;make;
+
+echo
+echo   ==== building archive jsurfaceworks
+echo
+cd $CSW_PARENT/csw/jsurfaceworks/src;make clean;make archive;
+
+echo
+echo   ==== building archive jeasyx and shared lib
+echo
+cd $CSW_PARENT/csw/jeasyx/src;make clean;make shared_lib;
+cd $CSW_PARENT/csw/lib;./build_shared_lib;
+
+echo
+echo   ==== building jtest
+echo
+cd $CSW_PARENT/csw/jtest;make clean;make;
+
+echo
+echo   ==== building mysql/jtest
+echo
+cd $CSW_PARENT/csw/mysql/jtest/src;make clean;make;
+
+echo
+echo   ==== building executable jeasyx
+echo
+cd $CSW_PARENT/csw/jeasyx/src;make executable;
+
+echo
+echo   ==== building executable jsurf
+echo
+cd $CSW_PARENT/csw/jsurfaceworks/src;make executable;
+
+

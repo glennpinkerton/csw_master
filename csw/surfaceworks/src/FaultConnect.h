@@ -91,15 +91,10 @@ class FaultConnect {
 
 // Objects of class are not meant to be copied or moved.
 
-  private:
-
-    FaultConnect (const FaultConnect &other) {};
-    const FaultConnect &operator= (const FaultConnect &other) {return *this;};
-    FaultConnect (const FaultConnect &&other) {};
-    const FaultConnect &operator= (const FaultConnect &&other) {return *this;};
-
-
-  public:
+  FaultConnect (const FaultConnect &other) = delete;
+  const FaultConnect &operator= (const FaultConnect &other) = delete;
+  FaultConnect (FaultConnect &&other) = delete;
+  const FaultConnect &operator= (FaultConnect &&other) = delete;
 
 
   void SetGrdFileioPtr (CSWGrdFileio *p) {grd_fileio_ptr = p;};

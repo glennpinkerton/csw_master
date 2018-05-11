@@ -75,23 +75,10 @@ class GPFLine
     GPFLine () {};
     ~GPFLine () {Cleanup ();};
 
-    GPFLine (const GPFLine &other) {
-        ResetForCopy ();
-    }
-
-    const GPFLine &operator= (const GPFLine &other) {
-        ResetForCopy ();
-        return *this;
-    }
-
-    GPFLine (const GPFLine &&other) {
-        ResetForCopy ();
-    }
-
-    const GPFLine &operator= (const GPFLine &&other) {
-        ResetForCopy ();
-        return *this;
-    }
+    GPFLine (const GPFLine &other) = delete;
+    const GPFLine &operator= (const GPFLine &other) = delete;
+    GPFLine (const GPFLine &&other) = delete;
+    const GPFLine &operator= (const GPFLine &&other) = delete;
 
 
   private:
@@ -120,7 +107,6 @@ class GPFLine
     int                    NtextRec = 0;
 
     void                   Cleanup (void);
-    void                   ResetForCopy ();
 
     int                    CalcLineDistances (CSW_F *x, CSW_F *y, int npts);
     int                    CalcLineDashes (CSW_F *x, CSW_F *y, int npts);
