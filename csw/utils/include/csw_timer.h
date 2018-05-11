@@ -39,14 +39,10 @@ class CSWTimer
 
 // Do not allow copy or move stuff.
 
-  private:
-
-    CSWTimer (const CSWTimer &other) {};
-    const CSWTimer &operator= (const CSWTimer &other) {return *this;};
-    CSWTimer (const CSWTimer &&other) {};
-    const CSWTimer &operator= (const CSWTimer &&other) {return *this;};
-
-  public:
+    CSWTimer (const CSWTimer &other) = delete;
+    const CSWTimer &operator= (const CSWTimer &other) = delete;
+    CSWTimer (CSWTimer &&other) = delete;
+    const CSWTimer &operator= (CSWTimer &&other) = delete;
 
     int csw_CpuDisp (void);
     int csw_CpuTime (double *);

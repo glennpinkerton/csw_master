@@ -67,15 +67,16 @@ class CSWConDraw
 
     void  SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};
 
-  private:
-
 // This class is not meant to be copied or moved
-// Thus, these methods are private.
+// Thus, these methods are = delete.
 
-    CSWConDraw (const CSWConDraw &other) {};
-    const CSWConDraw &operator= (const CSWConDraw &other) {return *this;};
-    CSWConDraw (const CSWConDraw &&other) {};
-    const CSWConDraw &operator= (const CSWConDraw &&other) {return *this;};
+    CSWConDraw (const CSWConDraw &other) = delete;
+    const CSWConDraw &operator= (const CSWConDraw &other) = delete;
+    CSWConDraw (CSWConDraw &&other) = delete;
+    const CSWConDraw &operator= (CSWConDraw &&other) = delete;
+
+
+  private:
 
     void FreeWork (void);
 

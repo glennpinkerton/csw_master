@@ -467,38 +467,6 @@ int GPFLine::gpf_CleanupLineCalc (void)
 /*
   ****************************************************************
 
-                       R e s e t F o r C o p y
-
-  ****************************************************************
-
-  The pointed to memory in a GPFLine object is only meant for use
-  as scratch space for various operations (public methods).  It
-  make no sense to copy or move this scratch space to a copy of
-  the GPFLine object.
-*/
-
-void GPFLine::ResetForCopy (void)
-{
-
-    PointRecArray = NULL;
-    PointArray = NULL;
-    CurrentPoint = NULL;
-    NpointRec = 0;
-
-    LineDistance = NULL;
-
-    TextRecArray = NULL;
-    TextArray = NULL;
-    NtextRec = 0;
-
-    return;
-
-}  /*  end of private ResetForCopy function  */
-
-
-/*
-  ****************************************************************
-
                          C l e a n u p
 
   ****************************************************************

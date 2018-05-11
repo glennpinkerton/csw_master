@@ -205,16 +205,10 @@ class SealedModel {
 
 // Objects of class not meant to be copied or moved.
 
-  private:
-
-    SealedModel (const SealedModel &other) {};
-    const SealedModel &operator= (const SealedModel &other) {return *this;};
-    SealedModel (const SealedModel &&other) {};
-    const SealedModel &operator= (const SealedModel &&other) {return *this;};
-
-
-  public:
-
+  SealedModel (const SealedModel &other) = delete;
+  const SealedModel &operator= (const SealedModel &other) = delete;
+  SealedModel (SealedModel &&other) = delete;
+  const SealedModel &operator= (SealedModel &&other) = delete;
 
 
   void setSimSealFlag (int ival);

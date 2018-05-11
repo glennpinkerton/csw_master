@@ -656,6 +656,12 @@ void CDisplayList::test_frame_indexes (void *vptr)
     int         *itest = 0;
     FRameStruct *frptr;
 
+
+// The ip0 and ip10 pointers are used to see if NULL or near NULL 
+// pointers exist in the various frame graphic object lists.
+// reinterpret_cast is generally a bad thing, but for this very
+// specific case, I think it is ok.
+
     static const int *ip0 = 0;
     static const int *ip10 = reinterpret_cast<const int *> (10);
 

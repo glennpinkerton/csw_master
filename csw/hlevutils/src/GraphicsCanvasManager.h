@@ -36,18 +36,18 @@ class CanvasManager
     CanvasManager () {};
     ~CanvasManager ();
 
+// Do not allow copy or move with this class
+// Compile error should be seen if copy or move is attempted.
+
+    CanvasManager (const CanvasManager &other) = delete;
+    const CanvasManager &operator= (const CanvasManager &other) = delete;
+    CanvasManager (CanvasManager &&other) = delete;
+    const CanvasManager &operator= (CanvasManager &&other) = delete;
+
 
   private:
 
     std::vector<GRaphicsCanvasStruct>    CanvasList;
-
-// Do not allow copy or move with this class
-// Compile error should be seen if copy or move is attempted.
-
-    CanvasManager (const CanvasManager &other) {};
-    const CanvasManager &operator= (const CanvasManager &other) {return *this;};
-    CanvasManager (const CanvasManager &&other) {};
-    const CanvasManager &operator= (const CanvasManager &&other) {return *this;};
 
 
   public:

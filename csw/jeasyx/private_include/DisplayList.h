@@ -112,17 +112,13 @@ private:
 
 // It makes no sense to copy construct, move construct,
 // assign or move assign a DisplayList object.  The 
-// various copy methods are made private to prevent 
+// various copy methods are flagged "delete" to prevent 
 // their use.
 
-  private:
-
-    CDisplayList (const CDisplayList &old) {};
-    const CDisplayList &operator=(const CDisplayList &old) {return *this;};
-    CDisplayList (const CDisplayList &&old) {};
-    const CDisplayList &operator=(const CDisplayList &&old) {return *this;};
-
-  public:
+    CDisplayList (const CDisplayList &old) = delete;
+    const CDisplayList &operator=(const CDisplayList &old) = delete;
+    CDisplayList (CDisplayList &&old) = delete;
+    const CDisplayList &operator=(CDisplayList &&old) = delete;
 
     void SetGrdAPIPtr (CSWGrdAPI *p) {grdapi_ptr = p;};
 

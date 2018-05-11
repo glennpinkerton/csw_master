@@ -88,14 +88,12 @@ class GTXDrawPrim
     GTXDrawPrim () {gtx_InitDrawPrim ();};
     ~GTXDrawPrim () {gtx_FreeDrawPrim ();};
 
-  private:
+  // do not allow copy or move stuff
 
-    GTXDrawPrim (const GTXDrawPrim &other) {};
-    const GTXDrawPrim &operator= (const GTXDrawPrim &other) {return *this;};
-    GTXDrawPrim (const GTXDrawPrim &&other) {};
-    const GTXDrawPrim &operator= (const GTXDrawPrim &&other) {return *this;};
-
-  public:
+    GTXDrawPrim (const GTXDrawPrim &other) = delete;
+    const GTXDrawPrim &operator= (const GTXDrawPrim &other) = delete;
+    GTXDrawPrim (GTXDrawPrim &&other) = delete;
+    const GTXDrawPrim &operator= (GTXDrawPrim &&other) = delete;
 
     void SetEZXJavaPtr (EZXJavaArea *p) {ezx_java_ptr = p;};
     void SetDlistIndex (int index) {dlist_index = index;};

@@ -60,31 +60,13 @@ class CSWScopeGuard
 
 //
 // The copy constructor, assignment operator, move constructor
-// and move assignment operator should never be called, explicitly
-// or implicitly.  These are all private and they just set func to NULL
-// in the destination object.  Not completely fool proof, but it takes
-// some intentional work to screw it up.
+// and move assignment operator should never be called
 //
-  private:
 
-    CSWScopeGuard (const CSWScopeGuard &other) {
-        func = NULL;
-    }
-
-    const CSWScopeGuard &operator= (const CSWScopeGuard &other) {
-        func = NULL;
-        return *this;
-    }
-
-    CSWScopeGuard (const CSWScopeGuard &&other) {
-        func = NULL;
-    }
-
-    const CSWScopeGuard &operator= (const CSWScopeGuard &&other) {
-        func = NULL;
-        return *this;
-    }
-
+    CSWScopeGuard (const CSWScopeGuard &other) = delete;
+    const CSWScopeGuard &operator= (const CSWScopeGuard &other) = delete;
+    CSWScopeGuard (CSWScopeGuard &&other)  = delete;
+    const CSWScopeGuard &operator= (CSWScopeGuard &&other) = delete;
 
 }; // end of class definition
 

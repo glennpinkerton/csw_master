@@ -64,6 +64,8 @@ ifndef NODEBUG
 #compile without debug and without profiling
 else
 
+$(info "Optimized CFLAGS")
+
   CFLAGS     = -O \
                -fPIC \
                -Wall\
