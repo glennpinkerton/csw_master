@@ -1,5 +1,7 @@
 #!/bin/bash
 
+unset NODEBUG;
+
 cd ..
 export CSW_PARENT=$(pwd);
 
