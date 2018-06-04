@@ -1,0 +1,12 @@
+
+
+Please see DATACMNS-944 which is associated to this commit which has the following renames
+
+    findOne(…) -> findById(…)
+    save(Iterable) -> saveAll(Iterable)
+    findAll(Iterable<ID>) -> findAllById(…)
+    delete(ID) -> deleteById(ID)
+    delete(Iterable<T>) -> deleteAll(Iterable<T>)
+    exists() -> existsById(…)
+
+

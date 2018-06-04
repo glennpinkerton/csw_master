@@ -4,17 +4,21 @@ include $(CSW_PARENT)/build/system.mk
 
 JAVA_SRC=\
   TestMain.java\
+  STSMain.java\
   LgLoad.java\
   DataGen.java\
   SpatialObj.java\
-  GLPDB.java
+  GLPDB.java\
+  STSDB.java
 
 JAVA_CLASSES=\
   TestMain.class\
+  STSMain.class\
   LgLoad.class\
   DataGen.class\
   SpatialObj.class\
-  GLPDB.class
+  GLPDB.class\
+  STSDB.class
 
 PACKAGE_PATH=csw/mysql/jtest/src
 JAR_FILE=mysql.jar

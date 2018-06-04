@@ -25,6 +25,7 @@
 #include <vector>
 #include <string>
 
+#include <memory>
 #include <exception>
 #include <iostream>
 #include <fstream>
@@ -1101,7 +1102,7 @@ private:
   /*
    * lists of grids, trimeshes and contours.
    */
-    std::vector<DLContour *>   contour_list;
+    std::vector<DLContour*>   contour_list;
 
     std::vector<DLSurf *>      surf_list;
 

@@ -1,0 +1,9 @@
+This directory has some code snnipets created in response to the Udemy 
+restfun api course.  I (Glenn) consider these to be useful references
+for the basic syntax and logic of many spring/hibernate features.
+
+The code smippets here use gradle to build.  I could not stomach putting
+stuff requiring an eclipse based ide into this directory.
+
+This code is not actually a part of the csw libraries.  However, putting this
+stuff here makes it easier to use github for backup purposes.

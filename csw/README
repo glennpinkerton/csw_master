@@ -1,4 +1,7 @@
-This directory has the code, makefiles, some data, etc. for the software.
+This directory has the code, makefiles, some data, etc. for the csw
+libraries.  The course_cpp and course_rest directories are not part
+of the csw build.  They are exaamples from a couple of Udemy courses.
+The code is here as useful notes on basic stuff.
 
 In case you are wondering about the name "csw", it is the initials of a
 company that I tried to start about 20 years ago.  I have kept it for
