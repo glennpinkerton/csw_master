@@ -10602,10 +10602,6 @@ int SealedModel::BuildFaultOutlineFromSealedIntersects (
 
 /*
  * Fill the gap by linear interpolation.
- *
- *  TODO  This is a quick fix for veit's Cancun data.  The
- *        code should drape the xy line onto the padded fault
- *        for its z values.
  */
     double      space, sp1, sp2, dtot;
     double      dx, dy, dz;

@@ -13,3 +13,24 @@ mv shr_lib_link.o shr_lib_link.z
 rm -f *.o
 mv shr_lib_link.z shr_lib_link.o
 
+rm -f csw_super.jar
+
+#jar uf csw/lib/csw_super.jar csw/jtest/src/*.class
+
+cd $CSW_PARENT
+jar cf csw/lib/csw_super.jar csw/jeasyx/src/*.class
+jar uf csw/lib/csw_super.jar csw/jsurfaceworks/src/*.class
+jar uf csw/lib/csw_super.jar csw/jutils/src/*.class
+jar uf csw/lib/csw_super.jar csw/uistuff/*.class
+jar uf csw/lib/csw_super.jar csw/uistuff/*.gif
+jar uf csw/lib/csw_super.jar csw/images/*.class
+jar uf csw/lib/csw_super.jar csw/images/*.gif
+jar uf csw/lib/csw_super.jar csw/lib/lib_csw_all.so
+
+rm -f csw/gradle/csw-api/build/libs/csw_super.jar 
+mv csw/lib/csw_super.jar csw/gradle/csw-api/src/dist/lib
+
+#cp csw/uistuff/*.gif csw/gradle/csw-api/src/main/resources
+#cp csw/images/*.gif csw/gradle/csw-api/src/main/resources
+
+cp csw/jtest/JEasyXTest.java csw/gradle/csw-api/src/main/java/jtest

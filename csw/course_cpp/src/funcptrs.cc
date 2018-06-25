@@ -40,7 +40,7 @@ void gprintnl (int val)
 
 
 //
-// Example of how to pass unction pointer to another function
+// Example of how to pass function pointer to another function
 // The list of baseball players and their stats is traversed by
 // the count_certain_players function.  The function pointer 
 // which is a parametger to count_certain_players provides the
@@ -68,7 +68,7 @@ int count_certain_players (std::vector<Player> players,
 }
 
 
-// Use the C++11 fumction tgemplated class (in the functional header).
+// Use the C++11 fumction templated class (in the functional header).
 
 int count_certain_players (std::vector<Player> players, 
                            std::function<int(Player const &)> pfunc)

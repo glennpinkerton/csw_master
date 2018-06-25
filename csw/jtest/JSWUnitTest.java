@@ -24,9 +24,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.Frame;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -119,20 +121,21 @@ public class JSWUnitTest {
 
     }
 
-
     static void showMem (String  msg)
     {
 
         long  maxmem = Runtime.getRuntime().maxMemory ();
         long  totmem = Runtime.getRuntime().totalMemory ();
+        long  freemem = Runtime.getRuntime().freeMemory ();
 
         maxmem /= 1000000;
         totmem /= 1000000;
-        long freemem = maxmem - totmem;
+        freemem /= 1000000;
 
         System.out.println ();
-        System.out.println ("maxmem = " + maxmem + "   total mem = " + totmem +
-                            "    free mem = " + freemem);
+        System.out.println ("maxmem = " + maxmem +
+                            "   total mem = " + totmem +
+                            "   free mem = " + freemem);
         if (msg != null) {
             System.out.println (msg);
         }
@@ -140,8 +143,6 @@ public class JSWUnitTest {
         System.out.flush ();
 
     }
-
-
 
 }
 
@@ -164,7 +165,7 @@ int idum = System.in.read();
 }
 catch (Exception e) {
 }
-*/
+ */
 
 
         String   cpar = System.getenv ("CSW_PARENT");
@@ -190,6 +191,13 @@ catch (Exception e) {
         setResizable (false);
         Container contentPane = getContentPane ();
         contentPane.setLayout (new GridLayout(15,1));
+
+        JButton showmem_button = new JButton ("Show Mem");
+        showmem_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                JSWUnitTest.showMem ("From user click");
+          }
+        });
 
         JButton trimesh_10_button = new JButton (nphint + " Point TriMesh");
         trimesh_10_button.addActionListener(new ActionListener() {
@@ -236,6 +244,15 @@ catch (Exception e) {
           }
         });
 
+        JButton toobig_grid_10_button = new JButton (1000 * nphint + " Point Grid");
+        toobig_grid_10_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                Grid10Frame gf = new Grid10Frame (1000 * nphint, false);
+                Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
+                SwingUtilities.invokeLater (run_frame);
+          }
+        });
+
         JButton huge_nsgrid_10_button = new JButton (150 * nphint + " Point Grid Unsmoothed");
         huge_nsgrid_10_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
@@ -269,6 +286,15 @@ catch (Exception e) {
         grid_huge_sm_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
                 Grid10Frame gf = new Grid10Frame (100 * nphint, true);
+                Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
+                SwingUtilities.invokeLater (run_frame);
+          }
+        });
+
+        JButton grid_mill_sm_button = new JButton ("1 Million Point Smooth Grid");
+        grid_mill_sm_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                Grid10Frame gf = new Grid10Frame (1000000, true);
                 Grid10FrameRunnable run_frame = new Grid10FrameRunnable (gf);
                 SwingUtilities.invokeLater (run_frame);
           }
@@ -355,15 +381,18 @@ catch (Exception e) {
           }
         });
 
+        contentPane.add (showmem_button);
         contentPane.add (trimesh_10_button);
         contentPane.add (grid_10_button);
         contentPane.add (large_grid_10_button);
         contentPane.add (large_nsgrid_10_button);
         contentPane.add (huge_grid_10_button);
         contentPane.add (huge_nsgrid_10_button);
+        contentPane.add (toobig_grid_10_button);
         contentPane.add (grid_sm_button);
         contentPane.add (grid_large_sm_button);
         contentPane.add (grid_huge_sm_button);
+        contentPane.add (grid_mill_sm_button);
 //        contentPane.add (trimesh_file_button);
 //        contentPane.add (divide_file_button);
 //        contentPane.add (grid_file_button);
@@ -515,8 +544,8 @@ class GFWorker extends SwingWorker<Integer, Void> {
     }
 
     protected void done () {
-JSWUnitTest.showMem ("in thread done");
         gf.setVisible (true);
+        gf = null;
     }
 
 }
@@ -548,7 +577,7 @@ class Grid10FrameRunnable implements Runnable {
 // thread resource contention at work.  As an experiment I sleep a bit
 // prior to creating and executing each thread.  The bigger the task
 // (more points hinted) then the longer the sleep.  This idea is
-// purely experimental.  If the slow execution stioll happens some times,
+// purely experimental.  If the slow execution still happens some times,
 // I will remove this sleep code.
 try {
 int  snp = gf.getNumHint ();
@@ -566,6 +595,7 @@ catch (Throwable e) {
         gf.populateDlist ();
         gf.setVisible (true);
       }
+      gf = null;
 
     }
 
@@ -585,7 +615,7 @@ class Grid10Frame extends JDLFrame
 
     public Grid10Frame (int nphint, boolean smooth_flag)
     {
-        super ();
+        super (false);
         this.nphint = nphint;
         this.smooth_flag = smooth_flag;
     }
@@ -606,7 +636,11 @@ class Grid10Frame extends JDLFrame
         double[]           x, y, z;
         int                i;
 
-        int  dl_id = super.getNativeID ();
+        createFramePanel ();
+        JEasyXGraphicsPanel gpanel = getGpanel();
+        if (gpanel == null) {
+            return;
+        }
 
         random = new Random();
         long  ctw = System.currentTimeMillis ();
@@ -622,12 +656,9 @@ class Grid10Frame extends JDLFrame
         setResizable (true);
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
 
-        JEasyXGraphicsPanel gpanel = new JEasyXGraphicsPanel ();
-        Container contentPane = getContentPane ();
-        contentPane.add (gpanel);
-
         JDisplayList dl = gpanel.getDisplayList ();
 
+        int  dl_id = getNativeID ();
         sw = new JSurfaceWorks (dl_id);
 
         x = new double[np];
@@ -654,6 +685,14 @@ class Grid10Frame extends JDLFrame
           }
         }
 
+
+        Date     date;
+        long     t1, t2;
+        double   dtm;
+
+        date = new Date ();
+        t1 = date.getTime ();
+
         Grid grid = sw.calcGrid
         (
             x,
@@ -667,6 +706,11 @@ class Grid10Frame extends JDLFrame
             force_no_smooth
         );
 
+        date = new Date ();
+        t2 = date.getTime ();
+
+        dtm = (double)(t2 - t1) / 1000.0;
+
         dl.beginPlot ("grid test" + np,
                       0.0, 0.0, 20.0, 20.0);
         dl.setColor (5, 5, 5);
@@ -679,9 +723,9 @@ class Grid10Frame extends JDLFrame
                        200.0);
 
         DLSurfaceProperties dlp = new DLSurfaceProperties ();
-        if (np < 2000) {
-            dlp.setShowNodes (true);
-        }
+//        if (np < 2000) {
+//            dlp.setShowNodes (true);
+//        }
         //dlp.setShowColorFills (false);
         ColorPalette cpal = new ColorPalette();
         double zmin = grid.getZMin ();
@@ -695,6 +739,16 @@ class Grid10Frame extends JDLFrame
         dl.addGrid ("test grid 10",
                     grid,
                     dlp);
+
+        int  np_loop = np;
+        if (np_loop > 1000) {
+            np_loop = 1000;
+        }
+        dl.setSymbolColor (0, 0, 0);
+        dl.setLineThickness (.01);
+        for (int isym=0; isym<np_loop; isym++) {
+            dl.addSymbol (x[isym], y[isym], .15, 0.0, 7);
+        }
 
     }
 
@@ -715,7 +769,8 @@ class Grid10Frame extends JDLFrame
 
         double    zz = (xw + yh) / 8.0;
 
-        Random  random = new Random();
+        long  ctw = System.currentTimeMillis ();
+        Random  random = new Random(ctw);
 
         x1 = xw * random.nextDouble () - 1.5 * xw;
         y1 = yh * random.nextDouble () - 1.5 * yh;

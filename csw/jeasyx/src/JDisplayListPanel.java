@@ -136,6 +136,7 @@ public class JDisplayListPanel extends JPanel
 
     void startSelectMode ()
     {
+        if (dlist == null) return;
         resetModes ();
         selectMode = 1;
         dlist.setEditor(null);
@@ -146,6 +147,7 @@ public class JDisplayListPanel extends JPanel
 
     void startUnselectMode ()
     {
+        if (dlist == null) return;
         resetModes ();
         dlist.unselectAll ();
         dlp_repaint ();
@@ -155,6 +157,7 @@ public class JDisplayListPanel extends JPanel
 
     void startZoomExtentsMode ()
     {
+        if (dlist == null) return;
         resetModes ();
 
         int iframe = dlist.getSingleRescaleFrame ();
@@ -171,6 +174,7 @@ public class JDisplayListPanel extends JPanel
 
     void startZoomOutMode ()
     {
+        if (dlist == null) return;
         resetModes ();
 
         int iframe = dlist.getSingleRescaleFrame ();
@@ -233,6 +237,7 @@ public class JDisplayListPanel extends JPanel
 
     void redraw ()
     {
+        if (dlist == null) return;
         dlist.setNativeDrawNeeded (1);
         resetModes ();
         dlp_repaint ();
@@ -260,6 +265,7 @@ public class JDisplayListPanel extends JPanel
         y1Pan = 0;
         panFrame = -1;
 
+        if (dlist == null) return;
         dlist.clearZoomPanShapes ();
 
         return;
@@ -339,16 +345,41 @@ public class JDisplayListPanel extends JPanel
     public void cleanup ()
     {
         if (dlist != null) {
+            resetModes ();
             dlist.cleanup ();
+            JDLFrameList.markFrameAsDeleted (dlist);
+            dlist.setPanelToNull ();
+            setDlistToNull ();
+        }
+        else {
+            JDLFrameList.markFrameAsDeleted (parentFrame);
         }
     }
 
+
+// When the display list and panel are both deleted,
+// set the references to each other to null in the
+// respective objects.  A corresponding set of the dlpanel
+// in the dlist object is also done.  This is intended
+// to be package scope.
+
+    void setDlistToNull () {dlist = null;}
+
+
+/*
     static void cleanup (JDisplayList dl)
     {
         if (dl != null) {
             dl.cleanup ();
+            JDLFrameList.markFrameAsDeleted (dl);
+            dl.setPanelToNull ();
         }
     }
+
+    static void cleanup (JFrame frm) {
+        JDLFrameList.markFrameAsDeleted (frm);
+    }
+*/
 
 /*---------------------------------------------------------------------------*/
 
@@ -469,6 +500,7 @@ public class JDisplayListPanel extends JPanel
         if (panStarted == 1) {
             return;
         }
+        if (dlist == null) return;
 
         dlist.setNativeDrawNeeded (0);
 
@@ -496,6 +528,7 @@ public class JDisplayListPanel extends JPanel
         if (panStarted == 0) {
             return;
         }
+        if (dlist == null) return;
 
         int ix = e.getX();
         int iy = e.getY();
@@ -523,6 +556,7 @@ public class JDisplayListPanel extends JPanel
         if (zoomStarted == 1) {
             return;
         }
+        if (dlist == null) return;
 
         dlist.setNativeDrawNeeded (0);
 
@@ -552,6 +586,7 @@ public class JDisplayListPanel extends JPanel
         if (zoomStarted == 0) {
             return;
         }
+        if (dlist == null) return;
 
         dlist.setNativeDrawNeeded (0);
 
@@ -596,6 +631,7 @@ public class JDisplayListPanel extends JPanel
         if (zoomStarted == 0) {
             return;
         }
+        if (dlist == null) return;
 
         int ix = e.getX();
         int iy = e.getY();
@@ -684,6 +720,7 @@ public class JDisplayListPanel extends JPanel
 
         private void localClick (MouseEvent e)
         {
+            if (dlist == null) return;
             setButtonID (e);
 
           /*
@@ -750,6 +787,7 @@ public class JDisplayListPanel extends JPanel
         public void mouseDragged(MouseEvent e) {
 
             setButtonID (e);
+            if (dlist == null) return;
 
           /*
            * If in zoom rectangle mode, it is possible to redraw the
@@ -768,6 +806,7 @@ public class JDisplayListPanel extends JPanel
         }
         public void mouseMoved(MouseEvent e) {
 
+            if (dlist == null) return;
           /*
            * If in zoom rectangle mode, it is possible to redraw the
            * zoom rectangle on a mouse drag.
@@ -785,6 +824,7 @@ public class JDisplayListPanel extends JPanel
 
         }
         public void mousePressed(MouseEvent e) {
+            if (dlist == null) return;
 
             setButtonID (e);
 
@@ -823,6 +863,7 @@ public class JDisplayListPanel extends JPanel
 
         public void mouseReleased(MouseEvent e) {
 
+            if (dlist == null) return;
             int            dx, dy;
 
             setButtonID (e);
@@ -896,6 +937,7 @@ public class JDisplayListPanel extends JPanel
     private void zoomToExtents (MouseEvent e)
     {
 
+        if (dlist == null) return;
         int ix = e.getX();
         int iy = e.getY();
 
@@ -915,6 +957,8 @@ public class JDisplayListPanel extends JPanel
     private void zoomOut (MouseEvent e)
     {
 
+        if (dlist == null) return;
+
         int ix = e.getX();
         int iy = e.getY();
 
@@ -933,6 +977,8 @@ public class JDisplayListPanel extends JPanel
 
     private void zoomIn (MouseEvent e)
     {
+
+        if (dlist == null) return;
 
         int ix = e.getX();
         int iy = e.getY();
@@ -956,6 +1002,8 @@ public class JDisplayListPanel extends JPanel
         if (selectionAllowed == false) {
             return;
         }
+
+        if (dlist == null) return;
 
         int ix = e.getX();
         int iy = e.getY();

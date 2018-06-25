@@ -43,11 +43,16 @@ public class JDLFrame extends JFrame {
     public static final int    FRAME_WITHOUT_TOOLBAR = 1;
 
  /**
-  *  The dl object is created by the construcor and can be accessed
+  *  The dl object is created by the constructor and can be accessed
   *  by a derived class via the getDL method.
   */
     private JDisplayList  dl = null;
     private int           dlist_id = -1;
+    private boolean       create_panel = true;
+    private int           panel_type = 0;
+
+    JDLFrame              activeFrame = null;
+
 
 /**
  *  This constructor will create a frame with a "tool bar" at the
@@ -55,6 +60,14 @@ public class JDLFrame extends JFrame {
  */
     public JDLFrame () 
     {
+        init (FRAME_WITH_TOOLBAR);
+    }
+
+
+
+    public JDLFrame (boolean bpanel) 
+    {
+        create_panel = bpanel;
         init (FRAME_WITH_TOOLBAR);
     }
 
@@ -71,8 +84,39 @@ public class JDLFrame extends JFrame {
         init (type);
     }
 
+
     JEasyXGraphicsPanel  gpanel = null;
     JDisplayListPanel dpanel = null;
+
+    public JEasyXGraphicsPanel getGpanel () {
+      return gpanel;
+    }
+
+
+    public void createFramePanel () {
+      if (gpanel != null  ||  dpanel != null) {
+        return;
+      }
+      createPanel ();
+    }
+
+
+    private void createPanel () {
+      if (panel_type == FRAME_WITH_TOOLBAR) {
+        gpanel = new JEasyXGraphicsPanel (BorderLayout.NORTH);
+        Container contentPane = getContentPane ();
+        contentPane.add (gpanel);
+        dl = gpanel.getDisplayList ();
+      }
+      else {
+        dpanel = new JDisplayListPanel ();
+        Container contentPane = getContentPane ();
+        contentPane.add (dpanel);
+        dl = dpanel.getDisplayList ();
+      }
+
+      dlist_id = dl.getNativeID ();
+    }
 
 /**
  *  Called by constructors to do the work of initializing the specified
@@ -80,28 +124,20 @@ public class JDLFrame extends JFrame {
  */
     private void init (int type) {
 
+        panel_type = type;
+
         setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
         setSize (700, 700);
         setResizable (true);
 
-        if (type == FRAME_WITH_TOOLBAR) {
-          gpanel = new JEasyXGraphicsPanel (BorderLayout.NORTH);
-          Container contentPane = getContentPane ();
-          contentPane.add (gpanel);
-          dl = gpanel.getDisplayList ();
+        if (create_panel) {
+          createPanel ();
         }
-        else {
-          dpanel = new JDisplayListPanel ();
-          Container contentPane = getContentPane ();
-          contentPane.add (dpanel);
-          dl = dpanel.getDisplayList ();
-        }
-
-        dlist_id = dl.getNativeID ();
 
         long  nid = 0;
 
         JDLFrameList.addFrame (nid, this);
+        activeFrame = this;
 
         addWindowListener (new WindowAdapter () {
             public void windowDeactivated (WindowEvent e) {
@@ -111,6 +147,19 @@ public class JDLFrame extends JFrame {
                 else if (gpanel != null) {
                     gpanel.forceZoomQuit ();
                 }
+            }
+            public void windowClosed (WindowEvent e) {
+                if (dl != null) {
+                    dl.clearArrays();
+                    dl = null;
+                }
+                if (activeFrame != null){ 
+                    JDLFrameList.removeFrame (nid, activeFrame);
+                    activeFrame = null;
+                }
+                dpanel = null;
+                gpanel = null;
+                System.gc();
             }
         });
 
@@ -127,5 +176,18 @@ public class JDLFrame extends JFrame {
     public void populateDlist () 
     {
     }
+
+
+    @Override
+    public void finalize () {
+
+      try {
+        super.finalize();
+      }
+      catch (Throwable e) {
+      }
+
+    }
+
 
 }  // end of JDLFrame class

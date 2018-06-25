@@ -1221,7 +1221,7 @@ set to false if the trimesh is for anything else.
 
   /*
    * Remove the cached triangle indexes associated with a particular
-   * {@link TriMesh} object.  The caced data is part of the native
+   * {@link TriMesh} object.  The cached data is part of the native
    * C implementation of line and point draping.  As long as you want
    * to drape onto a trimesh, you should NOT remove the index for the
    * trimesh.  This method should be called, for example, when the

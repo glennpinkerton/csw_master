@@ -109,7 +109,23 @@ public final class JEasyXIcons {
    * @return a URL object that points to an image file
    * @throws IndexOutOfBoundsException if type is invalid
    */
+
+// The "resources" are generally files that stay constant during the
+// life time of the java application.  In the case of the CSW stuff,
+// there are some gif files that fit this "resource" definition.  The
+// get Resource call basically returns the file name of the gif file.
+
+// It seems that resources can be retrieved either by the class of the class
+// loader.  In my experimenting, if the resource (in this case the gif file)
+// is in the package directory, then getting the resource using just the
+// filename works with the class, but not with the class loader.
+
+// For a gradle build, if the gif files were put into the src/main/resource
+// directory, then the classLoader version would work and the class version
+// would not, at least in my experimentation.
+
   public static URL getURL(String type) throws IndexOutOfBoundsException {
+    //URL url = JEasyXIcons.class.getClassLoader().getResource(type);
     URL url = JEasyXIcons.class.getResource(type);
     return(url);
   }
@@ -122,7 +138,9 @@ public final class JEasyXIcons {
    * @throws IndexOutOfBoundsException if type is invalid
    */
   public static ImageIcon getImageIcon(String type) throws IndexOutOfBoundsException {
-    return(new ImageIcon(getURL(type)));
+    URL url = getURL(type);
+    if (url == null) return null;
+    return(new ImageIcon(url));
   }
 
   /**

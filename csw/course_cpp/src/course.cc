@@ -1,256 +1,235 @@
-/*
- *  This example uses unique pointer objects in various ways.
- *  It is hard to know exactly when the C++ compiler makes
- *  something an r value or an l value.  When dealing with
- *  unique pointers, which cannot be copied, it is better to
- *  explicitly use the std::move() syntax when you want the 
- *  move copy constructor or move assinment operator to be used.
- *
- *  Unique pointers do not have an "is a" relationship to the
- *  undwerlying raw pointer.  The unique ppointer has a "has a"
- * relationship to the raw pointer.
- */
-
 #include <iostream>
 #include <string>
 #include <vector>
-#include <memory>
-#include <memory.h>
+#include <initializer_list>
 
-class RLTest
+
+template <typename T>
+class ringbuff
 {
     private:
 
-      static const int SIZE = 200;
-      int *rldata = nullptr;
+      int maxsize = 3;
+      int current = 0;
 
-  // The RLTest object is not a unique_ptr of itself.  A unique
-  // pointer object has a raw pointer of some type.  Thus, the
-  // RLTest class has a copy constrictor and assignment operator.
+      std::vector<T>  tvec;
 
       void init ()
       {
+
         try {
-          if (rldata != NULL) {
-            delete [] rldata;
-            rldata = NULL;
-          }
-          // In C++11, the {} sets the int array to zeros after allocation
-          rldata = new int[SIZE]{};
+
+// Using the vector is better than using an array of T objects.
+// The syntax for dynamic T array new and delete would be:
+// T *array = new T[maxsize]
+// delete[] array
+
+          tvec.resize (maxsize);
         }
         catch (...) {
-          std::cout << "exception constructing RLTest for size = " <<
-            SIZE << std::endl;
+          std::cout << "exception constructing ringbuff for size = " <<
+            maxsize << std::endl;
         }
+        current = 0;
       };
 
     public:
 
-  // The three constructors are just for variety.
+  // use a "forward declaration" of an inner class to keep
+  // the ringbuff class a bit less messy.  A class named iterator
+  // must be defined to get range basaed loop behavior.
 
-      RLTest () : rldata (new int[SIZE])
-      {
-        std::cout << "RLTest default constructor" << std::endl;
-        init ();
-      }
+      class iterator;
 
-      RLTest (int idum) : rldata (new int[SIZE])
+      ringbuff ()
       {
-        std::cout << "RLTest int param constructor" << std::endl;
         init ();
-        if (idum > SIZE) idum = SIZE;
-        for (int i=0; i<idum; i++) {
-            rldata[i] = i * i * 3;
-        }
       };
 
-      RLTest (int idum, int ival) : rldata (new int[SIZE])
+      ringbuff (int max) : maxsize (max)
       {
-        std::cout << "RLTest two int param constructor" << std::endl;
         init ();
-        if (idum > SIZE) idum = SIZE;
-        for (int i=0; i<idum; i++) {
-            rldata[i] = i * i * ival;
-        }
       };
 
-  // copy constructor
 
-      RLTest (const RLTest &other) {
-        std::cout << "RLTest copy constructor" << std::endl;
-        init ();
-      }  
+  // Constructor using C++11 initializer list
 
-  // copy assignment operator
-
-      RLTest &operator= (const RLTest &other) {
-        std::cout << "RLTest copy assignment" << std::endl;
-        init ();
-        return *this;
-      }
-
-   // move constructor
-
-      RLTest (RLTest &&other) {
-        std::cout << "RLTest move constructor" << std::endl;
-        if (rldata != other.rldata) {
-          rldata = other.rldata;
-          other.rldata = nullptr;
+      ringbuff (std::initializer_list<T> ilist) {
+        maxsize = (int) (ilist.size());
+        if (maxsize < 1) {
+          maxsize = 3;
         }
-      }  
-
-  // move assignment operator
-
-      RLTest &operator= (RLTest &&other) {
-        std::cout << "RLTest move assignment" << std::endl;
-        delete[] rldata;
-        rldata = other.rldata;
-        other.rldata = nullptr;
-        return *this;
+        init ();
+        for (auto lval : ilist) {
+          add (lval);
+        }
       }
 
-  // destgructor
+   // Reset the ring buffer data to the contents of a new initializer list
 
-      virtual ~RLTest ()
+      void reset (std::initializer_list<T> ilist) {
+        int newsize = (int)ilist.size();
+        if (newsize < 1) return;
+
+        maxsize = newsize;
+        init ();
+        for (auto lval : ilist) {
+          add (lval);
+        }
+
+      }
+
+
+      virtual ~ringbuff ()
       {
-        std::cout << std::endl << "RLTest destructor run" << std::endl;
-        delete [] rldata;
-        rldata = nullptr;
       };
 
-      friend std::ostream &operator<<(std::ostream &out, const RLTest &other);
-
-      int GetDataPoint (int idx)
+      void add (T val)
       {
-        return rldata[idx];
+          tvec[current] = val;
+          current++;
+          if (current == maxsize) current = 0;
+      };
+
+      T& get (int idx) {
+          idx %= maxsize;
+          return tvec[idx];
+      };
+
+// begin and end iterator accessors  These create an iterator
+// object rather than using a reference.  Both of these methods must 
+// be available to get range based loop behavior.
+
+      iterator begin () {
+          return iterator (0, *this);
+      }
+
+      iterator end () {
+          return iterator (maxsize, *this);
       }
 
 };
 
 
+// The actual iterator class methods are defined here.  Note the
+// syntax of the T stuff here.  This is all needed to allow the
+// iterator to know the type of the ringbuff class.  This is not
+// real clear as to the basic workings.  For now, just do it this
+// way because it works.
 
-std::ostream &operator<<(std::ostream &out, const RLTest &other)
+// It appears that the <T> stuff is implied in the iterator
+// class implementation.
+
+template <typename T>
+class ringbuff<T>::iterator
 {
-    out << "from RLTest << operator" << std::endl;
-    out << "    rldata[0] = " << other.rldata[0] << std::endl;
-    out << "    rldata[1] = " << other.rldata[1] << std::endl;
-    out << "    rldata[2] = " << other.rldata[2] << std::endl;
-    return out;
-}
+  private:
 
+    int        position = 0;
+    ringbuff   &rbuf;
 
+  public:
 
-// two overloaded functions for lvalue and rvalue refs
-// The && syntax has nothing to do with a reference to a
-// reference.  It specifies an rvalue reference.
+// This constructor and all the iterator methods must be available
+// to get range based loops to work.
 
-void rlfunc (RLTest &lvref) {
-    std::cout << "l value ref function" << std::endl;
-}
-void rlfunc (RLTest &&lvref) {
-    std::cout << "r value ref function" << std::endl;
-}
+    iterator (int pos, ringbuff &rb) :
+      position (pos), rbuf(rb) {};
+    
+// overload ++ operator.  The method with the int param is 
+// the postfix version.  The prefix version has no params.
+// The int param for postfix is not used for anything other
+// than differentiating postfix from prefix.  Both of these iterator
+// operators must be available to enable range based loops.
 
+    iterator &operator++ (int) {
+      position++;
+      return *this;
+    }
 
-static std::vector< std::shared_ptr<RLTest> > shrlvecstat;
+    iterator &operator++ () {
+      ++position;
+      return *this;
+    }
+
+// not equals operator
+
+    bool operator!= (const ringbuff<T>::iterator &other) const {
+      return position != other.position;
+    }
+
+// dereference (*) operator  Return a reference to an object of
+// type T whee the object is at the position specified in this
+// iterator object.
+
+    T &operator* () {
+        return rbuf.get (position);
+    }
+
+};
+
 
 int main() {
 
-    std::unique_ptr<RLTest[]> p_unq(new RLTest[2]);
-    std::cout << "from p_unq " << p_unq[0] << std::endl;
+    ringbuff <int> rbuff;
 
-    std::unique_ptr<RLTest> p_unq2(new RLTest(10));
-    std::cout << "from p_unq2 " << *(p_unq2.get()) << std::endl;
+    rbuff.add (10);
+    rbuff.add (20);
+    rbuff.add (30);
 
-  // pushing unique pointers onto a vector seems to work well
-  // when the std::move syntax is used.  The push triggers the
-  // unique pointer move constructor.  Experimentation shows
-  // that the raw pointer in the original pushed unique_ptr 
-  // object has been set to invalid after the push.  The vector
-  // takes ownership.  Subsequent vector elements reset the raw
-  // pointer and push the reset unique_ptr object onto the vector.
+    std::cout << "from old c++98 style" << std::endl;
+    for (ringbuff<int>::iterator it = rbuff.begin();
+         it != rbuff.end(); it++) {
+      std::cout << *it << std::endl;
+    }
+
+    std::cout << "from new c++11 style" << std::endl;
+    for (auto val : rbuff) {
+        std::cout << val << std::endl;
+    }
+
+
+// Create a string ring buffer using an initializer list.
+
+    ringbuff<std::string> rb_str{"sand", "wich", "ice", "cream", "yum"};
+
+    std::cout << "from string initializer_list" << std::endl;
+    for (auto val : rb_str) {
+        std::cout << val << std::endl;
+    }
+
+    rb_str.add ("first yummy");
+    for (auto val : rb_str) {
+        std::cout << val << std::endl;
+    }
+
+    rb_str.reset ({"toe", "ankle", "knee", "hip"});
+    rb_str.add ("neck");
     std::cout << std::endl;
-    std::vector< std::unique_ptr<RLTest> > rlvec;
+    for (auto val : rb_str) {
+        std::cout << val << std::endl;
+    }
+    std::cout << std::endl;
 
-    std::unique_ptr<RLTest> p_unq3(new RLTest(10));
-    rlvec.push_back (std::move(p_unq2));
-    p_unq2.reset (new RLTest(10));
-    rlvec.push_back (std::move(p_unq2));
-    p_unq2.reset (new RLTest());
-    rlvec.push_back (std::move(p_unq2));
-    p_unq2.reset (new RLTest(10, 9));
-    rlvec.push_back (std::move(p_unq2));
-    p_unq2.reset (new RLTest(10, -5));
-    rlvec.push_back (std::move(p_unq2));
-    
+// Create an int ring buffer using an initializer list.
 
-  // To use a range loop through a unique_ptr collection, use references
-  // to the collection elements.  A const reference can pinch hit for
-  // using a value in many cases.
+    ringbuff<double> rb_double{1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7};
 
-    for (const auto &p : rlvec) {
-        std::cout << "In rlvec loop:  " << std::endl << *p << std::endl;
+    std::cout << "from double initializer_list" << std::endl;
+    for (auto val : rb_double) {
+        std::cout << val << std::endl;
     }
 
-
-// shared pointers get "emptied" when moved to vector.
-// try regular copy constructor.  So unique_ptr objects
-// must be moved into a collection and shared_ptr objects
-// should be copied into the collection.
-
-    std::vector< std::shared_ptr<RLTest> > shrlvec1;
-    std::vector< std::shared_ptr<RLTest> > shrlvec2;
-
-    std::shared_ptr<RLTest> shp1 = std::make_shared<RLTest> (10);
-    std::shared_ptr<RLTest> shp2 = std::make_shared<RLTest> (10, 10);
-    std::shared_ptr<RLTest> shp3 = std::make_shared<RLTest> (10, -10);
-    std::shared_ptr<RLTest> shp4 = std::make_shared<RLTest> ();
-
-    shrlvec1.push_back ((shp1));
-    shrlvec1.push_back ((shp1));
-    shrlvec1.push_back ((shp1));
-    shrlvec2.push_back ((shp1));
-    shrlvec2.push_back ((shp1));
-    shrlvec2.push_back ((shp1));
-
-    shrlvec1.push_back ((shp2));
-    shrlvec1.push_back ((shp2));
-    shrlvec1.push_back ((shp2));
-    shrlvec2.push_back ((shp2));
-    shrlvec2.push_back ((shp2));
-    shrlvec2.push_back ((shp2));
-
-    shrlvec1.push_back ((shp3));
-    shrlvec1.push_back ((shp3));
-    shrlvec1.push_back ((shp3));
-    shrlvec2.push_back ((shp3));
-    shrlvec2.push_back ((shp3));
-    shrlvec2.push_back ((shp3));
-
-    shrlvec1.push_back ((shp4));
-    shrlvec1.push_back ((shp4));
-    shrlvec1.push_back ((shp4));
-    shrlvec2.push_back ((shp4));
-    shrlvec2.push_back ((shp4));
-    shrlvec2.push_back ((shp4));
-
-    shrlvecstat.push_back ((shp4));
-    shrlvecstat.push_back ((shp4));
-    shrlvecstat.push_back ((shp4));
-    shrlvecstat.push_back ((shp4));
-    shrlvecstat.push_back ((shp4));
-    shrlvecstat.push_back ((shp4));
-
-    for (const auto &p : shrlvec1) {
-      if (p) {
-        std::cout << "In shrlvec1 loop:  " << std::endl << *p << std::endl;
-      }
+    rb_double.add (3.141592618);
+    for (auto val : rb_double) {
+        std::cout << val << std::endl;
     }
 
-    for (const auto &p : shrlvec2) {
-      if (p) {
-        std::cout << "In shrlvec2 loop:  " << std::endl << *p << std::endl;
-      }
+    rb_double.reset ({2.34, 3.45, 11.111, 34.97});
+    rb_double.add (9.8765);
+    std::cout << std::endl;
+    for (auto val : rb_double) {
+        std::cout << val << std::endl;
     }
 
     return 0;

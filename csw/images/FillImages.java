@@ -32,6 +32,7 @@ public final class FillImages extends Object {
      */
     public Image getImage(String imgFilename) {
 
+      //URL url = FillImages.class.getClassLoader().getResource(imgFilename);
       URL url = FillImages.class.getResource(imgFilename);
       if (url == null) {
         throw new IllegalArgumentException(

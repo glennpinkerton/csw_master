@@ -1,0 +1,19 @@
+
+//apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'csw.jtest.JEasyXTest'
+
+applicationDefaultJvmArgs = ['-Xmx2g' , '-Djava.library.path=src/dist/lib']
+
+
+jar {
+    baseName = 'csw-grdl'
+}
+
+
+dependencies {
+    compile fileTree(dir : 'src/dist/lib', include : ['csw_super.jar'])
+    compile fileTree(dir : 'src/dist/lib', include : ['log*.jar'])
+}
+

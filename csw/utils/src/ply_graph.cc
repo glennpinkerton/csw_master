@@ -3973,13 +3973,6 @@ int CSWPolyGraph::IntersectGraphs (void)
         if (istat == -1) {
             seg->discarded = (char)DiscardFlag;
         }
-        else {
-/*
-printf("\nSegment number %d used  from set %d\n", i, seg->setid);
-intxy(node1->x, node1->y);
-intxy(node2->x, node2->y);
-*/
-        }
     }
 
 

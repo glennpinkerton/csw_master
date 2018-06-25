@@ -43,8 +43,14 @@
 /*
     define some constants for the class
 */
-#define ZPCT_BASE                .0025f
+
 #define MAX_LOCAL                200
+
+// _NBINS must be <= MAX_LOCAL
+#define _NBINS  50
+
+
+#define ZPCT_BASE                .0025f
 #define MAX_QUAD                 25
 #define MAX_OCTANT               10
 #define MAX_ITER                 4
@@ -62,6 +68,8 @@
 
 #define MIN_ROWS_GCALC           2
 #define MIN_COLS_GCALC           2
+
+
 
 /*
     define structures used in the class methods
@@ -110,6 +118,16 @@ class CSWGrdCalc
         TruncationGrid.grid = NULL;
     }
 
+    int    ploc_int1[MAX_LOCAL];
+    int    ploc_int2[MAX_LOCAL];
+    int    ploc_int3[MAX_LOCAL];
+    int    ploc_int4[MAX_LOCAL];
+
+    CSW_F  ploc_f1[MAX_LOCAL];
+    CSW_F  ploc_f2[MAX_LOCAL];
+    CSW_F  ploc_f3[MAX_LOCAL];
+    CSW_F  ploc_f4[MAX_LOCAL];
+
 
   public:
 
@@ -141,6 +159,9 @@ class CSWGrdCalc
               p_work1[MAX_WORK],
               p_work2[MAX_WORK],
               p_work3[MAX_WORK];
+
+    int       noisy_edge_data = 0;
+    CSW_F     LocalPointAreaSize = 0.0;
 
 /*
   Old static file variables become private class variables
@@ -283,6 +304,8 @@ class CSWGrdCalc
 
     CSW_F             MaxError {0.0f},
                       AvgError {0.0f};
+
+    int               MovingAvgOnly = 0;
 
     CSW_F             OptPreferredStrike {-1000.0f};
     int               OptOutsideBoundaryMargin {3};

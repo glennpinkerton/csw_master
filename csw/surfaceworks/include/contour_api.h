@@ -153,36 +153,36 @@
         CSWContourApi () {SetContourAPIPtrs ();};
         //~CSWContourApi () {};
 
-        int con_SetCalcOption (int, int, CSW_Float);
+        int con_SetCalcOption (int, int, CSW_F);
         int con_SetCalcOptions (COntourCalcOptions *);
         int con_DefaultCalcOptions (COntourCalcOptions *);
-        int con_SetContourIntervals (CSW_Float, int, CSW_Float, CSW_Float,
-                                     CSW_Float*, int, CSW_Float*, int);
+        int con_SetContourIntervals (CSW_F, int, CSW_F, CSW_F,
+                                     CSW_F*, int, CSW_F*, int);
         int con_CalcContoursFromDouble
-                             (CSW_Float*, int, int,
-                              double, double, double, double, CSW_Float,
+                             (CSW_F*, int, int,
+                              double, double, double, double, CSW_F,
                               COntourOutputRec **, int*,
                               FAultLineStruct*, int,
                               COntourCalcOptions*);
-        int con_CalcContours (CSW_Float*, int, int,
-                              CSW_Float, CSW_Float, CSW_Float, CSW_Float, CSW_Float,
+        int con_CalcContours (CSW_F*, int, int,
+                              CSW_F, CSW_F, CSW_F, CSW_F, CSW_F,
                               COntourOutputRec **, int*,
                               FAultLineStruct*, int,
                               COntourCalcOptions*);
         int con_FreeContours (COntourOutputRec *, int);
 
-        int con_BuildColorBands (CSW_Float, CSW_Float, CSW_Float, int,
-                                 CSW_Float*, CSW_Float*, int*);
-        int con_SetColorBands (CSW_Float*, CSW_Float*, int*, int);
+        int con_BuildColorBands (CSW_F, CSW_F, CSW_F, int,
+                                 CSW_F*, CSW_F*, int*);
+        int con_SetColorBands (CSW_F*, CSW_F*, int*, int);
         int con_SetZeroFillColor (int);
         int con_CalcColorFillsFromDouble
-                               (CSW_Float*, int, int,
-                                double, double, double, double, CSW_Float,
+                               (CSW_F*, int, int,
+                                double, double, double, double, CSW_F,
                                 COntourFillRec **, int*,
                                 FAultLineStruct*, int,
                                 COntourCalcOptions*);
-        int con_CalcColorFills (CSW_Float*, int, int,
-                                CSW_Float, CSW_Float, CSW_Float, CSW_Float, CSW_Float,
+        int con_CalcColorFills (CSW_F*, int, int,
+                                CSW_F, CSW_F, CSW_F, CSW_F, CSW_F,
                                 COntourFillRec **, int*,
                                 FAultLineStruct*, int,
                                 COntourCalcOptions*);
@@ -192,13 +192,13 @@
 
         int con_SetDrawScaleFromDouble
                              (double, double, double, double,
-                              CSW_Float, CSW_Float, CSW_Float, CSW_Float);
-        int con_SetDrawScale (CSW_Float, CSW_Float, CSW_Float, CSW_Float,
-                              CSW_Float, CSW_Float, CSW_Float, CSW_Float);
-        int con_SetDrawOption (int, int, CSW_Float);
+                              CSW_F, CSW_F, CSW_F, CSW_F);
+        int con_SetDrawScale (CSW_F, CSW_F, CSW_F, CSW_F,
+                              CSW_F, CSW_F, CSW_F, CSW_F);
+        int con_SetDrawOption (int, int, CSW_F);
         int con_SetDrawOptions (COntourDrawOptions *);
         int con_DefaultDrawOptions (COntourDrawOptions *);
-        int con_DrawLine (COntourOutputRec*, CSW_Float*,
+        int con_DrawLine (COntourOutputRec*, CSW_F*,
                           COntourLinePrim**, int*,
                           COntourTextPrim**, int*, COntourDrawOptions*);
         int con_DrawFill (COntourFillRec*,

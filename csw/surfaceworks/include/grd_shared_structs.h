@@ -168,6 +168,7 @@
         int       triangulate_flag;
         int       work_margin;
         int       error_number;
+        int       moving_avg_only = 0;
     }  GRidCalcOptions;
 
     typedef struct {
@@ -187,12 +188,12 @@
                            value2,
                            value3,
                            value4;
-        CSW_Float          percent1,
+        CSW_F          percent1,
                            percent2,
                            percent3,
                            percent4;
         int                nvalues;
-        CSW_Float          missing_percent;
+        CSW_F          missing_percent;
     }  CSW_Mixture;
 
     typedef struct {

@@ -177,6 +177,7 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
  * no longer needs them.
  */
     command_id = (int)j_commandID;
+
     if (j_ilist) {
         ilist = (*jnienv)->GetIntArrayElements (jnienv, j_ilist, JNI_FALSE);
     }
@@ -307,24 +308,31 @@ JNIEXPORT jlong JNICALL Java_csw_jsurfaceworks_src_JSurfaceWorksBase_sendCommand
  */
     if (j_ilist) {
         (*jnienv)->ReleaseIntArrayElements (jnienv, j_ilist, ilist, JNI_FALSE);
+        (*jnienv)->DeleteLocalRef (jnienv, j_ilist);
     }
     if (j_llist) {
         (*jnienv)->ReleaseLongArrayElements (jnienv, j_llist, llist, JNI_FALSE);
+        (*jnienv)->DeleteLocalRef (jnienv, j_llist);
     }
     if (j_cdata) {
         (*jnienv)->ReleaseStringUTFChars (jnienv, j_cdata, cdata);
+        (*jnienv)->DeleteLocalRef (jnienv, j_cdata);
     }
     if (j_dlist) {
         (*jnienv)->ReleaseDoubleArrayElements (jnienv, j_dlist, dlist, JNI_FALSE);
+        (*jnienv)->DeleteLocalRef (jnienv, j_dlist);
     }
     if (j_idata) {
         (*jnienv)->ReleaseIntArrayElements (jnienv, j_idata, idata, JNI_FALSE);
+        (*jnienv)->DeleteLocalRef (jnienv, j_idata);
     }
     if (j_fdata) {
         (*jnienv)->ReleaseFloatArrayElements (jnienv, j_fdata, fdata, JNI_FALSE);
+        (*jnienv)->DeleteLocalRef (jnienv, j_fdata);
     }
     if (j_ddata) {
         (*jnienv)->ReleaseDoubleArrayElements (jnienv, j_ddata, ddata, JNI_FALSE);
+        (*jnienv)->DeleteLocalRef (jnienv, j_ddata);
     }
 
     return (jlong)status;
@@ -1242,7 +1250,6 @@ void jni_call_add_tri_mesh_method (
 
 /*------------------------------------------------------------------------*/
 
-
 static void write_add_grid (
     double *data,
     double *derror,
@@ -1294,6 +1301,7 @@ void jni_call_add_grid_method (
     double ymax,
     int npts)
 {
+
     jdoubleArray    j_data;
     jdoubleArray    j_derror;
     jbyteArray      j_mask;
@@ -1398,6 +1406,7 @@ void jni_call_add_grid_method (
     }
 
     return;
+
 }
 
 /*------------------------------------------------------------------------*/

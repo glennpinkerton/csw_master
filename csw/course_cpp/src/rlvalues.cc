@@ -102,7 +102,7 @@ RLTest GetRLTest ()
 void rlfunc (RLTest &lvref) {
     std::cout << "l value ref function" << std::endl;
 }
-void rlfunc (RLTest &&lvref) {
+void rlfunc (RLTest &&rvref) {
     std::cout << "r value ref function" << std::endl;
 }
 
@@ -146,7 +146,7 @@ int main() {
 
 // It appears that using rvref as defined earlier here is considered an
 // l value.  The copy constructor is used.  The cast in the next line
-// causes the move constgructor to be used
+// causes the move constructor to be used
 std::cout << "straight rvref push back" << std::endl;
     rlvec.push_back (rvref);
 std::cout << "cast rvref push back" << std::endl;

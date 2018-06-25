@@ -20814,8 +20814,8 @@ int CSWGrdTriangle::SetupExistingTriangleNode
     kmin = -1;
 
     dcrit = AverageEdgeLength / 2.5;
-    dcrit1000 = dcrit / 3.0;
-    dcrit100 = dcrit / 3.0;  /*TODO!!!! change back to /10 */
+    dcrit1000 = dcrit / 10.0;
+    dcrit100 = dcrit / 10.0;
     if (ExactFlag == 0) {
         dcrit1000 /= 10000.0;
     }

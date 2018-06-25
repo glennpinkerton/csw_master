@@ -78,7 +78,20 @@ public class JDisplayList extends JDisplayListBase {
         }
 
         setFont ("arial", Font.PLAIN);
+
     }
+
+
+
+// When the display list and panel are both deleted,
+// set the references to eacch other to null in the
+// respective objects.  A corresponding set of the dlist
+// in the panel object is also done.  This is intended 
+// to be package scope.
+
+    void setPanelToNull () {dlPanel = null;}
+
+
 
     private String dlist_name = null;
     private double dlist_xminHint = 0.0;
@@ -129,6 +142,21 @@ public class JDisplayList extends JDisplayListBase {
     int          FdataMax = 10000;
     double[]     Ddata = new double[10000];
     int          DdataMax = 10000;
+
+
+// Check if these are preventing the JDL from being garbage collected.
+
+    public void clearArrays ()
+    {
+        Ilist = null;
+        Llist = null;
+        Bdata = null;
+        Sdata = null;
+        Idata = null;
+        Fdata = null;
+        Ddata = null;
+    }
+
 
     private void new_bdata (int size)
     {
@@ -260,11 +288,13 @@ public class JDisplayList extends JDisplayListBase {
         for (i=0; i<size; i++) {
             iobj = finalizedIDList.get (i);
             ilist[0] = iobj.intValue();
-            sendStaticNativeCommand (
-                ilist[0],
-                GTX_DELETEWINDOW,
-                ilist
-            );
+            if (ilist[0] >= 0) {
+                sendStaticNativeCommand (
+                    ilist[0],
+                    GTX_DELETEWINDOW,
+                    ilist
+                );
+            }
         }
 
         cleanupNeeded = false;
@@ -392,6 +422,8 @@ public class JDisplayList extends JDisplayListBase {
         if (beginPlotCalled) {
             return 1;
         }
+
+        if (dlPanel == null) return 1;
 
         beginXmin = page_xminHint;
         beginYmin = page_yminHint;
@@ -4841,6 +4873,7 @@ of Font.BOLD|Font.ITALIC.
   public void editSelectedLineGeometry (DLEditListener fb,
                                         JLineEditor jle, DLSelectable selectable)
     {
+        if (dlPanel == null) return;
         if (fb == null) {
             throw new IllegalArgumentException
                 ("Calling pickNewLineGeometry with a null feedback listener.");
@@ -4875,6 +4908,7 @@ of Font.BOLD|Font.ITALIC.
     public void pickNewLineGeometry (DLEditListener fb,
                                      JLineEditor jle)
     {
+        if (dlPanel == null) return;
         if (fb == null) {
             throw new IllegalArgumentException
                 ("Calling pickNewLineGeometry with a null feedback listener.");
@@ -4894,6 +4928,7 @@ of Font.BOLD|Font.ITALIC.
     }
 
     public void pickNewPointGeometry(DLEditListener fb, JLineEditor jle) {
+        if (dlPanel == null) return;
         if (fb == null) {
           throw new IllegalArgumentException(
               "Calling pickNewLineGeometry with a null feedback listener.");
@@ -4913,6 +4948,7 @@ of Font.BOLD|Font.ITALIC.
 
 
     public void pickNewFunction(DLEditListener fb) {
+        if (dlPanel == null) return;
         if (fb == null) {
             throw new IllegalArgumentException
               ("Calling pickNewLineGeometry with a null feedback listener.");
@@ -4946,6 +4982,7 @@ of Font.BOLD|Font.ITALIC.
     public void pickNewPolygonGeometry (DLEditListener fb,
                                         JLineEditor jle)
     {
+        if (dlPanel == null) return;
         if (fb == null) {
             throw new IllegalArgumentException
                 ("Calling pickNewPolygonGeometry with a null feedback listener.");
@@ -4988,6 +5025,7 @@ of Font.BOLD|Font.ITALIC.
     public void pickNewFillGeometry (DLEditListener fb,
                                      JLineEditor jle)
     {
+        if (dlPanel == null) return;
         if (fb == null) {
             throw new IllegalArgumentException
                 ("Calling pickNewFillGeometry with a null feedback listener.");

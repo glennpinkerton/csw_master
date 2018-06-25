@@ -124,10 +124,6 @@ int main() {
         yplist.push_back (yourpair(dval, ival));
     }
 
-// The use of decltype in this loop is overkill but it
-// serves to demonstrate the syntax of using decltype
-// in an auto loop.
-
     for (const auto &item : mplist) {
         print_item_type (item);
     }

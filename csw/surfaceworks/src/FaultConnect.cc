@@ -2025,7 +2025,7 @@ int FaultConnect::PadDetachment (void)
     else {
         istat =
           grd_utils_ptr->grd_recommended_size (
-            xa, ya, npts,
+            xa, ya, npts, 0,
             &dxmin, &dymin, &dxmax, &dymax,
             &ncol, &nrow);
         if (istat != 1) {

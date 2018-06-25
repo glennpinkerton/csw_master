@@ -74,7 +74,52 @@ public class JEasyXTest {
     private static Logger  logger = CSWLogger.getMyLogger ();
     
     static {
-        System.loadLibrary ("_csw_all");
+        String spwd = System.getProperty ("user.dir");
+/*
+        System.out.println ();
+        System.out.println ("user dir before try = ");
+        System.out.println ("    " + spwd);
+        System.out.println ();
+        String spth = System.getProperty ("java.library.path");
+        System.out.println ("library path before try = ");
+        System.out.println ("    " + spth);
+        System.out.println ();
+        System.out.flush ();
+*/
+        try {
+            System.loadLibrary ("_csw_all");
+        }
+        catch (UnsatisfiedLinkError use) {
+/*
+          System.out.println ();
+          System.out.println ("Caught link error from load library" );
+          System.out.println ();
+          System.out.flush ();
+*/
+          try {
+            String slib = spwd + "/src/dist/lib/lib_csw_all.so";
+/*
+            System.out.println();
+            System.out.println("load file: " + slib);
+            System.out.println();
+*/
+            System.load (slib);
+          }
+          catch (UnsatisfiedLinkError use2) {
+            System.out.println ();
+            System.out.println ("Unsatisfied link error from system load");
+            System.out.println ();
+            System.out.flush ();
+            System.exit(1234);
+          }
+        }
+        catch (Exception e) {
+            System.out.println ();
+            System.out.println ("Some other error in loading shared lib");
+            System.out.println ();
+            System.out.flush ();
+            System.exit(1234);
+        }
     }
 
     public static void main (String[] args) {
@@ -184,12 +229,16 @@ public class JEasyXTest {
 
         long  maxmem = Runtime.getRuntime().maxMemory ();
         long  totmem = Runtime.getRuntime().totalMemory ();
+        long  freemem = Runtime.getRuntime().freeMemory ();
 
         maxmem /= 1000000;
         totmem /= 1000000;
+        freemem /= 1000000;
 
         System.out.println ();
-        System.out.println ("maxmem = " + maxmem + "   total mem = " + totmem);
+        System.out.println ("maxmem = " + maxmem +
+                            "   total mem = " + totmem +
+                            "   free mem = " + freemem);
         if (msg != null) {
             System.out.println (msg);
         }
@@ -235,6 +284,13 @@ catch (Exception e) {
         setResizable (false);
         Container contentPane = getContentPane ();
         contentPane.setLayout (new GridLayout(25,1));
+
+        JButton show_mem_button = new JButton ("Show Memory");
+        show_mem_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+            JEasyXTest.showMem ("From user button click");
+          }
+        });
 
         JButton random_button = new JButton ("Random Primitives");
         random_button.addActionListener(new ActionListener() {
@@ -328,7 +384,7 @@ catch (Exception e) {
         JButton medium_button = new JButton ("Medium Random Frame");
         medium_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                HugeFrame hf = new HugeFrame (50);
+                HugeFrame hf = new HugeFrame (100);
                 HugeFrameRunnable run_frame = new HugeFrameRunnable (hf);
                 SwingUtilities.invokeLater (run_frame);
           }
@@ -346,7 +402,16 @@ catch (Exception e) {
         JButton huge_button = new JButton ("Huge Random Frame");
         huge_button.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent ae){
-                HugeFrame hf = new HugeFrame (-1);
+                HugeFrame hf = new HugeFrame (10000);
+                HugeFrameRunnable run_frame = new HugeFrameRunnable (hf);
+                SwingUtilities.invokeLater (run_frame);
+          }
+        });
+
+        JButton toobig_button = new JButton ("Too Big Random Frame");
+        toobig_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent ae){
+                HugeFrame hf = new HugeFrame (100000);
                 HugeFrameRunnable run_frame = new HugeFrameRunnable (hf);
                 SwingUtilities.invokeLater (run_frame);
           }
@@ -428,6 +493,7 @@ catch (Exception e) {
           }
         });
 
+        contentPane.add (show_mem_button);
         contentPane.add (dashed_button);
         contentPane.add (dashed2_button);
         contentPane.add (lith_button);
@@ -440,6 +506,7 @@ catch (Exception e) {
         contentPane.add (medium_button);
         contentPane.add (big_button);
         contentPane.add (huge_button);
+        contentPane.add (toobig_button);
         contentPane.add (reverse_button);
         contentPane.add (frame2_button);
         contentPane.add (text_frame_button);
@@ -1816,8 +1883,6 @@ Thread.sleep (100);
 catch (Throwable e) {
 }
 
-        JEasyXTest.showMem ("Just before huge frame thread start.");
-
         HFWorker hfw = new HFWorker (hf);
         hfw.execute ();
       }
@@ -1888,7 +1953,7 @@ catch (Exception e) {
 
         if (nhint <= 0) {
           ndo = 10000;
-          xymax = 10000.0;
+          xymax = 2000.0;
           setTitle ("Huge Random Frame Test * " + ndo);
         }
         else {
@@ -1931,8 +1996,8 @@ catch (Exception e) {
         dl.setFrameAxisProperties ("huge frame1 test", DLConst.FRAME_TOP_AXIS, ap);
 
         random = new Random();
-        long seed = 1234579;
-        random.setSeed (seed);
+//        long seed = 1234579;
+//        random.setSeed (seed);
 
         double xyrand = xymax * 1.2;
         double xyrand_shift = xymax / 10.0;
@@ -1944,16 +2009,7 @@ catch (Exception e) {
         if (ndo > 50) shfact = 1;
         if (ndo > 100) shfact = .5;
 
-idomod = ndo / 10;
-if (idomod < 100) idomod = 100;
-
         for (int ido=0; ido<ndo; ido++) {
-
-if (ido % idomod == 0  &&  ido != 0) {
-//System.out.println ("in populate loop, ido = " + ido);
-//System.out.println ();
-//System.out.flush ();
-}
 
             xr = random.nextDouble () * xyrand - xyrand_shift;
             yr = random.nextDouble () * xyrand - xyrand_shift;
@@ -3110,8 +3166,6 @@ class HugeGridTest extends JDLFrame
         }
 
         if (nhuge > MAX_HUGE) nhuge = MAX_HUGE;
-
-        JEasyXTest.showMem ("Start huge grid nhuge = " + nhuge);
 
         try {
             gdata = new double[nhuge * nhuge];

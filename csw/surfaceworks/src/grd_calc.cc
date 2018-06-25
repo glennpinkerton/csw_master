@@ -632,6 +632,7 @@ int CSWGrdCalc::grd_calc_grid
     int       do_write;
     char      fname[200];
 
+
     auto fscope = [&]()
     {
         csw_Free (local_mask);
@@ -711,7 +712,6 @@ int CSWGrdCalc::grd_calc_grid
         strcpy (fname, "grid_input.xyz");
         grd_fileio_ptr->grd_write_float_points (x, y, z, npts, fname);
     }
-
 
 
     PointNodeRatio = (double)npts / (double)(ncol * nrow);
@@ -794,6 +794,7 @@ int CSWGrdCalc::grd_calc_grid
         FaultedFlag = OptFaultedFlag;
         TriangulateFlag = OptTriangulateFlag;
         DefaultSizeMultiplier = OptDefaultSizeMultiplier;
+        MovingAvgOnly = 0;
     }
 
     else {
@@ -820,6 +821,7 @@ int CSWGrdCalc::grd_calc_grid
         FaultedFlag = options->faulted_flag;
         TriangulateFlag = options->triangulate_flag;;
         DefaultSizeMultiplier = 1;
+        MovingAvgOnly = options->moving_avg_only;
     }
 
 /*
@@ -1059,7 +1061,7 @@ int CSWGrdCalc::grd_calc_grid
                                     (double)x2r, (double)y2r,
                                     ncolr, nrowr);
         if (istat == 0) {
-            grd_utils_ptr->grd_recommended_size (x, y, npts,
+            grd_utils_ptr->grd_recommended_size (x, y, npts, 0,
                                   &x1r, &y1r, &x2r, &y2r,
                                   &ncolr, &nrowr);
             ncolr *= DefaultSizeMultiplier;
@@ -1155,7 +1157,7 @@ MSL
     Yspace = (y2 - y1) / (CSW_F)(nrow - 1);
 
   /*
-   * part of fix for bug 8003.  If x spacing or y spacing is
+   * If x spacing or y spacing is
    * ridiculously large, return an error 3, for a wild parameter.
    * The cutoffs are based on .01 * spacing squared being a
    * reasonable float number.
@@ -1623,8 +1625,7 @@ if (WorkMargin < 16) WorkMargin = 16;
     For a better fit, the trend surface is used closer to data.
 */
     TrendDistance = (int) ((Xrange + Yrange) / ((Xspace + Yspace) * 5.0f));
-    if (FaultedFlag)
-        TrendDistance *= 4;
+    if (FaultedFlag) TrendDistance *= 4;
     TrendPointErrors ();
 
 /*
@@ -1672,7 +1673,9 @@ if (WorkMargin < 16) WorkMargin = 16;
     Use the trend surface for coarse nodes
     very far from data points.
 */
-    if (FlatGridFlag == 0  &&  NoisyDataFlag == 0) AssignTrendNodes ();
+    if (FlatGridFlag == 0  &&  NoisyDataFlag == 0) {
+        AssignTrendNodes ();
+    }
 
 /*
     Assign elevations to all perimeter nodes that
@@ -2776,7 +2779,7 @@ int CSWGrdCalc::CollectLocalPoints
     int              jj, ii, i0, i2, j0, j2, level, astat, istat,
                      nmax, nq1, nq2, nq3, nq4, offset, nt, ipt;
     int              noctant[8], osearch, maxoct, minquad;
-    int              list[MAX_LOCAL];
+    int              *list = ploc_int1;
     CSW_F            x1, y1, x2, y2, swgt;
 
 /*
@@ -3098,6 +3101,8 @@ int CSWGrdCalc::CollectLocalPoints
 
   LEVELS_DONE:
 
+    LocalPointAreaSize = (CSW_F)(level + 1);
+
     nmax = 0;
     if (nq1 > 0) nmax++;
     if (nq2 > 0) nmax++;
@@ -3359,8 +3364,9 @@ int CSWGrdCalc::ProcessLocalPoints
         if (FaultedFlag) {
             if (Xdata[j] >= OnFault)
                 continue;
-            istat = grd_fault_ptr->grd_check_fault_blocking (irow, jcol, Xdata[j]+px, Ydata[j]+py,
-                                              &fault_weight);
+            istat = grd_fault_ptr->grd_check_fault_blocking (
+                irow, jcol, Xdata[j]+px, Ydata[j]+py,
+                &fault_weight);
             if (istat != 0)
                 continue;
         }
@@ -3500,6 +3506,11 @@ int CSWGrdCalc::ProcessLocalPoints
     istat = grd_utils_ptr->grd_inverse_distance_average
              (xloc, yloc, zloc, nlist, DistancePower,
               Xspace + Yspace, dsq, &valdsq);
+
+    if (MovingAvgOnly) {
+        *value = valdsq;
+        return 1;
+    }
 
 /*
  *  If the z range of the local data is huge,
@@ -3651,7 +3662,7 @@ int CSWGrdCalc::ProcessLocalPoints
     }
 
 /*
-    Fit a plane to all points.
+    Fit a plane to all local points.
 */
     istat = grd_utils_ptr->grd_calc_plane (xloc, yloc, zloc, nlist, coef);
 
@@ -3671,9 +3682,7 @@ int CSWGrdCalc::ProcessLocalPoints
         tiny_value = Z_ABSOLUTE_TINY;
         ztiny = tiny_value * 100.0f;
     }
-/*
-    if (Zrange > 0.0f)
-*/
+
     ztiny /= Zrange;
     tiny_value_2 = (CSW_F)(sqrt ((double)tiny_value));
     cf = 0;
@@ -3725,11 +3734,30 @@ int CSWGrdCalc::ProcessLocalPoints
         if (NoisyDataFlag > 1) {
             wgtplane /= (CSW_F)NoisyDataFlag;
         }
+
+// If trying to extrapolate a long way using a plane calculated from a dense
+// cluster of points, weight the plane much lower.
+
+        if (cp > Ncoarse * 2) {
+            CSW_F  wprat = LocalPointAreaSize / (CSW_F)(cp + 1);
+            if (wprat > 1.0) wprat = 1.0;
+//TODO            wprat *= wprat;
+            wgtplane *= wprat;
+        }
+
         wgtplane *= wgtplane;
         if (sum2 <= zpct  &&  nquad == 4) {
             *value = (valplane * wgtplane + valdsq) / (wgtplane + 1);
             return 1;
         }
+
+
+// TODO
+*value = (valplane * wgtplane + valdsq) / (wgtplane + 1);
+return 1;
+
+
+
         if (nlist < 4) {
             wgtplane /= 2.0;
             *value = (valplane * wgtplane + valdsq) / (wgtplane + 1);
@@ -4294,7 +4322,7 @@ int CSWGrdCalc::HalfPlaneSwitch
 
 int CSWGrdCalc::CalcLocalNodes (void)
 {
-    int           i, j, k, j1, list[MAX_LOCAL], nlist, nquad, start, maxquad,
+    int           i, j, k, j1, *list = ploc_int1, nlist, nquad, start, maxquad,
                   icrit, offset, istat, iend, iendmax, ncmax,
                   nc2, nmin, cf, fcrit, smallmult, ic, jc, kc, tmult;
     CSW_F         value;
@@ -4435,10 +4463,13 @@ int CSWGrdCalc::CalcLocalNodes (void)
 
             for (;;) {
                 nlist = 0;
+                LocalPointAreaSize = 0.0;
                 CollectLocalPoints (i, j, start, iend * Ndivide,
-                                    maxquad, MAX_LOCAL / 2, list, &nlist, &nquad);
+                                    maxquad, MAX_LOCAL / 2, list, &nlist,
+                                    &nquad);
                 istat = ProcessLocalPoints (list, nlist, nquad, i, j, start,
                                             &value);
+                LocalPointAreaSize = 0.0;
 
                 if (istat == -2) {
                     iend *= 2;
@@ -4515,22 +4546,28 @@ int CSWGrdCalc::CalcLocalNodes (void)
     if (DefaultSizeMultiplier < 1) DefaultSizeMultiplier = 1;
     nmin = 4;
 
+// This extension will help fill in holes and bays in the 
+// "interior" of the data
     j = (Ncol + Nrow) / Ncoarse;
     j /= 3;
     if (j < Extension) j = Extension;
     if (j < 2) j = 2;
+    if (j > 8) j = 8;
     j *= DefaultSizeMultiplier;
     for (i=0; i<j; i++) {
         ExtendCoarseNodes (i, nmin);
     }
     offset = j;
 
+// This extension will help extend the grid out from the edges
+// of the data
     nmin = 1;
     j = Extension / 2;
     if (j < 2) j = 2;
     if (ThicknessFlag == 1  ||  FaultedFlag) {
         j *= 2;
     }
+    if (j > 4) j = 4;
     if (FaultedFlag) {
         if (j < 8) j = 8;
     }
@@ -4570,7 +4607,6 @@ int CSWGrdCalc::AssignTrendNodes (void)
     }
 
     ft = (CSW_F)TrendDistance;
-    ft *= 2.0f;
     fc2 = Xrange / Xspace + Yrange / Yspace;
     fc2 /= 6.0f;
     if (fc2 < Ncoarse * 2.0f) fc2 = (CSW_F) (Ncoarse * 2.0f);
@@ -4614,6 +4650,7 @@ int CSWGrdCalc::AssignTrendNodes (void)
     Loop through each coarse node, assigning or combining
     trend surface values as needed.
 */
+//ft = (CSW_F)Ncoarse * 1.5;
     for (i=0; i<Nrow; i+=Ncoarse) {
 
         offset = i * Ncol;
@@ -4621,12 +4658,12 @@ int CSWGrdCalc::AssignTrendNodes (void)
 
         for (j=0; j<Ncol; j+=Ncoarse) {
 
-        /*
-         * bug 9498, if there are only 3 points, every node is from the trend grid
-         */
             zt = TrendGrid[coff+j/Ncoarse];
             k = j + offset;
 
+        /*
+         * if there are only 3 points, every node is from the trend grid
+         */
             if (Ndata == 3) {
                 Grid[k] = zt;
                 continue;
@@ -4676,6 +4713,7 @@ int CSWGrdCalc::AssignTrendNodes (void)
         */
             else {
                 fcp += 1.0f;
+fcp *= 2.0;
                 wgt = fcp / ft;
                 if (TriangulateFlag > 0  &&  TriangulateFlag < 4) {
                     wgt /= (TriangulateFlag * TriangulateFlag);
@@ -5276,8 +5314,8 @@ int CSWGrdCalc::CalcErrorAtNode
             CSW_F *error)
 {
     int         i, istat;
-    CSW_F       x0, y0, x[MAX_LOCAL], y[MAX_LOCAL],
-                z[MAX_LOCAL], z2[MAX_LOCAL], locerror;
+    CSW_F       x0, y0, *x = ploc_f1, *y = ploc_f2,
+                *z = ploc_f3, *z2 = ploc_f4, locerror;
     double      dmin, dist, wgt;
     int         closest;
 
@@ -5471,11 +5509,11 @@ int CSWGrdCalc::CheckForBicub (int i, int j)
 
   ****************************************************************
 
-    Calculate the error at each coarse grid node.  The error is the
+  Calculate the error at each coarse grid node.  The error is the
   inverse distance weighted average of the errors between the actual
   and interpolated values at data points near the node.
 
-    In order to distribute error smoothly away from a node, the error
+  In order to distribute error smoothly away from a node, the error
   is multiplied by a scaling factor which is a function of closest
   data point to the node.  These overcorrections are smoothed out
   using a simple 3 by 3 moving average.
@@ -5485,7 +5523,7 @@ int CSWGrdCalc::CheckForBicub (int i, int j)
 int CSWGrdCalc::CalcErrorGrid (int iter)
 {
     int            i, j, offset, cp, nquad, istat,
-                   list[MAX_LOCAL], nlist, nc2, nc22;
+                   *list = ploc_int1, nlist, nc2, nc22;
     CSW_F          err, emultmax, wgt;
     static const CSW_F   embase[] = {3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 1.0f};
 
@@ -5574,19 +5612,6 @@ int CSWGrdCalc::CalcErrorGrid (int iter)
     correction.  This provides a smoother transition from
     areas of sparse data to areas with good data coverage.
 */
-
-/*
- * Bug 8260, The call to SmoothErrors was changed to a
- * call to StrikeSmoothErrors in November, 2001.  This
- * caused reproduceability problems with the sept 2001
- * release, so it has been changed back.
-    if (PreferredStrike >= 0  ||  AnisotropyFlag) {
-        StrikeSmoothErrors ();
-    }
-    else {
-        SmoothErrors ();
-    }
- */
 
     SmoothErrors ();
 
@@ -6787,7 +6812,7 @@ int CSWGrdCalc::SimpleSmoothGrid (void)
 
   ****************************************************************
 
-    Assign elevations to some uncalculated coarse nodes by extending
+  Assign elevations to some uncalculated coarse nodes by extending
   the gradients defined by near neighbor nodes that have been
   calculated.  This may be called multiple times to extend further.
 
@@ -6882,6 +6907,8 @@ int CSWGrdCalc::ExtendCoarseNodes (int iter, int nmin)
         */
             sum3 = 0.0f;
             sum4 = 0.0f;
+            CSW_F z1sum3 = 0.0f;
+            CSW_F z1sum4 = 0.0f;
             n = 0;
 
         /*
@@ -6893,6 +6920,10 @@ int CSWGrdCalc::ExtendCoarseNodes (int iter, int nmin)
             j2 = j - 2 * Ncoarse;
             if (i2 >= 0  &&  j2 >= 0) {
                 z1 = Grid[i1*Ncol+j1];
+                if (z1 < 1.e29) {
+                    z1sum3 += z1 * .7;
+                    z1sum4 += .7;
+                }
                 z2 = Grid[i2*Ncol+j2];
                 if (z1 < 1.e29f  &&  z2 < 1.e29f) {
                     if (z1 > 0.0f) numpos++;
@@ -6924,6 +6955,10 @@ int CSWGrdCalc::ExtendCoarseNodes (int iter, int nmin)
             j2 = j;
             if (i2 >= 0) {
                 z1 = Grid[i1*Ncol+j1];
+                if (z1 < 1.e29) {
+                    z1sum3 += z1;
+                    z1sum4 ++;
+                }
                 z2 = Grid[i2*Ncol+j2];
                 if (z1 < 1.e29f  &&  z2 < 1.e29f) {
                     if (z1 > 0.0f) numpos++;
@@ -6955,6 +6990,10 @@ int CSWGrdCalc::ExtendCoarseNodes (int iter, int nmin)
             j2 = j + 2 * Ncoarse;
             if (i2 >= 0  &&  j2 < Ncol) {
                 z1 = Grid[i1*Ncol+j1];
+                if (z1 < 1.e29) {
+                    z1sum3 += z1 * .7;
+                    z1sum4 += .7;
+                }
                 z2 = Grid[i2*Ncol+j2];
                 if (z1 < 1.e29f  &&  z2 < 1.e29f) {
                     if (z1 > 0.0f) numpos++;
@@ -6988,6 +7027,10 @@ int CSWGrdCalc::ExtendCoarseNodes (int iter, int nmin)
             j2 = j - 2 * Ncoarse;
             if (j2 >= 0) {
                 z1 = Grid[i1*Ncol+j1];
+                if (z1 < 1.e29) {
+                    z1sum3 += z1;
+                    z1sum4 ++;
+                }
                 z2 = Grid[i2*Ncol+j2];
                 if (z1 < 1.e29f  &&  z2 < 1.e29f) {
                     if (z1 > 0.0f) numpos++;
@@ -7019,6 +7062,10 @@ int CSWGrdCalc::ExtendCoarseNodes (int iter, int nmin)
             j2 = j + 2 * Ncoarse;
             if (j2 < Ncol) {
                 z1 = Grid[i1*Ncol+j1];
+                if (z1 < 1.e29) {
+                    z1sum3 += z1;
+                    z1sum4 ++;
+                }
                 z2 = Grid[i2*Ncol+j2];
                 if (z1 < 1.e29f  &&  z2 < 1.e29f) {
                     if (z1 > 0.0f) numpos++;
@@ -7052,6 +7099,10 @@ int CSWGrdCalc::ExtendCoarseNodes (int iter, int nmin)
             j2 = j - 2 * Ncoarse;
             if (i2 < Nrow  &&  j2 >= 0) {
                 z1 = Grid[i1*Ncol+j1];
+                if (z1 < 1.e29) {
+                    z1sum3 += z1 * .7;
+                    z1sum4 += .7;
+                }
                 z2 = Grid[i2*Ncol+j2];
                 if (z1 < 1.e29f  &&  z2 < 1.e29f) {
                     if (z1 > 0.0f) numpos++;
@@ -7083,6 +7134,10 @@ int CSWGrdCalc::ExtendCoarseNodes (int iter, int nmin)
             j2 = j;
             if (i2 < Nrow) {
                 z1 = Grid[i1*Ncol+j1];
+                if (z1 < 1.e29) {
+                    z1sum3 += z1;
+                    z1sum4 ++;
+                }
                 z2 = Grid[i2*Ncol+j2];
                 if (z1 < 1.e29f  &&  z2 < 1.e29f) {
                     if (z1 > 0.0f) numpos++;
@@ -7114,6 +7169,10 @@ int CSWGrdCalc::ExtendCoarseNodes (int iter, int nmin)
             j2 = j + 2 * Ncoarse;
             if (i2 < Nrow  &&  j2 < Ncol) {
                 z1 = Grid[i1*Ncol+j1];
+                if (z1 < 1.e29) {
+                    z1sum3 += z1 * .7;
+                    z1sum4 += .7;
+                }
                 z2 = Grid[i2*Ncol+j2];
                 if (z1 < 1.e29f  &&  z2 < 1.e29f) {
                     if (z1 > 0.0f) numpos++;
@@ -7138,15 +7197,34 @@ int CSWGrdCalc::ExtendCoarseNodes (int iter, int nmin)
                 }
             }
 
+
+        /* 
+         *  There are no valid gradient extensions, but there
+         *  is a closest neighbor value available.
+         */
+            if (sum4 <= 0.0  &&  z1sum4 > 0.0  &&  n >= nmin) {
+                Gwork1[off1+j] = z1sum3 / z1sum4;
+            }
+                
         /*
             Put the average of valid gradient extensions into the
             results grid, or assign 1.e30f as the result if there
             are no valid gradient extensions.
         */
-            if (sum4 > 0.0f  &&  n >= nmin) {
-                Gwork1[off1+j] = sum3 / sum4;
+            else if (sum4 > 0.0f  &&  n >= nmin) {
+
+                CSW_F ss11 = sum3 / sum4;
+                CSW_F ss22 = z1sum3 / z1sum4;
+
                 cp = ClosestPoint[off1+j];
                 if (cp < 0) cp = 0;
+                CSW_F z1wgt = (double)cp / (double)Ncoarse;
+                if (z1wgt < 1.0) z1wgt = 1.0;
+                z1wgt *= z1wgt;
+                
+                Gwork1[off1+j] = (z1wgt * ss22 + ss11) /
+                                 (z1wgt + 1.0);
+
                 if (ThicknessFlag == 1  ||  OriginalThicknessFlag == 1) {
                     if (ZeroCoarse[off2] == 1) {
                         if (Gwork1[off1+j] > minusvalue * 10.0f) {
@@ -7169,9 +7247,53 @@ int CSWGrdCalc::ExtendCoarseNodes (int iter, int nmin)
 
     }  /*  end of i row loop  */
 
-/*
-    Transfer back to Grid array
-*/
+
+// Smooth far from data nodes and transfer back to Grid
+
+    int    ii, jj, kk, iioff;
+    int    cpmin;
+
+    cpmin = (iter / 2 + 2) * Ncoarse;
+
+cpmin = 4 * Ncoarse;
+
+    for (i=0; i<Nrow; i+=Ncoarse) {
+        off1 = i * Ncol;
+        i1 = i - Ncoarse;
+        i2 = i + Ncoarse;
+        if (i1 < 0) i1 = 0;
+        if (i2 > Nrow - 1) i2 = Nrow - 1;
+        for (j=0; j<Ncol; j+=Ncoarse) {
+            cp = ClosestPoint[off1+j];
+            if (Gwork1[off1+j] > 1.e29  ||  cp < cpmin) {
+                Grid[off1+j] = Gwork1[off1+j];
+                continue;
+            }
+            sum3 = 0.0;
+            sum4 = 0.0;
+            j1 = j - Ncoarse;
+            j2 = j + Ncoarse;
+            if (j1 < 0) j1 = 0;
+            if (j2 > Ncol - 1) j2 = Ncol - 1;
+            for (ii=i1; ii<=i2; ii+=Ncoarse) { 
+               iioff = ii * Ncol;
+               for (jj=j1; jj<=j2; jj+=Ncoarse) {
+                   kk = iioff + jj;
+                   if (Gwork1[kk] < 1.e29) {
+                       sum3 += Gwork1[kk];
+                       sum4 ++;
+                   }
+               }
+            }
+            if (sum4 > 0.0) {
+                Grid[off1+j] = sum3 / sum4;
+            }
+            else {
+                Grid[off1+j] = Gwork1[off1+j];
+            }
+        }
+    }
+
     for (i=0; i<Nrow; i+=Ncoarse) {
         off1 = i * Ncol;
         for (j=0; j<Ncol; j+=Ncoarse) {
@@ -7511,6 +7633,30 @@ MSL
     }
 
 /*
+ * Moving average only for smfact > 1000, regardless of faulting
+ */
+    if (smfact >= 1000) {
+
+        smfact -= 1000;
+
+        gwork3 = (CSW_F *)csw_Malloc (ncol * nrow * sizeof(CSW_F));
+        if (gwork3 == NULL) {
+            grd_utils_ptr->grd_set_err (1);
+            return -1;
+        }
+
+        memcpy (gwork3, grid, ncol*nrow*sizeof(CSW_F));
+
+        for (i=0; i<smfact; i++) {
+            MovingAverage (gwork3, ncol, nrow, smfact, 0);
+        }
+
+        memcpy (smg, gwork3, ncol * nrow * sizeof(CSW_F)); /*lint !e669 !e670*/
+        return 1;
+    }
+
+
+/*
  * If the smoothing factor is greater than 100, light smoothing
  * should be turned on and the smoothing factor is 100 less than
  * the factor specified.
@@ -7704,6 +7850,13 @@ MSL
     for (i=0; i<nma; i++) {
         MovingAverage (gwork3, ncol, nrow, smfact, 0);
     }
+
+//memcpy (smg, gwork3, ncol * nrow * sizeof(CSW_F)); /*lint !e669 !e670*/
+//return 1;
+
+
+
+
 
 /*
  * If the coarse interval is less than 2,
@@ -9013,8 +9166,6 @@ int CSWGrdCalc::CalcStrikeLine
 
 */
 
-#define _NBINS     50
-
 int CSWGrdCalc::FilterPointsForStrike
          (int *list1, int n1, int *list2, int *n2,
           int nmax, int nquad, int irow, int jcol,
@@ -9022,10 +9173,10 @@ int CSWGrdCalc::FilterPointsForStrike
 {
 
     int          i, j, k, kk, n, jmin, maxm2, maxloc, ipt;
-    int          count[_NBINS], bin[MAX_LOCAL];
+    int          *count = ploc_int1, *bin = ploc_int2;
     CSW_F        dt, pd1, pd2, x, y, x0, y0,
                  xmin, ymin, xmax, ymax, dz, z1, z2;
-    CSW_F        pdist[MAX_LOCAL], pdmax, zdist[MAX_LOCAL];
+    CSW_F        *pdist = ploc_f1, pdmax, *zdist = ploc_f2;
 
 /*
     Initialize some local arrays to suppress lint messages.
@@ -9233,7 +9384,6 @@ int CSWGrdCalc::FilterPointsForStrike
 
 }  /*  end of private FilterPointsForStrike function  */
 
-#undef _NBINS
 
 
 
@@ -10698,7 +10848,7 @@ int CSWGrdCalc::CalcFaultedErrorAtNode
           CSW_F *error)
 {
     int         i, n, istat;
-    CSW_F       x0, y0, x[MAX_LOCAL], y[MAX_LOCAL],
+    CSW_F       x0, y0, *x = ploc_f1, *y = ploc_f2,
                 locerror;
     CSW_F       fwgt;
     CSW_F       *z = p_zp, *z2 = p_yp;
@@ -13839,13 +13989,13 @@ int CSWGrdCalc::grd_WriteFaultLines (
 /*
   ****************************************************************
 
-            g r d _ C a l c G r i d F r o m D o u b l e
+        g r d _ c a l c _ g r i d _ f r o m _ d o u b l e
 
   ****************************************************************
 
-  function name:    grd_CalcGridFromDouble              (int)
+  function name:    grd_calc_grid_from_double              (int)
 
-  call sequence:    grd_CalcGridFromDouble (x, y, z, error, npts,
+  call sequence:    grd_calc_grid_from_double (x, y, z, error, npts,
                                         grid, mask, report, ncol, nrow,
                                         x1, y1, x2, y2,
                                         options)
@@ -14090,7 +14240,7 @@ MSL
 
     return istat;
 
-}  /*  end of function grd_CalcGridFromDouble  */
+}  /*  end of function grd_calc_grid_from_double  */
 
 
 
@@ -14098,19 +14248,19 @@ MSL
 /*
   ****************************************************************
 
-    g r d _ S e t C o n f o r m a b l e S u r f a c e F r o m D o u b l e
+  g r d _ s e t _ c o n f o r m a b l e _ s u r f a c e _ f r o m _ d o u b l e
 
   ****************************************************************
 
-  function name:        grd_SetConformableSurfaceFromDouble         (int)
+  function name:        grd_set_conformable_surface_from_double         (int)
 
-  call sequence:        grd_SetConformableSurfaceFromDouble
+  call sequence:        grd_set_conformable_surface_from_double
                                               (grid, ncol, nrow,
                                                x1, y1, x2, y2)
 
   purpose:              Set or unset the grid surface that will be used to
                         control the shape of the next grid calculated with
-                        grd_CalcGridFromDouble.  Call this with grid set
+                        grd_calc_grid_from_double.  Call this with grid set
                         to NULL to not use any shape grid.
 
   return value:         Always returns 1.
@@ -14145,7 +14295,7 @@ int CSWGrdCalc::grd_set_conformable_surface_from_double
 
     return 1;
 
-}  /*  end of function grd_SetConformableSurfaceFromDouble  */
+}  /*  end of function grd_set_conformable_surface_from_double  */
 
 
 /*---------------------------------------------------------------------------------*/
@@ -14198,17 +14348,17 @@ void CSWGrdCalc::RemoveSpikes
     zrange /= 40.0;
     smult = 2.0 / (CSW_F)smfact;
 
-if (nrow * ncol > 250000) {
-zrange *= .75;
-smult *= .75;
-}
-zrange *= .75;
-smult *= .75;
-smult2 = 1.0;
+    if (nrow * ncol > 250000) {
+        zrange *= .75;
+        smult *= .75;
+    }
+    zrange *= .75;
+    smult *= .75;
+    smult2 = 1.0;
 
-double sm2;
-int  nc2 = nc * 2;
-bool iedge, jedge;
+    double sm2;
+    int  nc2 = nc * 2;
+    bool iedge, jedge;
 
     for (i=0; i<nrow; i++) {
       i1 = i - 1;

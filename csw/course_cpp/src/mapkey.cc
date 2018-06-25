@@ -14,12 +14,10 @@ public:
 
     Person() :
         name(""), age(0) {
-
     }
 
     Person(std::string name, int age) :
         name(name), age(age) {
-
     }
 
     Person(const Person& other) {

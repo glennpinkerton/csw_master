@@ -158,6 +158,12 @@ void ThreadGuard::RemoveThreadData (long jside_id)
         it_ap->second = NULL;
     }
 
+    it_sw = sw_calc_map.find(jside_id);
+    if (it_sw != sw_calc_map.end()) {
+        delete (it_sw->second);
+        it_sw->second = NULL;
+    }
+
     ezf_it = ez_log_file_map.find (jside_id);
     if (ezf_it != ez_log_file_map.end()) {
         if (ezf_it->second != NULL) {
@@ -376,7 +382,6 @@ SWCalc  *ThreadGuard::GetSWCalc (long jside_id)
                 sw = NULL;
             }
             it->second = sw;
-            sw = NULL;
         }
         return sw;
     }
