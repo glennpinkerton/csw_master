@@ -89,10 +89,10 @@
     Define the structure for returning contour lines.
 */
 typedef struct {
-    CSW_Float     zvalue;
+    CSW_F     zvalue;
     char          text[MAX_CONTOUR_LABEL_SIZE+1];
     int           npts;
-    CSW_Float     *x, *y;
+    CSW_F     *x, *y;
     char          major;
     char          downhill;
     char          closure;
@@ -105,10 +105,10 @@ typedef struct {
     Structure for returning contour fills.
 */
 typedef struct {
-    CSW_Float     x[MAX_FILL_POLY],
+    CSW_F     x[MAX_FILL_POLY],
                   y[MAX_FILL_POLY];
     int           npts;
-    CSW_Float     zlow,
+    CSW_F     zlow,
                   zhigh;
     int           color;
     char          expect_double;
@@ -124,7 +124,7 @@ typedef struct {
                   smoothing,
                   resample_flag,
                   thickness_flag;
-    CSW_Float     base_value,
+    CSW_F     base_value,
                   log_base,
                   null_value,
                   minor_crowd,
@@ -133,12 +133,12 @@ typedef struct {
                   faulted_flag,
                   contour_in_faults_flag,
                   step_flag;
-    CSW_Float     fill_precision;
+    CSW_F     fill_precision;
 
     /*  contour interval stuff  */
-    CSW_Float     contour_interval;
+    CSW_F     contour_interval;
     int           major_spacing;
-    CSW_Float     first_contour,
+    CSW_F     first_contour,
                   last_contour,
                   base_grid_value,
                   top_grid_value,
@@ -157,7 +157,7 @@ typedef struct {
 */
 typedef struct {
     int           npts;
-    CSW_Float     *x, *y;
+    CSW_F     *x, *y;
     int           majorflag,
                   tickflag,
                   textflag,
@@ -168,21 +168,21 @@ typedef struct {
     int           nchar;
     char          *text;
     int           font;
-    CSW_Float     size;
-    CSW_Float     *x, *y, *angles;
+    CSW_F     size;
+    CSW_F     *x, *y, *angles;
     int           majorflag;
 }  COntourTextPrim;
 
 typedef struct {
     int           npts;
-    CSW_Float     x[6], y[6];
+    CSW_F     x[6], y[6];
 }  COntourFillPrim;
 
 /*
     Structure for contour drawing options.
 */
 typedef struct {
-    CSW_Float     major_tick_spacing,
+    CSW_F     major_tick_spacing,
                   major_text_spacing,
                   major_tick_len,
                   major_text_size,

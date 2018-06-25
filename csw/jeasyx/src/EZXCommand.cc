@@ -21,21 +21,6 @@
  ***************************************************************************
 */
 
-/*
- * This debug flag is the mechanism used for debugging the
- * native side of the 2d graphics code.  Eventually, this
- * will be set to zero, but for the first several usages
- * from application programmers, I will keep it set at 1 so
- * I can debug native code problems that come up.
- *
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- *
- * NOTE THAT THIS FLAG SHOULD **NEVER** BE SET TO 1 FOR
- * ANYTHING OTHER THAN DEBUGGING CODE
- *
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#define _EZX_DEBUG_LOG_FILE_        1
- */
 
 #include <stdio.h>
 

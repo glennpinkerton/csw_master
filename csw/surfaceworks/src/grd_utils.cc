@@ -176,7 +176,7 @@ MSL
 
   function name: grd_recommended_size              (int)
 
-  call sequence: grd_recommended_size (x, y, npts,
+  call sequence: grd_recommended_size (x, y, npts, noisy_edge,
                                        x1, y1, x2, y2,
                                        ncol, nrow)
 
@@ -210,6 +210,7 @@ MSL
     x        r    CSW_F*     Array of x coordinates.
     y        r    CSW_F*     Array of y coordinates.
     npts     r    int            Number of points in x,y.
+    noisy_edge  r int        1 if outgside edge of data id quite noisy, 0 if not noisy
     x1       r/w  *CSW_F     Minimum x value
     y1       r/w  *CSW_F     Minimum y value
     x2       r/w  *CSW_F     Maximum x value
@@ -220,7 +221,7 @@ MSL
 */
 
 int CSWGrdUtils::grd_recommended_size
-                         (CSW_F *x, CSW_F *y, int npts,
+                         (CSW_F *x, CSW_F *y, int npts, int noisy_edge,
                           CSW_F *x1p, CSW_F *y1p, CSW_F *x2p, CSW_F *y2p,
                           int *ncol, int *nrow)
 {
@@ -339,6 +340,20 @@ int CSWGrdUtils::grd_recommended_size
         }
         if (xt <= 0.0f) xt = yt;
         if (yt <= 0.0f) yt = xt;
+        if (noisy_edge) {
+            if (npts > 5000) {
+                xt /= 2.0;
+                yt /= 2.0;
+            }
+            if (npts > 20000) {
+                xt /= 2.0;
+                yt /= 2.0;
+            }
+            if (npts > 100000) {
+                xt = 0.0;
+                yt = 0.0;
+            }
+        }
         x1 -= xt;
         x2 += xt;
         y1 -= yt;
@@ -628,8 +643,6 @@ MSL
     if (ny < 5) ny = 5;
 
 /*
- * Bug 9489
- *
  *  If a bad point location is in the input, a huge grid
  *  may be recommended.  The maximum number of grid cells
  *  from a recommended grid is set to about 1 million.  This

@@ -342,18 +342,13 @@ int CSWContourApi::con_CalcContours
                                 (double)x2, (double)y2,
                                 faults, nfaults,
                                 contours, ncontours, options);
-printf ("faulted contours\n");
     }
     else {
         istat = con_calc_obj.con_calc_contours
                               (grid, ncol, nrow,
                                x1, y1, x2, y2, scale,
                                contours, ncontours, options);
-printf ("non faulted contours\n");
     }
-
-printf ("ncontours = %d\n", *ncontours);
-fflush (stdout);
 
     if (istat == -1  &&  options) {
         options->error_number = con_GetErr ();

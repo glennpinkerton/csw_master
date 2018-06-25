@@ -36,7 +36,8 @@ class ringbuff
     public:
 
   // use a "forward declaration" of an inner class to keep
-  // the ringbuff class a bit less messy.
+  // the ringbuff class a bit less messy.  A class named iterator
+  // must be defined to get range basaed loop behavior.
 
       class iterator;
 
@@ -96,7 +97,8 @@ class ringbuff
       };
 
 // begin and end iterator accessors  These create an iterator
-// object rather than using a reference.
+// object rather than using a reference.  Both of these methods must 
+// be available to get range based loop behavior.
 
       iterator begin () {
           return iterator (0, *this);
@@ -128,13 +130,17 @@ class ringbuff<T>::iterator
 
   public:
 
+// This constructor and all the iterator methods must be available
+// to get range based loops to work.
+
     iterator (int pos, ringbuff &rb) :
       position (pos), rbuf(rb) {};
     
 // overload ++ operator.  The method with the int param is 
 // the postfix version.  The prefix version has no params.
 // The int param for postfix is not used for anything other
-// than differentiating postfix from prefix.
+// than differentiating postfix from prefix.  Both of these iterator
+// operators must be available to enable range based loops.
 
     iterator &operator++ (int) {
       position++;

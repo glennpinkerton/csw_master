@@ -1,5 +1,5 @@
 
-// This is stricktly an example of the basic syntax use to define
+// This is strictly an example of the basic syntax use to define
 // template classes.  It is very simple and contrived.  It is very
 // strongly suggested that all template class methods are implemented
 // in the same header file where the class is defined.

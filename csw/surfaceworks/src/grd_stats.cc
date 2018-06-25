@@ -31,6 +31,8 @@
 
 #include "csw/surfaceworks/private_include/grd_stats.h"
 
+#define  MAX_NUGGET_POINTS  10000
+
 
 /*
   ****************************************************************
@@ -1226,3 +1228,135 @@ MSL
     return 1;
 
 }  /*  end of function grd_local_anisotropy  */
+
+
+
+
+
+/*
+  ****************************************************************
+
+            g r d _ n u g g e t _ e f f e c t
+
+  ****************************************************************
+
+    Calculate the "nugget effect" of the set of points.  This is a good 
+    indicator of how noisy (high spatial frequency noise) the data are.
+*/
+
+int CSWGrdStats::grd_nugget_effect
+    (CSW_F *xin, CSW_F *yin, CSW_F *zin, int nin,
+     CSW_F *global_delta, CSW_F *av_local_delta)
+{
+    CSW_F            x0, y0, z0, dx, dy, dz, dd, dmax,
+                     x1, y1, x2, y2, dist;
+    int              i, j, n;
+    CSW_F            *x = NULL, *y = NULL, *z = NULL;
+
+    *global_delta = -1.e30;
+    *av_local_delta = -1.e30;
+
+    auto fscope = [&]()
+    {
+    };
+    CSWScopeGuard func_scope_guard (fscope);
+
+
+    n = nin;
+
+    x = xin;
+    y = yin;
+    z = zin;
+
+/*
+ * Find the z value range for all points.
+ */
+    CSW_F  zin_min = 1.e30;
+    CSW_F  zin_max = -1.e30;
+    for (int i=0; i<nin; i++) {
+        CSW_F  zt = zin[i];
+        if (zt > -1.e20  &&  zt < 1.e20) {
+            if (zt < zin_min) zin_min = zt;
+            if (zt > zin_max) zin_max = zt;
+        }
+    }
+
+    if (zin_min > zin_max) return 1;
+
+    *global_delta = zin_max - zin_min;
+
+    CSW_F  global_10 = *global_delta / 5.0;
+
+/*
+    Find the x,y limits and use them to get the width
+    of the "high frequency" data separation
+*/
+    gpf_xandylimits (x, y, n, &x1, &y1, &x2, &y2);
+
+    dx = x2 - x1;
+    dy = y2 - y1;
+
+    if (dx <= ABSOLUTE_TINY  ||  dy <= ABSOLUTE_TINY) {
+        return 1;
+    }
+
+    dmax = dx * dx + dy * dy;
+    dmax = (CSW_F)sqrt ((double)dmax);
+
+    dd = dmax / 20.0;
+    CSW_F  ddsq = dd * dd;
+    
+    CSW_F  dzsum = 0.0;
+    int    dzcount = 0;
+    int    n10 = 0;
+
+    int   nskip = 1;
+    if (n > MAX_NUGGET_POINTS) {
+        nskip = n / MAX_NUGGET_POINTS + 1;
+    }
+/*
+    Calculate the variance (delta z squared) vs distance pairs
+*/
+    for (i=0; i<n; i+=nskip) {
+
+        x0 = x[i];
+        y0 = y[i];
+        z0 = z[i];
+
+        if (x0 < x1  ||  x0 > x2  ||
+            y0 < y1  ||  y0 > y2) {
+            continue;
+        }
+
+        for (j=i+1; j<n; j+=nskip) {
+
+            if (x[j] < x1  ||  x[j] > x2  ||
+                y[j] < y1  ||  y[j] > y2) {
+                continue;
+            }
+
+            dx = x[j] - x0;
+            dy = y[j] - y0;
+
+            dist = dx * dx + dy * dy;
+            if (dist > ddsq) continue;
+
+            dz = z[j] - z0;
+            if (dz < 0.0f) dz = -dz;
+
+            if (dz > global_10) n10++;
+
+            dzsum += dz;
+            dzcount++;
+
+        }
+
+    }
+
+    if (dzcount > 0) {
+        *av_local_delta = dzsum / dzcount;
+    }
+
+    return 1;
+
+}  /*  end of function grd_nugget_effect  */

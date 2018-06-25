@@ -174,7 +174,7 @@ class CSWGrdUtils
 
     int grd_get_err (void);
     int grd_recommended_size
-        (CSW_F *x, CSW_F *y, int npts,
+        (CSW_F *x, CSW_F *y, int npts, int noisy_edge,
          CSW_F *x1p, CSW_F *y1p, CSW_F *x2p, CSW_F *y2p,
          int *ncol, int *nrow);
 

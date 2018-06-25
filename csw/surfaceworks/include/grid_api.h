@@ -265,50 +265,52 @@ class CSWGrdAPI
     int grd_SetControlSurface (CSW_F*, int, int, CSW_F, CSW_F, CSW_F, CSW_F, int);
     
     int grd_CalcPerpPlaneFit (double *x, double *y, double *z, int npts, double *coef);
-    int grd_CalcTrendSurface (CSW_Float*, CSW_Float*, CSW_Float*, int, int,
-                              CSW_Float*);
-    int grd_EvalTrendSurface (CSW_Float*, CSW_Float*, CSW_Float*, int, int,
-                              CSW_Float*);
-    int grd_CalcTrendGrid (CSW_Float*, CSW_Float*, CSW_Float*, int, int,
-                           CSW_Float*, int, int,
-                           CSW_Float, CSW_Float, CSW_Float, CSW_Float);
+    int grd_CalcTrendSurface (CSW_F*, CSW_F*, CSW_F*, int, int,
+                              CSW_F*);
+    int grd_EvalTrendSurface (CSW_F*, CSW_F*, CSW_F*, int, int,
+                              CSW_F*);
+    int grd_CalcTrendGrid (CSW_F*, CSW_F*, CSW_F*, int, int,
+                           CSW_F*, int, int,
+                           CSW_F, CSW_F, CSW_F, CSW_F);
     int grd_CalcTrendGridFromDouble
                           (double*, double*, double*, int, int,
-                           CSW_Float*, int, int,
+                           CSW_F*, int, int,
                            double, double, double, double);
     int grd_SetConformableSurfaceFromDouble
                       (CSW_F *grid, int ncol, int nrow,
                        double x1, double y1, double x2, double y2);
     int grd_CalcGridFromDouble
-                     (double*, double*, double*, CSW_Float*, int,
-                      CSW_Float*, char*, char**, int, int,
+                     (double*, double*, double*, CSW_F*, int,
+                      CSW_F*, char*, char**, int, int,
                       double, double, double, double,
                       FAultLineStruct*, int,
                       GRidCalcOptions *);
-    int grd_CalcGrid (CSW_Float*, CSW_Float*, CSW_Float*, CSW_Float*, int,
-                      CSW_Float*, char*, char**, int, int,
-                      CSW_Float, CSW_Float, CSW_Float, CSW_Float,
+    int grd_CalcGrid (CSW_F*, CSW_F*, CSW_F*, CSW_F*, int,
+                      CSW_F*, char*, char**, int, int,
+                      CSW_F, CSW_F, CSW_F, CSW_F,
                       FAultLineStruct*, int,
                       GRidCalcOptions *);
     void grd_SetNoisyDataFlag (int ndf);
-    int grd_SetCalcOption (int, int, CSW_Float);
+    int grd_SetCalcOption (int, int, CSW_F);
     int grd_SetCalcOptions (GRidCalcOptions *);
     int grd_DefaultCalcOptions (GRidCalcOptions *);
     int grd_RecommendedSizeFromDouble
-                            (double*, double*, int,
+                            (double*, double*, int, int noisy_edge,
                              double*, double*, double*, double*,
                              int*, int*);
-    int grd_RecommendedSize (CSW_Float*, CSW_Float*, int,
-                             CSW_Float*, CSW_Float*, CSW_Float*, CSW_Float*,
+    int grd_RecommendedSize (CSW_F*, CSW_F*, int,
+                             CSW_F*, CSW_F*, CSW_F*, CSW_F*,
                              int*, int*);
-    int grd_SetHardNullValues (CSW_Float *, char *, int, int,
-                               CSW_Float, int, CSW_Float**);
-    int grd_SmoothGrid (CSW_Float*, int, int, int,
+    int grd_SetHardNullValues (CSW_F *, char *, int, int,
+                               CSW_F, int, CSW_F**);
+    int grd_SmoothGrid (CSW_F*, int, int, int,
                         FAultLineStruct*, int,
-                        CSW_Float, CSW_Float, CSW_Float, CSW_Float,
-                        CSW_Float, CSW_Float, CSW_Float**);
+                        CSW_F, CSW_F, CSW_F, CSW_F,
+                        CSW_F, CSW_F, CSW_F**);
+    int grd_EdgeNuggetEffect (CSW_F *x, CSW_F *y, CSW_F *z, int npts,
+                              CSW_F *global_zdelta, CSW_F *local_zdelta_avg);
     int grd_WriteFile (const char*, const char*,
-                       CSW_Float*, char*, char *mask2,
+                       CSW_F*, char*, char *mask2,
                        int, int,
                        double, double, double, double, int,
                        FAultLineStruct*, int);
@@ -317,72 +319,72 @@ class CSWGrdAPI
                            char *fname);
     int grd_WriteFaultLines (FAultLineStruct *faults, int nfaults, const char *fname);
     int grd_ReadFile (const char*, char*,
-                      CSW_Float**, char**, char **mask2,
+                      CSW_F**, char**, char **mask2,
                       int*, int*,
                       double*, double*, double*, double*, int*,
                       FAultLineStruct**, int*);
     int grd_WriteMultipleFile (char*, GRidFileRec*, int);
     int grd_ReadMultipleFile (char*, GRidFileRec*, int);
     void grd_CleanFileRecList (GRidFileRec *list, int nlist);
-    int grd_OneGridArith (CSW_Float*, CSW_Float*,
-                          int, int, int, CSW_Float,
-                          CSW_Float, void(*)(GRidArithData *), void*);
+    int grd_OneGridArith (CSW_F*, CSW_F*,
+                          int, int, int, CSW_F,
+                          CSW_F, void(*)(GRidArithData *), void*);
     int grd_TwoGridArithFromDouble
-                         (CSW_Float*, char*,
+                         (CSW_F*, char*,
                           double, double, double, double,
                           int, int,
                           FAultLineStruct*, int,
-                          CSW_Float*, char*,
+                          CSW_F*, char*,
                           double, double, double, double,
                           int, int,
                           FAultLineStruct*, int,
-                          CSW_Float,
-                          CSW_Float**, char**,
+                          CSW_F,
+                          CSW_F**, char**,
                           double*, double*, double*, double*,
                           int*, int*, int, void(*)(GRidArithData *), void*);
-    int grd_TwoGridArith (CSW_Float*, char*,
-                          CSW_Float, CSW_Float, CSW_Float, CSW_Float,
+    int grd_TwoGridArith (CSW_F*, char*,
+                          CSW_F, CSW_F, CSW_F, CSW_F,
                           int, int,
                           FAultLineStruct*, int,
-                          CSW_Float*, char*,
-                          CSW_Float, CSW_Float, CSW_Float, CSW_Float,
+                          CSW_F*, char*,
+                          CSW_F, CSW_F, CSW_F, CSW_F,
                           int, int,
                           FAultLineStruct*, int,
-                          CSW_Float,
-                          CSW_Float**, char**,
-                          CSW_Float*, CSW_Float*, CSW_Float*, CSW_Float*,
+                          CSW_F,
+                          CSW_F**, char**,
+                          CSW_F*, CSW_F*, CSW_F*, CSW_F*,
                           int*, int*, int, void(*)(GRidArithData *), void*);
-    int grd_ResampleGrid (CSW_Float*, char*, int, int,
-                          CSW_Float, CSW_Float, CSW_Float, CSW_Float,
+    int grd_ResampleGrid (CSW_F*, char*, int, int,
+                          CSW_F, CSW_F, CSW_F, CSW_F,
                           FAultLineStruct*, int,
-                          CSW_Float*, char*, int, int,
-                          CSW_Float, CSW_Float, CSW_Float, CSW_Float,
+                          CSW_F*, char*, int, int,
+                          CSW_F, CSW_F, CSW_F, CSW_F,
                           int);
-    int grd_ResampleGridFromDouble (CSW_Float*, char*, int, int,
+    int grd_ResampleGridFromDouble (CSW_F*, char*, int, int,
                           double, double, double, double,
                           FAultLineStruct*, int,
-                          CSW_Float*, char*, int, int,
+                          CSW_F*, char*, int, int,
                           double, double, double, double,
                           int);
-    int grd_BackInterpolateFromDouble (CSW_Float*, int, int,
+    int grd_BackInterpolateFromDouble (CSW_F*, int, int,
                              double, double, double, double,
                              FAultLineStruct*, int,
                              double*, double*, double*, int,
                              int);
-    int grd_BackInterpolate (CSW_Float*, int, int,
-                             CSW_Float, CSW_Float, CSW_Float, CSW_Float,
+    int grd_BackInterpolate (CSW_F*, int, int,
+                             CSW_F, CSW_F, CSW_F, CSW_F,
                              FAultLineStruct*, int,
-                             CSW_Float*, CSW_Float*, CSW_Float*, int,
+                             CSW_F*, CSW_F*, CSW_F*, int,
                              int);
-    int grd_HorizontalGradient (CSW_Float*, int, int,
-                                CSW_Float, CSW_Float, CSW_Float, CSW_Float,
+    int grd_HorizontalGradient (CSW_F*, int, int,
+                                CSW_F, CSW_F, CSW_F, CSW_F,
                                 FAultLineStruct*, int,
-                                CSW_Float*, CSW_Float*);
+                                CSW_F*, CSW_F*);
     int grd_HorizontalGradientFromDouble
-                               (CSW_Float*, int, int,
+                               (CSW_F*, int, int,
                                 double, double, double, double,
                                 FAultLineStruct*, int,
-                                CSW_Float*, CSW_Float*);
+                                CSW_F*, CSW_F*);
     int grd_Version (char *);
     int grd_GetErr (void);
     int grd_FillNullValues (CSW_F*, int, int,

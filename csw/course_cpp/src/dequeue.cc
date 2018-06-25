@@ -16,7 +16,6 @@ public:
 
     Player() :
         team(""), name(""), number(0) {
-
     }
 
     Player(std::string team, std::string name, int number) :

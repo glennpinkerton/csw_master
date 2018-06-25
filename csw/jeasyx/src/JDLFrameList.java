@@ -29,7 +29,7 @@ import javax.swing.WindowConstants;
   a way to clean up all the native resources (in the C and C++ code)
   used by a frame.  The cleanup can either be done by calling the
   remove... methods or if cleanup is done elsewhere, the JDLFrame
-  can be n]marked as already cleaned up via these methods.
+  can be marked as already cleaned up via these methods.
 
   @author Glenn Pinkerton
 
@@ -48,7 +48,7 @@ public class JDLFrameList {
 
     private static final long serialVersionUID = 1357L;
 
-    private static ArrayList<FrStruct>  frameIdList = new ArrayList<FrStruct> ();
+    private static ArrayList<FrStruct>  frameIdList = new ArrayList<FrStruct> (8);
 
     private JDLFrameList () {};
 
@@ -60,16 +60,21 @@ public class JDLFrameList {
         JDLFrame  frame_obj)
     {
         FrStruct  fr = new FrStruct (frame_id, frame_obj);
-        try {
-          frameIdList.add (fr);
+        int  idx = frameIdList.indexOf(null);
+        if (idx >= 0) {
+          frameIdList.set (idx, fr);
         }
-        catch (Throwable ex) {
-          System.out.println ();
-          System.out.println ("Exception adding to frameIdList");
-          System.out.println ();
-          System.out.flush ();
+        else {
+          try {
+            frameIdList.add (fr);
+          }
+          catch (Throwable ex) {
+            System.out.println ();
+            System.out.println ("Exception adding to frameIdList");
+            System.out.println ();
+            System.out.flush ();
+          }
         }
-
     }
 
 
@@ -79,10 +84,15 @@ public class JDLFrameList {
         if (dlin == null) return;
 
         for (FrStruct fr : frameIdList) {
+          if (fr == null) continue;
             if (fr.frame_obj != null) {
               if (fr.frame_obj.getDL() != null) {
                 if (dlin == fr.frame_obj.getDL()) {
                   fr.frame_obj = null;
+                  int idx = frameIdList.indexOf (fr);
+                  if (idx >= 0) {
+                      frameIdList.set (idx, null);
+                  }
                   break;
                 }
               }
@@ -91,15 +101,53 @@ public class JDLFrameList {
 
     }
 
+    public static synchronized void markFrameAsDeleted (
+        JFrame  fin)
+    {
+        if (fin == null) return;
+
+        if (!(fin instanceof JDLFrame)) {
+            return;
+        }
+
+        JDLFrame jdfin = (JDLFrame)fin;
+
+        for (FrStruct fr : frameIdList) {
+          if (fr == null) continue;
+            if (fr.frame_obj != null) {
+              if (fr.frame_obj.equals(jdfin)) {
+                  fr.frame_obj = null;
+                  int idx = frameIdList.indexOf (fr);
+                  if (idx >= 0) {
+                      frameIdList.set (idx, null);
+                  }
+                  break;
+              }
+            }
+        }
+
+    }
+
+
+
     public static synchronized void removeFrame (
         long      frame_id,
         JDLFrame  frame_obj)
     {
 
-        frame_obj.getDL().cleanup();
+        if (frame_obj == null) return;
+
         for (FrStruct fr : frameIdList) {
+          if (fr == null) continue;
             if (fr.frame_obj == frame_obj) {
+                if (frame_obj.getDL() != null) {
+                    fr.frame_obj.getDL().cleanup ();
+                }
                 fr.frame_obj = null;
+                int idx = frameIdList.indexOf (fr);
+                if (idx >= 0) {
+                    frameIdList.set (idx, null);
+                }
                 break;
             }
         }
@@ -109,11 +157,15 @@ public class JDLFrameList {
     {
 
         for (FrStruct fr : frameIdList) {
+          if (fr != null) {
             if (fr.frame_obj != null) {
-              fr.frame_obj.getDL().cleanup ();
+              if (fr.frame_obj.getDL() != null) {
+                fr.frame_obj.getDL().cleanup ();
+              }
             }
             fr.frame_obj = null;
             fr.frame_id = -1;
+          }
         }
         frameIdList.clear ();
     }

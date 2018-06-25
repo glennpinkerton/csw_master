@@ -112,8 +112,8 @@ long sw_process_command (
     char          *cdata,
     int           *idata,
     float         *fdata,
-    double        *ddata
-) {
+    double        *ddata) 
+{
     long          istat;
     int           iistat;
     double        *zp1, *zp2, *zp3;
@@ -123,6 +123,7 @@ long sw_process_command (
 
     int           nline, nline2, ntot, npts, zflag;
     int           start;
+
 
   #if _SW_DEBUG_LOG_FILE_
     int           i;

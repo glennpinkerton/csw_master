@@ -3540,7 +3540,7 @@ int PATCHSplit::CalcWorkPolygonSurfaces (void)
         y2 = ymax;
         istat =
         grdapi_ptr->grd_RecommendedSizeFromDouble (
-            xpts, ypts, npts,
+            xpts, ypts, npts, 0,
             &x1, &y1, &x2, &y2,
             &ncol, &nrow);
         if (MeshFlag) {

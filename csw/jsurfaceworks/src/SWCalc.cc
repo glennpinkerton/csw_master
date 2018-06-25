@@ -30,8 +30,6 @@
 #include "csw/utils/private_include/ply_protoP.h"
 
 
-#define _SW_DEBUG_LOG_FILE_ 1
-
 
 /*-----------------------------------------------------------------*/
 
@@ -364,7 +362,7 @@ int SWCalc::sw_CalcTriMesh (
         }
         else {
             istat = grdapi_ptr->grd_RecommendedSizeFromDouble
-                (xpg, ypg, npg,
+                (xpg, ypg, npg, 0,
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
@@ -397,7 +395,7 @@ int SWCalc::sw_CalcTriMesh (
         if (ncol < 2  ||  nrow < 2  ||
             gxmin >= gxmax  ||  gymin >= gymax) {
             istat = grdapi_ptr->grd_RecommendedSizeFromDouble
-                (xpg, ypg, npg,
+                (xpg, ypg, npg, 0,
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
@@ -616,7 +614,7 @@ int SWCalc::sw_CalcTriMesh (
             yline2 = (double *)csw_Malloc (ntot * sizeof(double));
             zline2 = (double *)csw_Malloc (ntot * sizeof(double));
             npline2 = (int *)csw_Malloc ((nline2 + 1) * sizeof(int));
-            linetypes2 = (int *)calloc (1, (nline2 + 1) * sizeof(int));
+            linetypes2 = (int *)csw_Calloc ((nline2 + 1) * sizeof(int));
             if (xline2 == NULL  ||
                 yline2 == NULL  ||
                 zline2 == NULL  ||
@@ -954,7 +952,7 @@ int SWCalc::SendBackTriMesh
     ynode = xnode + num_nodes;
     znode = ynode + num_nodes;
 
-    flagnode = (int *)calloc (1, num_nodes * sizeof(int));
+    flagnode = (int *)csw_Calloc (num_nodes * sizeof(int));
     if (flagnode == NULL) {
         csw_Free (xnode);
         return -1;
@@ -963,7 +961,7 @@ int SWCalc::SendBackTriMesh
 /*
  * Allocate space for edge arrays.
  */
-    n1edge = (int *)calloc (1, 5 * num_edges * sizeof(int));
+    n1edge = (int *)csw_Calloc (5 * num_edges * sizeof(int));
     if (n1edge == NULL) {
         csw_Free (xnode);
         csw_Free (flagnode);
@@ -977,7 +975,7 @@ int SWCalc::SendBackTriMesh
 /*
  * Allocate space for triangle arrays.
  */
-    e1tri = (int *)calloc (1, num_triangles * 4 * sizeof(int));
+    e1tri = (int *)csw_Calloc (num_triangles * 4 * sizeof(int));
     if (e1tri == NULL) {
         csw_Free (xnode);
         csw_Free (flagnode);
@@ -1145,8 +1143,25 @@ int SWCalc::sw_CalcGrid (
     };
     CSWScopeGuard func_scope_guard (fscope);
 
+    CSW_F    global_zdelta = 1.e30;
+    CSW_F    local_zdelta_avg = 1.e30;
+
+    int  nugget = grdapi_ptr->grd_EdgeNuggetEffect
+          (xpts, ypts, zpts, npts,
+           &global_zdelta, &local_zdelta_avg);
+    int      noisy_edge = 0;
+
+    if (nugget == 1  &&  fabs (global_zdelta) < 1.e20  &&
+        fabs (local_zdelta_avg) < 1.e20) {
+        if (local_zdelta_avg > global_zdelta * .1) {
+            noisy_edge = 1;
+        }
+    }
+
 /*
- * Get or calculate the grid geometry.
+ * Get or calculate the grid geometry.  In the code below, I
+ * limit the total number of grid nodes to 1000000 (for default
+ * size) and to 2000000 for explicitly specified size. 
  */
     if (grid_geometry != NULL) {
         ncol = grid_geometry->ncol;
@@ -1155,6 +1170,12 @@ int SWCalc::sw_CalcGrid (
         gymin = grid_geometry->ymin;
         gxmax = grid_geometry->xmax;
         gymax = grid_geometry->ymax;
+        while (ncol * nrow > 2 * MAX_DEFAULT_NODES) {
+            ncol *= 9;
+            nrow *= 9;
+            ncol /= 10;
+            nrow /= 10;
+        }
     }
     else {
         gxmin = 1.e30;
@@ -1162,41 +1183,51 @@ int SWCalc::sw_CalcGrid (
         gxmax = -1.e30;
         gymax = -1.e30;
         istat = grdapi_ptr->grd_RecommendedSizeFromDouble
-            (xpts, ypts, npts,
+            (xpts, ypts, npts, noisy_edge,
              &gxmin, &gymin, &gxmax, &gymax,
              &ncol, &nrow);
         if (istat == -1) {
             return -1;
         }
-        while (ncol * nrow > 5 * MAX_DEFAULT_NODES) {
+        while (ncol * nrow > MAX_DEFAULT_NODES) {
             ncol *= 9;
             nrow *= 9;
             ncol /= 10;
             nrow /= 10;
         }
-    }
 
-    if (grid_geometry != NULL) {
-        ncol = grid_geometry->ncol;
-        nrow = grid_geometry->nrow;
+if (noisy_edge == 0) {
+  CSW_F  ddx = (gxmax - gxmin) / 2.0;
+  CSW_F  ddy = (gymax - gymin) / 2.0;
+  gxmin -= ddx;
+  gxmax += ddx;
+  gymin -= ddy;
+  gymax += ddy;
+  ncol += ncol / 2;
+  nrow += nrow / 2;
+}
+
     }
 
     if (ncol < 2  ||  nrow < 2  ||
         gxmin >= gxmax  ||  gymin >= gymax) {
         istat = grdapi_ptr->grd_RecommendedSizeFromDouble
-            (xpts, ypts, npts,
+            (xpts, ypts, npts, noisy_edge,
              &gxmin, &gymin, &gxmax, &gymax,
              &ncol, &nrow);
         if (istat == -1) {
             return -1;
         }
-        while (ncol * nrow > 5 * MAX_DEFAULT_NODES) {
+        while (ncol * nrow > MAX_DEFAULT_NODES) {
             ncol *= 9;
             nrow *= 9;
             ncol /= 10;
             nrow /= 10;
         }
     }
+
+    if (ncol < 2) ncol = 2;
+    if (nrow < 2) nrow = 2;
 
 /*
  * Allocate space for the grid, mask and error array.
@@ -1206,12 +1237,12 @@ int SWCalc::sw_CalcGrid (
         return -1;
     }
 
-    mask = (char *)calloc (1, ncol * nrow * sizeof(char));
+    mask = (char *)csw_Calloc (ncol * nrow * sizeof(char));
     if (mask == NULL) {
         return -1;
     }
 
-    zerr = (CSW_F *)calloc (1, npts * sizeof(CSW_F));
+    zerr = (CSW_F *)csw_Calloc (npts * sizeof(CSW_F));
     if (zerr == NULL) {
         return -1;
     }
@@ -1243,20 +1274,34 @@ int SWCalc::sw_CalcGrid (
     char  *gdm = mask;
 
     int  n20 = 0;
+    n20 = (ncol + nrow) / 40;
+    if (n20 < 8) n20 = 8;
     double  gxmarg = 0.0;
     double  gymarg = 0.0;
+    gxmarg = (gxmax - gxmin) / 40.0;
+    gymarg = (gymax - gymin) / 40.0;
+
     if (grsmooth > 0) {
         n20 = (ncol + nrow) / 20;
-        if (n20 < 8) n20 = 8;
-        gxmarg = (gxmax - gxmin) / 10.0;
-        gymarg = (gymax - gymin) / 10.0;
-        int  nrs = (ncol + n20) * (nrow + n20);
-        rsgrid = (CSW_F *)csw_Malloc (nrs * sizeof(CSW_F));
-        if (rsgrid == NULL) return -1;
-        rsmask = (char *)csw_Malloc (nrs * sizeof(char));
-        if (rsmask == NULL) return -1;
-        gdc = rsgrid;
-        gdm = rsmask;
+        if (n20 < 16) n20 = 16;
+        gxmarg = (gxmax - gxmin) / 20.0;
+        gymarg = (gymax - gymin) / 20.0;
+    }
+
+    int  nrs = (ncol + n20) * (nrow + n20);
+    rsgrid = (CSW_F *)csw_Malloc (nrs * sizeof(CSW_F));
+    if (rsgrid == NULL) return -1;
+    rsmask = (char *)csw_Malloc (nrs * sizeof(char));
+    if (rsmask == NULL) return -1;
+    gdc = rsgrid;
+    gdm = rsmask;
+
+    if (nugget == 1  &&  fabs (global_zdelta) < 1.e20  &&
+        fabs (local_zdelta_avg) < 1.e20) {
+        if (local_zdelta_avg > global_zdelta * .1) {
+            grsmooth = 1000;
+            options.moving_avg_only = 1;
+        }
     }
 
 /*
@@ -1270,10 +1315,12 @@ int SWCalc::sw_CalcGrid (
          gxmax + gxmarg, gymax + gymarg,
          flist, nflist,
          &options);
+
+    int  rstat = 0;
     if (grsmooth > 0) {
         grsmooth++;
-        if (grsmooth > 9) grsmooth = 9;
-        int rstat =
+        if (grsmooth > 9  &&  grsmooth < 100) grsmooth = 9;
+        rstat =
         grdapi_ptr->grd_SmoothGrid 
             (gdc, ncol + n20, nrow + n20, grsmooth,
              flist, nflist,
@@ -1281,17 +1328,29 @@ int SWCalc::sw_CalcGrid (
              gxmax + gxmarg, gymax + gymarg,
              -1.e30, 1.e30, NULL);
         if (rstat == -1) return -1;
-        rstat =
-        grdapi_ptr->grd_ResampleGrid
-            (gdc, gdm, ncol + n20, nrow + n20,
-             gxmin - gxmarg, gymin - gymarg,
-             gxmax + gxmarg, gymax + gymarg,
-             flist, nflist,
-             gdata, mask, ncol, nrow,
-             gxmin, gymin, gxmax, gymax,
-             GRD_BILINEAR);
-        if (rstat == -1) return -1;
     }
+
+// Resample to the "final" grid geometry.
+
+/*
+    CSW_F    ddxx = 0.0, ddyy = 0.0;
+    if (nugget == 1  &&  grid_geometry == NULL) {
+        ddxx = (gxmax - gxmin) / 100.0;
+        ddyy = (gymax - gymin) / 100.0;
+    }
+*/
+
+    rstat =
+    grdapi_ptr->grd_ResampleGrid
+        (gdc, gdm, ncol + n20, nrow + n20,
+         gxmin - gxmarg, gymin - gymarg,
+         gxmax + gxmarg, gymax + gymarg,
+         flist, nflist,
+         gdata, mask, ncol, nrow,
+         gxmin, gymin, gxmax, gymax,
+         GRD_BILINEAR);
+    if (rstat == -1) return -1;
+
     grdapi_ptr->grd_FreeFaultLineStructs (flist, nflist);
     flist = NULL;
     nflist = 0;
@@ -1586,19 +1645,19 @@ int SWCalc::sw_SetDrapeTriMeshCache (
 
     vert_ConvertPoints (xnode, ynode, znode, num_node, gvert);
 
-    drapeNodes = (NOdeStruct *)calloc
-                 (1, num_node * sizeof(NOdeStruct));
+    drapeNodes = (NOdeStruct *)csw_Calloc
+                 (num_node * sizeof(NOdeStruct));
     if (drapeNodes == NULL) {
         return -1;
     }
-    drapeEdges = (EDgeStruct *)calloc
-                 (1, num_edge * sizeof(EDgeStruct));
+    drapeEdges = (EDgeStruct *)csw_Calloc
+                 (num_edge * sizeof(EDgeStruct));
     if (drapeEdges == NULL) {
         free_drape_trimesh ();
         return -1;
     }
-    drapeTriangles = (TRiangleStruct *)calloc
-                     (1, num_tri * sizeof(TRiangleStruct));
+    drapeTriangles = (TRiangleStruct *)csw_Calloc
+                     (num_tri * sizeof(TRiangleStruct));
     if (drapeTriangles == NULL) {
         free_drape_trimesh ();
         return -1;
@@ -1745,8 +1804,8 @@ int SWCalc::sw_ConvertNodeTrimesh (
  * Allocate space for the structure lists needed by
  * the csw library function and fill in the space.
  */
-    node_tris = (NOdeTriangleStruct *)calloc (
-        1, ntri * sizeof(NOdeTriangleStruct)
+    node_tris = (NOdeTriangleStruct *)csw_Calloc
+        (ntri * sizeof(NOdeTriangleStruct)
     );
     if (node_tris == NULL) {
         return -1;
@@ -1758,8 +1817,8 @@ int SWCalc::sw_ConvertNodeTrimesh (
         node_tris[i].node3 = n3tri[i];
     }
 
-    nodes = (NOdeStruct *)calloc (
-        1, nnodes * sizeof (NOdeStruct)
+    nodes = (NOdeStruct *)csw_Calloc
+        (nnodes * sizeof (NOdeStruct)
     );
     if (nodes == NULL) {
         csw_Free (node_tris);
@@ -1984,20 +2043,20 @@ int SWCalc::sw_WriteTriMesh (
 /*
  * Allocate space for nodes, edges and triangles.
  */
-    nodes = (NOdeStruct *)calloc (
-        1, nnode * sizeof(NOdeStruct));
+    nodes = (NOdeStruct *)csw_Calloc
+        (nnode * sizeof(NOdeStruct));
     if (nodes == NULL) {
         return -1;
     }
-    edges = (EDgeStruct *)calloc (
-        1, nedge * sizeof(EDgeStruct));
+    edges = (EDgeStruct *)csw_Calloc
+        (nedge * sizeof(EDgeStruct));
     if (edges == NULL) {
         csw_Free (nodes);
         return -1;
     }
 
-    triangles = (TRiangleStruct *)calloc (
-        1, ntri * sizeof(TRiangleStruct));
+    triangles = (TRiangleStruct *)csw_Calloc
+        (ntri * sizeof(TRiangleStruct));
     if (triangles == NULL) {
         csw_Free (edges);
         csw_Free (nodes);
@@ -2101,15 +2160,15 @@ long SWCalc::sw_AppendTriMesh (
     if (nodes == NULL) {
         return -1;
     }
-    edges = (EDgeStruct *)calloc (
-        1, nedge * sizeof(EDgeStruct));
+    edges = (EDgeStruct *)csw_Calloc
+        (nedge * sizeof(EDgeStruct));
     if (edges == NULL) {
         csw_Free (nodes);
         return -1;
     }
 
-    triangles = (TRiangleStruct *)calloc (
-        1, ntri * sizeof(TRiangleStruct));
+    triangles = (TRiangleStruct *)csw_Calloc
+        (ntri * sizeof(TRiangleStruct));
     if (triangles == NULL) {
         csw_Free (edges);
         csw_Free (nodes);
@@ -2549,16 +2608,10 @@ int SWCalc::sw_GridToTriMesh (
         return -1;
     }
 
-int nbad = 0;
-
     ntot = ncol * nrow;
     for (i=0; i<ntot; i++) {
         zt = gdata[i];
         if (zt < -1.e20  ||  zt > 1.e20) {
-if (nbad < 10) {
-printf ("bad node in grid to trimesh\n");
-nbad++;
-}
             zt = 1.e30;
         }
         grid[i] = (CSW_F)zt;
@@ -2888,7 +2941,7 @@ int SWCalc::sw_CalcTriMeshLocally
         }
         else {
             istat = grdapi_ptr->grd_RecommendedSizeFromDouble
-                (xpg, ypg, npg,
+                (xpg, ypg, npg, 0,
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
@@ -2919,7 +2972,7 @@ int SWCalc::sw_CalcTriMeshLocally
         if (ncol < 2  ||  nrow < 2  ||
             gxmin >= gxmax  ||  gymin >= gymax) {
             istat = grdapi_ptr->grd_RecommendedSizeFromDouble
-                (xpg, ypg, npg,
+                (xpg, ypg, npg, 0,
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
@@ -3109,7 +3162,7 @@ int SWCalc::sw_CalcTriMeshLocally
             yline2 = (double *)csw_Malloc (ntot * sizeof(double));
             zline2 = (double *)csw_Malloc (ntot * sizeof(double));
             npline2 = (int *)csw_Malloc ((nline2 + 1) * sizeof(int));
-            linetypes2 = (int *)calloc (1, (nline2 + 1) * sizeof(int));
+            linetypes2 = (int *)csw_Calloc ((nline2 + 1) * sizeof(int));
             if (xline2 == NULL  ||
                 yline2 == NULL  ||
                 zline2 == NULL  ||
@@ -3573,19 +3626,19 @@ int SWCalc::sw_CalcTriMeshOutline (
 /*
  * Allocate space for a trimesh representation (nodes, edges, triangles)
  */
-    nodes = (NOdeStruct *)calloc
-                 (1, num_node * sizeof(NOdeStruct));
+    nodes = (NOdeStruct *)csw_Calloc
+                 (num_node * sizeof(NOdeStruct));
     if (nodes == NULL) {
         return -1;
     }
-    edges = (EDgeStruct *)calloc
-                 (1, num_edge * sizeof(EDgeStruct));
+    edges = (EDgeStruct *)csw_Calloc
+                 (num_edge * sizeof(EDgeStruct));
     if (edges == NULL) {
         csw_Free (nodes);
         return -1;
     }
-    triangles = (TRiangleStruct *)calloc
-                     (1, num_tri * sizeof(TRiangleStruct));
+    triangles = (TRiangleStruct *)csw_Calloc
+                     (num_tri * sizeof(TRiangleStruct));
     if (triangles == NULL) {
         csw_Free (nodes);
         csw_Free (edges);
@@ -3791,7 +3844,7 @@ int SWCalc::sw_CalcExactTriMesh (
         assert (0);
     }
 
-    line_exact_flags = (int *)calloc (1, nline * sizeof(int));
+    line_exact_flags = (int *)csw_Calloc (nline * sizeof(int));
     if (line_exact_flags == NULL) {
         return -1;
     }
@@ -3885,7 +3938,7 @@ int SWCalc::sw_CalcExactTriMesh (
         }
         else {
             istat = grdapi_ptr->grd_RecommendedSizeFromDouble
-                (xpg, ypg, npg,
+                (xpg, ypg, npg, 0,
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
@@ -3932,7 +3985,7 @@ int SWCalc::sw_CalcExactTriMesh (
         if (ncol < 2  ||  nrow < 2  ||
             gxmin >= gxmax  ||  gymin >= gymax) {
             istat = grdapi_ptr->grd_RecommendedSizeFromDouble
-                (xpg, ypg, npg,
+                (xpg, ypg, npg, 0,
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
@@ -4108,7 +4161,7 @@ int SWCalc::sw_CalcExactTriMesh (
             yline2 = (double *)csw_Malloc (ntot * sizeof(double));
             zline2 = (double *)csw_Malloc (ntot * sizeof(double));
             npline2 = (int *)csw_Malloc ((nline2 + 1) * sizeof(int));
-            linetypes2 = (int *)calloc (1, (nline2 + 1) * sizeof(int));
+            linetypes2 = (int *)csw_Calloc ((nline2 + 1) * sizeof(int));
             if (xline2 == NULL  ||
                 yline2 == NULL  ||
                 zline2 == NULL  ||
@@ -4573,7 +4626,7 @@ int SWCalc::sw_CalcExactTriMeshLocally (
         }
         else {
             istat = grdapi_ptr->grd_RecommendedSizeFromDouble
-                (xpg, ypg, npg,
+                (xpg, ypg, npg, 0,
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
@@ -4613,7 +4666,7 @@ int SWCalc::sw_CalcExactTriMeshLocally (
         if (ncol < 2  ||  nrow < 2  ||
             gxmin >= gxmax  ||  gymin >= gymax) {
             istat = grdapi_ptr->grd_RecommendedSizeFromDouble
-                (xpg, ypg, npg,
+                (xpg, ypg, npg, 0,
                  &gxmin, &gymin, &gxmax, &gymax,
                  &ncol, &nrow);
             if (istat == -1) {
@@ -4786,7 +4839,7 @@ int SWCalc::sw_CalcExactTriMeshLocally (
             yline2 = (double *)csw_Malloc (ntot * sizeof(double));
             zline2 = (double *)csw_Malloc (ntot * sizeof(double));
             npline2 = (int *)csw_Malloc ((nline2 + 1) * sizeof(int));
-            linetypes2 = (int *)calloc (1, (nline2 + 1) * sizeof(int));
+            linetypes2 = (int *)csw_Calloc ((nline2 + 1) * sizeof(int));
             if (xline2 == NULL  ||
                 yline2 == NULL  ||
                 zline2 == NULL  ||
@@ -5089,7 +5142,7 @@ int SWCalc::ResampleConstraintLines (
 /*
  * Allocate space for temporary storage of each resampled line.
  */
-    tline = (_templine *)calloc (1, nline * sizeof(_templine));
+    tline = (_templine *)csw_Calloc (nline * sizeof(_templine));
     if (tline == NULL) {
         return -1;
     }
@@ -5504,7 +5557,7 @@ int SWCalc::UncrossConstraints (
  * Allocate the icross array, which marks
  * which lines should be removed due to crossing.
  */
-    icross = (int *)calloc (1, nline * sizeof(int));
+    icross = (int *)csw_Calloc (nline * sizeof(int));
     if (icross == NULL) {
         return -1;
     }

@@ -8,7 +8,7 @@
  *
  *  Unique pointers do not have an "is a" relationship to the
  *  undwerlying raw pointer.  The unique ppointer has a "has a"
- * relationship to the raw pointer.
+ *  relationship to the raw pointer.
  */
 
 #include <iostream>
@@ -109,7 +109,7 @@ class RLTest
         return *this;
       }
 
-  // destgructor
+  // destructor
 
       virtual ~RLTest ()
       {

@@ -43,7 +43,7 @@ public final class LithFill {
     "Evaporite",
     "Conglomerate",
     "Igneous",
-	"Salt"
+    "Salt"
   };
 
   private static final Color Sand = new Color(220, 220,   0); // Sandstone -- Dark Yellow
@@ -68,16 +68,47 @@ public final class LithFill {
     Salt
   };
 
+
+
+
+// The "resources" are generally files that stay constant during the
+// life time of the java application.  In the case of the CSW stuff,
+// there are some gif files that fit this "resource" definition.  The
+// get Resource call basically returns the file name of the gif file.
+
+// It seems that resources can be retrieved either by the class of the class 
+// loader.  In my experimenting, if the resource (in this case the gif file)
+// is in the package directory, then getting the resource using just the
+// filename works with the class, but not with the class loader.
+
+// For a gradle build, if the gif files were put into the src/main/resource
+// directory, then the classLoader version would work and the class version
+// would not, at least in my experimentation.
+
+/*
   public static final URL[] lithologyURL = {
-    FillImages.class.getResource(FillImages.SANDSTONE),
-    FillImages.class.getResource(FillImages.SILTSTONE),
-    FillImages.class.getResource(FillImages.SHALE),
-    FillImages.class.getResource(FillImages.LIMESTONE),
-    FillImages.class.getResource(FillImages.DOLOMITE),
-    FillImages.class.getResource(FillImages.EVAPORITE),
-    FillImages.class.getResource(FillImages.CONGLOMERATE),
-    FillImages.class.getResource(FillImages.IGNEOUS),
-    FillImages.class.getResource(FillImages.SALT)
+      FillImages.class.getClassLoader().getResource(FillImages.SANDSTONE),
+      FillImages.class.getClassLoader().getResource(FillImages.SILTSTONE),
+      FillImages.class.getClassLoader().getResource(FillImages.SHALE),
+      FillImages.class.getClassLoader().getResource(FillImages.LIMESTONE),
+      FillImages.class.getClassLoader().getResource(FillImages.DOLOMITE),
+      FillImages.class.getClassLoader().getResource(FillImages.EVAPORITE),
+      FillImages.class.getClassLoader().getResource(FillImages.CONGLOMERATE),
+      FillImages.class.getClassLoader().getResource(FillImages.IGNEOUS),
+      FillImages.class.getClassLoader().getResource(FillImages.SALT)
+  };
+*/
+
+  public static final URL[] lithologyURL = {
+      FillImages.class.getResource(FillImages.SANDSTONE),
+      FillImages.class.getResource(FillImages.SILTSTONE),
+      FillImages.class.getResource(FillImages.SHALE),
+      FillImages.class.getResource(FillImages.LIMESTONE),
+      FillImages.class.getResource(FillImages.DOLOMITE),
+      FillImages.class.getResource(FillImages.EVAPORITE),
+      FillImages.class.getResource(FillImages.CONGLOMERATE),
+      FillImages.class.getResource(FillImages.IGNEOUS),
+      FillImages.class.getResource(FillImages.SALT)
   };
 
   public static int getTypeFromName(String name) {
@@ -161,7 +192,7 @@ public final class LithFill {
     evapBI,
     congBI,
     ignsBI,
-	saltBI
+    saltBI
   };
 
   public LithFill() {

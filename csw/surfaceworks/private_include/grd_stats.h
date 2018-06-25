@@ -75,8 +75,11 @@ class CSWGrdStats
                                  CSW_F *strike, int *power, CSW_F *aratio,
                                  int thickflag);
 
-  private:
+    int    grd_nugget_effect 
+              (CSW_F *xin, CSW_F *yin, CSW_F *zin, int nin,
+               CSW_F *global_delta, CSW_F *av_local_delta);
 
+  private:
 
 /*
   Old static file functions become private class methods.

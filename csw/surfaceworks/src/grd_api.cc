@@ -37,6 +37,7 @@
 #include "csw/utils/private_include/ply_graph.h"
 
 #include "csw/surfaceworks/include/grid_api.h"
+#include "csw/surfaceworks/private_include/grd_stats.h"
 
 
 
@@ -728,7 +729,7 @@ int CSWGrdAPI::grd_RecommendedSize (CSW_F *x, CSW_F *y, int npts,
         return -1;
     }
 
-    istat = grd_utils_obj.grd_recommended_size (x, y, npts,
+    istat = grd_utils_obj.grd_recommended_size (x, y, npts, 0,
                                   x1, y1, x2, y2,
                                   ncol, nrow);
     return istat;
@@ -805,6 +806,16 @@ int CSWGrdAPI::grd_SetHardNullValues (CSW_F *grid, char *mask, int ncol, int nro
 }  /*  end of function grd_SetHardNullValues  */
 
 
+
+int CSWGrdAPI::grd_EdgeNuggetEffect (CSW_F *x, CSW_F *y, CSW_F *z, int npts,
+                                     CSW_F *global_zdelta, CSW_F *local_zdelta_avg)
+{
+    CSWGrdStats  gst;
+
+    int  istat = gst.grd_nugget_effect (x, y, z, npts,
+                                        global_zdelta, local_zdelta_avg);
+    return istat;
+}
 
 
 
@@ -1676,7 +1687,7 @@ int CSWGrdAPI::grd_CalcGridFromDouble
 
   function name: grd_RecommendedSizeFromDouble              (int)
 
-  call sequence: grd_RecommendedSizeFromDouble (x, y, npts,
+  call sequence: grd_RecommendedSizeFromDouble (x, y, npts, noisy_edge,
                                       x1, y1, x2, y2,
                                       ncol, nrow)
 
@@ -1711,6 +1722,7 @@ int CSWGrdAPI::grd_CalcGridFromDouble
     x        r    double*        Array of x coordinates.
     y        r    double*        Array of y coordinates.
     npts     r    int            Number of points in x,y.
+    noisy_edge  r int            ero if edge data seem smooth, 1 if noisy
     x1       r/w  double*        Minimum x value
     y1       r/w  double*        Minimum y value
     x2       r/w  double*        Maximum x value
@@ -1721,7 +1733,7 @@ int CSWGrdAPI::grd_CalcGridFromDouble
 */
 
 int CSWGrdAPI::grd_RecommendedSizeFromDouble
-                        (double *x, double *y, int npts,
+                        (double *x, double *y, int npts, int noisy_edge,
                          double *x1, double *y1, double *x2, double *y2,
                          int *ncol, int *nrow)
 {
@@ -1732,7 +1744,6 @@ int CSWGrdAPI::grd_RecommendedSizeFromDouble
 
     auto fscope = [&]()
     {
-        csw_Free (xt);
     };
     CSWScopeGuard func_scope_guard (fscope);
 
@@ -1749,12 +1760,12 @@ int CSWGrdAPI::grd_RecommendedSizeFromDouble
     allocate CSW_F work space.
 */
 MSL
-    xt = (CSW_F *)csw_Malloc (npts * 2 * sizeof(CSW_F));
+    xt = x;
     if (!xt) {
         grd_utils_obj.grd_set_err (1);
         return -1;
     }
-    yt = xt + npts;
+    yt = y;
 
 /*
     subtract minimum x and y values
@@ -1775,10 +1786,6 @@ MSL
 /*
     convert to CSW_F values
 */
-    for (i=0; i<npts; i++) {
-        xt[i] = (CSW_F)x[i];
-        yt[i] = (CSW_F)y[i];
-    }
     xt1 = (CSW_F)(*x1 - xmin);
     yt1 = (CSW_F)(*y1 - ymin);
     xt2 = (CSW_F)(*x2 - xmin);
@@ -1794,7 +1801,7 @@ MSL
         yt2 = -1.e30f;
     }
 
-    istat = grd_utils_obj.grd_recommended_size (xt, yt, npts,
+    istat = grd_utils_obj.grd_recommended_size (xt, yt, npts, noisy_edge,
                                   &xt1, &yt1, &xt2, &yt2,
                                   ncol, nrow);
 

@@ -1,4 +1,8 @@
-
+/*
+ * The loops traversing the stl lists are intentionally done using
+ * pre c++11 syntax.  Range based loops in c++11 are a cleaner
+ * (at least cleaner looking) way to do these.
+ */
 #include <iostream>
 #include <list>
 
@@ -29,7 +33,7 @@ int main() {
 
     std::list<int>::iterator it2 = numbers.begin();
 
-// The numbers.erase line will implicitly increment thr it2
+// The numbers.erase line will implicitly increment the it2
 // iterator when returning its result into it2.  When no 
 // erase is done, it2 needs to be explicitly incremented.
     while (it2 != numbers.end()) {

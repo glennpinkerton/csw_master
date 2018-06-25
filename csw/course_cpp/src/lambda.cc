@@ -9,7 +9,7 @@
  * a lambda.  The parentheses "()" are used very much like the
  * () in a function definition.  The optional list of parameters
  * used by the lambda are listed here.  The curly braces "{}"
- * have the body of the lambda, very much like the body od a
+ * have the body of the lambda, very much like the body of a
  * function.  
  */
 
@@ -67,7 +67,7 @@ void LambdaTest6 (std::function<void()> f) {
 
 
 /*
- * Example of this in capture expression.  This means that all the 
+ * Example of "this" in capture expression.  This means that all the 
  * object variables are captured by reference for use by the lambda.
  */
 class LC {
@@ -84,7 +84,7 @@ class LC {
     {
         double  dv1 = 3.579;
       // this in the capture expression.  Do not mix = for
-      // capture by value with this.  The mix will not compile.
+      // capture by value with "this".  The mix will not compile.
       // It will at least generate a warning.  I (Glenn) think
       // I will always just use the "&, this" expression when I 
       // want to capture the object variables.
