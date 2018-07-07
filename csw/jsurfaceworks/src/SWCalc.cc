@@ -374,10 +374,12 @@ int SWCalc::sw_CalcTriMesh (
                 ncol /= 2;
                 nrow /= 2;
             }
+/*
             else {
                 ncol /= 2;
                 nrow /= 2;
             }
+*/
         }
 
         if (grid_geometry != NULL) {
@@ -407,10 +409,12 @@ int SWCalc::sw_CalcTriMesh (
                 ncol /= 4;
                 nrow /= 4;
             }
+/*
             else {
                 ncol /= 2;
                 nrow /= 2;
             }
+*/
             while (ncol * nrow > MAX_DEFAULT_NODES) {
                 ncol *= 4;
                 nrow *= 4;
@@ -1196,6 +1200,7 @@ int SWCalc::sw_CalcGrid (
             nrow /= 10;
         }
 
+/*
 if (noisy_edge == 0) {
   CSW_F  ddx = (gxmax - gxmin) / 2.0;
   CSW_F  ddy = (gymax - gymin) / 2.0;
@@ -1206,6 +1211,7 @@ if (noisy_edge == 0) {
   ncol += ncol / 2;
   nrow += nrow / 2;
 }
+*/
 
     }
 
@@ -1228,6 +1234,9 @@ if (noisy_edge == 0) {
 
     if (ncol < 2) ncol = 2;
     if (nrow < 2) nrow = 2;
+
+printf ("\nncol = %d   nrow = %d\n", ncol, nrow);
+fflush (stdout);
 
 /*
  * Allocate space for the grid, mask and error array.

@@ -1248,7 +1248,7 @@ int CSWGrdCtog::InterpolateBetweenCrossings (void)
     int           *idist = NULL;
     CSW_F         *data = NULL;
     double        x1, y1, z1, x2, y2, z2, xt, yt, zt,
-                  zhoriz, zvert, whoriz, wvert,
+                  zhoriz = 1.0, zvert = 1.0, whoriz = 1.0, wvert = 1.0,
                   dx, dy, dz, xpct, ypct, tiny;
     _CRossing     *crptr = NULL;
 
