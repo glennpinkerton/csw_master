@@ -415,22 +415,27 @@ int CSWGrdUtils::grd_recommended_size
         ngrid = 9 * ntot;
     }
     else if (ntot < 20000) {
-        ngrid = 7 * ntot;
+        ngrid = 8 * ntot;
     }
     else if (ntot < 100000) {
-        ngrid = 5 * ntot;
+        ngrid = 7 * ntot;
     }
     else if (ntot < 300000) {
-        ngrid = 3 * ntot;
+        ngrid = 6 * ntot;
+    }
+    else if (ntot < 1000000) {
+        ngrid = 4 * ntot;
     }
     else {
-        ngrid = 1 * ntot;
+        ngrid = 2 * ntot;
     }
 
     ngrid = (int)(ngrid * datapct);
 
-    if (ngrid > 1000000) {
-        ngrid = 1000000;
+printf ("ntot = %d  datapct = %lf  ngrid = %d\n", ntot, datapct, ngrid);
+
+    if (ngrid > 4000000) {
+        ngrid = 4000000;
     }
 
 /*
@@ -649,7 +654,7 @@ MSL
  *  mitigates the problem.
  */
     n = 0;
-    while (n < 20  &&  nx * ny > 1000000) {
+    while (n < 20  &&  nx * ny > 4000000) {
         nx *= 4;
         nx /= 5;
         ny *= 4;

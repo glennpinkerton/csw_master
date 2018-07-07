@@ -92,7 +92,7 @@ class TableData {
 
 //
 // Create polylines with somewhat random shapes and sizes.
-// These re written to a binary file which hopefully can
+// These are written to a binary file which hopefully can
 // be used later to load into and test the glp data base
 // stuff.
 

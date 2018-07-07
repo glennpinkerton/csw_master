@@ -693,19 +693,20 @@ int tri_tri_intersect_with_isectline(
   double isectpt1[3],
   double isectpt2[3]
 ) {
-  double E1[3],E2[3];
-  double N1[3],N2[3],d1,d2;
+  double E1[3] {},E2[3] {};
+  double N1[3] {},N2[3] {},d1,d2;
   double du0,du1,du2,dv0,dv1,dv2;
-  double D[3];
-  double isect1[2], isect2[2];
-  double isectpointA1[3],isectpointA2[3];
-  double isectpointB1[3],isectpointB2[3];
+  double D[3] {};
+  double isect1[2] {}, isect2[2] {};
+  double isectpointA1[3] {},
+         isectpointA2[3] {};
+  double isectpointB1[3] {},
+         isectpointB2[3] {};
   double du0du1,du0du2,dv0dv1,dv0dv2;
   short index;
   double vp0,vp1,vp2;
   double up0,up1,up2;
   double b,c,max;
-//  double tmp,diff[3];
   int smallest1,smallest2;
 
   /* compute plane equation of triangle(V0,V1,V2) */

@@ -711,6 +711,10 @@ class Grid10Frame extends JDLFrame
 
         dtm = (double)(t2 - t1) / 1000.0;
 
+        System.out.println ("Elapsed time: " + dtm);
+        System.out.println ();
+        System.out.flush ();
+
         dl.beginPlot ("grid test" + np,
                       0.0, 0.0, 20.0, 20.0);
         dl.setColor (5, 5, 5);

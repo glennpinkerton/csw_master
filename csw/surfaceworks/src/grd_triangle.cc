@@ -4195,6 +4195,10 @@ int CSWGrdTriangle::AddTriangle (int e1, int e2, int e3, int flag)
     TRiangleStruct      *tptr;
     int                 istat;
 
+    if (e1 < 0  ||  e2 < 0  ||  e3 < 0) {
+        return -1;
+    }
+
     if (NumTriangles >= MaxTriangles) {
         istat = ExpandMem2();
         if (istat == -1) {
@@ -30422,7 +30426,7 @@ int CSWGrdTriangle::CreateNewTriangleForConstraint (int node1, int node2)
     int            list1[MAXLIST], list2[MAXLIST];
     int            nlist1, nlist2, nodecommon;
     int            *redge, nedge, maxedge;
-    int            i, j, n1, n2, ne1, ne2, ncommon, enew, tnew;
+    int            i, j, n1, n2, ne1 = -1, ne2 = -1, ncommon, enew, tnew;
     EDgeStruct     *ep1, *ep2;
     NOdeStruct     *np1, *np2;
     RAwPointStruct *rp1, *rp2;

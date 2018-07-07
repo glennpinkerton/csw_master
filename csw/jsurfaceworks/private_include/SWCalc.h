@@ -20,7 +20,7 @@
 #include <csw/surfaceworks/private_include/Vert.h>
 #include <csw/utils/private_include/ply_utils.h>
 
-#define MAX_DEFAULT_NODES    1000000
+#define MAX_DEFAULT_NODES    4000000
 
 typedef struct {
     int    ncol,
