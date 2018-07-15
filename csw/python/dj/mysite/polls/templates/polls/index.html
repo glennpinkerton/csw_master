@@ -1,0 +1,37 @@
+
+{# The latest_question_list is a list of Question objects #}
+{# passed to this html template.  The python looking lines #}
+{# in this file can be treated as just that.  For example,   #}
+{# the "for question ..." statement fills in question objects   #}
+{# and these objects members (id, question_text) are put into   #}
+{# an html link <li> for display.   #}
+
+{# The url for the detail link is not hard coded.  It uses the url #}
+{# keyword and the polls: namespace to generate the correct full url #}
+{# The url tag triggers a lookup in the polls.url.py file for a url pattern #}
+{# with name='detail'.  The path associated with the 'detail' name is used #}
+{# as the base url for the link. #}
+
+{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+        <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+
+
+{# The stuff below is an example of using a static image file in an html template  #}
+{# You must put the load static line in or it will not work.  #}
+{# The {% static must precede the quoted path and the quoted path should not  #}
+{# begin with a /.  Don't know if this works on windows.  If not, I need to  #}
+{# do more homework.  #}
+{#   #}
+{#   #}
+{#   #}
+
+{% load static %}
+
+<img src="{% static "polls/test.png" %}" alt="My image"/>

@@ -1,3 +1,5 @@
 /gradlew
 /gradle
 /.gradle
+/build
+/gradlew.bat

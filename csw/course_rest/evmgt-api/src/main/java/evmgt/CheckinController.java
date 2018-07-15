@@ -36,7 +36,7 @@ public class CheckinController {
     
 
 // The tutorial is not correct in how it uses ResponseEntity.  The respnse entity
-// is a generic class and needs a type in the <>.  Also, the ResponceEntity
+// is a generic class and needs a type in the <>.  Also, the ResponseEntity
 // contains a status code, a body and headers.  The string from the tutorial
 // is properly in the body of the response entity.
 

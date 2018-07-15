@@ -432,7 +432,7 @@ int CSWGrdUtils::grd_recommended_size
 
     ngrid = (int)(ngrid * datapct);
 
-printf ("ntot = %d  datapct = %lf  ngrid = %d\n", ntot, datapct, ngrid);
+//printf ("ntot = %d  datapct = %lf  ngrid = %d\n", ntot, datapct, ngrid);
 
     if (ngrid > 4000000) {
         ngrid = 4000000;

@@ -1,0 +1,29 @@
+
+{#  Use the main_template.html base template #}
+{#  This base template defines block title and block comment #}
+{#  The data for these two blocks are filled in here #}
+
+{% extends "polls/main_template.html" %}
+{% block title %}My Hello Page For Polls Site{% endblock %}
+{% block content %}
+
+Extend base template example  <p>Today is {{today}}</p>
+We are
+{% if today.day == 1 %}
+
+the first day of month.
+{% elif today.day == 30 %}
+
+the last day of month.
+{% else %}
+
+{{today.day}}.
+{%endif%}
+
+<p>
+   {% for day in days_of_week %}
+   {{day}}
+</p>
+
+{% endfor %}
+{% endblock %}

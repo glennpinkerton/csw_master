@@ -1235,8 +1235,8 @@ if (noisy_edge == 0) {
     if (ncol < 2) ncol = 2;
     if (nrow < 2) nrow = 2;
 
-printf ("\nncol = %d   nrow = %d\n", ncol, nrow);
-fflush (stdout);
+//printf ("\nncol = %d   nrow = %d\n", ncol, nrow);
+//fflush (stdout);
 
 /*
  * Allocate space for the grid, mask and error array.

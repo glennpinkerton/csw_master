@@ -337,7 +337,7 @@ class LocalDraw {
 
             /*
              * If this image has vector primitives bundled with it,
-             * draw thoe vector primitives now.
+             * draw the vector primitives now.
              */
                 if (native_image.id >= 0  &&  native_image.hasLines) {
                     DrawVectorsOverImage (native_image.id, g2d_fg, g2d_bg);

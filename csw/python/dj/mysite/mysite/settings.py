@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-#    'polls.apps.PollsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'polls',
+#    'polls.apps.PollsConfig', # suggested in one tutorial??
 ]
 
 MIDDLEWARE = [
@@ -84,10 +84,13 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': 'Dog4-J3ssi3',
         'HOST': 'localhost',
-        'PORT': '3306'
+        'PORT': '3306',
+# seems that options is a hash map
+        'OPTIONS': {'use_pure': 'True'},
     }
 }
 
+#use_pure=True` in DATABASES['default']['OPTIONS']. 
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -121,8 +124,20 @@ USE_L10N = True
 
 USE_TZ = True
 
+# The STATIC stuff below is needed to show my map images
+# in the django site. 
 
+# The three STATIC variables below need to all be defined.
 # Static files (CSS, JavaScript, Images)
+
+# The link below is not exactly correct, but it is really close
+
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
