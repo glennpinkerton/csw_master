@@ -24,6 +24,10 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -1224,6 +1228,7 @@ class JDisplayListBase extends DLConst {
    */
     BufferedImage    backgroundImage = null;
     BufferedImage    foregroundImage = null;
+//    BufferedImage    pngImage = null;
 
 /*--------------------------------------------------------------------------*/
 
@@ -1281,8 +1286,7 @@ class JDisplayListBase extends DLConst {
     private int          foregroundFlag = 1;
 
   /**
-   *
-   * Draw the current display list to the specifed graphics2d object.
+   * Draw the current display list to the specified graphics2d object.
    * This is called from the JDisplayListPanel class only.
    */
     int drawToDevice (Graphics2D g2d,
@@ -1330,6 +1334,9 @@ class JDisplayListBase extends DLConst {
             foregroundFlag = localDrawFunc ();
             needsNativeSelectRedraw = 0;
         }
+
+//        pngImage =
+//          new BufferedImage (width, height, BufferedImage.TYPE_INT_ARGB);
 
         if (jdlEditor != null) {
             jdlEditor.draw ();
@@ -1777,9 +1784,12 @@ class JDisplayListBase extends DLConst {
         int                      i, nshape;
         NativePrim.DirectShape   direct_shape;
         Color                    color;
+        Graphics2D               g2d_png;
 
         g2d.setColor (Color.red);
         g2d.fill3DRect (0, 0, 50, 50, true);
+
+//        g2d_png = pngImage.createGraphics ();
 
     /*
      * Draw the opaque background image.
@@ -1791,6 +1801,13 @@ class JDisplayListBase extends DLConst {
                 yorigin,
                 null
             );
+/*
+            g2d_png.drawImage (
+                backgroundImage,
+                0, 0,
+                null
+            );
+*/
         }
 
     /*
@@ -1805,8 +1822,24 @@ class JDisplayListBase extends DLConst {
                     yorigin,
                     null
                 );
+/*
+                g2d_png.drawImage (
+                    foregroundImage,
+                    0, 0,
+                    null
+                );
+*/
             }
         }
+
+/*
+        try {
+          ImageIO.write
+            (pngImage, "png", new File ("/home/gpinkerton/images/test.png"));
+        }
+        catch (Throwable e) {
+        }
+*/
 
     /*
      * Draw any rubber band graphics on top of everything else.

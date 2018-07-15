@@ -33,7 +33,7 @@ public class EventKickOffController {
     
 
 // The tutorial is not correct in how it uses ResponseEntity.  The respnse entity
-// is a generic class and needs a type in the <>.  Also, the ResponceEntity
+// is a generic class and needs a type in the <>.  Also, the ResponseEntity
 // contains a status code, a body and headers.  The string from the tutorial
 // is properly in the body of the response entity.
 
@@ -58,35 +58,13 @@ public class EventKickOffController {
   //      HttpHeaders headers = new HttpHeaders();
   //      headers.add("Responded", "EventKickOffController");
 
-        String  str = ev.getName() + " started with KickOffController";
+        //String  str = ev.getName() + " started with KickOffController";
+        String  str = ev.toString() + " started with KickOffController";
 
   // Create a ResponseEntity<String> and return it.
 
-        //return ResponseEntity.accepted().headers(headers).body(str);
         return ResponseEntity.ok(str);
         
     }
-
-/*
-    @GetMapping(path="/add") // Map ONLY GET Requests
-    public @ResponseBody String addNewUser (@RequestParam String name
-            , @RequestParam String email) {
-        // @ResponseBody means the returned String is the response, not a view name
-        // @RequestParam means it is a parameter from the GET or POST request
-        
-        User n = new User();
-        n.setName(name);
-        n.setEmail(email);
-        userRepository.save(n);
-        return "Saved in user table\n";
-    }
-    
-    @GetMapping(path="/all")
-    public @ResponseBody Iterable<User> getAllUsers() {
-        // This returns a JSON or XML with the users
-        return userRepository.findAll();
-    }
-
-*/
 
 }

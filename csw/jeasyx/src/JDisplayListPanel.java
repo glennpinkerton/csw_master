@@ -303,20 +303,6 @@ public class JDisplayListPanel extends JPanel
 
         g2d = (Graphics2D)g;
 
-/*
-        x = dlist.getDeviceViewportXorigin ();
-        y = dlist.getDeviceViewportYorigin ();
-        width = dlist.getDeviceViewportWidth ();
-        height = dlist.getDeviceViewportHeight ();
-
-        if (x < 0  ||  y < 0  ||  width < 0  ||  height < 0) {
-            x = 0;
-            y = 0;
-            width = getWidth ();
-            height = getHeight ();
-        }
-*/
-
         x = 0;
         y = 0;
         width = getWidth ();

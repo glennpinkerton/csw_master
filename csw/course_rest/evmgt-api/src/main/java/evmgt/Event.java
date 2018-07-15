@@ -25,6 +25,7 @@ public class Event extends BaseEntity {
     private String description;
     private ZonedDateTime start_time;
     private ZonedDateTime end_time;
+    private byte[] image_bytes;
 
 // The zone member was originally ycalled zone_id or zoneId and 
 // the jpa shat itself unpredictably.  Probably best not to use
@@ -77,6 +78,13 @@ public class Event extends BaseEntity {
     public void setZone(ZoneId zone) {
         this.zone = zone;
     }
+    public byte[] getImageBytes () {
+        return image_bytes;
+    }
+    public void setImageBytes (byte[] image_bytes) {
+        this.image_bytes = image_bytes;
+    }
+
     public Boolean getStarted() {
         return started;
     }

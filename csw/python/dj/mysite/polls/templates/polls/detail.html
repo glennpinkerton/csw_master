@@ -1,0 +1,13 @@
+
+{# The "detail" about a question is shown via this template #}
+{# The <p> and </p> tags specify a paragraph left justified on the page  #}
+{# Things in the paragraph that are not inside {{}} brackets are literal text  #}
+{# The question object is passed with the render call in the detail view  #}
+{# The template renderer uses the id and question_text mwmbers from the passed  #}
+{# in object to make the "raw" html #}
+
+{% if question %}
+    <p>Question ID: {{question.id}} ,  {{question.question_text}}</p>
+{% else %}
+    <p>Question detail not available.</p>
+{% endif %}

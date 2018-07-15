@@ -1,4 +1,8 @@
-import datetime
+
+#  It seems that django 2 and python 3 like this sort
+#  of import for the datetime stuff.
+
+from datetime import datetime
 
 from django.db import models
 from django.utils import timezone

@@ -711,9 +711,9 @@ class Grid10Frame extends JDLFrame
 
         dtm = (double)(t2 - t1) / 1000.0;
 
-        System.out.println ("Elapsed time: " + dtm);
-        System.out.println ();
-        System.out.flush ();
+//        System.out.println ("Elapsed time: " + dtm);
+//        System.out.println ();
+//        System.out.flush ();
 
         dl.beginPlot ("grid test" + np,
                       0.0, 0.0, 20.0, 20.0);
@@ -770,11 +770,32 @@ class Grid10Frame extends JDLFrame
         double    x4, y4, z4;
         double    x5, y5, z5;
         double    x6, y6, z6;
+        double    x7, y7, z7;
+        double    x8, y8, z8;
+        double    x9, y9, z9;
+        double    x10, y10, z10;
+
+        int       nsr = 10;
+        double    xsr[] = new double[nsr];
+        double    ysr[] = new double[nsr];
+        double    zsr[] = new double[nsr];
+
+        double    z1mag;
 
         double    zz = (xw + yh) / 8.0;
 
         long  ctw = System.currentTimeMillis ();
         Random  random = new Random(ctw);
+
+        z1mag = random.nextDouble () * 16.0 - 8.0;
+
+        for (int i=0; i<nsr; i++) {
+            xsr[i] = xw * random.nextDouble ();
+            ysr[i] = yh * random.nextDouble ();
+            z1 = .25 * (xw + yh) * random.nextDouble();
+            if (z1 < zz / 4) z1 = zz / 4;
+            zsr[i] = z1;
+        }
 
         x1 = xw * random.nextDouble () - 1.5 * xw;
         y1 = yh * random.nextDouble () - 1.5 * yh;
@@ -801,10 +822,30 @@ class Grid10Frame extends JDLFrame
         z5 = (xw + yh) / 8.0 * random.nextDouble();
         if (z5 < zz) z5 = zz;
 
-        x6 = xw * random.nextDouble () + xw;
-        y6 = yh * random.nextDouble () + yh;
+        x6 = xw * random.nextDouble () - xw;
+        y6 = yh * random.nextDouble () - yh;
         z6 = (xw + yh) * random.nextDouble();
         if (z6 < zz) z6 = zz;
+
+        x7 = xw * random.nextDouble () - xw;
+        y7 = yh * random.nextDouble () + yh;
+        z7 = (xw + yh) * random.nextDouble();
+        if (z7 < zz) z7 = zz;
+
+        x8 = xw * random.nextDouble () + xw;
+        y8 = yh * random.nextDouble () + yh;
+        z8 = (xw + yh) * random.nextDouble();
+        if (z8 < zz) z8 = zz;
+
+        x9 = xw * random.nextDouble () + xw;
+        y9 = yh * random.nextDouble () - yh;
+        z9 = (xw + yh) * random.nextDouble();
+        if (z9 < zz) z9 = zz;
+
+        x10 = xw * random.nextDouble ();
+        y10 = yh * random.nextDouble ();
+        z10 = .5 * (xw + yh) * random.nextDouble();
+        if (z10 < zz / 2) z10 = zz / 2;
 
         double   xt, yt, zt, dx, dy, dz, dd, zval;
         double   zvmin = 1.e30;
@@ -822,7 +863,17 @@ class Grid10Frame extends JDLFrame
             dy *= dy;
             dz = z1 * z1;
             dd = dx + dy + dz;
-            zval = 9.0 / dd;
+            zval = z1mag / dd;
+
+            for (int j=0; j<nsr; j++) {
+                dx = xt - xsr[j];
+                dy = yt - ysr[j];
+                dx *= dx;
+                dy *= dy;
+                dz = zsr[j] * zsr[j];
+                dd = dx + dy + dz;
+                zval += (.05 / dd);
+            }
 
             dx = xt - x2;
             dy = yt - y2;
@@ -838,7 +889,7 @@ class Grid10Frame extends JDLFrame
             dy *= dy;
             dz = z3 * z3;
             dd = dx + dy + dz;
-            zval += (1.0 / dd);
+            zval += (1.5 / dd);
 
             dx = xt - x4;
             dy = yt - y4;
@@ -846,7 +897,7 @@ class Grid10Frame extends JDLFrame
             dy *= dy;
             dz = z4 * z4;
             dd = dx + dy + dz;
-            zval += (0.5 / dd);
+            zval += (1.5 / dd);
 
             dx = xt - x5;
             dy = yt - y5;
@@ -854,7 +905,7 @@ class Grid10Frame extends JDLFrame
             dy *= dy;
             dz = z5 * z5;
             dd = dx + dy + dz;
-            zval += (3.0 / dd);
+            zval += (2.0 / dd);
 
             dx = xt - x6;
             dy = yt - y6;
@@ -864,37 +915,54 @@ class Grid10Frame extends JDLFrame
             dd = dx + dy + dz;
             zval += (2.0 / dd);
 
-            dx = xt - x1;
-            dy = yt - y6;
+            dx = xt - x7;
+            dy = yt - y7;
             dx *= dx;
             dy *= dy;
-            dz = z6 * z6 / 4.0;
+            dz = z7 * z7;
             dd = dx + dy + dz;
-            zval += (.4 / dd);
+            zval += (1.5 / dd);
 
-            dx = xt - x6;
-            dy = yt - y1;
+            dx = xt - x8;
+            dy = yt - y8;
             dx *= dx;
             dy *= dy;
-            dz = z1 * z1 / 4.0;
+            dz = z8 * z8;
             dd = dx + dy + dz;
-            zval += (.3 / dd);
+            zval += (2.0 / dd);
 
-            dx = xt - x2;
-            dy = yt - y5;
+            dx = xt - x9;
+            dy = yt - y9;
             dx *= dx;
             dy *= dy;
-            dz = z2 * z2 / 4.0;
+            dz = z9 * z9;
             dd = dx + dy + dz;
-            zval += (.2 / dd);
+            zval += (2.0 / dd);
 
-            dx = xt - x5;
-            dy = yt - y2;
+            dx = xt - x10;
+            dy = yt - y10;
             dx *= dx;
             dy *= dy;
-            dz = z5 * z5 / 4.0;
+            dz = z10 * z10;
             dd = dx + dy + dz;
-            zval += (.5 / dd);
+            zval += (1.0 / dd);
+
+            dx = xt - (x6 + x8) / 2.0;
+            dy = yt - (y6 + y8) / 2.0;
+            dx *= dx;
+            dy *= dy;
+            dz = z8 * z8;
+            dd = dx + dy + dz;
+            zval += (1.0 / dd);
+
+            dx = xt - (x7 + x9) / 2.0;
+            dy = yt - (y7 + y9) / 2.0;
+            dx *= dx;
+            dy *= dy;
+            dz = z9 * z9;
+            dd = dx + dy + dz;
+            zval += (1.0 / dd);
+
 
             if (zval < zvmin) zvmin = zval;
             if (zval > zvmax) zvmax = zval;
