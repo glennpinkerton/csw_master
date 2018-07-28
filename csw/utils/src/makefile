@@ -3,6 +3,8 @@
 include $(CSW_PARENT)/build/system.mk
 
 # gpf_fontlen.cc\
+# ply_calc.cc\
+# ply_drivers.cc\
 
 LIB_SRC_CC=\
  csw_timer.cc\
@@ -30,10 +32,8 @@ LIB_SRC_CC=\
  gpf_symbol.cc\
  gpf_thinxy.cc\
  gpf_utils.cc\
- ply_calc.cc\
  ply_compdata.cc\
  ply_cutline.cc\
- ply_drivers.cc\
  ply_edit.cc\
  ply_graph.cc\
  ply_gridvec.cc\

@@ -43,7 +43,7 @@ import javax.swing.event.PopupMenuListener;
  */
 public class JLineEditor implements JDLEditListener {
     /*
-	 * Picking Mode options.
+     * Picking Mode options.
      * Note: Changes or additions should also modify isLinePicking() and
      * isLineEditing().
      */
@@ -55,9 +55,9 @@ public class JLineEditor implements JDLEditListener {
     public static final int  POINT_PICKING = 20;
     public static final int  POINT_EDITING = 30;
 
-    private JDisplayList         dlist;
-    private JDisplayListPanel    panel;
-    private DLEditListener       editListener;
+    private JDisplayList         dlist = null;
+    private JDisplayListPanel    panel = null;
+    private DLEditListener       editListener = null;
     private int                  selectableNum;
     private int                  pickingMode;
 
@@ -177,7 +177,7 @@ public class JLineEditor implements JDLEditListener {
 
     private class deleteACT extends AbstractAction
     {
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
         deleteACT ()
         {
@@ -367,10 +367,12 @@ public class JLineEditor implements JDLEditListener {
                     }
 
                     else {
-                        currentLine.remove (currentPoint);
-                        n = currentLine.size();
-                        if (n < 2) {
-                            currentLine.clear ();
+                        if (currentLine.size() > 0) {
+                            currentLine.remove (currentPoint);
+                            n = currentLine.size();
+                            if (n < 2) {
+                                currentLine.clear ();
+                            }
                         }
                     }
                 }
@@ -401,7 +403,7 @@ public class JLineEditor implements JDLEditListener {
     }
 
     private ArrayList<ELine>   editLines = 
-		new ArrayList<ELine> (10);
+        new ArrayList<ELine> (10);
     private EPoint             dragEP = null;
 
 /*--------------------------------------------------------------------*/
@@ -566,6 +568,10 @@ public class JLineEditor implements JDLEditListener {
         setButtonID (e);
 
         findPointOrSegment (e);
+
+        if (currentLine == null) {
+            currentLine = new ArrayList<EPoint> (20);
+        }
 
         if (buttonNumber == 1) {
             if (popupActive == 0) {
@@ -777,6 +783,7 @@ public class JLineEditor implements JDLEditListener {
 
     public void mouseReleased (MouseEvent e)
     {
+
         setButtonID (e);
         if (buttonNumber == 1) {
             button1Pressed = false;
@@ -809,8 +816,9 @@ public class JLineEditor implements JDLEditListener {
 
         // Determine if the line is closed.
         boolean isClosed = false;
-        if (currentLine != null)
+        if (currentLine != null) {
           isClosed = isClosed(currentLine);
+        }
 
         dragEP.sx = e.getX();
         dragEP.sy = e.getY();
@@ -849,13 +857,15 @@ public class JLineEditor implements JDLEditListener {
 
         dlist.clearDirectShapes ();
 
-        if (editLines == null) {
+        if (editLines == null  &&  currentLine == null) {
             localRepaint ();
             return;
         }
 
         int lsize = editLines.size ();
-        if (lsize < 1) {
+        int csize = 0;
+        if (currentLine != null) csize = currentLine.size ();
+        if (lsize < 1  &&  csize < 1) {
             localRepaint ();
             return;
         }
@@ -883,7 +893,7 @@ public class JLineEditor implements JDLEditListener {
         int fnum = -1;
 
     /*
-     * Create shapes for the lines and put them in the display list.
+     * Create shapes for the edit lines and put them in the display list.
      */
         for (i=0; i<lsize; i++) {
             eline = editLines.get(i);
@@ -963,6 +973,62 @@ public class JLineEditor implements JDLEditListener {
                 dlist.addDirectShape (rect, r, g, b, 0, fnum);
             }
         }
+
+    /*
+     * Create shapes for the currentLine and put them in the display list.
+     */
+//        for (i=0; i<csize; i++) {
+            line = currentLine;
+            if (line == null) {
+                //continue;
+                return;
+            }
+            npts = line.size();
+            if (npts < 2) {
+                return;
+            }
+/*
+            ep = line.get(i);
+    private static class EPoint {
+        public       double    x;
+        public       double    y;
+        public       double    sx;
+        public       double    sy;
+        public       int       flag;
+        public       String    fname;
+        public       int       fnum;
+            fnum = dlist.findFrameNumberByName (ep.fname);
+            frame = dlist.findFrameByName (ep.fname);
+            if (frame == null) {
+                frame = dlist.findEditFrame (ep.fnum);
+                fnum = ep.fnum;
+                if (frame == null) {
+                    continue;
+                }
+            }
+            for (j=0; j<npts; j++) {
+                ep = line.get(j);
+                ep.sx = (ep.x - frame.fx1) / frame.xscale + frame.x1;
+                ep.sy = (ep.y - frame.fy1) / frame.yscale + frame.y1;
+            }
+*/
+            gpath = new GeneralPath (GeneralPath.WIND_EVEN_ODD);
+            ep = line.get(0);
+//System.out.println ("ep = " + ep.sx + " " + ep.sy);
+//System.out.flush ();
+            gpath.moveTo ((float)ep.sx, (float)ep.sy);
+            for (j=1; j<npts; j++) {
+                ep = line.get(j);
+//System.out.println ("ep = " + ep.sx + " " + ep.sy);
+//System.out.flush ();
+                if (ep == null) {
+                    continue;
+                }
+                gpath.lineTo ((float)ep.sx, (float)ep.sy);
+            }
+            //dlist.addDirectShape (gpath, r, g, b, 0, fnum);
+            dlist.addDirectShape (gpath, r, g, b, 0, -1);
+//        }
 
         localRepaint ();
 
@@ -1224,6 +1290,9 @@ public class JLineEditor implements JDLEditListener {
     {
         EPoint  ep;
 
+System.out.println ("process left click called");
+System.out.flush ();
+
     /*
      * If the alt key is down and the click is on a point, delete the point.
      * No delete in point mode for now.
@@ -1232,7 +1301,6 @@ public class JLineEditor implements JDLEditListener {
           e.isAltDown()  &&
           appendMode == false  &&
           prependMode == false &&
-          pickingMode != POINT_EDITING &&
           pickingMode != POINT_EDITING
         ) {
             if (currentLine != null) {
@@ -1254,8 +1322,12 @@ public class JLineEditor implements JDLEditListener {
             int iframe = dlist.findRescaleFrame (e.getX(),
                                                  e.getY());
             if (iframe == -1) {
+System.out.println ("iframe = -1 in processLeftClick");
+System.out.flush ();
                 return;
             }
+System.out.println ("starting new append in processLeftClick");
+System.out.flush ();
             currentLine = new ArrayList<EPoint> (20);
             ELine  eline = new ELine ();
             currentEline = eline;
@@ -1299,6 +1371,8 @@ public class JLineEditor implements JDLEditListener {
             }
             else {
                 int npts = currentLine.size ();
+System.out.println ("current line npts = " + npts);
+System.out.flush ();
                 if (npts < 3) {
                     currentLine.add (ep);
                 }
@@ -1401,9 +1475,10 @@ public class JLineEditor implements JDLEditListener {
 
     private void endEdit ()
     {
-        Iterator<ELine> it = editLines.iterator();
-        while (it.hasNext()) {
-          ELine eline =  it.next();
+        for (ELine eline : editLines) {
+//        Iterator<ELine> it = editLines.iterator();
+//        while (it.hasNext()) {
+//          ELine eline =  it.next();
           closeLineIfNeeded(eline.points);
         }
         callEndListeners ();
@@ -1980,4 +2055,3 @@ public class JLineEditor implements JDLEditListener {
 /*----------------------------------------------------------------------------*/
 
 }  // end of JLineEditor class
-

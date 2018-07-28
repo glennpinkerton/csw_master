@@ -15,9 +15,11 @@ import java.lang.Exception;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -98,6 +100,26 @@ public class JDLFrame extends JFrame {
         return;
       }
       createPanel ();
+    }
+
+ /*
+  * Build the additionalButtonList one button at a time.
+  * I use it for edit buttons, etc.
+  */
+    public void addAdditionalTextButton (
+        String labelText,
+        String toolTipText,
+        ActionListener al,
+        Dimension preferredSize)
+    {
+        if (gpanel != null) {
+          gpanel.addAdditionalTextButton (
+            labelText,
+            toolTipText,
+            al,
+            preferredSize
+          );
+        }
     }
 
 

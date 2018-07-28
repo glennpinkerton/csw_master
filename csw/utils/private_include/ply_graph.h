@@ -24,7 +24,7 @@
     in bypassing private header security in this fashion.
 */
 #ifndef PRIVATE_HEADERS_OK
-#error Illegal attempt to include private header file ply_protoP.h.
+#error Illegal attempt to include private header file ply_graph.h.
 #endif
 
 
@@ -61,8 +61,15 @@
 #define MAXSEG                     100
 
 
+#define PLY_GRAPH_INTERSECT        1
+#define PLY_GRAPH_UNION            2
+#define PLY_GRAPH_XOR              3
+#define PLY_GRAPH_FRAGMENT         4
+
+
+
 /*
-    Define some structures used by the CSWPolyGraph class.
+    Define some structures only used internally by the CSWPolyGraph class.
 */
 typedef struct {
     int            x1, y1, x2, y2;

@@ -13,7 +13,7 @@
  ***************************************************************************
 
   This file has functions used to process the EasyX graphics commands sent
-  from Java.    This is normally called from the jni function.  I have put
+  from Java.  This is normally called from the jni function.  I have put
   this extra level in to allow for debugging of the native side only via a
   main program that calls this directly.  This isolates the jni functions
   to a fairly good degree.
@@ -38,6 +38,8 @@
 #include "csw/utils/private_include/csw_scope.h"
 
 #include <csw/utils/private_include/TextBounds.h>
+
+#include "csw/jeasyx/private_include/ezx_NativeDebug.h"
 
 
 // The DLF macro is used to write a separate playback log file for
@@ -103,7 +105,51 @@ int ezx_process_command (
     };
     CSWScopeGuard func_scope_guard (fscope);
 
+/*
+ * Special native debug commands.  These are often from hand edited
+ * "playback" files and only run from the ezx_test program.
+ */
+    if (command_id == GTX_POLYGON_BOOLEAN) {
+        NativeDebug::SimplePolyInt ();
+        return 1;
+    }
 
+    if (command_id == GTX_POLYGON_BOOLEAN_2) {
+        double   *xs, *ys, *xc, *yc;
+        int      *isc, *isv, *icc, *icv, nsc, ncc;
+        int      svt, cvt, i, n;
+        nsc = ilist[0];
+        ncc = ilist[1];
+        isc = ilist + 2;
+        icc = ilist + 2 + nsc;
+        isv = icc + ncc;
+        svt = 0;
+        cvt = 0;
+        for (i=0; i<nsc; i++) {
+            svt += isc[i];
+        }
+        icv = isv + svt;
+        for (i=0; i<ncc; i++) {
+            cvt += icc[i];
+        }
+
+        n = 0;
+        for (i=0; i<svt; i++) {
+            n += isv[i];
+        }
+        int n2 = 0;
+        for (i=0; i<cvt; i++) {
+            n2 += icv[i];
+        }
+        xs = ddata;
+        xc = xs + n;
+        ys = xc + n2;
+        yc = ys + n;
+        
+        NativeDebug::poly_intersect (xs, ys, isc, isv, nsc,
+                                     xc, yc, icc, icv, ncc);
+        return 1;
+    }
 
 #if _EZX_DEBUG_LOG_FILE_
     int           i, ntot;
@@ -204,6 +250,7 @@ int ezx_process_command (
         }
     }
 #endif
+
 
 
 

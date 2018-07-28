@@ -84,12 +84,14 @@ public class JDisplayList extends JDisplayListBase {
 
 
 // When the display list and panel are both deleted,
-// set the references to eacch other to null in the
+// set the references to each other to null in the
 // respective objects.  A corresponding set of the dlist
 // in the panel object is also done.  This is intended 
 // to be package scope.
 
     void setPanelToNull () {dlPanel = null;}
+
+    public JDisplayListPanel getPanel () {return dlPanel;}
 
 
 
@@ -4966,10 +4968,8 @@ of Font.BOLD|Font.ITALIC.
   Create a new polygon by picking points with the mouse.  A {@link DLEditListener}
   must be specified.  If no edit listener is specified, an
   {@link IllegalArgumentException} is thrown.  The method allows the user to specify
-  the {@link JLineEditor} object to use for picking the new polygon.  If a null line
-  editor object is specified, a default object is used.  The line editor object
-  will have its closedLine flag always set to true, regardless of whether it is
-  specified or a default is used.
+  the {@link JPolygonEditor} object to use for picking the new polygon.  If a null
+  polygon editor object is specified, a default object is used.
   <p>
   When the user is finished creating the new polygon, the editFinished method of
   the feedback listener is called.
@@ -4977,72 +4977,27 @@ of Font.BOLD|Font.ITALIC.
   The new polygon will return all of the line graphic attributes currently set as part
   of the {@link DLSelectable} supplied to the listener methods.
   <p>
-  This method is identical to the pickNewFillGeometry method.
   */
+
     public void pickNewPolygonGeometry (DLEditListener fb,
-                                        JLineEditor jle)
+                                        JPolygonEditor jpe)
     {
         if (dlPanel == null) return;
         if (fb == null) {
             throw new IllegalArgumentException
-                ("Calling pickNewPolygonGeometry with a null feedback listener.");
+                ("Calling pickNewPolygonGeometry with a null DLEditListener.");
         }
 
-        JLineEditor jl;
+        JPolygonEditor jp;
 
-        if (jle == null) {
-            jl = new JLineEditor
-            (this, dlPanel, fb, -1, JLineEditor.LINE_PICKING_POLYGON);
-        }
-        else {
-            jl = jle;
-        }
-        jl.setClosedLine (true);
-
-        setEditor (jl);
-
-    }
-
-/*--------------------------------------------------------------------*/
-
-  /**
-  Create a new polygon by picking points with the mouse.  A {@link DLEditListener}
-  must be specified.  If no edit listener is specified, an
-  {@link IllegalArgumentException} is thrown.  The method allows the user to specify
-  the {@link JLineEditor} object to use for picking the new polygon.  If a null line
-  editor object is specified, a default object is used.  The line editor object
-  will have its closedLine flag always set to true, regardless of whether it is
-  specified or a default is used.
-  <p>
-  When the user is finished creating the new polygon, the editFinished method of
-  the feedback listener is called.
-  <p>
-  The new polygon will return all of the line graphic attributes currently set as part
-  of the {@link DLSelectable} supplied to the listener methods.
-  <p>
-  This method is identical to the pickNewPolygonGeometry method.
-  */
-    public void pickNewFillGeometry (DLEditListener fb,
-                                     JLineEditor jle)
-    {
-        if (dlPanel == null) return;
-        if (fb == null) {
-            throw new IllegalArgumentException
-                ("Calling pickNewFillGeometry with a null feedback listener.");
-        }
-
-        JLineEditor jl;
-
-        if (jle == null) {
-            jl = new JLineEditor
-            (this, dlPanel, fb, -1, JLineEditor.LINE_PICKING_POLYGON);
+        if (jpe == null) {
+            jp = new JPolygonEditor (this, dlPanel, fb, -1);
         }
         else {
-            jl = jle;
+            jp = jpe;
         }
-        jl.setClosedLine (true);
 
-        setEditor (jl);
+        setEditor (jp);
 
     }
 
