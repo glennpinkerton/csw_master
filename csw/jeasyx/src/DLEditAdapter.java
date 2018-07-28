@@ -13,7 +13,7 @@ package csw.jeasyx.src;
 
 /**
  This abstract class should be extended to allow an application object to get
- informed when edit operation occur.  It is registered with an editor such
+ informed when edit operations occur.  It is registered with an editor such
  as the {@link JLineEditor} object to receive results of a particular edit
  operation.
  */

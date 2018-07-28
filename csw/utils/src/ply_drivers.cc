@@ -308,10 +308,10 @@ int CSWPolyDrivers::ply_intcomps (CSWErrNum &err_obj,
     ndo = 0;
     npcomp = 0;
 
-//    int  first_inside = ply_utils_obj.ply_pointpa (xpolyc, ypolyc, ncompc, icompc,
-//                                                   xfirst, yfirst);
+    int  first_inside = ply_utils_obj.ply_pointpa (&xpolyc, &ypolyc, ncompc, icompc,
+                                                   xfirst, yfirst);
 
-    ply_traverse_obj.ply_SetPrevInOut (1);
+    ply_traverse_obj.ply_SetPrevInOut (first_inside);
 
 
     for (;;) {
@@ -383,6 +383,9 @@ int CSWPolyDrivers::ply_intcomps (CSWErrNum &err_obj,
         else {
             nowcomp = 0;
         }
+
+
+    // Find a single component of the intersection
 
         istat = ply_iandcomp (ply_gridvec_obj,
                               xfirst, yfirst, firstin, nowcomp, firstv,
@@ -1382,7 +1385,7 @@ int CSWPolyDrivers::ply_orcomps (
                    666 = bad polygon can't be traversed
                      -1 = not enough memory
 
-  usage:             This function is called from ply_iand only.  The
+  usage:             This function is called from ply_intcomps only.  The
                      calling function is responsible for error checking 
                      and preparing the data for this function.
 
@@ -1506,7 +1509,7 @@ int CSWPolyDrivers::ply_iandcomp (
         npts = 0;
         ToggleFlag = toggle;
         ply_traverse_obj.ply_SetMaxTrvOut (ntotnrloc);
-        if(toggle == 1) {
+        if(toggle != 1) {
             iflag = iflag1;
             if(nc != 0) iflag = 1;
             nctmp = nc;

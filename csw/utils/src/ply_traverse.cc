@@ -190,8 +190,6 @@ int CSWPolyTraverse::ply_trvint (double *xvply, double *yvply,
     double       savegraze;
     CSWPolyUtils  ply_utils_obj;
 
-outflag = 1;
-
 /*  check obvious errors  */
 
     if (nvpt < 3) return 1;

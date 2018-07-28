@@ -508,6 +508,12 @@ public class DLConst {
     final static int GTX_IMAGE_FAULT_DATA  = 135;
 
   /*
+   * Polygon boolean messages.
+   */
+    final static int GTX_POLYGON_BOOLEAN  = 180;
+    final static int GTX_POLYGON_BOOLEAN_2  = 182;
+
+  /*
    *  graph and chart messages
    */
     final static int GTX_CREATE_GRAPH     = 200;

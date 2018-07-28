@@ -34,6 +34,7 @@ JAVA_SRC=\
  JDisplayListPanel.java\
  JDLEditListener.java\
  JLineEditor.java\
+ JPolygonEditor.java\
  LithFill.java\
  LocalDraw.java\
  NativePrim.java\
@@ -71,6 +72,7 @@ JAVA_CLASSES=\
  JDisplayListPanel.class\
  JDLEditListener.class\
  JLineEditor.class\
+ JPolygonEditor.class\
  LithFill.class\
  LocalDraw.class\
  NativePrim.class\
@@ -84,6 +86,7 @@ LIB_SRC_C=\
  DisplayListJNI.c
 
 LIB_SRC_CC=\
+ ezx_NativeDebug.cc\
  DisplayList.cc\
  DLContour.cc\
  DLSelectable.cc\
@@ -97,6 +100,7 @@ LIB_OBJS_C=\
  DisplayListJNI$(OBJ_SUFFIX)
 
 LIB_OBJS_CC=\
+ ezx_NativeDebug$(OBJ_SUFFIX)\
  DisplayList$(OBJ_SUFFIX)\
  DLContour$(OBJ_SUFFIX)\
  DLSelectable$(OBJ_SUFFIX)\

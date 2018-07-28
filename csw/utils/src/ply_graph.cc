@@ -186,7 +186,8 @@ void CSWPolyGraph::prow (char *grid, int j1, int j2, int i1, int ncol) {
 
 */
 
-int CSWPolyGraph::ply_boolean (double *xp1, double *yp1, void **tag1,
+int CSWPolyGraph::ply_boolean 
+                (double *xp1, double *yp1, void **tag1,
                  int np1, int *nc1, int *nv1,
                  double *xp2, double *yp2, void **tag2,
                  int np2, int *nc2, int *nv2,
@@ -4865,7 +4866,7 @@ int CSWPolyGraph::FreeAllMem (void)
 
     if (Raw2.tag1) {
         csw_Free (Raw2.tag1);
-        Raw1.tag1 = NULL;
+        Raw2.tag1 = NULL;
     }
 
     if (IsegList) {

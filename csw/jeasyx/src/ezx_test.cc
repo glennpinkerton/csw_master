@@ -150,9 +150,129 @@ int main (int argc, char *argv[])
     /*
      * start of huge switch on each command
      */
+        int  npts = 0;
         int  ngdata = 0;
         end_flag = 0;
         switch (command_id) {
+
+            case GTX_POLYGON_BOOLEAN:
+
+                ezx_process_command (
+                    dlist_index,
+                    command_id,
+                    threadid,
+                    longlist,
+                    ilist,
+                    cdata,
+                    bdata,
+                    sdata,
+                    idata,
+                    fdata,
+                    ddata,
+                    dfile
+                );
+
+                break;
+
+            case GTX_POLYGON_BOOLEAN_2:
+
+                int    nps, npc, *icc, *ics, *ivc, *ivs;
+                int    cvt, svt;
+
+                ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
+                if (ctmp == NULL) {
+                    end_flag = 1;
+                    break;
+                }
+                strcpy (cdata, inbuff);
+
+                sscanf (cdata, "%d %d", ilist, ilist+1);
+                nps = ilist[0];
+                npc = ilist[1];
+
+                ics = ilist + 2;
+                icc = ics + nps;
+                svt = 0;
+                cvt = 0;
+
+                for (i=0; i<nps; i++) {
+                    ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
+                    if (ctmp == NULL) {
+                        end_flag = 1;
+                        break;
+                    }
+                    strcpy (cdata, inbuff);
+                    sscanf (cdata, "%d", ics + i);
+                    svt += ics[i];
+                }
+                if (end_flag == 1) break;
+
+                for (i=0; i<npc; i++) {
+                    ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
+                    if (ctmp == NULL) {
+                        end_flag = 1;
+                        break;
+                    }
+                    strcpy (cdata, inbuff);
+                    sscanf (cdata, "%d", icc + i);
+                    cvt += icc[i];
+                }
+                if (end_flag == 1) break;
+
+                ivs = icc + npc;
+                ivc = ivs + svt;
+
+                for (i=0; i<svt; i++) {
+                    ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
+                    if (ctmp == NULL) {
+                        end_flag = 1;
+                        break;
+                    }
+                    strcpy (cdata, inbuff);
+                    sscanf (cdata, "%d", ivs + i);
+                    npts += ivs[i];
+                }
+                if (end_flag == 1) break;
+
+                for (i=0; i<cvt; i++) {
+                    ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
+                    if (ctmp == NULL) {
+                        end_flag = 1;
+                        break;
+                    }
+                    strcpy (cdata, inbuff);
+                    sscanf (cdata, "%d", ivc + i);
+                    npts += ivc[i];
+                }
+                if (end_flag == 1) break;
+
+                for (i=0; i<npts; i++) {
+                    ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
+                    if (ctmp == NULL) {
+                        end_flag = 1;
+                        break;
+                    }
+                    strcpy (cdata, inbuff);
+                    sscanf (cdata, "%lf %lf", ddata + i, ddata + i + npts);
+                }
+                if (end_flag == 1) break;
+
+                ezx_process_command (
+                    dlist_index,
+                    command_id,
+                    threadid,
+                    longlist,
+                    ilist,
+                    cdata,
+                    bdata,
+                    sdata,
+                    idata,
+                    fdata,
+                    ddata,
+                    dfile
+                );
+
+                break;
 
             case GTX_DRAW_CURRENT_VIEW:
 

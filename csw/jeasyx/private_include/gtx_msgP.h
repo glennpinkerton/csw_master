@@ -205,6 +205,13 @@
 #define GTX_FAULT_LINE_DATA    131
 #define GTX_IMAGE_FAULT_DATA   135
 
+
+/*
+ * Polygon boolean messages.
+ */
+#define GTX_POLYGON_BOOLEAN     180
+#define GTX_POLYGON_BOOLEAN_2   182
+
 /*
     graph and chart messages
 */

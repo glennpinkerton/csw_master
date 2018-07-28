@@ -58,7 +58,7 @@ import csw.jutils.src.CSW_UI;
  */
 public class JEasyXGraphicsPanel extends JPanel {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
  /*
   * graphPanel has package visibility, instead of private, in order to avoid
@@ -73,7 +73,8 @@ public class JEasyXGraphicsPanel extends JPanel {
 
 /*---------------------------------------------------------------------------*/
 
-  private void createPanel(String layoutDirection, boolean useToolbar, int mask) {
+  private void createPanel(String layoutDirection, boolean useToolbar, int mask)
+  {
 
     graphPanel = new JDisplayListPanel();
 
@@ -250,10 +251,36 @@ public class JEasyXGraphicsPanel extends JPanel {
       }
 
       uiControlBox.addSeparator();
+      uiControlBox.addSeparator();
+
     }
   }
 
 /*--------------------------------------------------------------------------*/
+
+ /*
+  * Build the additionalButtonList one button at a time.
+  * I use it for edit buttons, etc.
+  */
+  public void addAdditionalTextButton (
+    String labelText,
+    String toolTipText,
+    ActionListener al,
+    Dimension preferredSize)
+  {
+    JButton button = new JButton (labelText);
+    if (toolTipText != null) {
+      button.setToolTipText(toolTipText);
+    }
+    if (al != null) {
+      button.addActionListener(al);
+    }
+    if (preferredSize != null) {
+      button.setMaximumSize(preferredSize);
+    }
+    addUIControl(button);
+    CSW_UI.setToolbarButtonLookAndFeel(button);
+  }
 
  /*
   * Convenience method to create a button for the toolbar.
@@ -263,14 +290,18 @@ public class JEasyXGraphicsPanel extends JPanel {
     String toolTipText,
     ActionListener al,
     Dimension preferredSize
-  ) {
+  )
+  {
     JButton button = JEasyXIcons.createJButton(type);
-    if (toolTipText != null)
+    if (toolTipText != null) {
       button.setToolTipText(toolTipText);
-    if (al != null)
+    }
+    if (al != null) {
       button.addActionListener(al);
-    if (preferredSize != null)
+    }
+    if (preferredSize != null) {
       button.setMaximumSize(preferredSize);
+    }
     addUIControl(button);
     CSW_UI.setToolbarButtonLookAndFeel(button);
   }
