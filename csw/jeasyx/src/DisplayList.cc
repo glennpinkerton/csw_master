@@ -43,6 +43,7 @@
 #include "csw/utils/private_include/gpf_spline.h"
 #include "csw/utils/private_include/gpf_utils.h"
 #include "csw/utils/private_include/TextBounds.h"
+#include "csw/utils/private_include/ply_graph.h"
 
 #include "csw/utils/include/csw_errnum.h"
 #include "csw/utils/include/csw_timer.h"
@@ -21638,5 +21639,83 @@ void CDisplayList::OutputForPlayback (const char *lfline) {
         }
 #endif
 
-    };
+};
 
+
+
+/*
+ * Method called only from EZXCommand.cc to calculate a boolean of
+ * two sets of polygons.  I hope to make another entry point accessible
+ * from java that does not require the Display List overhead.
+ */
+
+int CDisplayList::PerformPolyBoolean (int *ilist, int *idata, double *ddata)
+{
+    CSWPolyGraph   pcalc;
+
+    double  *xs, *ys, *xc, *yc;
+    int     *isc, *isv, *icc, *icv;
+
+    int     *icout, *ihout;
+    double  *xout, *yout;
+
+    int     nps, npc, npout;
+
+    nps = ilist[0];
+    npc = ilist[1];
+    int op_type = ilist[2];
+        
+    isc = idata;
+    icc = isc + nps;
+    isv = icc + npc;
+    int isvlen = 0;
+    for (int i=0; i<nps; i++) {
+        isvlen += isc[i];
+    }
+    icv = isv + isvlen;
+
+    int nspts = 0;
+    int nsv = 0;
+    for (int i=0; i<nps; i++) {
+      for (int j=0; j<isc[i]; j++) {
+        nspts += isv[nsv];
+        nsv++;
+      }
+    }
+    int ncpts = 0;
+    int ncv = 0;
+    for (int i=0; i<npc; i++) {
+      for (int j=0; j<icc[i]; j++) {
+        ncpts += icv[ncv];
+        ncv++;
+      }
+    }
+
+    xs = ddata;
+    xc = xs + nspts;
+    ys = xc + ncpts;
+    yc = ys + nspts;
+
+    int startpout = ilist[4];
+    int maxpout = ilist[5];
+    icout = idata + startpout;
+    ihout = icout + maxpout;
+
+    int start_xyout = ilist[6];
+    int max_xyout = ilist[7];
+
+    xout = ddata + start_xyout;
+    yout = xout + max_xyout;
+
+    int   istat = pcalc.ply_boolean (
+      xs, ys, NULL, nps, isc, isv,
+      xc, yc, NULL, npc, icc, icv,
+      op_type,
+      xout, yout, NULL, &npout, icout, ihout,
+      max_xyout, maxpout);
+
+    ilist[3] = npout;
+
+    return istat;
+
+}

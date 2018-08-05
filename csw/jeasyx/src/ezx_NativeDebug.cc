@@ -78,46 +78,65 @@ int NativeDebug::poly_intersect
     int   istat = pcalc.ply_boolean (
       xs, ys, tag1, nsc, isc, isv,
       xc, yc, tag2, ncc, icc, icv,
-      PLY_GRAPH_INTERSECT,
+      //PLY_GRAPH_INTERSECT,
+      PLY_GRAPH_UNION,
       xout, yout, tagout, &npout, icout, ihout,
       100, 100);
 
-printf ("\nistat from CalcIntersect = %d\n", istat);
-printf ("    npout = %d    icout = %d    ihout = %d\n",
-  npout, icout[0], ihout[0]);
-printf ("\n");
+printf ("\n\nFrom ezx_NativeDebug\n\n");
 
-int    i, j, n1;
+int    i, j, n1, nh;
 
 printf ("Source points:\n");
 n1 = 0;
+nh = 0;
 for (i=0; i<nsc; i++) {
-  for (j=0; j<isv[i]; j++) {
-    printf ("  %.2f, %.2f\n", xs[n1], ys[n1]);
-    n1++;
+  for (j=0; j<isc[i]; j++) {
+    for (int k=0; k<isv[nh]; k++) {
+      printf ("  %.2f, %.2f\n", xs[n1], ys[n1]);
+      n1++;
+    }
+    nh++;
+    printf ("\n");
   }
-  printf ("\n");
+  printf ("\n\n");
 }
 
 printf ("Clip points:\n");
 n1 = 0;
+nh = 0;
 for (i=0; i<ncc; i++) {
-  for (j=0; j<icv[i]; j++) {
-    printf ("  %.2f, %.2f\n", xc[n1], yc[n1]);
-    n1++;
+  for (j=0; j<icc[i]; j++) {
+    for (int k=0; k<icv[nh]; k++) {
+      printf ("  %.2f, %.2f\n", xc[n1], yc[n1]);
+      n1++;
+    }
+    nh++;
+    printf ("\n");
   }
-  printf ("\n");
+  printf ("\n\n");
 }
+
+printf ("\nistat from CalcIntersect = %d\n", istat);
+printf ("    npout = %d    icout = %d    ihout = %d\n\n",
+  npout, icout[0], ihout[0]);
 
 printf ("Intersection points:\n");
 n1 = 0;
+nh = 0;
 for (i=0; i<npout; i++) {
-  for (j=0; j<ihout[i]; j++) {
-    printf ("  %.2f, %.2f\n", xout[n1], yout[n1]);
-    n1++;
+  for (j=0; j<icout[i]; j++) {
+    for (int k=0; k<ihout[nh]; k++) {
+      printf ("  %.2f, %.2f\n", xout[n1], yout[n1]);
+      n1++;
+    }
+    nh++;
+    printf ("\n");
   }
-  printf ("\n");
+  printf ("\n\n");
 }
+
+fflush (stdout);
 
     return istat;
 

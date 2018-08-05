@@ -46,6 +46,22 @@ public class DLFill {
                     linePattern,
                     nativeIndex;
 
+    public void printForDebug () {
+      int k=0;
+      System.out.println ();
+      System.out.println ("DLFill geometry dump");
+      System.out.println ("  numComponents = " + numComponents);
+      for (int i=0; i<numComponents; i++) {
+        System.out.println ("    component # " + i + "  numpoints = "
+          + numPoints[i]);
+        for (int j=0; j<numPoints[i]; j++) {
+          System.out.println ("      " + xPoints[k] + "    " + yPoints[k]);
+          k++;
+        }
+      }
+      System.out.println ();
+    }
+
 /*
  * Constructor has package scope also.
  */

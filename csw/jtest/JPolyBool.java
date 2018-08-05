@@ -36,6 +36,7 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.util.Random;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -53,12 +54,6 @@ import csw.jeasyx.src.*;
 import csw.jutils.src.ColorPalette;
 import csw.jsurfaceworks.src.Grid;
 import csw.jutils.src.CSWLogger;
-
-
-// imports flagged as unused by eclipse
-
-//import java.util.Date;
-//import org.apache.logging.log4j.LogManager;
 
 
 
@@ -155,52 +150,8 @@ public class JPolyBool {
 
         frame.setVisible (true);
 
-//        timerTest ();
-
     }
 
-    /*
-    static private void timerTest ()
-    {
-        double[] d1, d2;
-        int      i, j, k, itot, jtot;
-
-        Date     date;
-        long     t1, t2;
-
-        date = new Date ();
-        t1 = date.getTime ();
-
-        itot = 2000;
-        jtot = 2000;
-
-        for (i=0; i<itot; i++) {
-            d1 = new double[jtot];
-            for (j=0; j<jtot; j++) {
-                d1[j] = j + i;
-            }
-
-            d2 = new double[jtot+ 2 * i];
-            for (j=0; j<jtot + 2 * i; j++) {
-                k = j % 100;
-                d2[j] = j + i + k;
-            }
-         }
-
-         date = new Date ();
-         t2 = date.getTime ();
-
-         System.out.print ("Elapsed time for itot = ");
-         System.out.print (itot);
-         System.out.print (" and jtot = ");
-         System.out.print (jtot);
-         System.out.print (" is ");
-         System.out.print (t2 - t1);
-         System.out.println (" milliseconds");
-
-         return;
-    }
-    */
 
 
     static void showMem (String  msg)
@@ -229,12 +180,43 @@ public class JPolyBool {
 }
 
 
-class JPolyBoolFrame extends JFrame
+
+class DigitizeFrame extends JDLFrame implements DLEditListener
 {
     private static final long serialVersionUID = 1L;
 
-    public JPolyBoolFrame ()
+    private static final int  DIG_TYPE_UNKNOWN = 1;
+    private static final int  DIG_TYPE_SOURCE = 1;
+    private static final int  DIG_TYPE_CLIP = 2;
+
+    private static Logger  logger = CSWLogger.getMyLogger ();
+
+    private int            dig_type = DIG_TYPE_UNKNOWN;
+    private JDisplayList   dl = null;
+    private JDisplayListPanel  dlpanel = null;
+
+    private JButton        sourceButton = null;
+    private JButton        clipButton = null;
+    private JButton        intersectButton = null;
+    private JButton        unionButton = null;
+    private JButton        xorButton = null;
+    private JButton        fragmentButton = null;
+    private JButton        clearButton = null;
+    private JButton        clearResultButton = null;
+
+    private ArrayList<DLSelectable>   sourceSel = new ArrayList<DLSelectable> ();
+    private ArrayList<DLSelectable>   clipSel = new ArrayList<DLSelectable> ();
+    private DLSelectable   resultSel = null;
+
+    private ArrayList<DLFill>  sourcePolyList = new ArrayList<DLFill> ();
+    private ArrayList<DLFill>  clipPolyList = new ArrayList<DLFill> ();
+
+    public DigitizeFrame ()
     {
+        super (FRAME_WITH_TOOLBAR, true);
+
+        dl = super.getDL ();
+        dlpanel = dl.getPanel ();
 
 /*
  * Possible wait spot to allow a gdb attach to the JVM process.
@@ -244,58 +226,111 @@ int idum = System.in.read();
 }
 catch (Exception e) {
 }
-*/
-
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation (screenSize.width - 250, 50);
-
-        setDefaultCloseOperation (WindowConstants.DISPOSE_ON_CLOSE);
-
-        setTitle ("JDisplayList Unit Test");
-        setSize (220, 250);
-        setResizable (false);
-        Container contentPane = getContentPane ();
-        contentPane.setLayout (new GridLayout(6,1));
-
-        JButton show_mem_button = new JButton ("Show Memory");
-        show_mem_button.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent ae){
-            JPolyBool.showMem ("From user button click");
-          }
-        });
-
-        JButton digitize_button = new JButton ("Digitize Polygons");
-        digitize_button.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent ae){
-                DigitizeFrame frame = new DigitizeFrame ();
-                frame.setVisible(true);
-          }
-        });
-
-        contentPane.add (show_mem_button);
-        contentPane.add (digitize_button);
-
-    }
+ */
 
 
+        sourceButton =
+        addAdditionalTextButton (
+             "Source",
+             "Digitize Source Polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.startSource ();
+               }
+             },
+             null
+        );
 
-}
+        clipButton =
+        addAdditionalTextButton (
+             "Clip",
+             "Digitize Clip Polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.startClip ();
+               }
+             },
+             null
+        );
 
+        intersectButton =
+        addAdditionalTextButton (
+             "Intersect",
+             "Intersect the Red Source and Blue Clip Polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.intersectPolys ();
+               }
+             },
+             null
+        );
+        intersectButton.setEnabled (false);
 
+        unionButton =
+        addAdditionalTextButton (
+             "Union",
+             "Union the Red Source and Blue Clip Polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.unionPolys ();
+               }
+             },
+             null
+        );
+        unionButton.setEnabled (false);
 
-class DigitizeFrame extends JDLFrame implements DLEditListener
-{
-    private static final long serialVersionUID = 1L;
+        xorButton =
+        addAdditionalTextButton (
+             "Xor",
+             "Xor the Red Source and Blue Clip Polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.xorPolys ();
+               }
+             },
+             null
+        );
+        xorButton.setEnabled (false);
 
-    private static Logger  logger = CSWLogger.getMyLogger ();
-    
-    public DigitizeFrame ()
-    {
-        super (FRAME_WITHOUT_TOOLBAR);
+        fragmentButton =
+        addAdditionalTextButton (
+             "Fragment",
+             "Calculate Fragments the Red Source and Blue Clip Polygon Combination",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.fragmentPolys ();
+               }
+             },
+             null
+        );
+        fragmentButton.setEnabled (false);
 
-        setTitle ("Digitize For Boolean");
+        clearButton =
+        addAdditionalTextButton (
+             "Clear",
+             "Clear (Erase) all polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.clearPolys ();
+               }
+             },
+             null
+        );
 
-        JDisplayList dl = super.getDL ();
+        clearResultButton =
+        addAdditionalTextButton (
+             "Clear Result",
+             "Clear (Erase) all result polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.clearResultPolys ();
+               }
+             },
+             null
+        );
+        clearResultButton.setEnabled (false);
+
+        setTitle ("Polygon Boolean Testing");
 
         dl.setBackgroundColor (225, 225, 225);
         dl.beginPlot ("digitize poly boolean",
@@ -305,16 +340,212 @@ class DigitizeFrame extends JDLFrame implements DLEditListener
         dl.createFrame ("source poly frame",
                         0.0, 0.0, 100.0, 100.0);
 
-//        dl.setSelectable (new DLSelectable());
+    }
 
+
+    private void startSource () {
+        dig_type = DIG_TYPE_SOURCE;
+        if (clipButton != null) {
+          clipButton.setEnabled (false);
+        }
         dl.pickNewPolygonGeometry (this, null);
+    }
+
+    private void startClip () {
+        dig_type = DIG_TYPE_CLIP;
+        if (sourceButton != null) {
+          sourceButton.setEnabled (false);
+        }
+        dl.pickNewPolygonGeometry (this, null);
+    }
 
 
+    private void repaintPanel () {
+        dl.clearDirectShapes ();
+        dlpanel.repaint ();
+    }
+
+
+
+    private void intersectPolys () {
+
+        ArrayList<DLFill> dlf_out = new ArrayList<DLFill> ();
+        dl.polyIntersect (sourcePolyList,
+                          clipPolyList,
+                          dlf_out);
+
+        dl.eraseSelectable (resultSel);
+
+        resultSel = new DLSelectable ();
+        dl.setSelectable (resultSel);
+
+        dl.setFillColor (100, 100, 100);
+        dl.setBorderColor (0, 0, 0);
+        dl.setLineThickness(.02);
+        int  n = 0;
+        for (DLFill dlf : dlf_out) {
+            if (dlf == null) continue;
+            int ncomp = dlf.getNumComponents ();
+            if (ncomp < 1) continue;
+            int[] npts_arr = dlf.getNumPoints ();
+            double[] xp = dlf.getXPoints();
+            double[] yp = dlf.getYPoints();
+            dl.addFill (xp, yp, npts_arr, ncomp, 1);
+        }
+
+        dl.setSelectable (null);
+
+        repaintPanel ();
+
+        clearResultButton.setEnabled (true);
 
     }
 
+
+    private void unionPolys () {
+        ArrayList<DLFill> dlf_out = new ArrayList<DLFill> ();
+        dl.polyUnion (sourcePolyList,
+                      clipPolyList,
+                      dlf_out);
+
 /*
- * Implement the DLEditListener intwerface
+        for (DLSelectable dlsel : sourceSel) {
+            dl.eraseSelectable (dlsel);
+        }
+        for (DLSelectable dlsel : clipSel) {
+            dl.eraseSelectable (dlsel);
+        }
+*/
+        dl.eraseSelectable (resultSel);
+
+        resultSel = new DLSelectable ();
+        dl.setSelectable (resultSel);
+
+        dl.setFillColor (200, 100, 100, 100);
+        dl.setBorderColor (200, 0, 0);
+        dl.setLineThickness(.02);
+        int  n = 0;
+        for (DLFill dlf : dlf_out) {
+            if (dlf == null) continue;
+            int ncomp = dlf.getNumComponents ();
+            if (ncomp < 1) continue;
+            int[] npts_arr = dlf.getNumPoints ();
+            double[] xp = dlf.getXPoints();
+            double[] yp = dlf.getYPoints();
+            dl.addFill (xp, yp, npts_arr, ncomp, 1);
+        }
+
+        dl.setSelectable (null);
+
+        repaintPanel ();
+
+        clearResultButton.setEnabled (true);
+
+    }
+
+
+    private void xorPolys () {
+        ArrayList<DLFill> dlf_out = new ArrayList<DLFill> ();
+        dl.polyXor (sourcePolyList,
+                    clipPolyList,
+                    dlf_out);
+
+        dl.eraseSelectable (resultSel);
+
+        resultSel = new DLSelectable ();
+        dl.setSelectable (resultSel);
+
+        dl.setFillColor (100, 100, 200, 100);
+        dl.setBorderColor (0, 0, 200);
+        dl.setLineThickness(.02);
+        int  n = 0;
+        for (DLFill dlf : dlf_out) {
+            if (dlf == null) continue;
+            int ncomp = dlf.getNumComponents ();
+            if (ncomp < 1) continue;
+            int[] npts_arr = dlf.getNumPoints ();
+            double[] xp = dlf.getXPoints();
+            double[] yp = dlf.getYPoints();
+            dl.addFill (xp, yp, npts_arr, ncomp, 1);
+        }
+
+        dl.setSelectable (null);
+
+        repaintPanel ();
+
+        clearResultButton.setEnabled (true);
+
+    }
+
+
+    private void fragmentPolys () {
+        ArrayList<DLFill> dlf_out = new ArrayList<DLFill> ();
+        dl.polyFragment (sourcePolyList,
+                         clipPolyList,
+                         dlf_out);
+
+        dl.eraseSelectable (resultSel);
+
+        resultSel = new DLSelectable ();
+        dl.setSelectable (resultSel);
+
+        dl.setLineThickness(.02);
+        int  n = 1;
+        for (DLFill dlf : dlf_out) {
+            if (dlf == null) continue;
+            int ncomp = dlf.getNumComponents ();
+            if (ncomp < 1) continue;
+            int[] npts_arr = dlf.getNumPoints ();
+            double[] xp = dlf.getXPoints();
+            double[] yp = dlf.getYPoints();
+            dl.setFillColor ((n * 20) % 250,  (n * 40) % 250, (n * 60) % 250, 100);
+            dl.setBorderColor ((n * 10) % 250,  (n * 20) % 250, (n * 30) % 250);
+            n++;
+            dl.addFill (xp, yp, npts_arr, ncomp, 1);
+        }
+
+        dl.setSelectable (null);
+
+        repaintPanel ();
+
+        clearResultButton.setEnabled (true);
+
+    }
+
+
+    private void clearPolys () {
+        for (DLSelectable dlsel : sourceSel) {
+            dl.eraseSelectable (dlsel);
+        }
+        for (DLSelectable dlsel : clipSel) {
+            dl.eraseSelectable (dlsel);
+        }
+        dl.eraseSelectable (resultSel); 
+        repaintPanel ();
+        sourceSel.clear();
+        clipSel.clear();
+        resultSel = null;
+        sourcePolyList.clear();
+        clipPolyList.clear();
+        intersectButton.setEnabled (false);
+        unionButton.setEnabled (false);
+        xorButton.setEnabled (false);
+        fragmentButton.setEnabled (false);
+    }
+
+
+    private void clearResultPolys () {
+        dl.eraseSelectable (resultSel); 
+        repaintPanel ();
+        resultSel = null;
+        clearResultButton.setEnabled (false);
+    }
+
+
+
+
+/*
+ * Implement the DLEditListener interface
  */
     public boolean editChanged (DLSelectable dls) {
         return false;
@@ -327,7 +558,82 @@ class DigitizeFrame extends JDLFrame implements DLEditListener
 
 
     public boolean editFinished (DLSelectable dls) {
-        return false;
+
+        sourceButton.setEnabled (true);
+        clipButton.setEnabled (true);
+
+        if (dls == null) {
+            System.out.println ("dls is null in editFinished");
+            System.out.println ();
+            System.out.flush ();
+            dig_type = DIG_TYPE_UNKNOWN;
+            return false;
+        }
+
+        ArrayList<DLFill> flist = dls.getFillList ();
+        if (flist == null) {
+            System.out.println ("fill list is null in editFinished");
+            System.out.println ();
+            System.out.flush ();
+            dig_type = DIG_TYPE_UNKNOWN;
+            return false;
+        }
+
+        if (dig_type == DIG_TYPE_SOURCE) {
+            DLSelectable _dls = new DLSelectable ();
+            sourceSel.add (_dls);
+            dl.setSelectable (_dls);
+            setSourceAttributes ();
+        }
+        else {
+            DLSelectable _dls = new DLSelectable ();
+            clipSel.add (_dls);
+            dl.setSelectable (_dls);
+            setClipAttributes ();
+        }
+        int  n = 0;
+        dl.setLineThickness(.002);
+        for (DLFill dlf : flist) {
+            if (dlf == null) continue;
+            int ncomp = dlf.getNumComponents ();
+            if (ncomp < 1) continue;
+            if (dig_type == DIG_TYPE_SOURCE) {
+                sourcePolyList.add (dlf);
+            }
+            else {
+                clipPolyList.add (dlf);
+            }
+            int[] npts_arr = dlf.getNumPoints ();
+            double[] xp = dlf.getXPoints();
+            double[] yp = dlf.getYPoints();
+            dl.addFill (xp, yp, npts_arr, ncomp, 1);
+        }
+
+        dl.setSelectable (null);
+
+        if (sourcePolyList.size() > 0  &&  clipPolyList.size() > 0) {
+            intersectButton.setEnabled (true);
+            unionButton.setEnabled (true);
+            xorButton.setEnabled (true);
+            fragmentButton.setEnabled (true);
+        }
+
+        dig_type = DIG_TYPE_UNKNOWN;
+
+        return true;
+
+    }
+
+
+    void setSourceAttributes () {
+        dl.setFillColor (-1, -1, -1);
+        dl.setBorderColor (255, 0, 0);
+    }
+
+
+    void setClipAttributes () {
+        dl.setFillColor (-1, -1, -1);
+        dl.setBorderColor (0, 0, 255);
     }
 
 };

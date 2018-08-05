@@ -4553,7 +4553,7 @@ int CSWPolyGraph::NestHoles (void)
                 }
 
             /*
-             * If all of the comp2 sides are indise the ith comp,
+             * If all of the comp2 sides are inside the ith comp,
              * then the comp2 comp is inside the ith comp and is
              * a potential level 1 hole.
              */
@@ -4572,7 +4572,8 @@ int CSWPolyGraph::NestHoles (void)
                         imain++;
                     }
                 }
-                if (imain < comp->npts-1) {
+                //if (imain < comp->npts-1) {
+                if (imain < comp2->npts-1) {
                     continue;
                 }
 
@@ -4701,7 +4702,7 @@ int CSWPolyGraph::BuildCompVecs (int *x1, int *y1, int *x2, int *y2,
 
   ****************************************************************************
 
-    Populate the output point and component arrays from the internal
+  Populate the output point and component arrays from the internal
   component structure array.  All main components will be immediately
   followed by their hole components in the output.
 

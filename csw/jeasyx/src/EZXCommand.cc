@@ -109,12 +109,12 @@ int ezx_process_command (
  * Special native debug commands.  These are often from hand edited
  * "playback" files and only run from the ezx_test program.
  */
-    if (command_id == GTX_POLYGON_BOOLEAN) {
+    if (command_id == TEST_POLYGON_BOOLEAN) {
         NativeDebug::SimplePolyInt ();
         return 1;
     }
 
-    if (command_id == GTX_POLYGON_BOOLEAN_2) {
+    if (command_id == TEST_POLYGON_BOOLEAN_2) {
         double   *xs, *ys, *xc, *yc;
         int      *isc, *isv, *icc, *icv, nsc, ncc;
         int      svt, cvt, i, n;
@@ -2352,6 +2352,18 @@ int ezx_process_command (
             break;
 
     /*--------------------------------------------------------------
+     * For a polygon boolean command, pass the raw ilist, idata and ddata 
+     * pointers to the polygon boolean calc stuff.  This keeps this huge 
+     * switch from getting even bigger.
+     */
+        case GTX_POLYGON_BOOLEAN:
+
+            dlist->PerformPolyBoolean (ilist, idata, ddata);
+
+            break;
+
+    
+    /*--------------------------------------------------------------
      * For an unrecognized command, return an error
      */
         default:
@@ -2434,9 +2446,8 @@ int  ezx_get_jenv (int dlist_index,
 
 }
 
-
-
-
-
 }  // end of extern "C" block
+
+
+
 

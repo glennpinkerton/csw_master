@@ -146,8 +146,8 @@ public class JDisplayList extends JDisplayListBase {
     int          DdataMax = 10000;
 
 
-// Check if these are preventing the JDL from being garbage collected.
-
+// Set the arrays to null in case it helps speed up garbage collection.
+// May not help, but it should not hurt either.
     public void clearArrays ()
     {
         Ilist = null;
@@ -2218,18 +2218,17 @@ public class JDisplayList extends JDisplayListBase {
 /*-------------------------------------------------------------*/
 
   /**
-  Add a complex filled polygons to the display list.  Complex polygons are packed into the x and y arrays
+  Add complex filled polygons to the display list.  Complex polygons are packed into the x and y arrays
   as a sequence of polygon components.  Each component has a number of points defining it.  For example,
   if a polygon has its main component and 2 holes, there are 3 components total.  In this case ncomp
   is 3.  If the main component has 10 points, the first hole has 5 points and the second hole has 7 points,
   then npts[0] is 10, npts[1] is 5 and npts[2] is 7.  x[0] to x[9] has the main x coordinates.  y[0] to y[9]
-  has main y coordinates.  x[10 = x[14] has hole1 x and y[10] to y[14] has hole 1 y.  x[15] to x[20] has
-  hole 2 x and y[15] t y[20] has hole 2 y.
+  has main y coordinates.  x[10] to x[14] has hole1 x and y[10] to y[14] has hole 1 y.  x[15] to x[20] has
+  hole 2 x and y[15] to y[20] has hole 2 y.
   <p>
   The polygon will be filled with the current fill color and pattern.  If the outline flag is specified
-  as 1, the polygon border will be drawn using the current line drawing graphic attributes.
+  as 1, the polygon border will be drawn using the current border drawing graphic attributes.
   <p>
-  This method is identical to the addPolygon method.
   @param x Packed x coordinates for all polygon components.
   @param y Packed y coordinates for all polygon components.
   @param npts Array with number of points per component.
@@ -3395,70 +3394,6 @@ of Font.BOLD|Font.ITALIC.
         currentFillPatternGreen = Ilist[1];
         currentFillPatternBlue = Ilist[2];
         currentFillPatternAlpha = Ilist[3];
-
-        return 1;
-
-    }
-
-/*-------------------------------------------------------------*/
-
-  /**
-  Add a complex filled polygons to the display list.  Complex polygons are packed into the x and y arrays
-  as a sequence of polygon components.  Each component has a number of points defining it.  For example,
-  if a polygon has its main component and 2 holes, there are 3 components total.  In this case ncomp
-  is 3.  If the main component has 10 points, the first hole has 5 points and the second hole has 7 points,
-  then npts[0] is 10, npts[1] is 5 and npts[2] is 7.  x[0] to x[9] has the main x coordinates.  y[0] to y[9]
-  has main y coordinates.  x[10 = x[14] has hole1 x and y[10] to y[14] has hole 1 y.  x[15] to x[20] has
-  hole 2 x and y[15] t y[20] has hole 2 y.
-  <p>
-  The polygon will be filled with the current fill color and pattern.  If the outline flag is specified
-  as 1, the polygon border will be drawn using the current line drawing graphic attributes.
-  <p>
-  This method is identical to the addFill method.
-  @param x Packed x coordinates for all polygon components.
-  @param y Packed y coordinates for all polygon components.
-  @param npts Array with number of points per component.
-  @param ncomp Number of components.
-  @param outline true=draw outline, false=do not draw outline
-   */
-    public int addPolygon (double[] x,
-                           double[] y,
-                           int[] npts,
-                           int ncomp,
-                           boolean outline)
-
-    {
-        int        ntot, i;
-
-        ntot = 0;
-        for (i=0; i<ncomp; i++) {
-            ntot += npts[i];
-        }
-        new_ddata ((ntot + ncomp) * 2);
-        for (i=0; i<ntot; i++) {
-            Ddata[i] = x[i];
-            Ddata[ntot + i] = y[i];
-        }
-        for (i=0; i<ncomp; i++) {
-            Idata[i] = npts[i];
-        }
-
-        Ilist[0] = ncomp;
-        Ilist[1] = ntot;
-        Ilist[2] = outline ? 1 : 0; // Ilist[2] expects an int flag
-
-        sendNativeCommand (
-            GTX_FILLPOLY,
-            Ilist,
-            null,
-            null,
-            null,
-            Idata,
-            null,
-            Ddata
-        );
-
-        logger.info ("    Added polygon with " + ncomp + " components    ");
 
         return 1;
 
@@ -4718,9 +4653,7 @@ of Font.BOLD|Font.ITALIC.
     public void eraseSelectable (DLSelectable s) {
 
         if (s == null) {
-            throw
-            new IllegalArgumentException
-            ("A null DLSelectable object is specified for the eraseSelectable method.");
+            return;
         }
 
         Ilist[0] = s.getNativeIndex ();
@@ -5458,6 +5391,287 @@ of Font.BOLD|Font.ITALIC.
 
     }
 
+
+/*---------------------------------------------------------------------*/
+
+    public int polyBoolean
+        (double[] xsrc,
+         double[] ysrc,
+         int[] npts_src,
+         int ncomp_src,
+         double[] xclip,
+         double[] yclip,
+         int[] npts_clip,
+         int ncomp_clip,
+         int boolean_type,
+         double[] xout,
+         double[] yout,
+         int[] npts_out,
+         Integer ncomp_out)
+    {
+        return 1;
+    }
+
+
+/*---------------------------------------------------------------------*/
+
+
+    public int polyBoolean
+        (ArrayList<Double> xsrc,
+         ArrayList<Double> ysrc,
+         ArrayList<Integer> npts_src,
+         int ncomp_src,
+         ArrayList<Double> xclip,
+         ArrayList<Double> yclip,
+         ArrayList<Integer> npts_clip,
+         int ncomp_clip,
+         int boolean_type,
+         ArrayList<Double> xout,
+         ArrayList<Double> yout,
+         ArrayList<Integer> npts_out,
+         Integer ncomp_out)
+    {
+        return 1;
+    }
+
+
+/*---------------------------------------------------------------------*/
+
+    public int polyIntersect
+        (ArrayList<DLFill> sourcePolyList,
+         ArrayList<DLFill> clipPolyList,
+         ArrayList<DLFill> outPolyList) 
+    {
+        return
+        polyBoolean
+          (sourcePolyList,
+           clipPolyList,
+           outPolyList,
+           DLConst.POLY_INTERSECT_OP);
+    }
+    
+
+    public int polyUnion
+        (ArrayList<DLFill> sourcePolyList,
+         ArrayList<DLFill> clipPolyList,
+         ArrayList<DLFill> outPolyList) 
+    {
+        return
+        polyBoolean
+          (sourcePolyList,
+           clipPolyList,
+           outPolyList,
+           DLConst.POLY_UNION_OP);
+    }
+    
+
+    public int polyXor
+        (ArrayList<DLFill> sourcePolyList,
+         ArrayList<DLFill> clipPolyList,
+         ArrayList<DLFill> outPolyList) 
+    {
+        return
+        polyBoolean
+          (sourcePolyList,
+           clipPolyList,
+           outPolyList,
+           DLConst.POLY_XOR_OP);
+    }
+   
+ 
+    public int polyFragment
+        (ArrayList<DLFill> sourcePolyList,
+         ArrayList<DLFill> clipPolyList,
+         ArrayList<DLFill> outPolyList) 
+    {
+        return
+        polyBoolean
+          (sourcePolyList,
+           clipPolyList,
+           outPolyList,
+           DLConst.POLY_FRAGMENT_OP);
+    }
+
+
+    int polyBoolean
+        (ArrayList<DLFill> sourcePolyList,
+         ArrayList<DLFill> clipPolyList,
+         ArrayList<DLFill> outPolyList,
+         int op_type)
+    {
+      double[] xpout, ypout;
+      int[] np1, np2, npout;
+      int nc1, nc2;
+      Integer ncout;
+
+      int siz1, siz2;
+      siz1 = sourcePolyList.size();
+      siz2 = clipPolyList.size();
+      if (siz1 < 1  ||  siz2 < 1) {
+        return -1;
+      }
+
+      int n1 = 0;
+      int nn1 = 0;
+      for (DLFill dlf : sourcePolyList) {
+        for (int i=0; i<dlf.numPoints.length; i++) {
+          n1 += dlf.numPoints[i];
+          nn1++;
+        }
+      }
+
+      int n2 = 0;
+      int nn2 = 0;
+      for (DLFill dlf : clipPolyList) {
+        for (int i=0; i<dlf.numPoints.length; i++) {
+          n2 += dlf.numPoints[i];
+          nn2++;
+        }
+      }
+
+      int maxout = (siz1 + siz2) * 10;
+      if (maxout < 100) maxout = 100;
+      int maxptsout = (n1 + n2) * 10;
+      if (maxptsout < 2000) maxptsout = 2000;
+
+      npout = new int[maxout];
+      xpout = new double[maxptsout];
+      ypout = new double[maxptsout];
+
+      Ilist[0] = siz1;
+      Ilist[1] = siz2;
+      Ilist[2] = op_type;
+
+// slot for number of output components
+      Ilist[3] = 0;
+
+// offset and max output size in idata for output space
+      Ilist[4] = siz1 + siz2 + nn1 + nn2;
+      Ilist[5] = maxout / 2;
+
+// offset and max output size in ddata for output points
+      Ilist[6] = n1 * 2 + n2 * 2;
+      Ilist[7] = maxptsout / 2;
+
+      int max_ddata =  n1 * 2 + n2 * 2 + maxptsout;
+      int max_idata =  siz1 + siz2 + maxout;
+ 
+      new_ddata (max_ddata);  
+      new_idata (max_idata);  
+
+      int nn = 0;
+      for (DLFill dlf : sourcePolyList) {
+        Idata[nn] = dlf.numPoints.length;
+        nn++;
+      }
+
+      for (DLFill dlf : clipPolyList) {
+        Idata[nn] = dlf.numPoints.length;
+        nn++;
+      }
+
+      int nptot = 0;
+      for (DLFill dlf : sourcePolyList) {
+        for (int nnn=0; nnn<dlf.numPoints.length; nnn++) {
+          Idata[nn] = dlf.numPoints[nnn];
+          nptot += Idata[nn];
+          nn++;
+        }
+      }
+
+      for (DLFill dlf : clipPolyList) {
+        for (int nnn=0; nnn<dlf.numPoints.length; nnn++) {
+          Idata[nn] = dlf.numPoints[nnn];
+          nptot += Idata[nn];
+          nn++;
+        }
+      }
+
+      nn = 0;
+      for (DLFill dlf : sourcePolyList) {
+        int nk = 0;
+        for (int i=0; i<dlf.numPoints.length; i++) {
+          for (int k=0; k<dlf.numPoints[i]; k++) {
+            Ddata[nn] = dlf.xPoints[nk];
+            Ddata[nptot + nn] = dlf.yPoints[nk];
+            nn++;
+            nk++;
+          }
+        }
+      }
+      
+      for (DLFill dlf : clipPolyList) {
+        int nk = 0;
+        for (int i=0; i<dlf.numPoints.length; i++) {
+          for (int k=0; k<dlf.numPoints[i]; k++) {
+            Ddata[nn] = dlf.xPoints[nk];
+            Ddata[nptot + nn] = dlf.yPoints[nk];
+            nn++;
+            nk++;
+          }
+        }
+      }
+
+      sendNativeCommand (
+          GTX_POLYGON_BOOLEAN,
+          Ilist,
+          null,
+          null,
+          null,
+          Idata,
+          null,
+          Ddata
+      );
+
+      int  npolyout = Ilist[3];
+      int  startcout = Ilist[4];
+      int  starthout = startcout + Ilist[5];
+
+      int  startxout = Ilist[6];
+      int  startyout = startxout + Ilist[7];
+
+      int psiz = 0;
+      int xysiz = 0;
+
+      int ihole = 0;
+      int ixy = 0;
+
+      for (int i=0; i<npolyout; i++) {
+
+        psiz = Idata[startcout + i];
+        int[] numPoints = new int[psiz];
+        xysiz = 0;
+
+        for (int j=0; j<psiz; j++) {
+          int  _nxy = Idata[starthout + ihole];
+          numPoints[j] = _nxy;
+          xysiz += _nxy;
+          ihole++;
+        }
+
+        double[] xPoints = new double[xysiz];
+        double[] yPoints = new double[xysiz];
+
+        int ixyout = 0;
+        for (int j=0; j<psiz; j++) {
+          for (int k=0; k<numPoints[j]; k++) {
+            xPoints[ixyout] = Ddata[startxout + ixy];
+            yPoints[ixyout] = Ddata[startyout + ixy];
+            ixy++;
+            ixyout++;
+          }
+        }
+
+        DLFill dlff = new DLFill ();
+        dlff.numPoints = numPoints;
+        dlff.xPoints = xPoints;
+        dlff.yPoints = yPoints;
+        dlff.numComponents = psiz;
+        outPolyList.add (dlff);
+      }
+
+      return 1;
+    }
 
 /*---------------------------------------------------------------------*/
 

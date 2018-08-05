@@ -155,7 +155,7 @@ int main (int argc, char *argv[])
         end_flag = 0;
         switch (command_id) {
 
-            case GTX_POLYGON_BOOLEAN:
+            case TEST_POLYGON_BOOLEAN:
 
                 ezx_process_command (
                     dlist_index,
@@ -174,7 +174,7 @@ int main (int argc, char *argv[])
 
                 break;
 
-            case GTX_POLYGON_BOOLEAN_2:
+            case TEST_POLYGON_BOOLEAN_2:
 
                 int    nps, npc, *icc, *ics, *ivc, *ivs;
                 int    cvt, svt;
