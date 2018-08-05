@@ -64,12 +64,15 @@ public class JPolygonEditor implements JDLEditListener {
     private boolean              appendMode = false,
                                  prependMode = false;
 
+    private boolean              bendFlag = false;
+
     private ArrayList<EPoint>  dbgLine = null;
 
     private ArrayList<EPoint>  currentLine = null;
-    private ELine     currentEline;
-    private int       currentPoint;
-    private int       currentSegment;
+    private EPoly     currentEline;
+    private int       currentPoint = -1;
+    private int       currentSegment = -1;
+    private int       currentFrameNum = -1;
 
     private boolean    bsypr = false;
     private boolean    bclick = false;
@@ -98,21 +101,6 @@ public class JPolygonEditor implements JDLEditListener {
       System.out.flush ();
     }
 
-    private void pr5 (String str, ArrayList<EPoint> line) {
-      if (!bsypr || !bclick) return;
-      if (line == null) {
-        System.out.println (" pr5 from: " + str + "  line is null");
-        System.out.flush ();
-        return;
-      }
-      System.out.println (" pr5 from: " + str);
-      EPoint ep = line.get(0);
-      System.out.println ("   sx = " + ep.sx + "  sy = " + ep.sy);
-      ep = line.get(4);
-      System.out.println ("   sx = " + ep.sx + "  sy = " + ep.sy);
-      System.out.flush ();
-    }
-      
 
 /**
  * The polygon editor must have references to a {@link JDisplayList} and
@@ -285,8 +273,6 @@ public class JPolygonEditor implements JDLEditListener {
     {
         EPoint          ep, ep1;
 
-pr5 ("processDelete start", dbgLine);
-
         if (currentLine != null) {
 
         /*
@@ -379,18 +365,14 @@ pr5 ("processDelete start", dbgLine);
             }
         }
 
-pr5 ("processDelete middle", dbgLine);
-
         drawEditPoints ();
-
-pr5 ("processDelete end", dbgLine);
 
     }
 
 /*------------------------------------------------------------------------------*/
 
-    private static class ELine {
-        DLLine               dline;
+    private static class EPoly {
+        DLFill               dpoly;
         ArrayList<EPoint>    points;
     }
 
@@ -404,8 +386,8 @@ pr5 ("processDelete end", dbgLine);
         public       int       fnum;
     }
 
-    private ArrayList<ELine>   editLines = 
-        new ArrayList<ELine> (10);
+    private ArrayList<EPoly>   editPolys = 
+        new ArrayList<EPoly> (10);
     private EPoint             dragEP = null;
 
 /*--------------------------------------------------------------------*/
@@ -457,21 +439,21 @@ pr5 ("processDelete end", dbgLine);
             return;
         }
 
-        ArrayList<DLLine> lines = dls.getLineList ();
-        if (lines == null) {
+        ArrayList<DLFill> polys = dls.getFillList ();
+        if (polys == null) {
             return;
         }
 
-        int nline = lines.size ();
-        if (nline < 1) {
+        int npoly = polys.size ();
+        if (npoly < 1) {
             return;
         }
 
         int         i, n;
 
         n = 0;
-        for (i=0; i<nline; i++) {
-            if (lines.get(i) != null) {
+        for (i=0; i<npoly; i++) {
+            if (polys.get(i) != null) {
                 n = 1;
                 break;
             }
@@ -481,35 +463,45 @@ pr5 ("processDelete end", dbgLine);
             return;
         }
 
-        DLLine      dline;
+        DLFill      dpoly;
         double[]    xp, yp;
         int         npts, j;
 
-        for (i=0; i<nline; i++) {
+        for (i=0; i<npoly; i++) {
 
-            dline = lines.get(i);
-            if (dline == null) {
+            dpoly = polys.get(i);
+            if (dpoly == null) {
                 continue;
             }
 
-            editPoints = new ArrayList<EPoint> (100);
 
-            xp = dline.getXPoints ();
-            yp = dline.getYPoints ();
-            npts = dline.getNumPoints ();
-            for (j=0; j<npts; j++) {
+            int jn = 0;
+            xp = dpoly.getXPoints ();
+            if (xp == null) continue;
+            yp = dpoly.getYPoints ();
+            if (yp == null) continue;
+            int[] npts_arr = dpoly.getNumPoints ();
+            if (npts_arr == null) continue;
+
+            for (int jc=0; jc<npts_arr.length; jc++) {
+              editPoints = new ArrayList<EPoint> (5);
+              npts = npts_arr[jc];
+
+              for (j=0; j<npts; j++) {
                 EPoint ep = new EPoint ();
-                ep.x = xp[j];
-                ep.y = yp[j];
+                ep.x = xp[jn];
+                ep.y = yp[jn];
+                jn++;
                 ep.flag = 0;
-                ep.fname = dline.frameName;
+                ep.fname = dpoly.frameName;
                 ep.fnum = -1;
                 editPoints.add (ep);
+              }
+              EPoly epoly = new EPoly ();
+              epoly.dpoly = dpoly;
+              epoly.points = editPoints;
+              editPolys.add (epoly);
             }
-            ELine eline = new ELine ();
-            eline.dline = dline;
-            eline.points = editPoints;
-            editLines.add (eline);
         }
 
     }
@@ -624,8 +616,6 @@ bclick = false;
             return;
         }
 
-pr5 ("mousePressed start", dbgLine);
-
     /*
      * If the button press is on a point or line, make the location
      * the drag point.  Only do this if not in append or prepend mode.
@@ -651,13 +641,9 @@ pr5 ("mousePressed start", dbgLine);
                 }
                 dragEP = ep;
             }
-pr5 ("mousePressed middle", dbgLine);
-
             drawEditPoints ();
 
         }
-
-pr5 ("mousePressed end", dbgLine);
 
         return;
 
@@ -723,9 +709,9 @@ pr5 ("mousePressed end", dbgLine);
             return;
         }
 
-        int index = editLines.indexOf (currentEline);
+        int index = editPolys.indexOf (currentEline);
         if (index >= 0) {
-            editLines.remove (index);
+            editPolys.remove (index);
         }
 
         callUpdateListeners ();
@@ -753,11 +739,11 @@ pr5 ("mousePressed end", dbgLine);
             return;
         }
         currentLine = new ArrayList<EPoint> (20);
-        ELine  eline = new ELine ();
-        currentEline = eline;
-        eline.dline = null;
-        eline.points = currentLine;
-        editLines.add (eline);
+        EPoly  epoly = new EPoly ();
+        currentEline = epoly;
+        epoly.dpoly = null;
+        epoly.points = currentLine;
+        editPolys.add (epoly);
         EPoint ep = new EPoint ();
         ep.sx = e.getX();
         ep.sy = e.getY();
@@ -787,7 +773,6 @@ pr5 ("mousePressed end", dbgLine);
     public void mouseReleased (MouseEvent e)
     {
 
-pr5 ("mouseReleased enter", dbgLine);
         setButtonID (e);
         if (buttonNumber == 1) {
             button1Pressed = false;
@@ -806,7 +791,6 @@ pr5 ("mouseReleased enter", dbgLine);
             drawEditPoints ();
         }
 
-pr5 ("mouseReleased end", dbgLine);
         return;
 
     }
@@ -822,8 +806,6 @@ pr5 ("mouseReleased end", dbgLine);
         dragEP.sx = e.getX();
         dragEP.sy = e.getY();
         screenToFrame (dragEP);
-
-pr5 ("mouse motion enter", dbgLine);
 
         // make sure the component stays closed.
         if (currentLine != null) {
@@ -842,9 +824,7 @@ pr5 ("mouse motion enter", dbgLine);
 
         callMotionListeners ();
 
-pr5 ("mouse motion middle", dbgLine);
         drawEditPoints ();
-pr5 ("mouse motion end", dbgLine);
 
     }
 
@@ -857,13 +837,11 @@ pr5 ("mouse motion end", dbgLine);
         GeneralPath     gpath, gpath2;
         EPoint          ep;
         ArrayList<EPoint>       line;
-        ELine           eline;
-
-sypr ("draw edit points called");
+        EPoly           epoly;
 
         dlist.clearDirectShapes ();
 
-        int lsize = editLines.size ();
+        int lsize = editPolys.size ();
         int csize = 0;
         if (currentLine != null) csize = currentLine.size ();
         if (lsize < 1  &&  csize < 1) {
@@ -889,19 +867,15 @@ sypr ("draw edit points called");
             b = 20;
         }
 
-        NativePrim.Frame   frame;
-
-        int fnum = -1;
-
         int lslast = lsize - 1;
-        if (currentLine == null) lslast = lsize;
+        if (bendFlag) lslast = lsize;
 
     /*
-     * Create shapes for the edit lines and put them in the display list.
+     * Create shapes for the edit polys and put them in the display list.
      */
         for (i=0; i<lslast; i++) {
-            eline = editLines.get(i);
-            line = eline.points;
+            epoly = editPolys.get(i);
+            line = epoly.points;
             if (line == null) {
                 continue;
             }
@@ -910,31 +884,7 @@ sypr ("draw edit points called");
                 continue;
             }
             ep = line.get(0);
-            fnum = dlist.findFrameNumberByName (ep.fname);
-            frame = dlist.findFrameByName (ep.fname);
-            if (frame == null) {
-                frame = dlist.findEditFrame (ep.fnum);
-                fnum = ep.fnum;
-                if (frame == null) {
-                    continue;
-                }
-            }
-sypr ("points in edit draw component = " + line.hashCode());
-if (currentLine != null) {
-sypr ("currentLine = " + currentLine.hashCode());
-}
-else {
-sypr ("currentLine = null");
-}
-sypr ("npts in edit draw old component = " + npts);
-syprcomp (line);
-            for (j=0; j<npts; j++) {
-                ep = line.get(j);
-                ep.sx = (ep.x - frame.fx1) / frame.xscale + frame.x1;
-                ep.sy = (ep.y - frame.fy1) / frame.yscale + frame.y1;
-            }
             gpath = new GeneralPath (GeneralPath.WIND_EVEN_ODD);
-            gpath.reset ();
             ep = line.get(0);
             gpath.moveTo ((float)ep.sx, (float)ep.sy);
             for (j=1; j<npts; j++) {
@@ -944,7 +894,7 @@ syprcomp (line);
                 }
                 gpath.lineTo ((float)ep.sx, (float)ep.sy);
             }
-            dlist.addDirectShape (gpath, r, g, b, 0, fnum);
+            dlist.addDirectShape (gpath, r, g, b, 0);
         }
 
     /*
@@ -953,8 +903,8 @@ syprcomp (line);
         Rectangle2D    rect;
 
         for (i=0; i<lslast; i++) {
-            eline = editLines.get(i);
-            line = eline.points;
+            epoly = editPolys.get(i);
+            line = epoly.points;
             if (line == null) {
                 continue;
             }
@@ -963,15 +913,6 @@ syprcomp (line);
                 continue;
             }
             ep = line.get(0);
-            fnum = dlist.findFrameNumberByName (ep.fname);
-            frame = dlist.findFrameByName (ep.fname);
-            if (frame == null) {
-                frame = dlist.findEditFrame (ep.fnum);
-                fnum = ep.fnum;
-                if (frame == null) {
-                    continue;
-                }
-            }
             for (j=0; j<npts; j++) {
                 ep = line.get(j);
                 if (ep == null  ||  ep == dragEP) {
@@ -983,8 +924,8 @@ syprcomp (line);
                     ep.sy,
                     ep.sx+3.0,
                     ep.sy+3.0);
-                dlist.addDirectShape (rect, bgr, bgg, bgb, 1, fnum);
-                dlist.addDirectShape (rect, r, g, b, 0, fnum);
+                dlist.addDirectShape (rect, bgr, bgg, bgb, 1);
+                dlist.addDirectShape (rect, r, g, b, 0);
             }
         }
 
@@ -993,30 +934,29 @@ syprcomp (line);
      */
         line = currentLine;
         if (line == null) {
+            localRepaint ();
             return;
         }
         npts = line.size();
         if (npts < 2) {
+            localRepaint ();
             return;
         }
         gpath2 = new GeneralPath (GeneralPath.WIND_EVEN_ODD);
         ep = line.get(0);
-sypr ("draw point 0 = " + ep.sx + "   " + ep.sy);
         gpath2.moveTo ((float)ep.sx, (float)ep.sy);
         for (j=1; j<npts; j++) {
             ep = line.get(j);
             if (ep == null) {
                 continue;
             }
-sypr ("draw point " + j + " = " + ep.sx + "   " + ep.sy);
             gpath2.lineTo ((float)ep.sx, (float)ep.sy);
         }
         if (npts > 2) {
             ep = line.get(0);
-sypr ("closure point = " + ep.sx + "   " + ep.sy);
             gpath2.lineTo ((float)ep.sx, (float)ep.sy);
         }
-        dlist.addDirectShape (gpath2, r, g, b, 0, fnum);
+        dlist.addDirectShape (gpath2, r, g, b, 0);
 
         localRepaint ();
 
@@ -1100,6 +1040,10 @@ sypr ("closure point = " + ep.sx + "   " + ep.sy);
         else if (ep.fnum >= 0) {
             f = dlist.findEditFrame (ep.fnum);
         }
+        else if (currentFrameNum >= 0) {
+            ep.fnum = currentFrameNum;
+            f = dlist.findEditFrame (ep.fnum);
+        }
 
         if (f != null) {
             ep.x = (ep.sx - f.x1) * f.xscale + f.fx1;
@@ -1119,7 +1063,7 @@ sypr ("closure point = " + ep.sx + "   " + ep.sy);
         EPoint        ep, ep1, ep2;
 
         ArrayList<EPoint>     line;
-        ELine         eline;
+        EPoly         epoly;
         int           lsize, npts, i, j, jmin, jlmin;
         double        dist, minDist;
 
@@ -1142,7 +1086,7 @@ sypr ("closure point = " + ep.sx + "   " + ep.sy);
         currentPoint = -1;
         currentSegment = -1;
 
-        lsize = editLines.size();
+        lsize = editPolys.size();
         if (lsize < 1) {
             return;
         }
@@ -1158,8 +1102,8 @@ sypr ("closure point = " + ep.sx + "   " + ep.sy);
         minDist = 1.e30;
 
         for (i=0; i<lsize; i++) {
-            eline = editLines.get(i);
-            line = eline.points;
+            epoly = editPolys.get(i);
+            line = epoly.points;
             if (line == null) {
                 continue;
             }
@@ -1175,7 +1119,7 @@ sypr ("closure point = " + ep.sx + "   " + ep.sy);
                 dist = Point2D.distance (xp, yp, ep.sx, ep.sy);
                 if (dist < 3.0) {
                     currentLine = line;
-                    currentEline = eline;
+                    currentEline = epoly;
                     currentPoint = j;
                     return;
                 }
@@ -1189,9 +1133,9 @@ sypr ("closure point = " + ep.sx + "   " + ep.sy);
 
         if (jmin >= 0  &&  jlmin >= 0) {
             if (minDist < 5.0) {
-                eline = editLines.get(jlmin);
-                currentLine = eline.points;
-                currentEline = eline;
+                epoly = editPolys.get(jlmin);
+                currentLine = epoly.points;
+                currentEline = epoly;
                 currentPoint = jmin;
                 return;
             }
@@ -1205,8 +1149,8 @@ sypr ("closure point = " + ep.sx + "   " + ep.sy);
         minDist = 1.e30;
 
         for (i=0; i<lsize; i++) {
-            eline = editLines.get(i);
-            line = eline.points;
+            epoly = editPolys.get(i);
+            line = epoly.points;
             if (line == null) {
                 continue;
             }
@@ -1225,7 +1169,7 @@ sypr ("closure point = " + ep.sx + "   " + ep.sy);
                                          xp, yp);
                 if (dist < 2.0) {
                     currentLine = line;
-                    currentEline = eline;
+                    currentEline = epoly;
                     currentSegment = j;
                     return;
                 }
@@ -1239,9 +1183,9 @@ sypr ("closure point = " + ep.sx + "   " + ep.sy);
 
         if (jmin >= 0  &&  jlmin >= 0) {
             if (minDist < 4.0) {
-                eline = editLines.get(jlmin);
-                currentLine = eline.points;
-                currentEline = eline;
+                epoly = editPolys.get(jlmin);
+                currentLine = epoly.points;
+                currentEline = epoly;
                 currentSegment = jmin;
                 return;
             }
@@ -1253,9 +1197,6 @@ sypr ("closure point = " + ep.sx + "   " + ep.sy);
 
 /*----------------------------------------------------------------------------*/
 
-    private int          currentFrameNum = -1;
-
-/*----------------------------------------------------------------------------*/
 
     private void processMiddleClick (MouseEvent e)
     {
@@ -1277,11 +1218,6 @@ sypr ("closure point = " + ep.sx + "   " + ep.sy);
     {
 
         EPoint  ep;
-
-sypr ();
-sypr ("process left click entered editLines size = " + editLines.size());
-sypr ("  sx = " + e.getX() + "  sy = " + e.getY());
-pr5 ("#100", dbgLine);
 
         int iframe = dlist.findRescaleFrame (e.getX(),
                                              e.getY());
@@ -1323,12 +1259,10 @@ pr5 ("#100", dbgLine);
 
         if (e.getClickCount() == 2) {
 bsypr = true;
-sypr ("double click count in left click npts = " + currentLine.size());
-
+bclick = true;
             closeLineIfNeeded (currentLine);
             endCurrentLine ();
             callUpdateListeners ();
-pr5 ("#7", dbgLine);
             return;            
         }
 
@@ -1390,15 +1324,11 @@ private void startNewComponent ()
 private void endCurrentLine ()
 {
 
-sypr ("endCurrentLine nline = " + editLines.size ());
-sypr (" line pointers at end  " + currentLine.hashCode() + "   " +
-  editLines.get(editLines.size() - 1).points.hashCode());
-
-syprcomp (editLines.get(editLines.size() - 1).points);
-
-dbgLine = currentLine;
-
     currentLine = null;
+    dragEP = null;
+
+    bendFlag = true;
+
     return;
 
 }
@@ -1409,11 +1339,18 @@ dbgLine = currentLine;
 private void addFirstTwoPoints (MouseEvent e, int iframe)
 {
 
-    ELine  eline = new ELine ();
-    currentEline = eline;
-    eline.dline = null;
-    eline.points = currentLine;
-    editLines.add (eline);
+    if (currentFrameNum == -1) {
+        currentFrameNum = dlist.findRescaleFrame (e.getX(), e.getY());
+        if (iframe == -1) iframe = currentFrameNum;
+    }
+    bendFlag = false;
+
+    EPoly epoly = new EPoly ();
+
+    currentEline = epoly;
+    epoly.dpoly = null;
+    epoly.points = currentLine;
+    editPolys.add (epoly);
     EPoint ep = new EPoint ();
     ep.sx = e.getX();
     ep.sy = e.getY();
@@ -1437,8 +1374,13 @@ private void addFirstTwoPoints (MouseEvent e, int iframe)
 
     private void endEdit ()
     {
-        for (ELine eline : editLines) {
-          closeLineIfNeeded(eline.points);
+        for (EPoly epoly : editPolys) {
+          closeLineIfNeeded(epoly.points);
+          if (epoly.points != null) {
+            for (EPoint ep : epoly.points) {
+              screenToFrame (ep);
+            }
+          }
         }
         callEndListeners ();
         dlist.setSelectionMode();
@@ -1473,7 +1415,6 @@ private void addFirstTwoPoints (MouseEvent e, int iframe)
 
     private void startExtensionMode ()
     {
-pr5 ("startExtensionMode enter", dbgLine);
         int last = currentLine.size () - 1;
         EPoint startEP = null;
         if (currentPoint == last) {
@@ -1500,7 +1441,6 @@ pr5 ("startExtensionMode enter", dbgLine);
         }
         dragEP = ep;
         currentSegment = -1;
-pr5 ("startExtensionMode end", dbgLine);
         return;
     }
 
@@ -1769,133 +1709,116 @@ pr5 ("startExtensionMode end", dbgLine);
 
 /*----------------------------------------------------------------------------*/
 
-    private int rebuildSelectableLines ()
+    private int rebuildSelectablePolys ()
     {
         DLSelectable dls = dlist.getSelectable (selectableNum);
         if (dls == null) {
             return -1;
         }
 
-        ArrayList<DLLine> lines;
-        lines = dls.lineList;
-        if (lines == null) {
-            lines = new ArrayList<DLLine> (10);
-            dls.lineList = lines;
+        ArrayList<DLFill> polys;
+        polys = dls.fillList;
+        if (polys == null) {
+            polys = new ArrayList<DLFill> (10);
+            dls.fillList = polys;
         }
 
-        DLLine        dline;
+        DLFill        dpoly;
         boolean       dlfound;
         int           i;
 
       /*
-       * If any dline in the original list has no counterpart in the
-       * edit list, that dline has been deleted and it is removed from
-       * the selectable's line list.
+       * If any dfill in the original list has no counterpart in the
+       * edit list, that dfill has been deleted and it is removed from
+       * the selectable's fill list.
        */
-        int lsize = lines.size();
+        int lsize = polys.size();
         if (lsize > 0) {
             for (i=lsize-1; i>=0; i--) {
-                dline = lines.get (i);
-                if (dline == null) {
-                    lines.remove (i);
+                dpoly = polys.get (i);
+                if (dpoly == null) {
+                    polys.remove (i);
                     continue;
                 }
-                dlfound = findDline (dline);
+                dlfound = findDline (dpoly);
                 if (dlfound == false) {
-                    lines.remove (i);
+                    polys.remove (i);
                     continue;
                 }
             }
         }
 
-        ELine          eline;
         int            index;
 
       /*
-       * If an edit line has a counterpart in the selectable line
-       * list (after the removal of lines that no longer exist),
+       * If an edit fill has a counterpart in the selectable fill
+       * list (after the removal of polys that no longer exist),
        * then update its geometry.  If there is no counterpart,
-       * create a new dline with the current graphic attributes
-       * and add it to the selectable's line list.
+       * create a new dpoly and add it to the selectable's fill list.
        */
-        int esize = editLines.size ();
-        for (i=0; i<esize; i++) {
-            eline = editLines.get (i);
-            assignXYToDline (eline);
-            if (eline.dline != null) {
-                index = lines.indexOf (eline.dline);
+        for (EPoly epoly : editPolys) {
+            if (epoly.dpoly != null) {
+                index = polys.indexOf (epoly.dpoly);
                 if (index < 0) {
-                    lines.add (eline.dline);
+                    polys.add (epoly.dpoly);
                 }
             }
         }
 
+      /*
+       * All of the new polygon components will be in the same
+       * dpoly object which is added to the selectable's fill list.
+       */
+        int esize = editPolys.size ();
+        int[] ip = new int[esize];
+        int nip = 0;
+        int nxy = 0;
+        for (EPoly epoly : editPolys) {
+            ip[nip] = 0;
+            if (epoly.points != null) {
+                nxy += epoly.points.size();
+                ip[nip] = epoly.points.size();
+            }
+            nip++;
+        }
+
+        double[] xp = new double[nxy];
+        double[] yp = new double[nxy];
+        int np = 0;
+        for (EPoly epoly : editPolys) {
+            if (epoly.points != null) {
+                for (EPoint ep : epoly.points) {
+                    xp[np] = ep.x;
+                    yp[np] = ep.y;
+                    np++;
+                }
+            }
+        }
+
+        DLFill  dl2 = new DLFill ();
+        dl2.xPoints = xp;
+        dl2.yPoints = yp;
+        dl2.numPoints = ip;
+        dl2.numComponents = esize;
+        polys.add (dl2);
+        
         return 1;
 
     }
 
 /*----------------------------------------------------------------------------*/
 
-    private void assignXYToDline (ELine eline)
-    {
-        if (eline == null) {
-            return;
-        }
-
-        if (eline.points == null) {
-            eline.dline = null;
-            return;
-        }
-
-        if (
-          eline.points.size() < 2 &&
-          (!isPointPicking() && !isPointEditing())
-        ) {
-            eline.dline = null;
-            return;
-        } else if (eline.points.size() < 1) {
-            eline.dline = null;
-            return;
-        }
-
-        if (eline.dline == null) {
-            eline.dline = new DLLine ();
-            dlist.populateLineAttributes (eline.dline);
-        }
-
-        double[]        xp, yp;
-        int             i;
-        EPoint          ep;
-
-        int size = eline.points.size ();
-        xp = new double[size];
-        yp = new double[size];
-
-        for (i=0; i<size; i++) {
-            ep = eline.points.get (i);
-            xp[i] = ep.x;
-            yp[i] = ep.y;
-        }
-
-        eline.dline.xPoints = xp;
-        eline.dline.yPoints = yp;
-        eline.dline.numPoints = size;
-
-    }
-
-/*----------------------------------------------------------------------------*/
-
-    private boolean findDline (DLLine dline)
+    private boolean findDline (DLFill dpoly)
     {
         int        i, size;
-        ELine      eline;
+        EPoly      epoly;
 
-        size = editLines.size();
+        size = editPolys.size();
         for (i=0; i<size; i++) {
-            eline = editLines.get (i);
-            if (eline.dline == dline) {
-                if (eline.points != null) {
-                    if (eline.points.size() > 1) {
+            epoly = editPolys.get (i);
+            if (epoly.dpoly == dpoly) {
+                if (epoly.points != null) {
+                    if (epoly.points.size() > 1) {
                         return true;
                     }
                 }
@@ -1913,7 +1836,7 @@ pr5 ("startExtensionMode end", dbgLine);
             return;
         }
 
-        rebuildSelectableLines ();
+        rebuildSelectablePolys ();
 
         DLSelectable dls = dlist.getSelectable (selectableNum);
         if (dls == null) {
@@ -1935,7 +1858,7 @@ pr5 ("startExtensionMode end", dbgLine);
             return;
         }
 
-        rebuildSelectableLines ();
+        rebuildSelectablePolys ();
 
         DLSelectable dls = dlist.getSelectable (selectableNum);
         if (dls == null) {
@@ -1954,7 +1877,7 @@ pr5 ("startExtensionMode end", dbgLine);
     private void callEndListeners ()
     {
 
-        rebuildSelectableLines ();
+        rebuildSelectablePolys ();
 
         DLSelectable dls = dlist.getSelectable (selectableNum);
         if (dls == null) {

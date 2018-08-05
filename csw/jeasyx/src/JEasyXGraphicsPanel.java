@@ -146,7 +146,9 @@ public class JEasyXGraphicsPanel extends JPanel {
         );
       }
 
-      uiControlBox.addSeparator();
+      if (mask != 0) {
+        uiControlBox.addSeparator();
+      }
 
       // Zoom in button
       if ((mask & DLConst.ZOOM_IN_BUTTON_MASK)  !=  0) {
@@ -204,7 +206,9 @@ public class JEasyXGraphicsPanel extends JPanel {
         );
       }
 
-      uiControlBox.addSeparator();
+      if (mask != 0) {
+        uiControlBox.addSeparator();
+      }
 
       // pan button
       if ((mask & DLConst.PAN_BUTTON_MASK) != 0) {
@@ -220,7 +224,9 @@ public class JEasyXGraphicsPanel extends JPanel {
         );
       }
 
-      uiControlBox.addSeparator();
+      if (mask != 0) {
+        uiControlBox.addSeparator();
+      }
 
       // redraw button
       if ((mask & DLConst.REFRESH_BUTTON_MASK) != 0) {
@@ -250,8 +256,9 @@ public class JEasyXGraphicsPanel extends JPanel {
         );
       }
 
-      uiControlBox.addSeparator();
-      uiControlBox.addSeparator();
+      if (mask != 0) {
+        uiControlBox.addSeparator();
+      }
 
     }
   }
@@ -262,7 +269,7 @@ public class JEasyXGraphicsPanel extends JPanel {
   * Build the additionalButtonList one button at a time.
   * I use it for edit buttons, etc.
   */
-  public void addAdditionalTextButton (
+  public JButton addAdditionalTextButton (
     String labelText,
     String toolTipText,
     ActionListener al,
@@ -280,6 +287,8 @@ public class JEasyXGraphicsPanel extends JPanel {
     }
     addUIControl(button);
     CSW_UI.setToolbarButtonLookAndFeel(button);
+    
+    return button;
   }
 
  /*
@@ -326,7 +335,7 @@ public class JEasyXGraphicsPanel extends JPanel {
    */
   public JEasyXGraphicsPanel() {
     super();
-    createPanel(BorderLayout.NORTH, true/*useToolbar*/, 0xffffffff);
+    createPanel(BorderLayout.NORTH, true, 0xffffffff);
   }
 
   public JEasyXGraphicsPanel(boolean useToolbar) {
@@ -346,7 +355,7 @@ public class JEasyXGraphicsPanel extends JPanel {
    */
   public JEasyXGraphicsPanel(String layoutDirection) {
     super();
-    createPanel(layoutDirection, true/*useToolbar*/, 0xffffffff);
+    createPanel(layoutDirection, true, 0xffffffff);
   }
 
 /*---------------------------------------------------------------------------*/
@@ -370,7 +379,7 @@ public class JEasyXGraphicsPanel extends JPanel {
    */
   public JEasyXGraphicsPanel(int buttonMask) {
     super();
-    createPanel(BorderLayout.NORTH, true/*useToolbar*/, buttonMask);
+    createPanel(BorderLayout.NORTH, true, buttonMask);
   }
 
 /*---------------------------------------------------------------------------*/
@@ -397,7 +406,7 @@ public class JEasyXGraphicsPanel extends JPanel {
    */
   public JEasyXGraphicsPanel(String layoutDirection, int buttonMask) {
     super();
-    createPanel(layoutDirection, true/*useToolbar*/, buttonMask);
+    createPanel(layoutDirection, true, buttonMask);
   }
 
 /*---------------------------------------------------------------------------*/

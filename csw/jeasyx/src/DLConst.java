@@ -510,8 +510,13 @@ public class DLConst {
   /*
    * Polygon boolean messages.
    */
-    final static int GTX_POLYGON_BOOLEAN  = 180;
-    final static int GTX_POLYGON_BOOLEAN_2  = 182;
+    final static int GTX_POLYGON_BOOLEAN  = 184;
+    final static int GTX_POLYGON_BOOLEAN_2  = 186;
+
+    final static int POLY_INTERSECT_OP = 1;
+    final static int POLY_UNION_OP = 2;
+    final static int POLY_XOR_OP = 3;
+    final static int POLY_FRAGMENT_OP = 4;
 
   /*
    *  graph and chart messages

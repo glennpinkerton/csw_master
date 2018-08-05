@@ -22,6 +22,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
+import javax.swing.JButton;
 import javax.swing.WindowConstants;
 
 
@@ -52,6 +53,8 @@ public class JDLFrame extends JFrame {
     private int           dlist_id = -1;
     private boolean       create_panel = true;
     private int           panel_type = 0;
+
+    private boolean       mask_out_buttons = false;
 
     JDLFrame              activeFrame = null;
 
@@ -86,6 +89,14 @@ public class JDLFrame extends JFrame {
         init (type);
     }
 
+    public JDLFrame (int   type, boolean bmask) {
+        if (type != FRAME_WITHOUT_TOOLBAR) {
+            type = FRAME_WITH_TOOLBAR;
+        }
+        mask_out_buttons = bmask;
+        init (type);
+    }
+
 
     JEasyXGraphicsPanel  gpanel = null;
     JDisplayListPanel dpanel = null;
@@ -106,26 +117,33 @@ public class JDLFrame extends JFrame {
   * Build the additionalButtonList one button at a time.
   * I use it for edit buttons, etc.
   */
-    public void addAdditionalTextButton (
+    public JButton addAdditionalTextButton (
         String labelText,
         String toolTipText,
         ActionListener al,
         Dimension preferredSize)
     {
+        JButton  jb = null;
         if (gpanel != null) {
-          gpanel.addAdditionalTextButton (
+          jb = gpanel.addAdditionalTextButton (
             labelText,
             toolTipText,
             al,
             preferredSize
           );
         }
+        return jb;
     }
 
 
     private void createPanel () {
       if (panel_type == FRAME_WITH_TOOLBAR) {
-        gpanel = new JEasyXGraphicsPanel (BorderLayout.NORTH);
+        if (mask_out_buttons == false) {
+          gpanel = new JEasyXGraphicsPanel (BorderLayout.NORTH);
+        }
+        else {
+          gpanel = new JEasyXGraphicsPanel (0);
+        }
         Container contentPane = getContentPane ();
         contentPane.add (gpanel);
         dl = gpanel.getDisplayList ();

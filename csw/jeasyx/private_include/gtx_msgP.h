@@ -209,8 +209,14 @@
 /*
  * Polygon boolean messages.
  */
-#define GTX_POLYGON_BOOLEAN     180
-#define GTX_POLYGON_BOOLEAN_2   182
+#define TEST_POLYGON_BOOLEAN    180
+#define TEST_POLYGON_BOOLEAN_2  182
+#define GTX_POLYGON_BOOLEAN     184
+#define GTX_POLYGON_BOOLEAN_2   186
+
+#define POLY_INTERSECT_OP       1
+#define POLY_UNION_OP           2
+#define POLY_XOR_OP             3
 
 /*
     graph and chart messages

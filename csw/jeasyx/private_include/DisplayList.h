@@ -131,6 +131,12 @@ private:
     void OutputForPlayback (const char *lfline);
 
   /*
+   * Kind of independent polygon boolean method called only
+   * from EZXCommand.cc file.
+   */
+    int PerformPolyBoolean (int *ilist, int *idata, double *ddata);
+
+  /*
    * Set and get various boundary stuff
    */
     void SetPageUnitsType (int type);
