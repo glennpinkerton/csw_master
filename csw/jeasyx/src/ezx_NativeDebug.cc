@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <memory>
 
 #include "csw/jeasyx/private_include/ezx_NativeDebug.h"
 
@@ -62,7 +63,8 @@ int NativeDebug::poly_intersect
                    (double *xs, double *ys, int *isc, int *isv, int nsc,
                     double *xc, double *yc, int *icc, int *icv, int ncc)
 {
-    CSWPolyGraph   pcalc;
+    std::unique_ptr <CSWPolyGraph>
+        pcalc {new CSWPolyGraph ()};
 
     double         xout[1000], yout[1000];
     int            icout[1000], ihout[1000], npout;
@@ -75,7 +77,7 @@ int NativeDebug::poly_intersect
         icout[i] = 0;
     }
 
-    int   istat = pcalc.ply_boolean (
+    int   istat = pcalc->ply_boolean (
       xs, ys, tag1, nsc, isc, isv,
       xc, yc, tag2, ncc, icc, icv,
       //PLY_GRAPH_INTERSECT,

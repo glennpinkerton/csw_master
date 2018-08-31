@@ -755,9 +755,9 @@ int CSWPolyUtils::ply_holnest (
     double *xpout, double *ypout, int *npout, int *ncout,
     int *icout)
 {
-    HList        *holist = NULL, *holorg = NULL,
+    HList        *holist = NULL, *holorg = NULL, *holorg_alloc = NULL,
                  *holsav = NULL, *holtmp = NULL;
-    PList        *plylist = NULL;
+    PList        *plylist = NULL, *plyorg_alloc = NULL;
     int          i, j, offset, istat, ioff, joff, koff,
                  numout, nstack, rootoff, rootnps, iroot, nstacksav;
     int          nctemp, nout, npts, inps, jnps;
@@ -766,8 +766,8 @@ int CSWPolyUtils::ply_holnest (
 
     auto fscope = [&]()
     {
-        csw_Free (holist);
-        csw_Free (plylist);
+        csw_Free (holorg_alloc);
+        csw_Free (plyorg_alloc);
     };
     CSWScopeGuard  func_scope_guard (fscope);
 
@@ -792,11 +792,13 @@ int CSWPolyUtils::ply_holnest (
         return -1;
     }
     holorg = holist;
+    holorg_alloc = holist;
 
     plylist = (PList *) csw_Malloc(ncomp * sizeof(PList));
     if(!plylist) {
         return -1;
     }
+    plyorg_alloc = plylist;
 
 /*  build local structure array in holist which contains offset, size
     and flag for each polygon component  */
@@ -1055,8 +1057,7 @@ int CSWPolyUtils::ply_holnest (
     ncout[nptemp-1] = nctemp - nclast;
     *npout = nptemp;
 
-/*  csw_Free workspace memory and return as successful completion  */
-
+/*  return as successful completion  */
 
     return 0;
 

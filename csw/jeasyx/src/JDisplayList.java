@@ -19,6 +19,8 @@ import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import java.util.Date;
+
 import javax.swing.SwingUtilities;
 
 
@@ -5499,10 +5501,38 @@ of Font.BOLD|Font.ITALIC.
          ArrayList<DLFill> outPolyList,
          int op_type)
     {
+        int  istat = -1;
+        try {
+            istat = 
+            _polyBoolean_p (sourcePolyList,
+                            clipPolyList,
+                            outPolyList,
+                            op_type);
+        }
+        catch (Throwable th) {
+            System.out.println ();
+            System.out.println ();
+            System.out.println
+              ("Exception from polygon boolean calculations.");
+            System.out.println (th.getMessage());
+            System.out.println ();
+            System.out.flush ();
+            System.gc ();
+            istat = -1;
+        }
+        return istat;
+    }
+
+
+    private int _polyBoolean_p
+        (ArrayList<DLFill> sourcePolyList,
+         ArrayList<DLFill> clipPolyList,
+         ArrayList<DLFill> outPolyList,
+         int op_type)
+    {
       double[] xpout, ypout;
       int[] np1, np2, npout;
       int nc1, nc2;
-      Integer ncout;
 
       int siz1, siz2;
       siz1 = sourcePolyList.size();
@@ -5529,10 +5559,16 @@ of Font.BOLD|Font.ITALIC.
         }
       }
 
-      int maxout = (siz1 + siz2) * 10;
-      if (maxout < 100) maxout = 100;
-      int maxptsout = (n1 + n2) * 10;
-      if (maxptsout < 2000) maxptsout = 2000;
+      int mp100 = 50;
+      if (n1 + n2 > 100000) mp100 = 40;
+      if (n1 + n2 > 300000) mp100 = 30;
+      if (n1 + n2 > 500000) mp100 = 20;
+
+      int maxout = (siz1 + siz2) * 100;
+      if (maxout < 10000) maxout = 10000;
+      int maxptsout = (n1 + n2) * mp100;
+      
+      if (maxptsout < 1000000) maxptsout = 1000000;
 
       npout = new int[maxout];
       xpout = new double[maxptsout];
@@ -5587,30 +5623,60 @@ of Font.BOLD|Font.ITALIC.
         }
       }
 
+  // total length of input Idata stuff
+
+      Ilist[8] = nn;
+
+int nnsp = 0;
+int nnsc = 0;
+int nnsxy = 0;
+
       nn = 0;
       for (DLFill dlf : sourcePolyList) {
+nnsp++;
         int nk = 0;
         for (int i=0; i<dlf.numPoints.length; i++) {
+nnsc++;
           for (int k=0; k<dlf.numPoints[i]; k++) {
             Ddata[nn] = dlf.xPoints[nk];
             Ddata[nptot + nn] = dlf.yPoints[nk];
             nn++;
             nk++;
+nnsxy++ ;
           }
         }
       }
       
+
+int nncp = 0;
+int nncc = 0;
+int nncxy = 0;
+
       for (DLFill dlf : clipPolyList) {
+nncp++;
         int nk = 0;
         for (int i=0; i<dlf.numPoints.length; i++) {
+nncc++;
           for (int k=0; k<dlf.numPoints[i]; k++) {
             Ddata[nn] = dlf.xPoints[nk];
             Ddata[nptot + nn] = dlf.yPoints[nk];
             nn++;
             nk++;
+nncxy++;
           }
         }
       }
+
+  // total length of input Ddata stuff
+
+      Ilist[9] = nn * 2;
+
+
+Date date = new Date ();
+long t1, t2;
+
+t1 = date.getTime ();
+
 
       sendNativeCommand (
           GTX_POLYGON_BOOLEAN,
@@ -5622,6 +5688,28 @@ of Font.BOLD|Font.ITALIC.
           null,
           Ddata
       );
+
+date = new Date ();
+t2 = date.getTime ();
+
+String stev = System.getenv ("PB_PRINT_TIMING");
+if (stev != null) {
+System.out.println ();
+System.out.println ();
+System.out.println ("nnsp = " + nnsp + "  nnsc = " + nnsc +
+    "  nnsxy = " + nnsxy);
+System.out.println ("nncp = " + nncp + "  nncc = " + nncc +
+    "  nncxy = " + nncxy);
+
+System.out.println ();
+System.out.print ("Elapsed time for native boolean operation = ");
+System.out.print (t2 - t1);
+System.out.println (" milliseconds");
+System.out.println ();
+}
+
+
+
 
       int  npolyout = Ilist[3];
       int  startcout = Ilist[4];
@@ -5636,6 +5724,8 @@ of Font.BOLD|Font.ITALIC.
       int ihole = 0;
       int ixy = 0;
 
+      boolean bdump = false;
+
       for (int i=0; i<npolyout; i++) {
 
         psiz = Idata[startcout + i];
@@ -5645,6 +5735,7 @@ of Font.BOLD|Font.ITALIC.
         for (int j=0; j<psiz; j++) {
           int  _nxy = Idata[starthout + ihole];
           numPoints[j] = _nxy;
+
           xysiz += _nxy;
           ihole++;
         }
@@ -5652,11 +5743,31 @@ of Font.BOLD|Font.ITALIC.
         double[] xPoints = new double[xysiz];
         double[] yPoints = new double[xysiz];
 
+        if (bdump) {
+          System.out.println ();
+          System.out.println ("dumping poly 1 before dlfill construct");
+          System.out.println ();
+          System.out.flush ();
+        }
         int ixyout = 0;
+        int  ixy_start = ixy;
         for (int j=0; j<psiz; j++) {
+          if (bdump) {
+            System.out.println ();
+            System.out.println ("  hole number " + j +
+                                " has " + numPoints[j] + " points");
+            System.out.flush ();
+          }
           for (int k=0; k<numPoints[j]; k++) {
             xPoints[ixyout] = Ddata[startxout + ixy];
             yPoints[ixyout] = Ddata[startyout + ixy];
+            if (bdump) {
+              int ixy_2 = ixy - ixy_start;
+              System.out.println ("    ixy = " + ixy_2 + "  " +
+                                  Ddata[startxout+ixy] + "   " +
+                                  Ddata[startyout+ixy]);
+              System.out.flush ();
+            }
             ixy++;
             ixyout++;
           }
@@ -5667,7 +5778,15 @@ of Font.BOLD|Font.ITALIC.
         dlff.xPoints = xPoints;
         dlff.yPoints = yPoints;
         dlff.numComponents = psiz;
+
+        if (bdump) {
+          dlff.dumpPoints (1);
+        }
+
+//        dlff.testForLongLine (i, 10.0);
+
         outPolyList.add (dlff);
+
       }
 
       return 1;

@@ -352,6 +352,9 @@ class LocalDraw {
      * used in symbols or text.  This includes fills with snall_flag
      * of zero (interior) or 9 (border).
      */
+
+String st_env = System.getenv ("PBOOL_DEBUG_FILLS");
+
         if (nativeFillArray != null) {
             nprim = nativeFillArray.size ();
             for (i=0; i<nprim; i++) {

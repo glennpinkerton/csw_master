@@ -719,7 +719,7 @@ int GTXDrawPrim::gtx_drawfillprim (CSW_F *coords, int npt, int red, int green, i
 /*  if npt is gt XYMAX, allocate temporary space for polyline  */
 
     if (nout > XYMAX) {
-        xy = (CSW_F *)csw_Malloc ((nout+2) * sizeof (CSW_F));
+        xy = (CSW_F *)csw_Malloc ((nout*2+2) * sizeof (CSW_F));
         if (!xy) {
             return -1;
         }
@@ -796,7 +796,7 @@ int GTXDrawPrim::gtx_drawlineprim (CSW_F *coords, int npt, CSW_F thick,
     if npt is gt XYMAX, allocate temporary space for polyline
 */
     if (npt > XYMAX) {
-        xy = (CSW_F *)csw_Malloc ((npt*2) * sizeof (CSW_F));
+        xy = (CSW_F *)csw_Malloc ((npt*2+2) * sizeof (CSW_F));
         if (!xy) {
             return -1;
         }
@@ -1120,6 +1120,7 @@ int GTXDrawPrim::gtx_cliptextprim
   function name:    gtx_clipfillprim      (int)
 
   call sequence:    gtx_clipfillprim (coords, npt, smoothflag,
+                                      holepts, nholes,
                                       fred, fgreen, fblue, 
                                       pred, pgreen, pblue,
                                       bred, bgreen, bblue,
@@ -1135,6 +1136,9 @@ int GTXDrawPrim::gtx_cliptextprim
     coords      r    CSW_F*       array of x, y outline coordinates
     npts        r    int          number of points in the outline
     smoothflag  r    char         'y' to smooth, else no smooth
+    holepts     r    int*         Array with number of points in each hole
+                                  or NULL if not wanted
+    nholes      r    int          Numbe rof holes in holepts
     fred        r    int          fill red value
     fgreen      r    int          fill green value
     fblue       r    int          fill blue value
@@ -1162,11 +1166,13 @@ int GTXDrawPrim::gtx_cliptextprim
 
 */
 
-int GTXDrawPrim::gtx_clipfillprim (CSW_F *coords, int npt, char smoothflag, 
+int GTXDrawPrim::gtx_clipfillprim
+                     (CSW_F *coords, int npt, char smoothflag, 
+                      int *holepts, int nholes,
                       int fred, int fgreen, int fblue,
                       int pred, int pgreen, int pblue,
                       int bred, int bgreen, int bblue,
-                      CSW_F thick, int outline, int pattern, 
+                      CSW_F thick, int outlinein, int pattern, 
                       CSW_F patscale, int linepatt, CSW_F dashscale,
                       CSW_F x1, CSW_F y1t, CSW_F x2, CSW_F y2)
 
@@ -1175,6 +1181,8 @@ int GTXDrawPrim::gtx_clipfillprim (CSW_F *coords, int npt, char smoothflag,
     int         istat, nstat, np2, memflag;
     int         dflagsav;
     CSW_F       *xyclip;
+
+    int         outline = outlinein;
 
     if (coords == NULL  ||  npt < 3) {
         return 0;
@@ -1193,10 +1201,29 @@ int GTXDrawPrim::gtx_clipfillprim (CSW_F *coords, int npt, char smoothflag,
     nstat = 0;
 
     xyclip = NULL;
-        
+
+    if (outline  &&  holepts != NULL  &&  nholes > 0) {
+
+        ezx_java_ptr->ezx_SetAlphaValue (BorderAlpha);
+        CSW_F  *xyh = coords;
+        for (int ih=0; ih<nholes; ih++) {
+            gtx_clipfilloutline (1, xyh, holepts[ih],        
+                                 smoothflag, bred, bgreen, bblue,
+                                 2.0 * thick, linepatt, dashscale,
+                                 x1, y1t, x2, y2);
 /*
- * let java clip solid filled polygons
- */
+            gtx_cliplineprim (xyh, holepts[ih], smoothflag,
+                              thick, bred, bgreen, bblue,
+                              linepatt, dashscale, 0);
+            gtx_drawlineprim (xyh, holepts[ih],
+                              thick, bred, bgreen, bblue,
+                              linepatt);
+*/
+            xyh += 2 * holepts[ih];
+        }
+        outline = 0;
+    }
+        
     memflag = 0;
     istat = gpf_compressfillpoints (coords, npt, xyfill, &np2, &memflag);
     if (istat == -1) {
@@ -1212,14 +1239,18 @@ int GTXDrawPrim::gtx_clipfillprim (CSW_F *coords, int npt, char smoothflag,
         if (pattern < 1) {
             if (memflag) {
                 csw_Free (*xyfill);
+                *xyfill = NULL;
             }
             DashFlag = dflagsav;
             if (outline) {
                 ezx_java_ptr->ezx_SetAlphaValue (BorderAlpha);
-                gtx_clipfilloutline (outline, coords, npt, smoothflag, bred, bgreen, bblue,
-                                     thick, linepatt, dashscale, x1, y1t, x2, y2);
+                gtx_clipfilloutline (outline, coords, npt,
+                                     smoothflag, bred, bgreen, bblue,
+                                     thick, linepatt, dashscale,
+                                     x1, y1t, x2, y2);
             }
             if (xyclip) csw_Free (xyclip);
+            xyclip = NULL;
             return 0;
         }
     }
@@ -1237,7 +1268,8 @@ int GTXDrawPrim::gtx_clipfillprim (CSW_F *coords, int npt, char smoothflag,
 
     if (outline) {
         ezx_java_ptr->ezx_SetAlphaValue (BorderAlpha);
-        gtx_clipfilloutline (outline, coords, npt, smoothflag, bred, bgreen, bblue, thick, linepatt,
+        gtx_clipfilloutline (outline, coords, npt, smoothflag,
+                             bred, bgreen, bblue, thick, linepatt,
                              dashscale, x1, y1t, x2, y2);
     }
 
@@ -1825,6 +1857,7 @@ int GTXDrawPrim::gtx_drawpolytext (CSW_F x, CSW_F y, char *text, int nc, CSW_F t
                     }
                 }
                 gtx_clipfillprim (Fontxy, nn, 0, 
+                                  NULL, 0,
                                   RedFG, GreenFG, BlueFG, 
                                   -1, -1, -1, -1, -1, -1,
                                   0.0, 0, -1, (CSW_F)1.0, 0, (CSW_F)1.0,
@@ -1893,6 +1926,7 @@ int GTXDrawPrim::gtx_drawpolytext (CSW_F x, CSW_F y, char *text, int nc, CSW_F t
                 }
             }
             gtx_clipfillprim (Fontxy, nn, 0, 
+                              NULL, 0,
                               fred, fgreen, fblue, -1, -1, -1, red, green, blue,
                               thick, 1, -1, (CSW_F)1.0, 0, (CSW_F)1.0,
                               x1, y1t, x2, y2);
@@ -2015,6 +2049,7 @@ int GTXDrawPrim::gtx_drawsymbprim (CSW_F x, CSW_F y, int symb, CSW_F size, CSW_F
                 gpf_symbol_obj.gpf_symlinetrans (xylocal, npts);
                 gpf_xylimits (xylocal, npts, &x1, &y1t, &x2, &y2);
                 gtx_clipfillprim (xylocal, npts/2, 0,
+                                  NULL, 0,
                                   RedBG, GreenBG, BlueBG,
                                   RedBG, GreenBG, BlueBG,
                                   RedBG, GreenBG, BlueBG,
@@ -2057,6 +2092,7 @@ int GTXDrawPrim::gtx_drawsymbprim (CSW_F x, CSW_F y, int symb, CSW_F size, CSW_F
             gpf_symbol_obj.gpf_symlinetrans (xylocal, npts);
             gpf_xylimits (xylocal, npts, &x1, &y1t, &x2, &y2);
             gtx_clipfillprim (xylocal, npts/2, 0, 
+                              NULL, 0,
                               red, green, blue,
                               red, green, blue,
                               red, green, blue,
@@ -2530,6 +2566,7 @@ int GTXDrawPrim::gtx_cliprectprim
         if (xyout  ||  no_outline) outline = 0;
         FillPattern = 0;
         gtx_clipfillprim (xyt, npt, 0,
+                          NULL, 0,
                           fred, fgreen, fblue,
                           pred, pgreen, pblue,
                           bred, bgreen, bblue,
@@ -2539,6 +2576,7 @@ int GTXDrawPrim::gtx_cliprectprim
         if (pattern > 0  &&  ShapeFillFlag == 1) {
             FillPattern = pattern;
             gtx_clipfillprim (xyt, npt, 0,
+                              NULL, 0,
                               -1, -1, -1,
                               pred, pgreen, pblue,
                               bred, bgreen, bblue,
@@ -2651,6 +2689,7 @@ int GTXDrawPrim::gtx_cliparcprim
         ShapeFillFlag = 1;
         FillPattern = 0;
         gtx_clipfillprim (xyt, narc, 0,
+                          NULL, 0,
                           fred, fgreen, fblue,
                           pred, pgreen, pblue,
                           bred, bgreen, bblue,
@@ -2660,6 +2699,7 @@ int GTXDrawPrim::gtx_cliparcprim
         if (pattern > 0  &&  ShapeFillFlag == 1) {
             FillPattern = pattern;
             gtx_clipfillprim (xyt, narc, 0, 
+                              NULL, 0,
                               -1, -1, -1,
                               pred, pgreen, pblue,
                               bred, bgreen, bblue,

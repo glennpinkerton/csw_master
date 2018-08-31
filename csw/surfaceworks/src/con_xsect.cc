@@ -20,6 +20,7 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <memory>
 #include <math.h>
 
 /*
@@ -855,7 +856,8 @@ int CSWConXsect::con_calc_cross_section_polygons
     double                    area, areacheck, xt;
     CRossSectionFillStruct    *ftmp = NULL;
 
-    CSWPolyGraph              ply_graph_obj;
+    std::unique_ptr<CSWPolyGraph>
+        ply_graph_obj {new CSWPolyGraph ()};
 
 
     auto fscope = [&]()
@@ -998,7 +1000,7 @@ int CSWConXsect::con_calc_cross_section_polygons
 
     nc = 1;
     nc2 = 1;
-    istat = ply_graph_obj.ply_boolean (xp1, yp1, NULL, 1, &nc, &n1,
+    istat = ply_graph_obj->ply_boolean (xp1, yp1, NULL, 1, &nc, &n1,
                          xp2, yp2, NULL, 1, &nc2, &n2,
                          PLY_INTERSECT, 
                          xout, yout, NULL, &ncomp, compout, holeout,

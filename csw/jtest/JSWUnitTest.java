@@ -459,6 +459,14 @@ class TriMesh10Frame extends JDLFrame
         }
 
         sw.setBadBoundaryAction (2);
+
+        Date     date;
+        long     t1, t2;
+        double   dtm;
+
+        date = new Date ();
+        t1 = date.getTime ();
+
         TriMesh tmesh = sw.calcTriMesh
         (
             x,
@@ -472,6 +480,19 @@ class TriMesh10Frame extends JDLFrame
             null,
             null
         );
+
+        date = new Date ();
+        t2 = date.getTime ();
+
+        dtm = (double)(t2 - t1) / 1000.0;
+
+String stev = System.getenv ("SW_PRINT_TIMING");
+if (stev != null) {
+System.out.println ();
+System.out.println ("elapsed time for " + np + " point trimesh = " + dtm);
+System.out.println ();
+System.out.flush ();
+}
 
         //sw.writeTextTriMeshFile (tmesh, "contour.tri");
 
@@ -711,9 +732,18 @@ class Grid10Frame extends JDLFrame
 
         dtm = (double)(t2 - t1) / 1000.0;
 
-//        System.out.println ("Elapsed time: " + dtm);
-//        System.out.println ();
-//        System.out.flush ();
+String stev = System.getenv ("SW_PRINT_TIMING");
+if (stev != null) {
+int __nc__, __nr__;
+__nc__ = grid.getNCols ();
+__nr__ = grid.getNRows ();
+System.out.println ();
+System.out.println ("Grid from " + np + " points with " + __nc__ +
+   " cols and " + __nr__ + " rows");
+System.out.println ("Elapsed time for calculation = " + dtm);
+System.out.println ();
+System.out.flush ();
+}
 
         dl.beginPlot ("grid test" + np,
                       0.0, 0.0, 20.0, 20.0);
@@ -1632,6 +1662,13 @@ class FileioFrame extends JFrame
 
         JSurfaceWorks jsw = new JSurfaceWorks ();
 
+        Date     date;
+        long     t1, t2;
+        double   dtm;
+
+        date = new Date ();
+        t1 = date.getTime ();
+
         TriMesh tmesh = jsw.calcTriMesh
         (
             x,
@@ -1645,6 +1682,19 @@ class FileioFrame extends JFrame
             null,
             null
         );
+
+        date = new Date ();
+        t2 = date.getTime ();
+
+        dtm = (double)(t2 - t1) / 1000.0;
+
+String stev = System.getenv ("SW_PRINT_TIMING");
+if (stev != null) {
+System.out.println ();
+System.out.println ("elapsed time for trimesh = " + dtm);
+System.out.println ();
+System.out.flush ();
+}
 
         dl.clear();
 

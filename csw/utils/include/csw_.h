@@ -89,7 +89,7 @@
  *       Always comment it out.
  */
 
-#define _MEMCOUNT_ 1
+//#define _MEMCOUNT_ 1
 
 /*
     union for packing a 2 byte int into a

@@ -18,6 +18,8 @@
 
 #define DEBUG_DRAPED_LINES 0
 
+#define _SW_DEBUG_LOG_FILE_ 1
+
 #include <assert.h>
 
 #include "csw/jsurfaceworks/private_include/SurfaceWorksJNI.h"

@@ -22,6 +22,7 @@
 */
 
 #include <iostream>
+#include <memory>
 #include <math.h>
 #include <string.h>
 #include <ctype.h>
@@ -1104,7 +1105,8 @@ int CSWPolyCalc::ply_CalcIntersect1 (CSWErrNum &err_obj,
     };
     CSWScopeGuard  func_scope_guard (fscope);
 
-    CSWPolyGraph   ply_graph_obj;
+    std::unique_ptr <CSWPolyGraph>
+        ply_graph_obj {new CSWPolyGraph ()};
 
     maxcomp = maxcomp;
 
@@ -1144,7 +1146,8 @@ int CSWPolyCalc::ply_CalcIntersect1 (CSWErrNum &err_obj,
 
 /*  call the double version of the function  */
 
-    istat = ply_graph_obj.ply_boolean (dx1, dy1, NULL, 1, &ncomps, icomps,
+    istat = ply_graph_obj->ply_boolean
+                        (dx1, dy1, NULL, 1, &ncomps, icomps,
                          dx2, dy2, NULL, 1, &ncompc, icompc,
                          PLY_INTERSECT,
                          dx3, dy3, NULL, &n2, icompout, iholeout,

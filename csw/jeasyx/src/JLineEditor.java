@@ -1290,9 +1290,6 @@ public class JLineEditor implements JDLEditListener {
     {
         EPoint  ep;
 
-System.out.println ("process left click called");
-System.out.flush ();
-
     /*
      * If the alt key is down and the click is on a point, delete the point.
      * No delete in point mode for now.
@@ -1322,12 +1319,8 @@ System.out.flush ();
             int iframe = dlist.findRescaleFrame (e.getX(),
                                                  e.getY());
             if (iframe == -1) {
-System.out.println ("iframe = -1 in processLeftClick");
-System.out.flush ();
                 return;
             }
-System.out.println ("starting new append in processLeftClick");
-System.out.flush ();
             currentLine = new ArrayList<EPoint> (20);
             ELine  eline = new ELine ();
             currentEline = eline;
@@ -1371,8 +1364,6 @@ System.out.flush ();
             }
             else {
                 int npts = currentLine.size ();
-System.out.println ("current line npts = " + npts);
-System.out.flush ();
                 if (npts < 3) {
                     currentLine.add (ep);
                 }

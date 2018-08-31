@@ -27,6 +27,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <memory>
 
 #include "csw/utils/include/csw_.h"
 #include "csw/utils/private_include/csw_scope.h"
@@ -73,7 +74,7 @@ int CSWGrdAPI::grd_SetCalcOption (int tag, int ival, CSW_F fval)
 {
     int           istat;
 
-    istat = grd_calc_obj.grd_set_calc_option (tag, ival, fval);
+    istat = grd_calc_obj->grd_set_calc_option (tag, ival, fval);
     return istat;
 
 }  /*  end of function grd_SetCalcOption  */
@@ -82,7 +83,7 @@ int CSWGrdAPI::grd_SetCalcOption (int tag, int ival, CSW_F fval)
 
 
 void CSWGrdAPI::grd_SetNoisyDataFlag (int ndf) {
-    grd_calc_obj.grd_set_noisy_data_flag (ndf);
+    grd_calc_obj->grd_set_noisy_data_flag (ndf);
 }
 
 
@@ -116,7 +117,7 @@ int CSWGrdAPI::grd_SetCalcOptions (GRidCalcOptions *options)
 {
     int           istat;
 
-    istat = grd_calc_obj.grd_set_calc_options (options);
+    istat = grd_calc_obj->grd_set_calc_options (options);
     return istat;
 
 }  /*  end of function grd_SetCalcOptions  */
@@ -152,7 +153,7 @@ int CSWGrdAPI::grd_DefaultCalcOptions (GRidCalcOptions *options)
 {
     int           istat;
 
-    istat = grd_calc_obj.grd_default_calc_options (options);
+    istat = grd_calc_obj->grd_default_calc_options (options);
     return istat;
 
 }  /*  end of function grd_DefaultCalcOptions  */
@@ -321,7 +322,7 @@ int CSWGrdAPI::grd_CalcGrid (CSW_F *x, CSW_F *y, CSW_F *z, CSW_F *error, int npt
     x2 -= xmin;
     y2 -= ymin;
 
-    grd_calc_obj.grd_set_output_shifts (xmin, ymin);
+    grd_calc_obj->grd_set_output_shifts (xmin, ymin);
 
 /*
     Define the fault vectors and set the faulting option.
@@ -334,14 +335,14 @@ int CSWGrdAPI::grd_CalcGrid (CSW_F *x, CSW_F *y, CSW_F *z, CSW_F *error, int npt
         if (istat == -1) {
             return -1;
         }
-        grd_calc_obj.grd_set_calc_option (GRD_FAULTED_GRID_FLAG, 1, 0.0f);
+        grd_calc_obj->grd_set_calc_option (GRD_FAULTED_GRID_FLAG, 1, 0.0f);
         if (options) {
             fsave = options->faulted_flag;
             options->faulted_flag = 1;
         }
     }
 
-    istat = grd_calc_obj.grd_calc_grid (x, y, z, error, npts,
+    istat = grd_calc_obj->grd_calc_grid (x, y, z, error, npts,
                            grid, mask, report, ncol, nrow,
                            x1, y1, x2, y2, options);
 
@@ -353,10 +354,10 @@ int CSWGrdAPI::grd_CalcGrid (CSW_F *x, CSW_F *y, CSW_F *z, CSW_F *error, int npt
         if (options) {
             options->faulted_flag = fsave;
         }
-        grd_calc_obj.grd_set_calc_option (GRD_FAULTED_GRID_FLAG, 0, 0.0f);
+        grd_calc_obj->grd_set_calc_option (GRD_FAULTED_GRID_FLAG, 0, 0.0f);
     }
 
-    grd_calc_obj.grd_set_output_shifts (0.0, 0.0);
+    grd_calc_obj->grd_set_output_shifts (0.0, 0.0);
 
     for (i=0; i<npts; i++) {
         x[i] += xmin;
@@ -887,7 +888,7 @@ int CSWGrdAPI::grd_SmoothGrid (CSW_F *grid, int ncol, int nrow, int smflag,
 {
     int           istat;
 
-    istat = grd_calc_obj.grd_smooth_grid (grid, ncol, nrow, smflag,
+    istat = grd_calc_obj->grd_smooth_grid (grid, ncol, nrow, smflag,
                              faults, nfaults,
                              x1, y1, x2, y2,
                              minval, maxval, smgrid);
@@ -1663,7 +1664,7 @@ int CSWGrdAPI::grd_CalcGridFromDouble
 {
     int  istat = 0;
 
-    istat = grd_calc_obj.grd_calc_grid_from_double
+    istat = grd_calc_obj->grd_calc_grid_from_double
         (x, y, z, error, npts,
          grid, mask, report,
          ncol, nrow,
@@ -2967,7 +2968,7 @@ int CSWGrdAPI::grd_SetControlPointStructs (GRidControlPoint *list, int nlist)
 {
     int                     istat;
 
-    istat = grd_calc_obj.grd_set_control_points (list, nlist);
+    istat = grd_calc_obj->grd_set_control_points (list, nlist);
     return istat;
 
 }  /*  end of function grd_SetControlPointStructs  */
@@ -3026,7 +3027,7 @@ int CSWGrdAPI::grd_SetControlPoints (CSW_F *x, CSW_F *y, CSW_F *z1, CSW_F *z2,
     CSWScopeGuard func_scope_guard (fscope);
 
     if (nlist == 0) {
-        grd_calc_obj.grd_set_control_points (NULL, 0);
+        grd_calc_obj->grd_set_control_points (NULL, 0);
         return 1;
     }
 
@@ -3044,7 +3045,7 @@ int CSWGrdAPI::grd_SetControlPoints (CSW_F *x, CSW_F *y, CSW_F *z1, CSW_F *z2,
         list[i].type = type[i];
     }
 
-    istat = grd_calc_obj.grd_set_control_points (list, nlist);
+    istat = grd_calc_obj->grd_set_control_points (list, nlist);
 
     return istat;
 
@@ -3099,7 +3100,7 @@ int CSWGrdAPI::grd_SetControlSurface (CSW_F *grid, int ncol, int nrow,
 {
     int          istat;
 
-    istat = grd_calc_obj.grd_set_control_surface (grid, ncol, nrow,
+    istat = grd_calc_obj->grd_set_control_surface (grid, ncol, nrow,
                                      x1, y1, x2, y2, type);
     return istat;
 
@@ -4163,8 +4164,8 @@ int CSWGrdAPI::grd_Triangulate  (double *xpts, double *ypts, double *zpts, int n
 /*
  * First, calculate the trimesh without constraints.
  */
-    grd_triangle_obj.grd_set_shifts_for_debug (0.0, 0.0);
-    istat = grd_triangle_obj.grd_calc_trimesh  (xpts, ypts, zpts, npts,
+    grd_triangle_obj.get()->grd_set_shifts_for_debug (0.0, 0.0);
+    istat = grd_triangle_obj.get()->grd_calc_trimesh  (xpts, ypts, zpts, npts,
                                NULL, NULL, NULL,
                                NULL, NULL, 0,
                                nodes_out, edges_out, triangles_out,
@@ -4183,7 +4184,7 @@ int CSWGrdAPI::grd_Triangulate  (double *xpts, double *ypts, double *zpts, int n
                         (char *)"fromgrid.xyz");
     }
     if (do_write) {
-        grd_triangle_obj.grd_WriteTextTriMeshFile (
+        grd_triangle_obj.get()->grd_WriteTextTriMeshFile (
           0, NULL,
           *triangles_out, *num_triangles_out,
           *edges_out, *num_edges_out,
@@ -4196,7 +4197,7 @@ int CSWGrdAPI::grd_Triangulate  (double *xpts, double *ypts, double *zpts, int n
  */
     if (xlines != NULL  &&  nlines > 0) {
         istat =
-          grd_triangle_obj.grd_add_lines_to_trimesh (
+          grd_triangle_obj.get()->grd_add_lines_to_trimesh (
             xlines, ylines, zlines,
             linepoints, linetypes, nlines,
             0,
@@ -4231,7 +4232,7 @@ int CSWGrdAPI::grd_RemoveNodesFromTriMesh (NOdeStruct **nodelist, int *numnodes,
 {
     int                   istat;
 
-    istat = grd_triangle_obj.grd_remove_nodes_from_trimesh (nodelist, numnodes,
+    istat = grd_triangle_obj.get()->grd_remove_nodes_from_trimesh (nodelist, numnodes,
                                            edgelist, numedges,
                                            trilist, numtriangles,
                                            nodes_to_remove, num_nodes_to_remove);
@@ -4306,8 +4307,8 @@ int CSWGrdAPI::grd_CalcTriMeshFromGrid (CSW_F *grid, int nc, int nr,
         trimesh_style != GRD_CELL_DIAGONALS) {
         trimesh_style = GRD_EQUILATERAL;
     }
-    grd_triangle_obj.grd_set_shifts_for_debug (0.0, 0.0);
-    istat = grd_triangle_obj.grd_grid_to_trimesh (grid, nc, nr,
+    grd_triangle_obj.get()->grd_set_shifts_for_debug (0.0, 0.0);
+    istat = grd_triangle_obj.get()->grd_grid_to_trimesh (grid, nc, nr,
                                  x1, y1, x2, y2,
                                  xlines, ylines, zlines,
                                  linepoints, ltypes, nlines,
@@ -4328,7 +4329,7 @@ int CSWGrdAPI::grd_CalcTriMeshFromGrid (CSW_F *grid, int nc, int nr,
                         (char *)"fromgrid.xyz");
     }
     if (do_write) {
-        grd_triangle_obj.grd_WriteTextTriMeshFile (
+        grd_triangle_obj.get()->grd_WriteTextTriMeshFile (
           0, NULL,
           *triangles_out, *num_triangles_out,
           *edges_out, *num_edges_out,
@@ -4405,8 +4406,8 @@ int CSWGrdAPI::grd_CalcFaultedTriMeshFromGrid
  * First, calculate an unconstrained trimesh from the grid.
  */
     trimesh_style = GRD_EQUILATERAL;
-    grd_triangle_obj.grd_set_shifts_for_debug (0.0, 0.0);
-    istat = grd_triangle_obj.grd_grid_to_trimesh (grid, nc, nr,
+    grd_triangle_obj.get()->grd_set_shifts_for_debug (0.0, 0.0);
+    istat = grd_triangle_obj.get()->grd_grid_to_trimesh (grid, nc, nr,
                                  x1, y1, x2, y2,
                                  xlines, ylines, zlines,
                                  linepoints, ltypes, nlines,
@@ -4427,7 +4428,7 @@ int CSWGrdAPI::grd_CalcFaultedTriMeshFromGrid
                         (char *)"fromgrid.xyz");
     }
     if (do_write) {
-        grd_triangle_obj.grd_WriteTextTriMeshFile (
+        grd_triangle_obj.get()->grd_WriteTextTriMeshFile (
           0, NULL,
           *triangles_out, *num_triangles_out,
           *edges_out, *num_edges_out,
@@ -4440,7 +4441,7 @@ int CSWGrdAPI::grd_CalcFaultedTriMeshFromGrid
  */
     if (xlines != NULL  &&  nlines > 0) {
         istat =
-          grd_triangle_obj.grd_add_lines_to_trimesh (
+          grd_triangle_obj.get()->grd_add_lines_to_trimesh (
             xlines, ylines, zlines,
             linepoints, ltypes, nlines,
             0,
@@ -4472,7 +4473,7 @@ int CSWGrdAPI::grd_InterpolateUnfaultedTriMesh (
     int    istat;
 
     istat =
-    grd_triangle_obj.grd_interpolate_unfaulted_trimesh_values (
+    grd_triangle_obj.get()->grd_interpolate_unfaulted_trimesh_values (
         grid, ncol, nrow,
         xmin, ymin, xmax, ymax,
         nodes, num_nodes,
@@ -4504,7 +4505,7 @@ int CSWGrdAPI::grd_RemoveNullsFromTriMesh (NOdeStruct *nodes, int *numnodes,
 {
     int                 istat;
 
-    istat = grd_triangle_obj.grd_remove_nulls_from_trimesh (triangles, numtriangles,
+    istat = grd_triangle_obj.get()->grd_remove_nulls_from_trimesh (triangles, numtriangles,
                                            edges, numedges,
                                            nodes, numnodes,
                                            nullval, edge_swap_flag);
@@ -4541,8 +4542,8 @@ int CSWGrdAPI::grd_CalcTriMeshFromPointerGrid
     int                 istat;
     linetypes = linetypes;
 
-    grd_triangle_obj.grd_set_shifts_for_debug (0.0, 0.0);
-    istat = grd_triangle_obj.grd_pointer_grid_to_trimesh
+    grd_triangle_obj.get()->grd_set_shifts_for_debug (0.0, 0.0);
+    istat = grd_triangle_obj.get()->grd_pointer_grid_to_trimesh
                                 (grid, nc, nr,
                                  x1, y1, x2, y2,
                                  xlines, ylines, zlines,
@@ -4579,7 +4580,7 @@ int CSWGrdAPI::grd_CalcGridFromTriMesh (NOdeStruct *nodes, int numnodes,
 {
     int             istat;
 
-    istat = grd_triangle_obj.grd_calc_grid_from_trimesh (nodes, numnodes,
+    istat = grd_triangle_obj.get()->grd_calc_grid_from_trimesh (nodes, numnodes,
                                         edges, numedges,
                                         triangles, numtriangles,
                                         nullvalue,
@@ -4612,7 +4613,7 @@ int CSWGrdAPI::grd_CalcTriMeshBoundingBox (NOdeStruct *nodes, int numnodes,
 {
     int                 istat;
 
-    istat = grd_triangle_obj.grd_calc_trimesh_bounding_box (nodes, numnodes,
+    istat = grd_triangle_obj.get()->grd_calc_trimesh_bounding_box (nodes, numnodes,
                                            edges, numedges,
                                            triangles, numtriangles,
                                            x1, y1, x2, y2, z1, z2);
@@ -4657,7 +4658,7 @@ int CSWGrdAPI::grd_OutlineTriangles (NOdeStruct *nodes, int num_nodes,
 {
     int             istat;
 
-    istat = grd_triangle_obj.grd_outline_triangles (nodes, num_nodes,
+    istat = grd_triangle_obj.get()->grd_outline_triangles (nodes, num_nodes,
                                    edges, num_edges,
                                    triangles, num_triangles,
                                    xout, yout,
@@ -4687,7 +4688,7 @@ int CSWGrdAPI::grd_GetBugLocations (double *bx, double *by, int *nbugs, int maxb
 {
     int             istat;
 
-    istat = grd_triangle_obj.grd_get_bug_locations (bx, by, nbugs, maxbugs);
+    istat = grd_triangle_obj.get()->grd_get_bug_locations (bx, by, nbugs, maxbugs);
     return istat;
 
 }  /* end of function grd_GetBugLocations */
@@ -4733,7 +4734,7 @@ int CSWGrdAPI::grd_CalculateDrainagePolygons (
 {
     int            istat;
 
-    istat = grd_triangle_obj.grd_calculate_drainage_polygons (
+    istat = grd_triangle_obj.get()->grd_calculate_drainage_polygons (
             grid, ncol, nrow,
             x1, y1, x2, y2,
             future_flag,
@@ -4763,7 +4764,7 @@ int CSWGrdAPI::grd_DeleteEdgesFromTriMesh (NOdeStruct *nodes, int numnodes,
 {
     int                  istat;
 
-    istat = grd_triangle_obj.grd_delete_edges_from_trimesh (nodes, numnodes,
+    istat = grd_triangle_obj.get()->grd_delete_edges_from_trimesh (nodes, numnodes,
                                            edges, numedges,
                                            triangles, numtriangles,
                                            edgenumlist, nlist,
@@ -4996,7 +4997,7 @@ int CSWGrdAPI::grd_DeleteTrianglesFromTriMesh (NOdeStruct *nodes, int numnodes,
 {
     int                  istat;
 
-    istat = grd_triangle_obj.grd_delete_triangles_from_trimesh (nodes, numnodes,
+    istat = grd_triangle_obj.get()->grd_delete_triangles_from_trimesh (nodes, numnodes,
                                            edges, numedges,
                                            triangles, numtriangles,
                                            trianglenumlist, nlist);
@@ -5024,7 +5025,7 @@ int CSWGrdAPI::grd_CalcTriMeshDips (NOdeStruct *nodes, int numnodes,
 {
     int                istat;
 
-    istat = grd_triangle_obj.grd_calc_triangle_dips (nodes, numnodes,
+    istat = grd_triangle_obj.get()->grd_calc_triangle_dips (nodes, numnodes,
                                     edges, numedges,
                                     triangles, numtriangles,
                                     degree_flag,
@@ -5202,7 +5203,7 @@ int CSWGrdAPI::grd_GetNodesForTriangle (TRiangleStruct *triangle,
 {
     int                  istat;
 
-    istat = grd_triangle_obj.grd_get_nodes_for_triangle (triangle, edgelist,
+    istat = grd_triangle_obj.get()->grd_get_nodes_for_triangle (triangle, edgelist,
                                         n1, n2, n3);
     return istat;
 
@@ -5226,7 +5227,7 @@ int CSWGrdAPI::grd_BackInterpolateTriMeshStruct
 {
     int                     istat;
 
-    istat = grd_triangle_obj.grd_back_interpolate_tri_mesh
+    istat = grd_triangle_obj.get()->grd_back_interpolate_tri_mesh
         (tmptr->triangles, tmptr->numtriangles,
          tmptr->edges, tmptr->numedges,
          tmptr->nodes, tmptr->numnodes,
@@ -5258,7 +5259,7 @@ int CSWGrdAPI::grd_BackInterpolateTriMesh
 {
     int                     istat;
 
-    istat = grd_triangle_obj.grd_back_interpolate_tri_mesh
+    istat = grd_triangle_obj.get()->grd_back_interpolate_tri_mesh
         (triangles, ntriangles,
          edges, nedges,
          nodes, numnodes,
@@ -5289,7 +5290,7 @@ int CSWGrdAPI::grd_TriMeshFromNodeTriangles (NOdeTriangleStruct *node_triangles,
 {
     int                     istat;
 
-    istat = grd_triangle_obj.grd_tri_mesh_from_node_triangles (node_triangles,
+    istat = grd_triangle_obj.get()->grd_tri_mesh_from_node_triangles (node_triangles,
                                               num_node_triangles,
                                               nodes,
                                               num_nodes,
@@ -5330,7 +5331,7 @@ int CSWGrdAPI::grd_DrapeLinesOnTriMesh (int id1, int id2,
 {
     int             istat;
 
-    istat = grd_triangle_obj.grd_drape_lines_on_tri_mesh (id1, id2,
+    istat = grd_triangle_obj.get()->grd_drape_lines_on_tri_mesh (id1, id2,
                                          nodes, numnodes,
                                          edges, numedges,
                                          triangles, numtriangles,
@@ -5353,7 +5354,7 @@ void CSWGrdAPI::grd_SetTriangleIndex (
     double    xspace,
     double    yspace)
 {
-    grd_triangle_obj.grd_set_triangle_index (
+    grd_triangle_obj.get()->grd_set_triangle_index (
         index,
         xmin, ymin, xmax, ymax,
         ncol, nrow, xspace, yspace);
@@ -5371,7 +5372,7 @@ void CSWGrdAPI::grd_GetTriangleIndex (
     double    *xspace,
     double    *yspace)
 {
-    grd_triangle_obj.grd_get_triangle_index (
+    grd_triangle_obj.get()->grd_get_triangle_index (
         index,
         xmin, ymin, xmax, ymax,
         ncol, nrow, xspace, yspace);
@@ -5382,7 +5383,7 @@ void CSWGrdAPI::grd_FreeTriangleIndex (
     void *index,
     int  ncells)
 {
-    grd_triangle_obj.grd_free_triangle_index (index, ncells);
+    grd_triangle_obj.get()->grd_free_triangle_index (index, ncells);
     return;
 }
 
@@ -5412,7 +5413,7 @@ int CSWGrdAPI::grd_CalcHolesInTriMesh (NOdeStruct *nodes, int *numnodes,
 {
     int               istat;
 
-    istat = grd_triangle_obj.grd_calc_holes_in_tri_mesh (nodes, numnodes,
+    istat = grd_triangle_obj.get()->grd_calc_holes_in_tri_mesh (nodes, numnodes,
                                         edges, numedges,
                                         triangles, numtriangles,
                                         zmin, zmax);
@@ -5445,7 +5446,7 @@ int CSWGrdAPI::grd_ClipTriMeshToPolygon (NOdeStruct **nodes, int *num_nodes,
 {
     int             istat;
 
-    istat = grd_triangle_obj.grd_clip_tri_mesh_to_polygon (nodes, num_nodes,
+    istat = grd_triangle_obj.get()->grd_clip_tri_mesh_to_polygon (nodes, num_nodes,
                                           edges, num_edges,
                                           triangles, num_triangles,
                                           xpoly, ypoly,
@@ -5482,7 +5483,7 @@ int CSWGrdAPI::grd_TriMeshFromGridPoints (
 {
     int         istat;
 
-    istat =  grd_triangle_obj.grd_tri_mesh_from_grid_points (x, y, z, npts,
+    istat =  grd_triangle_obj.get()->grd_tri_mesh_from_grid_points (x, y, z, npts,
                                             xlines, ylines, zlines,
                                             line_points, line_types, nlines,
                                             grid, ncol, nrow,
@@ -5508,7 +5509,7 @@ int CSWGrdAPI::grd_TriMeshFromGridPoints (
 
 int CSWGrdAPI::grd_SetPolyConstraintFlag (int val)
 {
-    grd_triangle_obj.grd_set_poly_constraint_flag (val);
+    grd_triangle_obj.get()->grd_set_poly_constraint_flag (val);
     return 1;
 }
 
@@ -5538,7 +5539,7 @@ int CSWGrdAPI::grd_ClipTriMeshToMultiplePolygons
 {
     int             istat;
 
-    istat = grd_triangle_obj.grd_clip_tri_mesh_to_multiple_polygons
+    istat = grd_triangle_obj.get()->grd_clip_tri_mesh_to_multiple_polygons
                                          (nodes, num_nodes,
                                           edges, num_edges,
                                           triangles, num_triangles,
@@ -5557,7 +5558,7 @@ int CSWGrdAPI::grd_FilterDataSpikes (double *xin, double *yin, double *zin,
 {
     int           istat;
 
-    istat = grd_triangle_obj.grd_filter_data_spikes (xin, yin, zin, ibad, nin,
+    istat = grd_triangle_obj.get()->grd_filter_data_spikes (xin, yin, zin, ibad, nin,
                                     options);
 
     return istat;
@@ -5573,7 +5574,7 @@ int CSWGrdAPI::grd_FilterGridSpikes (CSW_F *grid, int ncol, int nrow,
 {
     int           istat;
 
-    istat = grd_calc_obj.grd_filter_grid_spikes (grid, ncol, nrow,
+    istat = grd_calc_obj->grd_filter_grid_spikes (grid, ncol, nrow,
                                     sfact);
 
     return istat;
@@ -5603,7 +5604,7 @@ int CSWGrdAPI::grd_GetXYZForTriangle (TRiangleStruct *triangle,
     int                  istat, n1, n2, n3;
     NOdeStruct           *nptr;
 
-    istat = grd_triangle_obj.grd_get_nodes_for_triangle (triangle, edgelist,
+    istat = grd_triangle_obj.get()->grd_get_nodes_for_triangle (triangle, edgelist,
                                         &n1, &n2, &n3);
     if (istat == -1) {
         return -1;
@@ -5686,7 +5687,7 @@ int CSWGrdAPI::grd_CalcPreciseDoublePlane (double *x, double *y, double *z,
     memcpy (coef, coef1, 3 * sizeof(double));
 #endif
 
-// grd_triangle_obj.  etc.
+// grd_triangle_obj.get()->  etc.
 
     return 1;
 
@@ -5740,9 +5741,10 @@ int CSWGrdAPI::ply_BuildPolygonsFromLines (double *xline, double *yline,
                                 int maxpts, int maxpoly)
 {
     int          istat;
-    CSWPolyGraph ply_graph_obj;
+    std::unique_ptr <CSWPolyGraph>
+        ply_graph_obj {new CSWPolyGraph ()};
 
-    istat = ply_graph_obj.ply_build_polygons_from_lines (xline, yline,
+    istat = ply_graph_obj->ply_build_polygons_from_lines (xline, yline,
                                            nline, line_pts,
                                            xpout, ypout,
                                            npolyout, nptsout,
@@ -5771,9 +5773,10 @@ int CSWGrdAPI::ply_BuildPolygonsFromTaggedLines
 {
     int          istat;
 
-    CSWPolyGraph ply_graph_obj;
+    std::unique_ptr<CSWPolyGraph>
+        ply_graph_obj {new CSWPolyGraph ()};
 
-    istat = ply_graph_obj.ply_build_polygons_from_tagged_lines
+    istat = ply_graph_obj->ply_build_polygons_from_tagged_lines
                                           (xline, yline, tags,
                                            nline, line_pts,
                                            xpout, ypout, tagout,
@@ -5835,9 +5838,10 @@ int ply_NestHoles (double *xpoly, double *ypoly,
                    int max_points, int max_comps)
 {
     int         istat;
-    CSWPolyGraph  ply_graph_obj;
+    std::unique_ptr <CSWPolyGraph>
+        ply_graph_obj {new CSWPolyGraph ()};
 
-    istat = ply_graph_obj.ply_nest_holes (xpoly, ypoly,
+    istat = ply_graph_obj->ply_nest_holes (xpoly, ypoly,
                             npoly, polypoints,
                             xpout, ypout,
                             npout, icout, ipout,
@@ -5983,7 +5987,7 @@ int CSWGrdAPI::grd_OutlineTriMeshBoundary
 {
     int             istat;
 
-    istat = grd_triangle_obj.grd_outline_tri_mesh_boundary
+    istat = grd_triangle_obj.get()->grd_outline_tri_mesh_boundary
                                   (nodes, num_nodes,
                                    edges, num_edges,
                                    triangles, num_triangles,
@@ -6236,14 +6240,15 @@ int CSWGrdAPI::grd_CalcConvexHull (
     nnodes = 0;
     nedges = 0;
     ntris = 0;
-    grd_triangle_obj.grd_set_remove_zero_flag (0);
-    istat = grd_triangle_obj.grd_calc_trimesh (
+    grd_triangle_obj.get()->grd_set_remove_zero_flag (0);
+
+    istat = grd_triangle_obj.get()->grd_calc_trimesh (
         xpts, ypts, zpts, -npts,
         NULL, NULL, NULL,
         NULL, NULL, 0,
         &nodes, &edges, &triangles,
         &nnodes, &nedges, &ntris);
-    grd_triangle_obj.grd_set_remove_zero_flag (1);
+    grd_triangle_obj.get()->grd_set_remove_zero_flag (1);
 
     if (istat == -1) {
         return -1;
@@ -6275,7 +6280,7 @@ int CSWGrdAPI::grd_CalcConvexHull (
         return -1;
     }
 
-    istat = grd_triangle_obj.grd_outline_tri_mesh_boundary (
+    istat = grd_triangle_obj.get()->grd_outline_tri_mesh_boundary (
         nodes, nnodes,
         edges, nedges,
         triangles, ntris,
@@ -6903,7 +6908,7 @@ int CSWGrdAPI::grd_AddLinesToTriMesh
 {
     int istat;
 
-    istat = grd_triangle_obj.grd_add_lines_to_trimesh
+    istat = grd_triangle_obj.get()->grd_add_lines_to_trimesh
         (xlinesin, ylinesin, zlinesin,
          linepointsin, lineflagsin, nlinesin,
          exact_flag,
@@ -6948,7 +6953,7 @@ double CSWGrdAPI::grd_CalcAverageEdgeLength (
     double            value;
 
     value =
-    grd_triangle_obj.grd_calc_average_edge_length (
+    grd_triangle_obj.get()->grd_calc_average_edge_length (
         nodes,
         edges,
         num_edges,
@@ -7031,7 +7036,7 @@ int CSWGrdAPI::grd_DecimateConstraint (
     int             istat;
 
     istat =
-    grd_triangle_obj.grd_decimate_constraint (
+    grd_triangle_obj.get()->grd_decimate_constraint (
         xline,
         yline,
         zline,
@@ -7251,7 +7256,7 @@ int CSWGrdAPI::grd_RemoveSliverTriangles (
 {
     int                istat;
 
-    istat = grd_triangle_obj.grd_remove_sliver_triangles (
+    istat = grd_triangle_obj.get()->grd_remove_sliver_triangles (
         nodes, edges, triangles,
         num_nodes, num_edges, num_triangles,
         height_base_ratio);
@@ -7342,7 +7347,7 @@ int CSWGrdAPI::grd_InsertCrossingPoints (
 {
     int     istat;
 
-    istat = grd_triangle_obj.grd_insert_crossing_points (
+    istat = grd_triangle_obj.get()->grd_insert_crossing_points (
         x1, y1, z1, NULL, n1,
         x2, y2, z2, NULL, n2,
         x3, y3, z3, tag3, n3,
@@ -7371,7 +7376,7 @@ int CSWGrdAPI::grd_DecimateTaggedLine (
 {
     int      istat;
 
-    istat = grd_triangle_obj.grd_decimate_tagged_line (
+    istat = grd_triangle_obj.get()->grd_decimate_tagged_line (
         x, y, z, tag, n);
 
     return istat;
@@ -7493,7 +7498,7 @@ int CSWGrdAPI::grd_DrapePointsOnTriMesh (int id1, int id2,
 {
     int             istat;
 
-    istat = grd_triangle_obj.grd_drape_points_on_tri_mesh (id1, id2,
+    istat = grd_triangle_obj.get()->grd_drape_points_on_tri_mesh (id1, id2,
                                          nodes, numnodes,
                                          edges, numedges,
                                          triangles, numtriangles,
@@ -7522,7 +7527,7 @@ int CSWGrdAPI::grd_RemoveTriIndex (int id1, int id2)
 {
     int            istat;
 
-    istat = grd_triangle_obj.grd_remove_tri_index (id1, id2);
+    istat = grd_triangle_obj.get()->grd_remove_tri_index (id1, id2);
     return istat;
 
 }
@@ -7542,7 +7547,7 @@ int CSWGrdAPI::grd_RemoveTriIndex (int id1, int id2)
 
 void CSWGrdAPI::grd_FreeTriIndexList (void)
 {
-    grd_triangle_obj.grd_free_tri_index_list ();
+    grd_triangle_obj.get()->grd_free_tri_index_list ();
     return;
 }
 
@@ -7639,7 +7644,7 @@ int CSWGrdAPI::grd_SetConformableSurfaceFromDouble
 
 {
 
-    int   istat = grd_calc_obj.grd_set_conformable_surface_from_double
+    int   istat = grd_calc_obj->grd_set_conformable_surface_from_double
       (grid, ncol, nrow,
        x1, y1, x2, y2);
     return istat;
@@ -7736,7 +7741,7 @@ int CSWGrdAPI::grd_ChewUpTriangles (
 {
     int            istat;
 
-    istat = grd_triangle_obj.grd_chew_up_triangles (
+    istat = grd_triangle_obj.get()->grd_chew_up_triangles (
         startnode,
         nodes, numnodes,
         edges, numedges,
@@ -7767,7 +7772,7 @@ int CSWGrdAPI::grd_RemoveDeletedTriMeshElements (
     int             istat;
 
     istat =
-      grd_triangle_obj.grd_remove_deleted_trimesh_elements (
+      grd_triangle_obj.get()->grd_remove_deleted_trimesh_elements (
         nodes, num_nodes,
         edges, num_edges,
         tris, num_tris);
@@ -7795,7 +7800,7 @@ int CSWGrdAPI::grd_ReshapeTriangles (
     int             istat;
 
     istat =
-      grd_triangle_obj.grd_reshape_triangles (
+      grd_triangle_obj.get()->grd_reshape_triangles (
         nodes, num_nodes,
         edges, num_edges,
         tris, num_tris);
@@ -7924,7 +7929,7 @@ int CSWGrdAPI::grd_ResetTriMeshZValuesFromGrid (
     int            istat;
 
     istat =
-      grd_triangle_obj.grd_reset_trimesh_zvalues_from_grid (
+      grd_triangle_obj.get()->grd_reset_trimesh_zvalues_from_grid (
         nodes,
         num_nodes,
         edges,
@@ -8097,7 +8102,7 @@ int CSWGrdAPI::grd_SmoothTriMeshNodes (
     int            istat;
 
     istat =
-      grd_triangle_obj.grd_smooth_trimesh_nodes (
+      grd_triangle_obj.get()->grd_smooth_trimesh_nodes (
         nodes,
         numnodes,
         edges,

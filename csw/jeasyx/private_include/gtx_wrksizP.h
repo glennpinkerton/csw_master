@@ -34,16 +34,16 @@
 
 #  include "csw/utils/include/csw_.h"
 
-#  define MAXPOLYPOINTS    50000
-#  define MAXLINEPOINTS    50000
+#  define MAXPOLYPOINTS    100000
+#  define MAXLINEPOINTS    100000
 
 /*  
     MAXWORK and MAXLINE should be at least twice as large as the largest 
     of MAXPOLYPOINTS and MAXLINEPOINTS  
 */
 
-#  define MAXWORK          100000
-#  define MAXLINE          100000
+#  define MAXWORK          200000
+#  define MAXLINE          200000
 
 /*  add nothing below this endif  */
 

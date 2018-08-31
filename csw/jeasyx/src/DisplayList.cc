@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <memory>
 #include <math.h>
 
 #include <iostream>
@@ -3039,8 +3040,9 @@ int CDisplayList::AddFill (double *xptsin, double *yptsin,
 /*
     If any polygon components are not closed, close them.
 */
-    istat = gpf_calcdraw_obj.gpf_close_polygon_holes (xptsin, yptsin, icompin, ncompin,
-                                     &x_closed, &y_closed, &npts_closed);
+    istat = gpf_calcdraw_obj.gpf_close_polygon_holes 
+                              (xptsin, yptsin, icompin, ncompin,
+                               &x_closed, &y_closed, &npts_closed);
     if (istat == -1) {
         return -1;
     }
@@ -3051,8 +3053,9 @@ int CDisplayList::AddFill (double *xptsin, double *yptsin,
     polygon can be clipped.  All polygons need to have
     this done before being put into the display list.
 */
-    istat = gpf_calcdraw_obj.gpf_removecutlines (x_closed, y_closed, ncompin, npts_closed,
-                                &x_cut, &y_cut, &ncomp, &npts_cut);
+    istat = gpf_calcdraw_obj.gpf_removecutlines
+                           (x_closed, y_closed, ncompin, npts_closed,
+                            &x_cut, &y_cut, &ncomp, &npts_cut);
     csw_Free (x_closed);
     csw_Free (y_closed);
     csw_Free (npts_closed);
@@ -3299,6 +3302,8 @@ int CDisplayList::DrawAllFills (void)
                         (xylocal,
                          fptr->npts,
                          fptr->smooth_flag,
+                         fptr->npts_orig,
+                         fptr->ncomp_orig,
                          fptr->fill_red,
                          fptr->fill_green,
                          fptr->fill_blue,
@@ -10100,6 +10105,7 @@ void CDisplayList::draw_frame_border_prims (int fnum) {
             gtx_drawprim_obj.gtx_clipfillprim(fptr->xypts,
                              fptr->npts,
                              fptr->smooth_flag,
+                             NULL, 0,  // need component stuff here
                              fptr->fill_red,
                              fptr->fill_green,
                              fptr->fill_blue,
@@ -17239,6 +17245,7 @@ void CDisplayList::reclip_and_draw_selected_fills (DLSelectable *dls)
         gtx_drawprim_obj.gtx_clipfillprim(xyp,
                          nptot,
                          fptr->smooth_flag,
+                         NULL, 0, 
                          fptr->fill_red,
                          fptr->fill_green,
                          fptr->fill_blue,
@@ -21630,6 +21637,7 @@ void CDisplayList::OutputForPlayback (const char *lfline) {
                     std::string pbstr;
                     pbstr.append (lfline);
                     pbfile << pbstr;
+                    pbfile.flush();
                 }
             }
         }
@@ -21651,7 +21659,7 @@ void CDisplayList::OutputForPlayback (const char *lfline) {
 
 int CDisplayList::PerformPolyBoolean (int *ilist, int *idata, double *ddata)
 {
-    CSWPolyGraph   pcalc;
+    std::unique_ptr<CSWPolyGraph>   pcalc (new CSWPolyGraph());
 
     double  *xs, *ys, *xc, *yc;
     int     *isc, *isv, *icc, *icv;
@@ -21707,7 +21715,7 @@ int CDisplayList::PerformPolyBoolean (int *ilist, int *idata, double *ddata)
     xout = ddata + start_xyout;
     yout = xout + max_xyout;
 
-    int   istat = pcalc.ply_boolean (
+    int   istat = pcalc->ply_boolean (
       xs, ys, NULL, nps, isc, isv,
       xc, yc, NULL, npc, icc, icv,
       op_type,
@@ -21716,6 +21724,48 @@ int CDisplayList::PerformPolyBoolean (int *ilist, int *idata, double *ddata)
 
     ilist[3] = npout;
 
+//CDisplayList::testForLongLine (xout, yout, npout, icout, ihout);
+
     return istat;
+
+}
+
+
+void CDisplayList::testForLongLine (double *xout, double *yout,
+                                    int npout, int *icout, int *ihout)
+{
+    int  i, j, k, nh, np;
+
+    double  dx, dy, dd;
+    double  dtest = 20.0;
+
+    nh = 0;
+    np = 0;
+
+    printf ("\nTesting for long lines in DisplayList.cc\n\n");
+
+    for (i=0; i<npout; i++) {
+        printf ("polygon %d  number of components %d\n",
+                i, icout[i]);
+        for (j=0; j<icout[i]; j++) {
+            int nph = ihout[nh];
+            nh++;
+            printf ("  npts in hole = %d\n", nph);
+            for (k=0; k<nph-1; k++) {
+                dx = xout[np] - xout[np+1];
+                dy = yout[np] - yout[np+1];
+                dd = dx * dx + dy * dy;
+                dd = sqrt (dd);
+                if (dd > dtest) {
+                    printf ("    long line at component %d  point %d\n",
+                            j, k);
+                    fflush (stdout);
+                }
+                np++;
+            }
+            np++;
+        }
+    }
+
 
 }

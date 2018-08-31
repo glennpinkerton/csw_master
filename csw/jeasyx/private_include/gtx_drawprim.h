@@ -354,6 +354,8 @@ class GTXDrawPrim
         CSW_F * coords,
         int npt,
         char smoothflag,
+        int *holepts,
+        int nholes,
         int fred, int fgreen, int fblue,
         int pred, int pgreen, int pblue,
         int bred, int bgreen, int bblue,

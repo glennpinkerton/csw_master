@@ -34,6 +34,8 @@
 #define PRIVATE_HEADERS_OK
 #endif
 
+#  include<memory>
+
 #  include "csw/utils/include/csw_.h"
 
 #  include "csw/surfaceworks/include/con_shared_structs.h"
@@ -65,19 +67,24 @@
 
         CSWConCalc    con_calc_obj;
         CSWConDraw    con_draw_obj;
-        CSWConTriangle  con_triangle_obj;
         CSWConXsect   con_xsect_obj;
 
         CSWGrdUtils   grd_utils_obj;
-        CSWGrdCalc    grd_calc_obj;
         CSWGrdFault   grd_fault_obj;
         CSWGrdArith   grd_arith_obj;
         CSWGrdImage   grd_image_obj;
-        CSWGrdTriangle  grd_triangle_obj;
         CSWGrdFileio  grd_fileio_obj;
         CSWGrdStats   grd_stats_obj;
         CSWGrdTsurf   grd_tsurf_obj;
-        CSWGrdConstraint  grd_constraint_obj;
+
+        std::unique_ptr <CSWGrdTriangle>
+            grd_triangle_obj {new CSWGrdTriangle()};
+        std::unique_ptr <CSWConTriangle>
+            con_triangle_obj {new CSWConTriangle()};
+        std::unique_ptr<CSWGrdCalc>
+            grd_calc_obj {new CSWGrdCalc ()};
+        std::unique_ptr<CSWGrdConstraint>
+            grd_constraint_obj {new CSWGrdConstraint ()};
 
         void SetContourAPIPtrs () {
 
@@ -87,49 +94,49 @@
 
             con_draw_obj.SetGrdUtilsPtr (&grd_utils_obj);
 
-            con_triangle_obj.SetConCalcPtr (&con_calc_obj);
-            con_triangle_obj.SetGrdFaultPtr (&grd_fault_obj);
-            con_triangle_obj.SetGrdUtilsPtr (&grd_utils_obj);
-            con_triangle_obj.SetGrdFileioPtr (&grd_fileio_obj);
-            con_triangle_obj.SetGrdTrianglePtr (&grd_triangle_obj);
+            con_triangle_obj->SetConCalcPtr (&con_calc_obj);
+            con_triangle_obj->SetGrdFaultPtr (&grd_fault_obj);
+            con_triangle_obj->SetGrdUtilsPtr (&grd_utils_obj);
+            con_triangle_obj->SetGrdFileioPtr (&grd_fileio_obj);
+            con_triangle_obj->SetGrdTrianglePtr (grd_triangle_obj.get());
 
             con_xsect_obj.SetGrdArithPtr (&grd_arith_obj);
             con_xsect_obj.SetGrdUtilsPtr (&grd_utils_obj);
 
             grd_utils_obj.SetGrdArithPtr (&grd_arith_obj);
-            grd_utils_obj.SetGrdCalcPtr (&grd_calc_obj);
+            grd_utils_obj.SetGrdCalcPtr (grd_calc_obj.get());
             grd_utils_obj.SetGrdFaultPtr (&grd_fault_obj);
-            grd_utils_obj.SetGrdTrianglePtr (&grd_triangle_obj);
+            grd_utils_obj.SetGrdTrianglePtr (grd_triangle_obj.get());
 
-            grd_calc_obj.SetGrdArithPtr (&grd_arith_obj);
-            grd_calc_obj.SetGrdFaultPtr (&grd_fault_obj);
-            grd_calc_obj.SetGrdFileioPtr (&grd_fileio_obj);
-            grd_calc_obj.SetGrdStatsPtr (&grd_stats_obj);
-            grd_calc_obj.SetGrdTrianglePtr (&grd_triangle_obj);
-            grd_calc_obj.SetGrdTsurfPtr (&grd_tsurf_obj);
-            grd_calc_obj.SetGrdUtilsPtr (&grd_utils_obj);
+            grd_calc_obj->SetGrdArithPtr (&grd_arith_obj);
+            grd_calc_obj->SetGrdFaultPtr (&grd_fault_obj);
+            grd_calc_obj->SetGrdFileioPtr (&grd_fileio_obj);
+            grd_calc_obj->SetGrdStatsPtr (&grd_stats_obj);
+            grd_calc_obj->SetGrdTrianglePtr (grd_triangle_obj.get());
+            grd_calc_obj->SetGrdTsurfPtr (&grd_tsurf_obj);
+            grd_calc_obj->SetGrdUtilsPtr (&grd_utils_obj);
 
             grd_fault_obj.SetGrdArithPtr (&grd_arith_obj);
             grd_fault_obj.SetGrdFileioPtr (&grd_fileio_obj);
-            grd_fault_obj.SetGrdTrianglePtr (&grd_triangle_obj);
+            grd_fault_obj.SetGrdTrianglePtr (grd_triangle_obj.get());
             grd_fault_obj.SetGrdUtilsPtr (&grd_utils_obj);
 
             grd_arith_obj.SetGrdFaultPtr (&grd_fault_obj);
             grd_arith_obj.SetGrdUtilsPtr (&grd_utils_obj);
 
-        CSWGrdTsurf   grd_tsurf_obj;
-        CSWGrdConstraint  grd_constraint_obj;
+//        CSWGrdTsurf   grd_tsurf_obj;
+//        CSWGrdConstraint  grd_constraint_obj;
 
             grd_image_obj.SetGrdArithPtr (&grd_arith_obj);
             grd_image_obj.SetGrdFileioPtr (&grd_fileio_obj);
             grd_image_obj.SetGrdUtilsPtr (&grd_utils_obj);
 
-            grd_triangle_obj.SetGrdArithPtr (&grd_arith_obj);
-            grd_triangle_obj.SetGrdCalcPtr (&grd_calc_obj);
-            grd_triangle_obj.SetGrdConstraintPtr (&grd_constraint_obj);
-            grd_triangle_obj.SetGrdFaultPtr (&grd_fault_obj);
-            grd_triangle_obj.SetGrdTsurfPtr (&grd_tsurf_obj);
-            grd_triangle_obj.SetGrdUtilsPtr (&grd_utils_obj);
+            grd_triangle_obj->SetGrdArithPtr (&grd_arith_obj);
+            grd_triangle_obj->SetGrdCalcPtr (grd_calc_obj.get());
+            grd_triangle_obj->SetGrdConstraintPtr (grd_constraint_obj.get());
+            grd_triangle_obj->SetGrdFaultPtr (&grd_fault_obj);
+            grd_triangle_obj->SetGrdTsurfPtr (&grd_tsurf_obj);
+            grd_triangle_obj->SetGrdUtilsPtr (&grd_utils_obj);
 
             grd_fileio_obj.SetGrdFaultPtr (&grd_fault_obj);
             grd_fileio_obj.SetGrdUtilsPtr (&grd_utils_obj);
@@ -140,10 +147,10 @@
             grd_tsurf_obj.SetGrdFileioPtr (&grd_fileio_obj);
             grd_tsurf_obj.SetGrdUtilsPtr (&grd_utils_obj);
 
-            grd_constraint_obj.SetGrdFaultPtr (&grd_fault_obj);
-            grd_constraint_obj.SetGrdFileioPtr (&grd_fileio_obj);
-            grd_constraint_obj.SetGrdTrianglePtr (&grd_triangle_obj);
-            grd_constraint_obj.SetGrdUtilsPtr (&grd_utils_obj);
+            grd_constraint_obj->SetGrdFaultPtr (&grd_fault_obj);
+            grd_constraint_obj->SetGrdFileioPtr (&grd_fileio_obj);
+            grd_constraint_obj->SetGrdTrianglePtr (grd_triangle_obj.get());
+            grd_constraint_obj->SetGrdUtilsPtr (&grd_utils_obj);
 
         };
 

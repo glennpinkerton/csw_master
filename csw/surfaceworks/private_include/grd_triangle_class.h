@@ -195,6 +195,12 @@ class CSWGrdTriangle
 
     CSWGrdTriangle () {};
 
+int do_nothing () {
+printf ("\nFrom grd_triangle do nothing\n\n");
+fflush (stdout);
+return 1;
+}
+
     void  SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};
     void  SetGrdCalcPtr (CSWGrdCalc *p) {grd_calc_ptr = p;};
     void  SetGrdConstraintPtr (CSWGrdConstraint *p) {grd_constraint_ptr = p;};

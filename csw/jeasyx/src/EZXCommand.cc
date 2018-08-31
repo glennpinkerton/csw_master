@@ -2358,7 +2358,39 @@ int ezx_process_command (
      */
         case GTX_POLYGON_BOOLEAN:
 
-            dlist->PerformPolyBoolean (ilist, idata, ddata);
+          #if _EZX_DEBUG_LOG_FILE_
+            if (LogFile) {
+                int  nidata = ilist[8];
+                int  nddata = ilist[9];
+                for (int i = 0; i<10; i++) {
+                    sprintf (LogFileLine,
+                             "%d\n",
+                             ilist[i]);
+                    DLF
+                }
+                for (int i = 0; i<nidata; i++) {
+                    sprintf (LogFileLine,
+                             "%d\n",
+                             idata[i]);
+                    DLF
+                }
+                for (int i = 0; i<nddata; i++) {
+                    sprintf (LogFileLine,
+                             "%lf\n",
+                             ddata[i]);
+                    DLF
+                }
+            }
+          #endif
+
+            try {
+                dlist->PerformPolyBoolean (ilist, idata, ddata);
+            }
+            catch (...) {
+                printf 
+                ("Unknown exception from polygon boolean calculations.");
+                ilist[3] = 0;  // return 0 polygons in result
+            }
 
             break;
 
