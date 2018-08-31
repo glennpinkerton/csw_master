@@ -10,19 +10,16 @@
 
 package csw.jeasyx.src;
 
+import java.lang.Math;
 import java.awt.Color;
+import java.io.Serializable;
 
 /**
- * This class stores the data for a polygon fill primitive returned
- * from a pick or edit operation.  It is
- * used to return the data and graphic attributes for a fill.  The
- * native display list has the data for all fills.  An instance of
- * DLFill will only be created by querying the display list.  Therefore,
- * the constructor is not public.  The various set methods are also of
- * package scope.
  */
 
-public class DLFill {
+public class DLFill implements Serializable {
+
+    private static final long serialVersionUID = 1357952L;
 
   /*
    * The variables have package scope so the JDisplayList can
@@ -46,6 +43,9 @@ public class DLFill {
                     linePattern,
                     nativeIndex;
 
+    public void outlineComponents (JDisplayList  dl) {
+    }
+
     public void printForDebug () {
       int k=0;
       System.out.println ();
@@ -62,11 +62,80 @@ public class DLFill {
       System.out.println ();
     }
 
-/*
- * Constructor has package scope also.
- */
-    DLFill () {
+
+
+    public DLFill () {
     }
+
+
+
+public void dumpPoints (int findex)
+{
+
+    System.out.println ();
+    System.out.println ("In DLFill dumpPoints");
+    System.out.println ("numComponents = " + numComponents + 
+           "  in polygon # " + findex);
+    System.out.println ();
+    System.out.flush ();
+
+    int  ixy = 0;
+
+    for (int i=0; i<numComponents; i++) {
+        System.out.println ();
+        System.out.println (numPoints[i] + " points for component " + i);
+        for (int j=0; j<numPoints[i]; j++) {
+            System.out.println ("  ixy = " + ixy + "   " +
+                  xPoints[ixy] + "   " + yPoints[ixy]);
+            ixy++;
+            System.out.flush ();
+        }
+    }
+
+}
+
+
+public void testForLongLine (int findex, double dtest) {
+
+    dtest = 10.0;
+
+    int  ixy = 0;
+
+    double  dx, dy, dd;
+
+    System.out.println ();
+    System.out.println ("In DLFill testForLongLine");
+    System.out.println ("numComponents = " + numComponents + 
+           "  in polygon # " + findex);
+    System.out.println ();
+    System.out.flush ();
+
+    for (int i=0; i<numComponents; i++) {
+        System.out.println ();
+        System.out.println (numPoints[i] + " points for component " + i);
+        for (int j=0; j<numPoints[i] - 1; j++) {
+            dx = xPoints[ixy] - xPoints[ixy+1];
+            dy = yPoints[ixy] - yPoints[ixy+1];
+            dd = dx * dx + dy * dy;
+            dd = Math.sqrt (dd);
+            if (dd > dtest) {
+                System.out.println (
+                    "  long vector at component " + i +
+                    "  point " + j);
+                System.out.println ("  ixy1 = " + ixy + "   " +
+                  xPoints[ixy] + "   " + yPoints[ixy]);
+                int  ixy2 = ixy + 1;
+                System.out.println ("  ixy2 = " + ixy2 + "   " +
+                  xPoints[ixy2] + "   " + yPoints[ixy2]);
+                System.out.flush ();
+            }
+            ixy++;
+        }
+        ixy++;
+    }
+
+}
+
 
 
     /**
@@ -201,75 +270,71 @@ public class DLFill {
 
 /*--------------------------------------------------------------------------------*/
 
-    /*
-     * The set functions have package scope.  Only the JDisplayList class
-     * and its associated utilities can set the data.
-     */
-    void setBorderColor(Color color) {
+    public void setBorderColor(Color color) {
         borderColor = color;
     }
 
-    void setBorderThickness(double d) {
+    public void setBorderThickness(double d) {
         borderThickness = d;
     }
 
-    void setDashScale(double d) {
+    public void setDashScale(double d) {
         dashScale = d;
     }
 
-    void setColor(Color color) {
+    public void setColor(Color color) {
         this.color = color;
     }
 
-    void setPattern(int i) {
+    public void setPattern(int i) {
         pattern = i;
     }
 
-    void setFrameName(String string) {
+    public void setFrameName(String string) {
         frameName = string;
     }
 
-    void setItemName(String string) {
+    public void setItemName(String string) {
         itemName = string;
     }
 
-    void setLayerName(String string) {
+    public void setLayerName(String string) {
         layerName = string;
     }
 
-    void setLinePattern(int i) {
+    public void setLinePattern(int i) {
         linePattern = i;
     }
 
-    void setNativeIndex(int i) {
+    public void setNativeIndex(int i) {
         nativeIndex = i;
     }
 
-    void setPatternColor(Color color) {
+    public void setPatternColor(Color color) {
         patternColor = color;
     }
 
-    void setPatternScale(double d) {
+    public void setPatternScale(double d) {
         patternScale = d;
     }
 
-    void setSelectableObject(DLSelectable selectable) {
+    public void setSelectableObject(DLSelectable selectable) {
         selectableObject = selectable;
     }
 
-    void setXPoints(double[] ds) {
+    public void setXPoints(double[] ds) {
         xPoints = ds;
     }
 
-    void setYPoints(double[] ds) {
+    public void setYPoints(double[] ds) {
         yPoints = ds;
     }
 
-    void setNumPoints (int[] np) {
+    public void setNumPoints (int[] np) {
         numPoints = np;
     }
 
-    void setNumComponents (int nc) {
+    public void setNumComponents (int nc) {
         numComponents = nc;
     }
 

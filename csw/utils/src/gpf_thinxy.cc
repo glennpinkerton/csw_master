@@ -546,11 +546,13 @@ int gpf_compressfillpoints (CSW_F *xyin, int npt, CSW_F **xy,
     {
         if (bsuccess == false) {
             csw_Free (xyt);
+            xy[0] = NULL;
         }
     };
     CSWScopeGuard func_scope_guard (fscope);
 
 
+    xy[0] = NULL;
     big = 1.e15f;
 
 /*  allocate memory for output  */

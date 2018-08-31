@@ -25,6 +25,7 @@
 */
 
 #include <assert.h>
+#include <memory>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6542,7 +6543,8 @@ int CSWGrdFault::UnionFaults (void)
                        *npout = NULL, *nvout = NULL, nfout;
     char               *cenv = NULL;
 
-    CSWPolyGraph       ply_graph_obj;
+    std::unique_ptr <CSWPolyGraph>
+        ply_graph_obj {new CSWPolyGraph ()};
 
 
     auto fscope = [&]()
@@ -6690,7 +6692,7 @@ int CSWGrdFault::UnionFaults (void)
 /*
     Do the union operation.
 */
-    istat = ply_graph_obj.ply_boolean (xf1, yf1, NULL, nf1, npf1, nvf1,
+    istat = ply_graph_obj->ply_boolean (xf1, yf1, NULL, nf1, npf1, nvf1,
                          xf2, yf2, NULL, nf2, npf2, nvf2,
                          PLY_UNION,
                          xout, yout, NULL, &nfout, npout, nvout,

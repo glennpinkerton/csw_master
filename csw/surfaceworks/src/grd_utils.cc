@@ -17,6 +17,7 @@
 */
 
 #include <float.h>
+#include <memory>
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -4074,7 +4075,8 @@ int CSWGrdUtils::grd_mask_with_polygon
     int              istat, maxpoints, maxcomps, offset;
 
     CSWPolyUtils     ply_utils_obj;
-    CSWPolyGraph     ply_graph_obj;
+    std::unique_ptr <CSWPolyGraph>
+        ply_graph_obj {new CSWPolyGraph ()};
 
 /*
  * check for obvious errors
@@ -4129,7 +4131,7 @@ int CSWGrdUtils::grd_mask_with_polygon
 /*
  * Union the input polygons.
  */
-    istat = ply_graph_obj.ply_union_components (xpin, ypin, NULL,
+    istat = ply_graph_obj->ply_union_components (xpin, ypin, NULL,
                                   npin, icin, ipin,
                                   xp, yp, NULL,
                                   &npout, ic, ip,

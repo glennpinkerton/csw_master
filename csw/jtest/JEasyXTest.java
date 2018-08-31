@@ -1959,6 +1959,8 @@ catch (Exception e) {
         else {
           ndo = nhint;
           xymax = 2000.0;
+          if (ndo > 5000) xymax = 20000.0;
+          if (ndo > 50000) xymax = 200000.0;
           setTitle ("Random Frame Test * " + ndo);
         }
 

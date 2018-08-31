@@ -21,6 +21,7 @@
 */
 #include <assert.h>
 #include <stdlib.h>
+#include <memory>
 
 /*
     application header files
@@ -391,7 +392,8 @@ int CSWPolyEdit::UnionNewComponents (void)
     int               *ipts = NULL;
     int               i, j, n, nc, n2,
                       istat, ifirst;
-    CSWPolyGraph      ply_graph_obj;
+    std::unique_ptr <CSWPolyGraph>
+        ply_graph_obj {new CSWPolyGraph ()};
 
     auto fscope = [&]()
     {
@@ -453,7 +455,7 @@ int CSWPolyEdit::UnionNewComponents (void)
 /*
  * Union the polygons.
  */
-    istat = ply_graph_obj.ply_union_components (xp, yp, vp,
+    istat = ply_graph_obj->ply_union_components (xp, yp, vp,
                                   Npoly, Icomp, ipts,
                                   Xout, Yout, Vpout,
                                   &Nout, Icout, Ipout,

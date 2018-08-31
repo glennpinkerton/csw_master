@@ -161,6 +161,7 @@ int EZXJavaArea::ezx_AppendFillToJavaArea (
     );
 
     if  (freeflag) {
+        freeflag = 0;
         csw_Free (fxy);
         fxy = NULL;
     }
@@ -225,7 +226,9 @@ int EZXJavaArea::ezx_AppendLineToJavaArea (
     );
 
     if (freeflag) {
+        freeflag = 0;
         csw_Free (fxy);
+        fxy = NULL;
     }
 
     return 1;

@@ -104,7 +104,11 @@ private:
     std::ofstream  pbfile;
 
 
+
   public:
+
+static void testForLongLine (double *xout, double *yout,
+                             int npout, int *icout, int *ihout);
 
     EZXJavaArea    ezx_java_obj;
 
@@ -1005,7 +1009,7 @@ private:
    */
 
     const int  max_static_ppts = 1000;
-    double   static_xy_local[2002];
+    double   static_xy_local[20020];
 
     int      page_units_type;
 

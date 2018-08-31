@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <memory>
 #include <math.h>
 #include <assert.h>
 
@@ -733,6 +734,7 @@ int CSWGrdTriangle::grd_grid_to_equilateral_trimesh
     ClipToGridFlag = 1;
     istat = FixLineDefects (xlinesin, ylinesin, zlinesin,
                             linepointsin, NULL, nlinesin);
+    istat = 1;
     ClipToGridFlag = 0;
     if (istat == -1) {
         grd_utils_ptr->grd_set_err (1);
@@ -1482,7 +1484,7 @@ int CSWGrdTriangle::grd_calc_trimesh
     int                    exact_flag = 0;
     int                    closed_flag;
 
-    CSWPolyUtils        ply_utils_obj;
+    CSWPolyUtils           ply_utils_obj;
 
 /*
  * !!!! debug only
@@ -4396,10 +4398,14 @@ int CSWGrdTriangle::FreeMem (void)
     }
     if (RawLines) csw_Free (RawLines);
     RawLines = NULL;
-    if (Xline) csw_Free (Xline);
+    csw_Free (Xline);
     Xline = NULL;
-    if (Iline) csw_Free (Iline);
+    Yline = NULL;
+    Zline = NULL;
+    Nline = 0;
+    csw_Free (Iline);
     Iline = NULL;
+    Iflag = NULL;
 
     if (ConstraintRawPoints) {
         for (i=0; i<NumConstraintRawPoints; i++) {
@@ -9035,7 +9041,8 @@ int CSWGrdTriangle::FixLineDefects (double *x, double *y, double *z,
                   *iw4 = NULL, *nlcomp = NULL;
     char          *cenv = NULL;
 
-    CSWPolyGraph  ply_graph_obj;
+    std::unique_ptr<CSWPolyGraph>
+        ply_graph_obj {new CSWPolyGraph ()};
 
     bool     bsuccess = false;
 
@@ -9280,11 +9287,12 @@ int CSWGrdTriangle::FixLineDefects (double *x, double *y, double *z,
         for (i=0; i<nlwork; i++) {
             nlcomp[i] = 1;
         }
-        istat = ply_graph_obj.ply_union_components (xw1, yw1, tag1, nlwork, nlcomp, iw1,
-                                      xw2, yw2, tag2, &np2, iw3, iw2,
-                                      npmax, ncmax);
+        istat = ply_graph_obj->ply_union_components 
+            (xw1, yw1, tag1, nlwork, nlcomp, iw1,
+             xw2, yw2, tag2, &np2, iw3, iw2,
+             npmax, ncmax);
         if (Nbugs == 0) {
-            ply_graph_obj.ply_get_bug_locations (BugX, BugY, &Nbugs, 10);
+            ply_graph_obj->ply_get_bug_locations (BugX, BugY, &Nbugs, 10);
             for (i=0; i<Nbugs; i++) {
                 BugX[i] += Xshift;
                 BugY[i] += Yshift;
@@ -9312,13 +9320,14 @@ int CSWGrdTriangle::FixLineDefects (double *x, double *y, double *z,
 
         n = 1;
         n2 = 5;
-        istat = ply_graph_obj.ply_boolean (xw2, yw2, tag2, np2, iw3, iw2,
-                             xbox, ybox, NULL, 1, &n, &n2,
-                             PLY_INTERSECT,
-                             xw1, yw1, tag1, &np2, iw3, iw1,
-                             npmax, ncmax);
+        istat = ply_graph_obj->ply_boolean
+            (xw2, yw2, tag2, np2, iw3, iw2,
+             xbox, ybox, NULL, 1, &n, &n2,
+             PLY_INTERSECT,
+             xw1, yw1, tag1, &np2, iw3, iw1,
+             npmax, ncmax);
         if (Nbugs == 0) {
-            ply_graph_obj.ply_get_bug_locations (BugX, BugY, &Nbugs, 10);
+            ply_graph_obj->ply_get_bug_locations (BugX, BugY, &Nbugs, 10);
             for (i=0; i<Nbugs; i++) {
                 BugX[i] += Xshift;
                 BugY[i] += Yshift;
@@ -17078,7 +17087,8 @@ int CSWGrdTriangle::grd_outline_triangles (NOdeStruct *nodes, int num_nodes,
     int                istat, i, n, *nc1 = NULL, *nv1 = NULL, np1;
     double             *xp1 = NULL, *yp1 = NULL, zdum[3];
 
-    CSWPolyGraph  ply_graph_obj;
+    std::unique_ptr<CSWPolyGraph>
+        ply_graph_obj {new CSWPolyGraph ()};
 
 
     auto fscope = [&]()
@@ -17168,7 +17178,7 @@ int CSWGrdTriangle::grd_outline_triangles (NOdeStruct *nodes, int num_nodes,
 /*
  * Combine all the triangles into outline polygons.
  */
-    istat = ply_graph_obj.ply_union_components (xp1, yp1, NULL,
+    istat = ply_graph_obj->ply_union_components (xp1, yp1, NULL,
                                   np1, nc1, nv1,
                                   xout, yout, NULL,
                                   npout, ncout, nvout,
@@ -17181,11 +17191,11 @@ int CSWGrdTriangle::grd_outline_triangles (NOdeStruct *nodes, int num_nodes,
 
 
 /*
- ***************************************************************************************
+ ***************************************************************************
 
               g r d _ c l i p _ t r i _ m e s h _ t o _ p o l y g o n
 
- ***************************************************************************************
+ ***************************************************************************
 
   Delete any nodes, edges or triangles outside the specified polygon.
 

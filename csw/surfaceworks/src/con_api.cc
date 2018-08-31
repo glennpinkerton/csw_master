@@ -317,11 +317,11 @@ int CSWContourApi::con_CalcContours
 
     do_write = csw_GetDoWrite ();
     if (do_write) {
-        grd_triangle_obj.grd_WriteXYZGridFile (
+        grd_triangle_obj.get()->grd_WriteXYZGridFile (
         "pre_contour.grd",
                 grid, ncol, nrow, 1,
                 (double)x1, (double)y1, (double)x2, (double)y2);
-        grd_calc_obj.grd_WriteFaultLines (faults, nfaults, "pre_contour.flt");
+        grd_calc_obj->grd_WriteFaultLines (faults, nfaults, "pre_contour.flt");
     }
 
 /*
@@ -336,7 +336,7 @@ int CSWContourApi::con_CalcContours
             fsave = options->faulted_flag;
             options->faulted_flag = 1;
         }
-        istat = con_triangle_obj.con_contour_grid_using_trimesh
+        istat = con_triangle_obj->con_contour_grid_using_trimesh
                                (grid, ncol, nrow, 1.e30,
                                 (double)x1, (double)y1,
                                 (double)x2, (double)y2,
@@ -1287,7 +1287,7 @@ int CSWContourApi::con_CalcContoursFromDouble
         }
     }
 
-    grd_triangle_obj.grd_set_shifts_for_debug (x1, y1);
+    grd_triangle_obj.get()->grd_set_shifts_for_debug (x1, y1);
 
     xt1 = 0.0f;
     yt1 = 0.0f;
@@ -1331,7 +1331,7 @@ int CSWContourApi::con_CalcContoursFromDouble
         options->error_number = con_GetErr ();
     }
 
-    grd_triangle_obj.grd_set_shifts_for_debug (0.0, 0.0);
+    grd_triangle_obj.get()->grd_set_shifts_for_debug (0.0, 0.0);
 
     return istat;
 
@@ -1959,7 +1959,7 @@ int CSWContourApi::con_SmoothTriMesh (
     int istat;
 
     istat =
-      con_triangle_obj.con_smooth_trimesh (
+      con_triangle_obj->con_smooth_trimesh (
         nodes, numnodes,
         edges, numedges,
         tris, numtris,
@@ -1995,7 +1995,7 @@ int CSWContourApi::con_CalcTriMeshContours
 {
     int                   istat;
 
-    istat = con_triangle_obj.con_contours_from_trimesh
+    istat = con_triangle_obj->con_contours_from_trimesh
                                       (triangles, ntriangles,
                                        edges, nedges,
                                        nodes, nnodes,

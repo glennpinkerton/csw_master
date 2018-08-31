@@ -42,16 +42,16 @@
 #define GRAZE                      9
 #define FUDGE                      2
 #define RAW_OFFSET                 5
-#define INTEGER_RANGE              10000000
+#define INTEGER_RANGE              50000000
 #define BBMARGIN                   100
 
 #define IDENTICAL_GRAZE            2000.0
 
 #define EDGE_CHECK_LENGTH          100
 
-#define LOCAL_MAX_GRID_SIZE              20000
-#define MAX_SEG_INDEX              1000
-#define MAX_NODE_INDEX             1000
+#define LOCAL_MAX_GRID_SIZE        20000
+#define MAX_SEG_INDEX              4000
+#define MAX_NODE_INDEX             4000
 #define LIST_CHUNK                 1000
 
 #define NCOMP_INDEXED              20
@@ -165,6 +165,9 @@ bool  _bbr_ = false;
 
   private:
 
+void testForLongLine (int cidx, double dt);
+void initIntListForDebug (int *lp, int n);
+
 // Static variables from the old C file are now private class variables.
 
     int         first {1};
@@ -215,8 +218,10 @@ bool  _bbr_ = false;
                          NodeIndexNcol {0},
                          NodeIndexNrow {0},
                          NodeIndexSpace {0};
-    int                  IndexXmin {0},
-                         IndexYmin {0};
+    int                  IndexXmin {2000000000},
+                         IndexYmin {2000000000};
+    int                  IndexXmax {-2000000000},
+                         IndexYmax {-2000000000};
 
     double               TestScale {0.0},
                          TestXmin {0.0},
@@ -327,7 +332,7 @@ bool  _bbr_ = false;
     int FragmentGraphs (void);
     int RemoveTemporaryNodes (void);
     int CalculateSegmentIntersections (void);
-    int SplitSegments (SEgmentStruct *, SEgmentStruct *, int, int, int);
+    int SplitSegments (int index_seg1, int index_seg2, int, int, int);
     int BuildPolygonComponents (void);
     int BuildPolygonComponentsForFragments (void);
     int BuildXorComponents (void);
@@ -371,6 +376,11 @@ bool  _bbr_ = false;
 
     int AddUntouchedInputPolygons (int *nc, int *nv);
 
+    int _ply_boolean_ (double*, double*, void**, int, int*, int*,
+                     double*, double*, void**, int, int*, int*,
+                     int,
+                     double*, double*, void**, int*, int*, int*,
+                     int, int);
 
   public:
 

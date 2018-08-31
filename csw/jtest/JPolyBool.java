@@ -12,6 +12,13 @@ package csw.jtest;
 
 import java.lang.Exception;
 import java.lang.Runtime;
+import java.lang.Math;
+
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.IOException;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -60,7 +67,7 @@ import csw.jutils.src.CSWLogger;
 /**
  *
  *  A class to digitize polygon sets for boolean operations
- *  and to display the results.``jjjjjjjjjjjjjjjjjjj
+ *  and to display the results.
  *
  *  @author Glenn Pinkerton
  *
@@ -197,12 +204,15 @@ class DigitizeFrame extends JDLFrame implements DLEditListener
 
     private JButton        sourceButton = null;
     private JButton        clipButton = null;
+    private JButton        randomButton = null;
+    private JButton        random4Button = null;
     private JButton        intersectButton = null;
     private JButton        unionButton = null;
     private JButton        xorButton = null;
-    private JButton        fragmentButton = null;
     private JButton        clearButton = null;
     private JButton        clearResultButton = null;
+    private JButton        saveButton = null;
+    private JButton        restoreButton = null;
 
     private ArrayList<DLSelectable>   sourceSel = new ArrayList<DLSelectable> ();
     private ArrayList<DLSelectable>   clipSel = new ArrayList<DLSelectable> ();
@@ -253,6 +263,31 @@ catch (Exception e) {
              null
         );
 
+        randomButton =
+        addAdditionalTextButton (
+             "Random",
+             "Generate Random Source Polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.generateRandom ();
+               }
+             },
+             null
+        );
+
+        random4Button =
+        addAdditionalTextButton (
+             "Random4",
+             "Generate 4 Random Source Polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.clearPolys ();
+                 DigitizeFrame.this.generateRandom4 ();
+               }
+             },
+             null
+        );
+
         intersectButton =
         addAdditionalTextButton (
              "Intersect",
@@ -292,18 +327,6 @@ catch (Exception e) {
         );
         xorButton.setEnabled (false);
 
-        fragmentButton =
-        addAdditionalTextButton (
-             "Fragment",
-             "Calculate Fragments the Red Source and Blue Clip Polygon Combination",
-             new ActionListener() {
-               public void actionPerformed(ActionEvent ae){
-                 DigitizeFrame.this.fragmentPolys ();
-               }
-             },
-             null
-        );
-        fragmentButton.setEnabled (false);
 
         clearButton =
         addAdditionalTextButton (
@@ -329,6 +352,32 @@ catch (Exception e) {
              null
         );
         clearResultButton.setEnabled (false);
+
+        saveButton =
+        addAdditionalTextButton (
+             "Save",
+             "Save Current Source and Clip Polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.saveInputPolys ();
+               }
+             },
+             null
+        );
+
+        restoreButton =
+        addAdditionalTextButton (
+             "Restore",
+             "Restore Most Recently Saved Source and Clip Polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.restoreInputPolys ();
+               }
+             },
+             null
+        );
+
+
 
         setTitle ("Polygon Boolean Testing");
 
@@ -367,6 +416,69 @@ catch (Exception e) {
 
 
 
+
+
+    private void dumpSourcePolys () {
+
+        for (DLFill dlf : sourcePolyList) {
+            DLSelectable _dls = new DLSelectable ();
+            sourceSel.add (_dls);
+            dl.setSelectable (_dls);
+            setSourceAttributes ();
+            int ncomp = dlf.getNumComponents ();
+            if (ncomp < 1) continue;
+            int[] npts_arr = dlf.getNumPoints ();
+        }
+
+    }
+
+
+    private void drawPolys () {
+
+        dl.setLineThickness(.002);
+
+        for (DLFill dlf : sourcePolyList) {
+            DLSelectable _dls = new DLSelectable ();
+            sourceSel.add (_dls);
+            dl.setSelectable (_dls);
+            setSourceAttributes ();
+            int ncomp = dlf.getNumComponents ();
+            if (ncomp < 1) continue;
+            int[] npts_arr = dlf.getNumPoints ();
+            double[] xp = dlf.getXPoints();
+            double[] yp = dlf.getYPoints();
+            dl.addFill (xp, yp, npts_arr, ncomp, 1);
+        }
+
+        for (DLFill dlf : clipPolyList) {
+            DLSelectable _dls = new DLSelectable ();
+            clipSel.add (_dls);
+            dl.setSelectable (_dls);
+            setClipAttributes ();
+            int ncomp = dlf.getNumComponents ();
+            if (ncomp < 1) continue;
+            int[] npts_arr = dlf.getNumPoints ();
+            double[] xp = dlf.getXPoints();
+            double[] yp = dlf.getYPoints();
+            dl.addFill (xp, yp, npts_arr, ncomp, 1);
+        }
+
+        dl.setSelectable (null);
+
+        if (sourcePolyList.size() > 0  &&  clipPolyList.size() > 0) {
+            intersectButton.setEnabled (true);
+            unionButton.setEnabled (true);
+            xorButton.setEnabled (true);
+        }
+
+        dig_type = DIG_TYPE_UNKNOWN;
+
+        repaintPanel ();
+
+    }
+
+
+
     private void intersectPolys () {
 
         ArrayList<DLFill> dlf_out = new ArrayList<DLFill> ();
@@ -382,7 +494,15 @@ catch (Exception e) {
         dl.setFillColor (100, 100, 100);
         dl.setBorderColor (0, 0, 0);
         dl.setLineThickness(.02);
-        int  n = 0;
+
+/*
+System.out.println ();
+System.out.println ("Intersect finished with " + dlf_out.size() +
+          " polygons in result");
+System.out.println ();
+System.out.flush ();
+*/
+
         for (DLFill dlf : dlf_out) {
             if (dlf == null) continue;
             int ncomp = dlf.getNumComponents ();
@@ -408,14 +528,6 @@ catch (Exception e) {
                       clipPolyList,
                       dlf_out);
 
-/*
-        for (DLSelectable dlsel : sourceSel) {
-            dl.eraseSelectable (dlsel);
-        }
-        for (DLSelectable dlsel : clipSel) {
-            dl.eraseSelectable (dlsel);
-        }
-*/
         dl.eraseSelectable (resultSel);
 
         resultSel = new DLSelectable ();
@@ -424,7 +536,15 @@ catch (Exception e) {
         dl.setFillColor (200, 100, 100, 100);
         dl.setBorderColor (200, 0, 0);
         dl.setLineThickness(.02);
-        int  n = 0;
+
+/*
+System.out.println ();
+System.out.println ("Union finished with " + dlf_out.size() +
+          " polygons in result");
+System.out.println ();
+System.out.flush ();
+*/
+
         for (DLFill dlf : dlf_out) {
             if (dlf == null) continue;
             int ncomp = dlf.getNumComponents ();
@@ -458,7 +578,15 @@ catch (Exception e) {
         dl.setFillColor (100, 100, 200, 100);
         dl.setBorderColor (0, 0, 200);
         dl.setLineThickness(.02);
-        int  n = 0;
+
+/*
+System.out.println ();
+System.out.println ("Xor finished with " + dlf_out.size() +
+          " polygons in result");
+System.out.println ();
+System.out.flush ();
+*/
+
         for (DLFill dlf : dlf_out) {
             if (dlf == null) continue;
             int ncomp = dlf.getNumComponents ();
@@ -478,6 +606,7 @@ catch (Exception e) {
     }
 
 
+/*
     private void fragmentPolys () {
         ArrayList<DLFill> dlf_out = new ArrayList<DLFill> ();
         dl.polyFragment (sourcePolyList,
@@ -498,10 +627,11 @@ catch (Exception e) {
             int[] npts_arr = dlf.getNumPoints ();
             double[] xp = dlf.getXPoints();
             double[] yp = dlf.getYPoints();
-            dl.setFillColor ((n * 20) % 250,  (n * 40) % 250, (n * 60) % 250, 100);
+            dl.setFillColor ((n * 40) % 250,  (n * 30) % 250, (n * 20) % 250, 100);
             dl.setBorderColor ((n * 10) % 250,  (n * 20) % 250, (n * 30) % 250);
             n++;
-            dl.addFill (xp, yp, npts_arr, ncomp, 1);
+            dl.addFill (xp, yp, npts_arr, ncomp, 0);
+            dlf.outlineComponents (dl);
         }
 
         dl.setSelectable (null);
@@ -511,6 +641,7 @@ catch (Exception e) {
         clearResultButton.setEnabled (true);
 
     }
+*/
 
 
     private void clearPolys () {
@@ -530,7 +661,6 @@ catch (Exception e) {
         intersectButton.setEnabled (false);
         unionButton.setEnabled (false);
         xorButton.setEnabled (false);
-        fragmentButton.setEnabled (false);
     }
 
 
@@ -539,6 +669,69 @@ catch (Exception e) {
         repaintPanel ();
         resultSel = null;
         clearResultButton.setEnabled (false);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private void restoreInputPolys () {
+
+      clearPolys ();
+
+      String  fparent = System.getenv ("CSW_PARENT");
+      String  fdir = fparent + "/csw/jtest/";
+      try {
+         FileInputStream fileIn =
+         new FileInputStream(fdir + "source_polys.ser");
+         ObjectInputStream oin = new ObjectInputStream(fileIn);
+         sourcePolyList = (ArrayList<DLFill>) oin.readObject();
+         oin.close();
+         fileIn.close();
+         fileIn =
+         new FileInputStream(fdir + "clip_polys.ser");
+         oin = new ObjectInputStream(fileIn);
+         clipPolyList = (ArrayList<DLFill>) oin.readObject();
+         oin.close();
+         fileIn.close();
+      }
+      catch (IOException ex) {
+         System.out.println("IO exception for restore");
+         ex.printStackTrace();
+         return;
+      }
+      catch (ClassNotFoundException ex) {
+         System.out.println("class not found for restore");
+         ex.printStackTrace();
+         return;
+      }
+
+      drawPolys ();
+ 
+    }
+
+
+
+    private void saveInputPolys () {
+
+      String  fparent = System.getenv ("CSW_PARENT");
+      String  fdir = fparent + "/csw/jtest/";
+      try {
+         FileOutputStream fileOut =
+         new FileOutputStream(fdir + "source_polys.ser");
+         ObjectOutputStream out = new ObjectOutputStream(fileOut);
+         out.writeObject(sourcePolyList);
+         out.close();
+         fileOut.close();
+         fileOut =
+         new FileOutputStream(fdir + "clip_polys.ser");
+         out = new ObjectOutputStream(fileOut);
+         out.writeObject(clipPolyList);
+         out.close();
+         fileOut.close();
+      } catch (IOException ex) {
+         System.out.println("IO exception for save");
+         ex.printStackTrace();
+      }
+ 
     }
 
 
@@ -615,12 +808,203 @@ catch (Exception e) {
             intersectButton.setEnabled (true);
             unionButton.setEnabled (true);
             xorButton.setEnabled (true);
-            fragmentButton.setEnabled (true);
         }
 
         dig_type = DIG_TYPE_UNKNOWN;
 
         return true;
+
+    }
+
+
+
+    private void generateRandom4 () {
+
+        Random  ran = new Random ();
+
+        int maxpts = 10;
+        int mprand = 100;
+
+        String stm = System.getenv ("PBOOL_RANDOM_MAXPTS");
+        try {
+            Integer iob = Integer.parseInt (stm);
+            mprand = iob.intValue();
+        }
+        catch (Throwable ex) {
+        }
+        if (mprand > 100000) mprand = 100000;
+        maxpts = ran.nextInt (mprand) + mprand / 2;
+        if (maxpts < 10) maxpts = 10;
+
+        double  dang = Math.PI * 2.0 / (maxpts - 1);
+
+        DLSelectable _dls = new DLSelectable ();
+        sourceSel.add (_dls);
+        dl.setSelectable (_dls);
+        setSourceAttributes ();
+        dl.setLineThickness(.002);
+
+        for (int i=0; i<4; i++) {
+
+            double xc = ran.nextDouble () * 30.0 +  i * 60.0;
+            double yc = ran.nextDouble () * 30.0 +  i * 60.0;
+            if (i == 2) {
+                xc = 25.0;
+                yc = 75.0;
+            }
+            if (i == 3) {
+                xc = 75.0;
+                yc = 25.0;
+            }
+            double rad = ran.nextDouble () * 20.0 + 10.0;
+            double rad11 = rad * 1.1;
+            if (xc < rad11) xc = rad11;
+            if (yc < rad11) yc = rad11;
+            if (xc > 100. - rad11) xc = 100. - rad11;
+            if (yc > 100. - rad11) yc = 100. - rad11;
+
+            double[] xgr = new double[maxpts * 3 / 2];
+            double[] ygr = new double[maxpts * 3 / 2];
+            int[] npgr = new int[2];
+
+            int  nxy = 0;
+            double  ang = 0.0;
+            npgr[0] = maxpts;
+
+            for (int j=0; j<maxpts-1; j++) {
+                double rt = ran.nextDouble () * rad * .05 + rad * .5;
+                double xt = xc + rt * Math.cos(ang);
+                double yt = yc + rt * Math.sin(ang);
+                xgr[nxy] = xt;
+                ygr[nxy] = yt;
+                nxy++;
+                ang += dang;
+            }
+            xgr[nxy] = xgr[0];
+            ygr[nxy] = ygr[0];
+            nxy++;
+
+            int holebase = nxy;
+            ang = 0.0;
+            npgr[1] = maxpts / 2;
+
+            for (int j=0; j<maxpts/2-1; j++) {
+                double rt = ran.nextDouble () * rad * .02 + rad * .2;
+                double xt = xc + rt * Math.cos(ang);
+                double yt = yc + rt * Math.sin(ang);
+                xgr[nxy] = xt;
+                ygr[nxy] = yt;
+                nxy++;
+                ang +=  2.0 * dang;
+            }
+            xgr[nxy] = xgr[holebase];
+            ygr[nxy] = ygr[holebase];
+
+            DLFill  dlf = new DLFill ();
+            dlf.setNumComponents (2);
+            dlf.setNumPoints (npgr);
+            dlf.setXPoints (xgr);
+            dlf.setYPoints (ygr);
+
+            sourcePolyList.add (dlf);
+
+            dl.addFill (xgr, ygr, npgr, 2, 1);
+        }
+
+        dl.setSelectable (null);
+
+        repaintPanel ();
+
+    }
+
+
+    private void generateRandom () {
+
+        Random  ran = new Random ();
+
+        int maxpts = 10;
+        int mprand = 100;
+
+        String stm = System.getenv ("PBOOL_RANDOM_MAXPTS");
+        try {
+            Integer iob = Integer.parseInt (stm);
+            mprand = iob.intValue();
+        }
+        catch (Throwable ex) {
+        }
+        maxpts = ran.nextInt (mprand) + mprand / 10;
+        if (maxpts < 10) maxpts = 10;
+
+        double  dang = Math.PI * 2.0 / (maxpts - 1);
+
+        DLSelectable _dls = new DLSelectable ();
+        sourceSel.add (_dls);
+        dl.setSelectable (_dls);
+        setSourceAttributes ();
+        dl.setLineThickness(.002);
+
+        for (int i=0; i<1; i++) {
+
+            double xc = ran.nextDouble () * 50.0 +  25.0;
+            double yc = ran.nextDouble () * 50.0 +  25.0;
+            double rad = ran.nextDouble () * 30.0 + 10.0;
+            double rad11 = rad * 1.1;
+            if (xc < rad11) xc = rad11;
+            if (yc < rad11) yc = rad11;
+            if (xc > 100. - rad11) xc = 100. - rad11;
+            if (yc > 100. - rad11) yc = 100. - rad11;
+
+            double[] xgr = new double[maxpts * 3 / 2];
+            double[] ygr = new double[maxpts * 3 / 2];
+            int[] npgr = new int[2];
+
+            int  nxy = 0;
+            double  ang = 0.0;
+            npgr[0] = maxpts;
+
+            for (int j=0; j<maxpts-1; j++) {
+                double rt = ran.nextDouble () * rad * .01 + rad * .5;
+                double xt = xc + rt * Math.cos(ang);
+                double yt = yc + rt * Math.sin(ang);
+                xgr[nxy] = xt;
+                ygr[nxy] = yt;
+                nxy++;
+                ang += dang;
+            }
+            xgr[nxy] = xgr[0];
+            ygr[nxy] = ygr[0];
+            nxy++;
+
+            int holebase = nxy;
+            ang = 0.0;
+            npgr[1] = maxpts / 2;
+
+            for (int j=0; j<maxpts/2-1; j++) {
+                double rt = ran.nextDouble () * rad * .005 + rad * .2;
+                double xt = xc + rt * Math.cos(ang);
+                double yt = yc + rt * Math.sin(ang);
+                xgr[nxy] = xt;
+                ygr[nxy] = yt;
+                nxy++;
+                ang +=  2.0 * dang;
+            }
+            xgr[nxy] = xgr[holebase];
+            ygr[nxy] = ygr[holebase];
+
+            DLFill  dlf = new DLFill ();
+            dlf.setNumComponents (2);
+            dlf.setNumPoints (npgr);
+            dlf.setXPoints (xgr);
+            dlf.setYPoints (ygr);
+
+            sourcePolyList.add (dlf);
+
+            dl.addFill (xgr, ygr, npgr, 2, 1);
+        }
+
+        dl.setSelectable (null);
+
+        repaintPanel ();
 
     }
 
@@ -637,4 +1021,3 @@ catch (Exception e) {
     }
 
 };
-

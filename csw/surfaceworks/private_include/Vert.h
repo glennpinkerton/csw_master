@@ -24,6 +24,8 @@ class GRDVert
 };
 
 
+#include <csw/surfaceworks/include/grid_api.h>
+
 /*
     If a C++ compiler is running, all of the prototypes
     must be declared extern "C".
@@ -32,8 +34,6 @@ class GRDVert
 extern "C"
 {
 # endif
-
-#include <csw/surfaceworks/include/grid_api.h>
 
 
 int vert_CalcBaselineFromJava (

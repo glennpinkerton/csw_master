@@ -183,9 +183,11 @@ long sw_process_command (
             assert (false);
         }
         grdapi = ThreadGuard::GetGrdAPI (threadid);
+
         if (grdapi == NULL) {
             assert (false);
         }
+
     }
 
     swcalc = ThreadGuard::GetSWCalc (threadid);

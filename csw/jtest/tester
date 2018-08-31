@@ -4,8 +4,15 @@ export classpath=$CSW_PARENT
 #lpath=/usr/java/jdk1.8.0_152/jre/lib/amd64
 echo
 cd $CSW_PARENT
-java -Xmx1g -Djava.library.path=$CSW_PARENT/csw/lib  csw.jtest.$@
+
+#export SW_PRINT_TIMING=1
+#export PB_PRINT_TIMING=1
+
+java -Xmx1500m -Djava.library.path=$CSW_PARENT/csw/lib  csw.jtest.$@
 #java -Xmx500m -Djava.library.path=$CSW_PARENT/csw/lib  csw.jtest.$@
+
+#unset SW_PRINT_TIMING
+#unset PB_PRINT_TIMING
 
 cd csw/jtest
 

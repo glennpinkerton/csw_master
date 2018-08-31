@@ -25,7 +25,9 @@
 */
 
 #include <assert.h>
+#include <memory>
 #include <math.h>
+#include <exception>
 
 #include "csw/utils/include/csw_.h"
 #include "csw/utils/private_include/ply_protoP.h"
@@ -196,6 +198,60 @@ int CSWPolyGraph::ply_boolean
                  int *npout, int *ncout, int *nvout,
                  int maxpts, int maxcomp)
 {
+    int  istat = 0;
+
+    try {
+        istat = _ply_boolean_
+                (xp1, yp1, tag1,
+                 np1, nc1, nv1,
+                 xp2, yp2, tag2,
+                 np2, nc2, nv2,
+                 operation,
+                 xout, yout, tagout,
+                 npout, ncout, nvout,
+                 maxpts, maxcomp);
+    }
+    catch (int e) {
+        printf
+          ("\nPolygon boolean operation requires more memory.\n\n");
+        *npout = 0;
+        istat = -1;
+    }
+    catch (std::exception e) {
+        printf
+          ("\nException in polygon boolean calculations.\n");
+        printf ("exception message: %s\n", e.what());
+        printf ("    This can happen when quite large (> 50000 points)\n"
+                "    and complicated self intersecting polygons are\n"
+                "    used as input.\n\n");
+        *npout = 0;
+        istat = -1;
+    }
+    catch (...) {
+        printf
+          ("\nUnknown exception in polygon boolean calculations.\n");
+        printf ("    This can happen when quite large (> 50000 points)\n"
+                "    and complicated self intersecting polygons are\n"
+                "    used as input.\n\n");
+        *npout = 0;
+        istat = -1;
+    }
+
+    return istat;
+        
+}
+
+
+int CSWPolyGraph::_ply_boolean_
+                (double *xp1, double *yp1, void **tag1,
+                 int np1, int *nc1, int *nv1,
+                 double *xp2, double *yp2, void **tag2,
+                 int np2, int *nc2, int *nv2,
+                 int operation,
+                 double *xout, double *yout, void **tagout,
+                 int *npout, int *ncout, int *nvout,
+                 int maxpts, int maxcomp)
+{
     int             istat, i;
 
 // lambda expression captures all local variables by reference.
@@ -229,6 +285,7 @@ int CSWPolyGraph::ply_boolean
             return 1;
         }
     }
+
 
     Xp1 = xp1;
     Yp1 = yp1;
@@ -310,6 +367,7 @@ int CSWPolyGraph::ply_boolean
 
     SnapNodes ();
 
+
     DiscardFlag = -1;
     istat = CalculateSegmentIntersections ();
     if (istat == -1) {
@@ -370,6 +428,7 @@ int CSWPolyGraph::ply_boolean
             return -1;
         }
     }
+
 
     istat = BuildOutputPolygons ();
     if (istat == -1) {
@@ -918,12 +977,23 @@ int CSWPolyGraph::SetupRawVectors (double *xp1, double *yp1, void **tag1,
 
 */
 
-int CSWPolyGraph::SegintInteger (int x1, int y1, int x2, int y2,
-                          int x3, int y3, int x4, int y4,
+int CSWPolyGraph::SegintInteger (int ix1, int iy1, int ix2, int iy2,
+                          int ix3, int iy3, int ix4, int iy4,
                           int *x, int *y)
 {
     double       s1, s2, b1, b2, xt, xint, yint;
-    int          sameline=0, ixint, iyint;
+    double       x1, y1, x2, y2, x3, y3, x4, y4;
+    double       txint, tyint;
+    int          sameline=0;
+
+    x1 = (double)ix1;
+    y1 = (double)iy1;
+    x2 = (double)ix2;
+    y2 = (double)iy2;
+    x3 = (double)ix3;
+    y3 = (double)iy3;
+    x4 = (double)ix4;
+    y4 = (double)iy4;
 
 // lambda expression captures all local variables by reference.
 // Any cleanup needed upon this function going out of scope
@@ -936,27 +1006,27 @@ int CSWPolyGraph::SegintInteger (int x1, int y1, int x2, int y2,
 
 /*  check if either vector has zero length  */
 
-    if (x1 == x2  &&  y1 == y2) return 6;
-    if (x3 == x4  &&  y3 == y4) return 6;
+    if (ix1 == ix2  &&  iy1 == iy2) return 6;
+    if (ix3 == ix4  &&  iy3 == iy4) return 6;
 
 /*  both segments are identical   */
 
-    if(x1 == x3  &&  y1 == y3  &&  x2 == x4  &&  y2 == y4) return 4;
-    if(x2 == x3  &&  y2 == y3  &&  x1 == x4  &&  y1 == y4) return 4;
+    if(ix1 == ix3  &&  iy1 == iy3  &&  ix2 == ix4  &&  iy2 == iy4) return 4;
+    if(ix2 == ix3  &&  iy2 == iy3  &&  ix1 == ix4  &&  iy1 == iy4) return 4;
 
 /*  calculate slopes and intercepts of the vectors */
 
-    if(x1 != x2) {
-        s1 = (double)(y2-y1) / (double)(x2-x1);
-        b1 = (double)y1 - s1 * (double)x1;
+    if(ix1 != ix2) {
+        s1 = (y2-y1) / (x2-x1);
+        b1 = y1 - s1 * x1;
     }
     else {
         s1 = 1.e30f;
         b1 = 1.e30f;
     }
-    if(x3 != x4) {
-        s2 = (double)(y4-y3) / (double)(x4-x3);
-        b2 = (double)y3 - s2 * (double)x3;
+    if(ix3 != ix4) {
+        s2 = (y4-y3) / (x4-x3);
+        b2 = y3 - s2 * x3;
     }
     else {
         s2 = 1.e30f;
@@ -967,12 +1037,12 @@ int CSWPolyGraph::SegintInteger (int x1, int y1, int x2, int y2,
 
     xint = 0.0;
     yint = 0.0;
-    if(x1 == x2) {
+    if(ix1 == ix2) {
 
 /*      both vectors vertical  */
 
-        if(x3 == x4) {
-            if(x3 == x1) {
+        if(ix3 == ix4) {
+            if(ix3 == ix1) {
                 sameline = 1;
             }
             else {
@@ -983,16 +1053,16 @@ int CSWPolyGraph::SegintInteger (int x1, int y1, int x2, int y2,
 /*      only 1st vector is vertical  */
 
         else {
-            yint = (s2 * (double)x1 + b2 + .5);
-            xint = (double)x1;
+            yint = s2 * x1 + b2;
+            xint = x1;
         }
     }
 
 /*  special case, second vector is vertical  */
 
-    else if(x3 == x4) {
-        yint = (s1 * (double)x3 + b1 + .5);
-        xint = (double)x3;
+    else if(ix3 == ix4) {
+        yint = s1 * x3 + b1;
+        xint = x3;
     }
 
 /*  general case, neither vector is vertical  */
@@ -1019,10 +1089,10 @@ int CSWPolyGraph::SegintInteger (int x1, int y1, int x2, int y2,
         }
     }
 
-    if (y1 == y2) {
+    if (iy1 == iy2) {
         yint = y1;
     }
-    else if (y3 == y4) {
+    else if (iy3 == iy4) {
         yint = y3;
     }
 
@@ -1035,25 +1105,25 @@ int CSWPolyGraph::SegintInteger (int x1, int y1, int x2, int y2,
     If the intersection point is very close to a vector endpoint,
     make it the vector endpoint.
 */
-    if (VeryClose (*x, *y, x1, y1)) {
-        *x = x1;
-        *y = y1;
+    if (VeryClose (*x, *y, ix1, iy1)) {
+        *x = ix1;
+        *y = iy1;
     }
-    else if (VeryClose (*x, *y, x2, y2)) {
-        *x = x2;
-        *y = y2;
+    else if (VeryClose (*x, *y, ix2, iy2)) {
+        *x = ix2;
+        *y = iy2;
     }
-    else if (VeryClose (*x, *y, x3, y3)) {
-        *x = x3;
-        *y = y3;
+    else if (VeryClose (*x, *y, ix3, iy3)) {
+        *x = ix3;
+        *y = iy3;
     }
-    else if (VeryClose (*x, *y, x4, y4)) {
-        *x = x4;
-        *y = y4;
+    else if (VeryClose (*x, *y, ix4, iy4)) {
+        *x = ix4;
+        *y = iy4;
     }
 
-    ixint = *x;
-    iyint = *y;
+    txint = (double) (*x);
+    tyint = (double) (*y);
 
 /*  check if the intersection point is on the vector  */
 
@@ -1061,34 +1131,34 @@ int CSWPolyGraph::SegintInteger (int x1, int y1, int x2, int y2,
 
     if(!sameline) {
 
-        if( ((double)(x1 - ixint) * (double)(ixint - x2)) >= CSW_DZERO  &&
-            ((double)(y1 - iyint) * (double)(iyint - y2)) >= CSW_DZERO  &&
-            ((double)(x3 - ixint) * (double)(ixint - x4)) >= CSW_DZERO  &&
-            ((double)(y3 - iyint) * (double)(iyint - y4)) >= CSW_DZERO ) {
+        if( ((x1 - txint) * (txint - x2)) >= CSW_DZERO  &&
+            ((y1 - tyint) * (tyint - y2)) >= CSW_DZERO  &&
+            ((x3 - txint) * (txint - x4)) >= CSW_DZERO  &&
+            ((y3 - tyint) * (tyint - y4)) >= CSW_DZERO ) {
             return 0;
         }
         else {
 
 /*          check if one endpoint is coincident  */
 
-            if (x1 == x3  &&  y1 == y3) {
-                *x = x1;
-                *y = y1;
+            if (ix1 == ix3  &&  iy1 == iy3) {
+                *x = ix1;
+                *y = iy1;
                 return 0;
             }
-            if (x1 == x4  &&  y1 == y4) {
-                *x = x1;
-                *y = y1;
+            if (ix1 == ix4  &&  iy1 == iy4) {
+                *x = ix1;
+                *y = iy1;
                 return 0;
             }
-            if (x2 == x3  &&  y2 == y3) {
-                *x = x2;
-                *y = y2;
+            if (ix2 == ix3  &&  iy2 == iy3) {
+                *x = ix2;
+                *y = iy2;
                 return 0;
             }
-            if (x2 == x4  &&  y2 == y4) {
-                *x = x2;
-                *y = y2;
+            if (ix2 == ix4  &&  iy2 == iy4) {
+                *x = ix2;
+                *y = iy2;
                 return 0;
             }
 
@@ -1101,31 +1171,35 @@ int CSWPolyGraph::SegintInteger (int x1, int y1, int x2, int y2,
 /*  check if segments of overlapping line overlap or touch at one point */
 
     else {
-        if((((double)(x1-x3) * (double)(x3-x2)) >= CSW_DZERO  ||
-            ((double)(x1-x4) * (double)(x4-x2)) >= CSW_DZERO  ||
-            ((double)(x3-x1) * (double)(x1-x4)) >= CSW_DZERO  ||
-            ((double)(x3-x2) * (double)(x2-x4)) >= CSW_DZERO)
+        if((((x1-x3) * (x3-x2)) >= CSW_DZERO  ||
+            ((x1-x4) * (x4-x2)) >= CSW_DZERO  ||
+            ((x3-x1) * (x1-x4)) >= CSW_DZERO  ||
+            ((x3-x2) * (x2-x4)) >= CSW_DZERO)
             &&
-           (((double)(y1-y3) * (double)(y3-y2)) >= CSW_DZERO  ||
-            ((double)(y1-y4) * (double)(y4-y2)) >= CSW_DZERO  ||
-            ((double)(y3-y1) * (double)(y1-y4)) >= CSW_DZERO  ||
-            ((double)(y3-y2) * (double)(y2-y4)) >= CSW_DZERO)) {
+           (((y1-y3) * (y3-y2)) >= CSW_DZERO  ||
+            ((y1-y4) * (y4-y2)) >= CSW_DZERO  ||
+            ((y3-y1) * (y1-y4)) >= CSW_DZERO  ||
+            ((y3-y2) * (y2-y4)) >= CSW_DZERO)) {
 
 /*          do segments touch at one point  */
 
-            if( (x1==x3 && y1==y3 && (x4-x1)*(x1-x2)>=0 && (y4-y1)*(y1-y2)>=0 ) ||
-                (x1==x4 && y1==y4 && (x3-x1)*(x1-x2)>=0 && (y3-y1)*(y1-y2)>=0 )) {
-                *x = x1;
-                *y = y1;
+            if( (ix1==ix3 && iy1==iy3 &&
+                  (x4-x1)*(x1-x2)>=0 && (y4-y1)*(y1-y2)>=0 ) ||
+                (ix1==ix4 && iy1==iy4 &&
+                  (x3-x1)*(x1-x2)>=0 && (y3-y1)*(y1-y2)>=0 )) {
+                *x = ix1;
+                *y = iy1;
                 return 2;
             }
 
-            if( (x2==x3 && y2==y3 && ((double)(x1-x2)*(double)(x2-x4)) >= CSW_DZERO &&
-                                     ((double)(y1-y2)*(double)(y2-y4)) >= CSW_DZERO ) ||
-                (x2==x4 && y2==y4 && ((double)(x1-x2)*(double)(x2-x3)) >= CSW_DZERO &&
-                                     ((double)(y1-y2)*(double)(y2-y3)) >= CSW_DZERO )) {
-                *x = x2;
-                *y = y2;
+            if( (ix2==ix3 && iy2==iy3 &&
+                  ((x1-x2)*(x2-x4)) >= CSW_DZERO &&
+                  ((y1-y2)*(y2-y4)) >= CSW_DZERO ) ||
+                (ix2==ix4 && iy2==iy4 &&
+                  ((x1-x2)*(x2-x3)) >= CSW_DZERO &&
+                  ((y1-y2)*(y2-y3)) >= CSW_DZERO )) {
+                *x = ix2;
+                *y = iy2;
                 return 2;
             }
 
@@ -2094,6 +2168,15 @@ int CSWPolyGraph::BuildInitialLists (void)
     IndexXmin = xmin;
     IndexYmin = ymin;
 
+    xmax /= INTEGER_MULTIPLIER;
+    xmax *= INTEGER_MULTIPLIER;
+    xmax += INTEGER_MULTIPLIER;
+    ymax /= INTEGER_MULTIPLIER;
+    ymax *= INTEGER_MULTIPLIER;
+    ymax += INTEGER_MULTIPLIER;
+    IndexXmax = xmax;
+    IndexYmax = ymax;
+
     ratio = (double)(xmax - xmin) / (double)(ymax - ymin);
     if (ratio < .1) ratio = .1;
     if (ratio > 10.) ratio = 10.;
@@ -2688,6 +2771,12 @@ int CSWPolyGraph::InsertSegmentPieces (int px1, int py1, int px2, int py2,
 
 
 
+void CSWPolyGraph::initIntListForDebug (int *lp, int n) {
+    for (int i=0; i<n; i++) {
+        lp[i] = -2000000000;
+    }
+}
+
 
 
 
@@ -2706,7 +2795,7 @@ int CSWPolyGraph::InsertPiece (int x1in, int y1in, int x2in, int y2in,
                         int setid, int kcell, int node1flag, int node2flag)
 {
     SEgmentStruct       *seg;
-    PLY_NOdeStruct          *node,
+    PLY_NOdeStruct      *node,
                         *lastnode;
     int                 i, j, k, n1, n2, new1, new2, *list, istat;
     int                 x1, y1, x2, y2;
@@ -2896,20 +2985,23 @@ int CSWPolyGraph::InsertPiece (int x1in, int y1in, int x2in, int y2in,
         return -1;
     }
 
+
+    static const int list_chunk_size = 100;
 /*
     Index the segment.
 */
     list = SegIndex[kcell];
     if (!list) {
-        list = (int *)csw_Calloc (12 * sizeof(int));
+        list = (int *)csw_Calloc ((list_chunk_size + 2) * sizeof(int));
         if (!list) {
             return -1;
         }
-        list[0] = 10;
+initIntListForDebug (list+2, list_chunk_size);
+        list[0] = list_chunk_size;
     }
 
     else if (list[1] >= list[0]) {
-        list[0] += 10;
+        list[0] += list_chunk_size;
         list = (int *)csw_Realloc (list, (list[0]+2) * sizeof(int));
         if (!list) {
             return -1;
@@ -2935,15 +3027,15 @@ int CSWPolyGraph::InsertPiece (int x1in, int y1in, int x2in, int y2in,
         k = i * NodeIndexNcol + j;
         list = NodeIndex[k];
         if (!list) {
-            list = (int *)csw_Calloc (12 * sizeof(int));
+            list = (int *)csw_Calloc ((list_chunk_size + 2) * sizeof(int));
             if (!list) {
                 return -1;
             }
-            list[0] = 10;
+            list[0] = list_chunk_size;
         }
 
         else if (list[1] >= list[0]) {
-            list[0] += 10;
+            list[0] += list_chunk_size;
             list = (int *)csw_Realloc (list, (list[0]+2) * sizeof(int));
             if (!list) {
                 return -1;
@@ -2966,15 +3058,15 @@ int CSWPolyGraph::InsertPiece (int x1in, int y1in, int x2in, int y2in,
         k = i * NodeIndexNcol + j;
         list = NodeIndex[k];
         if (!list) {
-            list = (int *)csw_Calloc (12 * sizeof(int));
+            list = (int *)csw_Calloc (102 * sizeof(int));
             if (!list) {
                 return -1;
             }
-            list[0] = 10;
+            list[0] = 100;
         }
 
         else if (list[1] >= list[0]) {
-            list[0] += 10;
+            list[0] += 100;
             list = (int *)csw_Realloc (list, (list[0]+2) * sizeof(int));
             if (!list) {
                 return -1;
@@ -3119,8 +3211,12 @@ int CSWPolyGraph::CalculateSegmentIntersections (void)
     insures that all segment intersections are found when one segment
     is intersected by more than one other segment.
 */
+    int  index_seg1 = 0;
+    int  index_seg2 = 0;
     i = 0;
     while (i < NumSegs) {
+
+        index_seg1 = i;
 
     /*
         Get the endpoints for the first segment.
@@ -3180,6 +3276,7 @@ int CSWPolyGraph::CalculateSegmentIntersections (void)
             }
 
             seg2 = SegList + list[j+2];
+            index_seg2 = list[j+2];
             if (seg2->discarded) continue;
             node = NodeList + seg2->node1;
             x21 = node->x;
@@ -3230,8 +3327,10 @@ int CSWPolyGraph::CalculateSegmentIntersections (void)
             Attempt to split the segments using this intersection point.
         */
             if (istat == 0) {
-                istat = SplitSegments (seg1, seg2,
+
+                istat = SplitSegments (index_seg1, index_seg2,
                                        xint, yint, k);
+                seg2 = SegList + index_seg2;
                 if (istat == -1) {
                     return -1;
                 }
@@ -3244,7 +3343,7 @@ int CSWPolyGraph::CalculateSegmentIntersections (void)
             /*
                 Update the endpoints for the first segment.
             */
-                seg1 = SegList + i;
+                seg1 = SegList + index_seg1;
                 node = NodeList + seg1->node1;
                 x1 = node->x;
                 y1 = node->y;
@@ -3279,8 +3378,8 @@ int CSWPolyGraph::CalculateSegmentIntersections (void)
 
 */
 
-int CSWPolyGraph::SplitSegments (SEgmentStruct *seg1, SEgmentStruct *seg2,
-                          int xint, int yint, int kcell)
+int CSWPolyGraph::SplitSegments (int index_seg1, int index_seg2,
+                                 int xint, int yint, int kcell)
 {
     int                  istat, nodenum, *list, nlist, i, n1, n2;
     int                  nstat1, nstat2, nstat3, nstat4;
@@ -3295,6 +3394,9 @@ int CSWPolyGraph::SplitSegments (SEgmentStruct *seg1, SEgmentStruct *seg2,
     {
     };
     CSWScopeGuard  func_scope_guard (fscope);
+
+    SEgmentStruct *seg1 = SegList + index_seg1;
+    SEgmentStruct *seg2 = SegList + index_seg2;
 
 /*
     If there is already a node at the intersection location, use it.
@@ -3452,6 +3554,9 @@ int CSWPolyGraph::SplitSegments (SEgmentStruct *seg1, SEgmentStruct *seg2,
         istat = InsertPiece (xint, yint, node1->x, node1->y,
                              seg1->setid, kcell, -(nodenum + 1),
                              -(seg1->node2 + 1));
+        seg1 = SegList + index_seg1;
+        seg2 = SegList + index_seg2;
+        node = NodeList + nodenum;
         if (istat == -1) {
             NewNode1 = -1;
             NewNode2 = -1;
@@ -3477,6 +3582,9 @@ int CSWPolyGraph::SplitSegments (SEgmentStruct *seg1, SEgmentStruct *seg2,
         istat = InsertPiece (xint, yint, node2->x, node2->y,
                              seg2->setid, kcell, -(nodenum + 1),
                              -(seg2->node2 + 1));
+        seg1 = SegList + index_seg1;
+        seg2 = SegList + index_seg2;
+        node = NodeList + nodenum;
         if (istat == -1) {
             NewNode2 = -1;
             return -1;
@@ -3723,7 +3831,7 @@ int CSWPolyGraph::RemoveDuplicateSegments (void)
 
   ****************************************************************************
 
-    The temporary nodes used to speed up intersection calculation are removed.
+  The temporary nodes used to speed up intersection calculation are removed.
   No segment will have a temporary node at either endpoint when this function
   is finished.
 
@@ -3950,8 +4058,8 @@ int CSWPolyGraph::IntersectGraphs (void)
         PerpY1 = node1->y;
         PerpX2 = node2->x;
         PerpY2 = node2->y;
-        xmid = (node1->x + node2->x) / 2;
-        ymid = (node1->y + node2->y) / 2;
+        xmid = node1->x / 2 + node2->x / 2;
+        ymid = node1->y / 2 + node2->y / 2;
         xlen = node1->x - node2->x;
         if (xlen < 0) xlen = -xlen;
         ylen = node1->y - node2->y;
@@ -4028,8 +4136,8 @@ int CSWPolyGraph::UnionGraphs (void)
         PerpY1 = node1->y;
         PerpX2 = node2->x;
         PerpY2 = node2->y;
-        xmid = (node1->x + node2->x) / 2;
-        ymid = (node1->y + node2->y) / 2;
+        xmid = node1->x / 2 + node2->x / 2;
+        ymid = node1->y / 2 + node2->y / 2;
         xlen = node1->x - node2->x;
         if (xlen < 0) xlen = -xlen;
         ylen = node1->y - node2->y;
@@ -4120,8 +4228,8 @@ int CSWPolyGraph::XorGraphs (void)
 
         node1 = NodeList + seg->node1;
         node2 = NodeList + seg->node2;
-        xmid = (node1->x + node2->x) / 2;
-        ymid = (node1->y + node2->y) / 2;
+        xmid = node1->x / 2 + node2->x / 2;
+        ymid = node1->y / 2 + node2->y / 2;
 
         if (seg->setid == 1) {
             istat = InsideOutside (xmid, ymid, 2);
@@ -4215,7 +4323,8 @@ int CSWPolyGraph::BuildPolygonComponents (void)
         Tagwork[0] = node->tag;
         Nwork++;
         if (Nwork >= Pmaxnpts) {
-            return -2;
+            //return -2;
+            throw -2;
         }
 
         node = NodeList + seg1->node2;
@@ -4247,7 +4356,8 @@ int CSWPolyGraph::BuildPolygonComponents (void)
             j++;
             Nwork++;
             if (Nwork >= Pmaxnpts) {
-                return -2;
+                //return -2;
+                throw -2;
             }
 
             istat = -1;
@@ -4277,11 +4387,6 @@ int CSWPolyGraph::BuildPolygonComponents (void)
         /*
             This error condition should not happen, but just in case.
         */
-/*
-                fprintf (stderr,
-"Unexpected termination of a polygon building loop.\n\
-This indicates a bug in the polygon boolean algorithm.\n");
-*/
                 SetBugLocation (node->x, node->y);
                 badflag = 1;
                 break;
@@ -4326,14 +4431,16 @@ This indicates a bug in the polygon boolean algorithm.\n");
         j++;
         Nwork++;
         if (Nwork >= Pmaxnpts) {
-            return -2;
+            //return -2;
+            throw -2;
         }
 
     /*
         Transfer the component into the CompList array.
     */
         if (Ncomp >= Pmaxcomp) {
-            return -3;
+            //return -3;
+            throw -3;
         }
 
         xcomp = (int *)csw_Malloc (2 * j * sizeof(int));
@@ -4470,11 +4577,11 @@ int CSWPolyGraph::NestHoles (void)
     lastndone = -1;
     for (;;) {
 
-    /*
-        The loop that uses i as a counter checks to see if a component is outside
-        all other components.  If that is the case, the component is a main
-        component and its holeflag is set to -1.
-    */
+  /*
+    The loop that uses i as a counter checks to see if a component is outside
+    all other components.  If that is the case, the component is a main
+    component and its holeflag is set to -1.
+  */
         for (i=0; i<Ncomp; i++) {
 
             comp = CompList + i;
@@ -4728,6 +4835,9 @@ int CSWPolyGraph::BuildOutputPolygons (void)
     nv = 0;
     nc = 0;
 
+//printf ("\nNcomp in BuildOutput = %d\n\n", Ncomp);
+//fflush (stdout);
+
     for (;;) {
 
     /*
@@ -4763,7 +4873,8 @@ int CSWPolyGraph::BuildOutputPolygons (void)
             }
             n++;
             if (n >= Pmaxnpts) {
-                return -2;
+                //return -2;
+                throw -2;
             }
         }
 
@@ -4801,7 +4912,8 @@ int CSWPolyGraph::BuildOutputPolygons (void)
                 }
                 n++;
                 if (n >= Pmaxnpts) {
-                    return -2;
+                    //return -2;
+                    throw -2;
                 }
             }
 
@@ -4810,6 +4922,7 @@ int CSWPolyGraph::BuildOutputPolygons (void)
             nv++;
             CompList[i].holeflag = -2;
         }
+
 
     /*
         Done with this main/holes combination, find the next.
@@ -5633,7 +5746,8 @@ int CSWPolyGraph::IndexedNestHoles (void)
                                 jlast++;
                                 if (jlast > maxlist2) {
                                     maxlist2 += chunk;
-                                    list2 = (int *)csw_Realloc (list2, maxlist2 * sizeof(int));
+                                    list2 = (int *)csw_Realloc
+                                        (list2, maxlist2 * sizeof(int));
                                     if (list2 == NULL) {
                                         goto LIST2_ERROR;
                                     }
@@ -6113,9 +6227,10 @@ CSWPolyGraph::int XorEdgeCheck (int p, int q, int tiny, int setid)
 
   ****************************************************************************
 
-    Build polygon components after the xor operation on the graphs.  The xor
-  differentuiates between two types of segments.  When possible, the exit segment
-  from a node will use the same type of segment as the entrance segment.
+  Build polygon components after the xor operation on the graphs.  The xor
+  differentiates between two types of segments.  When possible, the exit
+  segment from a node will use the same type of segment as the entrance
+  segment.
 
 */
 
@@ -6123,8 +6238,10 @@ int CSWPolyGraph::BuildXorComponents (void)
 {
     int               i, j, k, istat, n0, nlast, n1, *xcomp, *ycomp;
     int               xmin, ymin, xmax, ymax, nd, senter;
-    PLY_NOdeStruct        *node;
+    PLY_NOdeStruct    *node;
     SEgmentStruct     *seg1, *seg2;
+
+//    int               *jflags = NULL;
 
 // lambda expression captures all local variables by reference.
 // Any cleanup needed upon this function going out of scope
@@ -6132,8 +6249,16 @@ int CSWPolyGraph::BuildXorComponents (void)
 // expression.
     auto fscope = [&]()
     {
+//        csw_Free (jflags);
     };
     CSWScopeGuard  func_scope_guard (fscope);
+
+/*
+jflags = (int *)csw_Malloc (NumNodes * sizeof(int));
+if (jflags == NULL) {
+    throw -2;
+}
+*/
 
 /*
     This is only to suppress a compiler warning.
@@ -6155,12 +6280,16 @@ int CSWPolyGraph::BuildXorComponents (void)
 
         n0 = seg1->node1;
         node = NodeList + n0;
+//jflags[n0] = 1;
         Xwork[0] = node->x;
         Ywork[0] = node->y;
         Nwork++;
         if (Nwork >= Pmaxnpts) {
-            return -2;
+            //return -2;
+            throw -2;
         }
+
+//memset (jflags, 0, NumNodes * sizeof(int));
 
         node = NodeList + seg1->node2;
         j = 1;
@@ -6175,12 +6304,23 @@ int CSWPolyGraph::BuildXorComponents (void)
     */
         for (;;) {
 
+/*
+if (jflags[node - NodeList] > 0) {
+    printf ("Xor node used before in j loop\n");
+    printf ("  node # %ld   old j = %d   new j = %d\n",
+      node - NodeList, jflags[node - NodeList] -1, j);
+    fflush (stdout);
+}
+jflags[node - NodeList] = j + 1;
+*/
+
             Xwork[j] = node->x;
             Ywork[j] = node->y;
             j++;
             Nwork++;
             if (Nwork >= Pmaxnpts) {
-                return -2;
+                //return -2;
+                throw -2;
             }
 
             istat = -1;
@@ -6219,10 +6359,12 @@ int CSWPolyGraph::BuildXorComponents (void)
             This error condition should not happen, but just in case.
         */
             if (istat == -1) {
-                fprintf (stderr,
-"Unexpected termination of a xor polygon building loop.\n\
-This indicates a bug in the polygon boolean algorithm.\n");
-                return -1;
+//printf 
+//("\n****** Cannot find exit segment in Xor calculation ********\n");
+//printf ("Ncomp = %d   i = %d   j = %d\n\n", Ncomp, i, j);
+//fflush (stdout);
+                //return -1;
+                goto TRY_NEXT_I;
             }
 
             seg2 = SegList + node->seglist[istat];
@@ -6253,14 +6395,16 @@ This indicates a bug in the polygon boolean algorithm.\n");
         j++;
         Nwork++;
         if (Nwork >= Pmaxnpts) {
-            return -2;
+            //return -2;
+            throw -2;
         }
 
     /*
         Transfer the component into the CompList array.
     */
         if (Ncomp >= Pmaxcomp) {
-            return -3;
+            //return -3;
+            throw -3;
         }
 
         xcomp = (int *)csw_Malloc (2 * j * sizeof(int));
@@ -6286,6 +6430,8 @@ This indicates a bug in the polygon boolean algorithm.\n");
 
         CompList[Ncomp].x = xcomp;
         CompList[Ncomp].y = ycomp;
+        xcomp = NULL;
+        ycomp = NULL;
         CompList[Ncomp].npts = j;
         CompList[Ncomp].holeflag = 0;
         CompList[Ncomp].xmin = xmin;
@@ -6293,6 +6439,8 @@ This indicates a bug in the polygon boolean algorithm.\n");
         CompList[Ncomp].xmax = xmax;
         CompList[Ncomp].ymax = ymax;
         Ncomp++;
+
+     TRY_NEXT_I:
 
         i++;
 
@@ -6591,8 +6739,8 @@ int CSWPolyGraph::PerpPoints (int dist, int *x1, int *y1, int *x2, int *y2)
     };
     CSWScopeGuard  func_scope_guard (fscope);
 
-    xmid = (double)(PerpX1 + PerpX2) / 2.0;
-    ymid = (double)(PerpY1 + PerpY2) / 2.0;
+    xmid = (double)(PerpX1 / 2 + PerpX2 / 2.0);
+    ymid = (double)(PerpY1 / 2 + PerpY2 / 2.0);
 
 /*
     Vertical line case.
@@ -7268,7 +7416,7 @@ int CSWPolyGraph::CopyPolygons (double *xp1, double *yp1, int np1, int *nc1, int
     n = 0;
     for (i=0; i<np1; i++) {
         nc2[i] = nc1[i];
-        n++;
+        n += nc2[i];
     }
 
     np = 0;
@@ -9409,7 +9557,8 @@ int CSWPolyGraph::AddUntouchedInputPolygons (int *ncio, int *nvio)
                     n++;
                     nout++;
                     if (nout >= Pmaxnpts) {
-                        return -2;
+                        //return -2;
+                        throw -2;
                     }
                 }
                 Pxout[nout-1] = Pxout[nfirst];
@@ -9453,7 +9602,8 @@ int CSWPolyGraph::AddUntouchedInputPolygons (int *ncio, int *nvio)
                     n++;
                     nout++;
                     if (nout >= Pmaxnpts) {
-                        return -2;
+                        //return -2;
+                        throw -2;
                     }
                 }
                 Pxout[nout-1] = Pxout[nfirst];
@@ -9582,3 +9732,4 @@ int CSWPolyGraph::InitAllMem (void)
     return 1;
 
 }  /*  end of private InitAllMem function  */
+

@@ -44,7 +44,7 @@
 
 FILE      *dfile = NULL;
 
-#define  MAX_DDATA   70000000
+#define  MAX_DDATA   20000000
 
 
 int main (int argc, char *argv[])
@@ -58,12 +58,12 @@ int main (int argc, char *argv[])
     static char      inbuff[1000];
 
     static long      longlist[100];
-    static int       ilist[1000];
+    static int       ilist[100];
     static double    ddata[MAX_DDATA + 100];
-    static float     fdata[1000000];
-    static int       idata[10000000];
-    static short int sdata[1000000];
-    static unsigned char  bdata[5000000];
+    static float     fdata[100000];
+    static int       idata[100000];
+    static short int sdata[100000];
+    static unsigned char  bdata[500000];
     static char      cdata[100000];
 
     argc = argc;
@@ -147,6 +147,7 @@ int main (int argc, char *argv[])
 
         sscanf (local_line+8, "%d %d", &command_id, &dlist_index);
 
+
     /*
      * start of huge switch on each command
      */
@@ -154,6 +155,55 @@ int main (int argc, char *argv[])
         int  ngdata = 0;
         end_flag = 0;
         switch (command_id) {
+
+            case GTX_POLYGON_BOOLEAN:
+
+                for (int i=0; i<10; i++) {
+                    ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
+                    if (ctmp == NULL) {
+                        end_flag = 1;
+                        break;
+                    }
+                    strcpy (cdata, inbuff);
+                    sscanf (cdata, "%d", ilist + i);
+                }
+
+                for (int i=0; i<ilist[8]; i++) {
+                    ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
+                    if (ctmp == NULL) {
+                        end_flag = 1;
+                        break;
+                    }
+                    strcpy (cdata, inbuff);
+                    sscanf (cdata, "%d", idata + i);
+                }
+
+                for (int i=0; i<ilist[9]; i++) {
+                    ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
+                    if (ctmp == NULL) {
+                        end_flag = 1;
+                        break;
+                    }
+                    strcpy (cdata, inbuff);
+                    sscanf (cdata, "%lf", ddata + i);
+                }
+
+                ezx_process_command (
+                    dlist_index,
+                    command_id,
+                    threadid,
+                    longlist,
+                    ilist,
+                    cdata,
+                    bdata,
+                    sdata,
+                    idata,
+                    fdata,
+                    ddata,
+                    dfile
+                );
+
+                break;
 
             case TEST_POLYGON_BOOLEAN:
 

@@ -20,6 +20,7 @@
 #include <jni.h>
 #include <limits.h>
 #include <stdio.h>
+#include <math.h>
 
 #include <csw/utils/private_include/TextBounds.h>
 
@@ -232,6 +233,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
                          fdata,
                          ddata,
                          NULL);
+
 /*
  * the jint is not the same size as int, so I need to
  * copy ilist and idata into int arrays.
@@ -271,6 +273,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
                              ddata,
                              NULL);
     }
+
     free (idata2);
 
     if (ibad == 1) {
@@ -282,6 +285,7 @@ JNIEXPORT jint JNICALL Java_csw_jeasyx_src_JDisplayListBase_sendCommand
     if (command_id == GTX_GET_PRIM_NUM) {
         if (ilist[0] >= 0) status = ilist[0];
     }
+
 
 /*
  * Even though no copies of the elements were made above, the release
