@@ -132,6 +132,17 @@ class CSWGrdCalc
   public:
 
     CSWGrdCalc () {__init();};
+    ~CSWGrdCalc () {FreeMem();};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWGrdCalc (const CSWGrdCalc &old) = delete;
+    const CSWGrdCalc &operator=(const CSWGrdCalc &old) = delete;
+    CSWGrdCalc (CSWGrdCalc &&old) = delete;
+    const CSWGrdCalc &operator=(CSWGrdCalc &&old) = delete;
 
     void  SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};
     void  SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};

@@ -49,6 +49,17 @@ class CSWPolyTiledata
   public:
 
     CSWPolyTiledata () {};
+    ~CSWPolyTiledata () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWPolyTiledata (const CSWPolyTiledata &old) = delete;
+    const CSWPolyTiledata &operator=(const CSWPolyTiledata &old) = delete;
+    CSWPolyTiledata (CSWPolyTiledata &&old) = delete;
+    const CSWPolyTiledata &operator=(CSWPolyTiledata &&old) = delete;
 
     int ply_SetTileNum (int num);
     int ply_SetTileScale (CSW_F num);

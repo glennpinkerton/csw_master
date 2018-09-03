@@ -62,9 +62,17 @@ class CSWPolyCutline
   public:
 
     CSWPolyCutline () {};
-    ~CSWPolyCutline () 
-    {
-    };
+    ~CSWPolyCutline () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWPolyCutline (const CSWPolyCutline &old) = delete;
+    const CSWPolyCutline &operator=(const CSWPolyCutline &old) = delete;
+    CSWPolyCutline (CSWPolyCutline &&old) = delete;
+    const CSWPolyCutline &operator=(CSWPolyCutline &&old) = delete;
 
     int ply_AddCutLines (double *xin, double *yin, int ncompin, int *nptsin,
                          double *xout, double *yout, int *npolyout, int *nptsout);

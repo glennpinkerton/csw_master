@@ -70,6 +70,17 @@ class CSWGrdCtog
   public:
 
     CSWGrdCtog () {};
+    ~CSWGrdCtog () {FreeData ();};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWGrdCtog (const CSWGrdCtog &old) = delete;
+    const CSWGrdCtog &operator=(const CSWGrdCtog &old) = delete;
+    CSWGrdCtog (CSWGrdCtog &&old) = delete;
+    const CSWGrdCtog &operator=(CSWGrdCtog &&old) = delete;
 
     void SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};
     void SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};

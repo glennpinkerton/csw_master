@@ -42,7 +42,7 @@
     filled arcs that make up a tile of the pattern
 */
 
-static FIllPatRec          TileRecs[] = {
+static FIllPatRec     TileRecs[] = {
 
     {    0,  10,   -1,   0,   -1,   0,   -1,   0},
     {   10,  10,   -1,   0,   -1,   0,   -1,   0},
@@ -96,7 +96,7 @@ static FIllPatRec          TileRecs[] = {
     Define vector data for fill patterns
 */
 
-static FIllVecRec          TileVectors[] = {
+static FIllVecRec     TileVectors[] = {
 
     {   0,  4}, {   4,  4}, {   8,  4}, {  12,  4}, {  16,  4},
     {  20,  4}, {  24,  4}, {  28,  4}, {  32,  4}, {  36,  4},
@@ -303,7 +303,7 @@ static FIllVecRec          TileVectors[] = {
     Define filled polygon data for fill patterns
 */
 
-static FIllVecRec          TilePolygons[] = {
+static FIllVecRec     TilePolygons[] = {
 
     {3178,  8}, {3186,  8}, {3194,  8}, {3202,  8}, {3210,  8},
     {3218,  8}, {3226,  8}, {3234,  8}, {3242,  8}, {3250,  8},
@@ -327,7 +327,7 @@ static FIllVecRec          TilePolygons[] = {
     Define circle data for fill patterns
 */
 
-static FIllArcRec          TileArcs[] = {
+static FIllArcRec     TileArcs[] = {
 
     {10, 20, 10}, {50, 20, 10}, {90, 20, 10}, {130, 20, 10},
     {170, 20, 10}, {10, 60, 10}, {50, 60, 10}, {90, 60, 10},
@@ -397,7 +397,7 @@ static FIllArcRec          TileArcs[] = {
     Define filled circle data for fill patterns
 */
 
-static FIllArcRec          TileFarcs[] = {
+static FIllArcRec     TileFarcs[] = {
 
     {10, 20, 10}, {50, 20, 10}, {90, 20, 10}, {130, 20, 10},
     {170, 20, 10}, {10, 60, 10}, {50, 60, 10}, {90, 60, 10},
@@ -467,7 +467,7 @@ static FIllArcRec          TileFarcs[] = {
     Points for vectors and polygons
 */
 
-static FILLPATINT          TilePoints[] = {
+static FILLPATINT     TilePoints[] = {
 
       0,  0, 200,  0,   0, 20, 200, 20,   0, 40, 200, 40,   0, 60, 200, 60, 
       0, 80, 200, 80,   0,100, 200,100,   0,120, 200,120,   0,140, 200,140, 

@@ -107,9 +107,6 @@ private:
 
   public:
 
-static void testForLongLine (double *xout, double *yout,
-                             int npout, int *icout, int *ihout);
-
     EZXJavaArea    ezx_java_obj;
 
     CDisplayList(int index, int ifile);

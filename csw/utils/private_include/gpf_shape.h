@@ -42,6 +42,17 @@ class GPFShape
   public:
 
     GPFShape () {};
+    ~GPFShape () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    GPFShape (const GPFShape &old) = delete;
+    const GPFShape &operator=(const GPFShape &old) = delete;
+    GPFShape (GPFShape &&old) = delete;
+    const GPFShape &operator=(GPFShape &&old) = delete;
 
   private:
 

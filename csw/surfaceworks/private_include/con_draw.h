@@ -65,16 +65,17 @@ class CSWConDraw
     CSWConDraw () {};
     ~CSWConDraw () {FreeWork ();};
 
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWConDraw (const CSWConDraw &old) = delete;
+    const CSWConDraw &operator=(const CSWConDraw &old) = delete;
+    CSWConDraw (CSWConDraw &&old) = delete;
+    const CSWConDraw &operator=(CSWConDraw &&old) = delete;
+
     void  SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};
-
-// This class is not meant to be copied or moved
-// Thus, these methods are = delete.
-
-    CSWConDraw (const CSWConDraw &other) = delete;
-    const CSWConDraw &operator= (const CSWConDraw &other) = delete;
-    CSWConDraw (CSWConDraw &&other) = delete;
-    const CSWConDraw &operator= (CSWConDraw &&other) = delete;
-
 
   private:
 

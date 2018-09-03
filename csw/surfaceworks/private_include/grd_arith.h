@@ -37,6 +37,8 @@
 #ifndef GRD_ARITH_H
 #  define GRD_ARITH_H
 
+#include <memory>
+
 #include "csw/surfaceworks/include/grd_shared_structs.h"
 
 
@@ -61,6 +63,17 @@ class CSWGrdArith
   public:
 
     CSWGrdArith () {};
+    ~CSWGrdArith () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWGrdArith (const CSWGrdArith &old) = delete;
+    const CSWGrdArith &operator=(const CSWGrdArith &old) = delete;
+    CSWGrdArith (CSWGrdArith &&old) = delete;
+    const CSWGrdArith &operator=(CSWGrdArith &&old) = delete;
 
     void SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};
     void SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};
@@ -76,8 +89,10 @@ class CSWGrdArith
                                   CSW_F*, char*, CSW_F, CSW_F, CSW_F, CSW_F,
                                   int, int, int);
 
-    CSW_F           x_maxc[MAX_COLUMNS];
-    CSW_F           y_maxc[MAX_COLUMNS];
+    std::unique_ptr<CSW_F[]> x_maxc {new CSW_F[MAX_COLUMNS]};
+    std::unique_ptr<CSW_F[]> y_maxc {new CSW_F[MAX_COLUMNS]};
+//    CSW_F           x_maxc[MAX_COLUMNS];
+//    CSW_F           y_maxc[MAX_COLUMNS];
 
 
   public:

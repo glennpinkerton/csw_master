@@ -194,6 +194,17 @@ class CSWGrdTriangle
   public:
 
     CSWGrdTriangle () {};
+    ~CSWGrdTriangle () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWGrdTriangle (const CSWGrdTriangle &old) = delete;
+    const CSWGrdTriangle &operator=(const CSWGrdTriangle &old) = delete;
+    CSWGrdTriangle (CSWGrdTriangle &&old) = delete;
+    const CSWGrdTriangle &operator=(CSWGrdTriangle &&old) = delete;
 
 int do_nothing () {
 printf ("\nFrom grd_triangle do nothing\n\n");

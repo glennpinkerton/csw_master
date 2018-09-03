@@ -51,6 +51,17 @@ class CSWConTriangle
   public:
 
     CSWConTriangle () {};
+    ~CSWConTriangle () {FreeMem ();};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWConTriangle (const CSWConTriangle &old) = delete;
+    const CSWConTriangle &operator=(const CSWConTriangle &old) = delete;
+    CSWConTriangle (CSWConTriangle &&old) = delete;
+    const CSWConTriangle &operator=(CSWConTriangle &&old) = delete;
 
     void SetConCalcPtr (CSWConCalc *p) {con_calc_ptr = p;};
     void SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};

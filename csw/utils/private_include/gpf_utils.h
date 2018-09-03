@@ -12,10 +12,10 @@
     gpf_utils.h
 
     This header has function prototypes for private functions
-    int gpf_utils.c.  The refactor to C++  (2017) doesn,t absolutely
+    int gpf_utils.c.  The refactor to C++  (2017) doesn't absolutely
     require "classifying" the utils functions.  No static variables
     are used in the gpf_utils.cc file, so (hopefully) these functions
-    will be tghread safe as is.
+    will be thread safe as is.
 */
 
 

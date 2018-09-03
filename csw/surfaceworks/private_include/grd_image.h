@@ -44,6 +44,8 @@
 #define MAX_COLOR         255
 #define COLOR_UNDEFINED   -99999
 
+#define MAX_IMAGE_COLOR_BANDS    1000
+
 
 class CSWGrdImage;
 
@@ -63,6 +65,17 @@ class CSWGrdImage
   public:
 
     CSWGrdImage () {};
+    ~CSWGrdImage () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWGrdImage (const CSWGrdImage &old) = delete;
+    const CSWGrdImage &operator=(const CSWGrdImage &old) = delete;
+    CSWGrdImage (CSWGrdImage &&old) = delete;
+    const CSWGrdImage &operator=(CSWGrdImage &&old) = delete;
 
     void SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};
     void SetGrdFileioPtr (CSWGrdFileio *p) {grd_fileio_ptr = p;};
@@ -133,7 +146,7 @@ class CSWGrdImage
                     Jrow2 = 0;
     unsigned char   *Dwork = NULL;
 
-    int             ColorTable[10000];
+    int             ColorTable[MAX_IMAGE_COLOR_BANDS];
     unsigned char   BadColor = 0;
     double          Zmin = 0.0,
                        Zinc = 0.0;

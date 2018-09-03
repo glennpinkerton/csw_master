@@ -38,6 +38,20 @@ class CSWTimeUtil
 
   public:
 
+    CSWTimeUtil () {};
+    ~CSWTimeUtil () {};
+
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWTimeUtil (const CSWTimeUtil &old) = delete;
+    const CSWTimeUtil &operator=(const CSWTimeUtil &old) = delete;
+    CSWTimeUtil (CSWTimeUtil &&old) = delete;
+    const CSWTimeUtil &operator=(CSWTimeUtil &&old) = delete;
+
     int csw_SetTimeFormat (int format, int monthflag);
     int csw_FormatTime (int seconds, char *tstring);
     int csw_SetBaseTime (int basetime);

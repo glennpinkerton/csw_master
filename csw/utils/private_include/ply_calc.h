@@ -55,8 +55,17 @@ class CSWPolyCalc
   public:
 
     CSWPolyCalc () {};
+    ~CSWPolyCalc () {};
 
-bool  _bbr_ = false;
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWPolyCalc (const CSWPolyCalc &old) = delete;
+    const CSWPolyCalc &operator=(const CSWPolyCalc &old) = delete;
+    CSWPolyCalc (CSWPolyCalc &&old) = delete;
+    const CSWPolyCalc &operator=(CSWPolyCalc &&old) = delete;
 
   private:
 
