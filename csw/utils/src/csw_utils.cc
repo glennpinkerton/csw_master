@@ -441,11 +441,8 @@ int csw_GetHostId (void)
 
 #  endif
 
-/*
-    If the csw_portP.h file has not defined TCP_IP_FLAG,
-    it is assumed that the program will not be run on a
-    network, and zero is always returned.
-*/
+
+
 #  ifndef TCP_IP_FLAG
         return 0;
 #  endif

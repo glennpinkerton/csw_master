@@ -11,12 +11,12 @@
 /*
     gpf_sfill.h
 
-      Header file with data for the smooth filled polygon font.
+    Header file with data for the smooth filled polygon font.
     This is only used in the gpf_font.c file.  This header file
     depends on some constant and structure definitions in the 
     gpf_font.c file.
 
-      This data is used to produce font numbers 14 to 19.
+    This data is used to produce font numbers 14 to 19.
 
 */
 

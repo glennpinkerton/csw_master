@@ -116,6 +116,17 @@ class CSWGrdFault
   public:
 
     CSWGrdFault () {};
+    ~CSWGrdFault () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWGrdFault (const CSWGrdFault &old) = delete;
+    const CSWGrdFault &operator=(const CSWGrdFault &old) = delete;
+    CSWGrdFault (CSWGrdFault &&old) = delete;
+    const CSWGrdFault &operator=(CSWGrdFault &&old) = delete;
 
     void SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};
     void SetGrdFileioPtr (CSWGrdFileio *p) {grd_fileio_ptr = p;};

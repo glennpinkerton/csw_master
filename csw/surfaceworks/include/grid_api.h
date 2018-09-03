@@ -172,13 +172,13 @@ class CSWGrdAPI
   private:
 
     CSWGrdArith        grd_arith_obj;
-    CSWGrdCtog         grd_ctog_obj;
     CSWGrdFault        grd_fault_obj;
     CSWGrdFileio       grd_fileio_obj;
     CSWGrdImage        grd_image_obj;
     CSWGrdStats        grd_stats_obj;
     CSWGrdTsurf        grd_tsurf_obj;
     CSWGrdUtils        grd_utils_obj;
+    CSWGrdCtog         grd_ctog_obj;
 
     std::unique_ptr<CSWGrdTriangle>
         grd_triangle_obj {new CSWGrdTriangle()};

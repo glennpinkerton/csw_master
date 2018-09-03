@@ -524,6 +524,19 @@ class GPFGraph  :  public GraphBase
 
   public:
 
+    GPFGraph () {};
+    virtual ~GPFGraph () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    GPFGraph (const GPFGraph &old) = delete;
+    const GPFGraph &operator=(const GPFGraph &old) = delete;
+    GPFGraph (GPFGraph &&old) = delete;
+    const GPFGraph &operator=(GPFGraph &&old) = delete;
+
     void SetDlistIndex (int index) {dlist_index = index;};
 
     int gpf_StartGraph (CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,

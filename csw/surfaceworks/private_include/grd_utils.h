@@ -70,6 +70,17 @@ class CSWGrdUtils
   public:
 
     CSWGrdUtils () {};
+    ~CSWGrdUtils () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWGrdUtils (const CSWGrdUtils &old) = delete;
+    const CSWGrdUtils &operator=(const CSWGrdUtils &old) = delete;
+    CSWGrdUtils (CSWGrdUtils &&old) = delete;
+    const CSWGrdUtils &operator=(CSWGrdUtils &&old) = delete;
 
     void SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};
     void SetGrdCalcPtr (CSWGrdCalc *p) {grd_calc_ptr = p;};

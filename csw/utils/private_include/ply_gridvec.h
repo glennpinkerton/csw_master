@@ -83,6 +83,16 @@ class CSWPolyGridvec
         gstruct2.grid = NULL;
     };
 
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWPolyGridvec (const CSWPolyGridvec &old) = delete;
+    const CSWPolyGridvec &operator=(const CSWPolyGridvec &old) = delete;
+    CSWPolyGridvec (CSWPolyGridvec &&old) = delete;
+    const CSWPolyGridvec &operator=(CSWPolyGridvec &&old) = delete;
+
     int ply_initvecgrid (void);
     int ply_setupvecgrids (double *xc, double *yc, int nc, int *ic,
                            double *xs, double *ys, int ns, int *is);

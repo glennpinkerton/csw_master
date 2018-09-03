@@ -53,6 +53,16 @@ class CSWPolyCompdata
     CSWPolyCompdata () {};
     ~CSWPolyCompdata () {ply_compfree ();};
 
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWPolyCompdata (const CSWPolyCompdata &old) = delete;
+    const CSWPolyCompdata &operator=(const CSWPolyCompdata &old) = delete;
+    CSWPolyCompdata (CSWPolyCompdata &&old) = delete;
+    const CSWPolyCompdata &operator=(CSWPolyCompdata &&old) = delete;
+
     int ply_compinit (int sval, int cval);
     int ply_compfree (void);
     int ply_compflag (char flag);
@@ -61,13 +71,6 @@ class CSWPolyCompdata
     int ply_compclear (int val);
     int ply_compnoop (char cin);
 
-//  Do not allow copy or move.
-
-    CSWPolyCompdata (const CSWPolyCompdata &other) = delete; 
-    CSWPolyCompdata (CSWPolyCompdata &&other) = delete;
-    const CSWPolyCompdata &operator= (const CSWPolyCompdata &other) = delete;
-    const CSWPolyCompdata &operator= (CSWPolyCompdata &&other) = delete;
-  
   private:
 
     void reset_for_copy (void);

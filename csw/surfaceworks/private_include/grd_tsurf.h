@@ -72,6 +72,17 @@ class CSWGrdTsurf
   public:
 
     CSWGrdTsurf () {};
+    ~CSWGrdTsurf () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWGrdTsurf (const CSWGrdTsurf &old) = delete;
+    const CSWGrdTsurf &operator=(const CSWGrdTsurf &old) = delete;
+    CSWGrdTsurf (CSWGrdTsurf &&old) = delete;
+    const CSWGrdTsurf &operator=(CSWGrdTsurf &&old) = delete;
 
     void  SetGrdFileioPtr (CSWGrdFileio *p) {grd_fileio_ptr = p;};
     void  SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};

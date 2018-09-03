@@ -159,6 +159,16 @@ class CSWPolyPatfill
         ply_PattWorkFree ();
     };
 
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWPolyPatfill (const CSWPolyPatfill &old) = delete;
+    const CSWPolyPatfill &operator=(const CSWPolyPatfill &old) = delete;
+    CSWPolyPatfill (CSWPolyPatfill &&old) = delete;
+    const CSWPolyPatfill &operator=(CSWPolyPatfill &&old) = delete;
+
     int ply_SetPatternAllOrNothingFlag (int val);
     int ply_GetAllOrNothingFlag (void);
     int ply_SetupPatFill (CSW_F *xp, CSW_F *yp, int *ic, int nc,

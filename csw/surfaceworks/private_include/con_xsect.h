@@ -63,6 +63,17 @@ class CSWConXsect
   public:
 
     CSWConXsect () {};
+    ~CSWConXsect () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWConXsect (const CSWConXsect &old) = delete;
+    const CSWConXsect &operator=(const CSWConXsect &old) = delete;
+    CSWConXsect (CSWConXsect &&old) = delete;
+    const CSWConXsect &operator=(CSWConXsect &&old) = delete;
 
     void SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};
     void SetGrdUtilsPtr (CSWGrdUtils *p) {grd_utils_ptr = p;};

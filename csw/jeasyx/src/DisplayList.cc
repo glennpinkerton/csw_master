@@ -21724,48 +21724,6 @@ int CDisplayList::PerformPolyBoolean (int *ilist, int *idata, double *ddata)
 
     ilist[3] = npout;
 
-//CDisplayList::testForLongLine (xout, yout, npout, icout, ihout);
-
     return istat;
-
-}
-
-
-void CDisplayList::testForLongLine (double *xout, double *yout,
-                                    int npout, int *icout, int *ihout)
-{
-    int  i, j, k, nh, np;
-
-    double  dx, dy, dd;
-    double  dtest = 20.0;
-
-    nh = 0;
-    np = 0;
-
-    printf ("\nTesting for long lines in DisplayList.cc\n\n");
-
-    for (i=0; i<npout; i++) {
-        printf ("polygon %d  number of components %d\n",
-                i, icout[i]);
-        for (j=0; j<icout[i]; j++) {
-            int nph = ihout[nh];
-            nh++;
-            printf ("  npts in hole = %d\n", nph);
-            for (k=0; k<nph-1; k++) {
-                dx = xout[np] - xout[np+1];
-                dy = yout[np] - yout[np+1];
-                dd = dx * dx + dy * dy;
-                dd = sqrt (dd);
-                if (dd > dtest) {
-                    printf ("    long line at component %d  point %d\n",
-                            j, k);
-                    fflush (stdout);
-                }
-                np++;
-            }
-            np++;
-        }
-    }
-
 
 }

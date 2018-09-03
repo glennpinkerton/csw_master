@@ -73,6 +73,20 @@ class GPFCalcdraw
 
   public:
 
+    GPFCalcdraw () {};
+    ~GPFCalcdraw () {};
+
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    GPFCalcdraw (const GPFCalcdraw &old) = delete;
+    const GPFCalcdraw &operator=(const GPFCalcdraw &old) = delete;
+    GPFCalcdraw (GPFCalcdraw &&old) = delete;
+    const GPFCalcdraw &operator=(GPFCalcdraw &&old) = delete;
+
     int gpf_SetClipWindow (CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2);
     int gpf_transxyline (CSW_F x, CSW_F y, CSW_F angle, CSW_F *xy, int npts);
     int gpf_pcliprect (CSW_F x1, CSW_F y1, CSW_F x2, CSW_F y2,

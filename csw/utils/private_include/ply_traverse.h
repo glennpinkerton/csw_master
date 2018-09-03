@@ -67,6 +67,17 @@ class CSWPolyTraverse
   public:
 
     CSWPolyTraverse () {};
+    ~CSWPolyTraverse () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWPolyTraverse (const CSWPolyTraverse &old) = delete;
+    const CSWPolyTraverse &operator=(const CSWPolyTraverse &old) = delete;
+    CSWPolyTraverse (CSWPolyTraverse &&old) = delete;
+    const CSWPolyTraverse &operator=(CSWPolyTraverse &&old) = delete;
 
     void SetDriverPtr (CSWPolyDrivers *p) {ply_drivers_ptr = p;};
 

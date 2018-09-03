@@ -65,7 +65,7 @@
 #define MIN_COLS_CON_CALC 2
 #define MIN_ROWS_CON_CALC 2
 
-#define MAX_LOOKUP        10000
+#define MAX_LOOKUP        1000
 #define MAX_BANDS         200
 #define MAX_DETAIL        50
 #define FILL_CHUNK        1000
@@ -100,6 +100,18 @@ class CSWConCalc
     CSWGrdUtils     *grd_utils_ptr = NULL;
 
   public:
+
+    CSWConCalc () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWConCalc (const CSWConCalc &old) = delete;
+    const CSWConCalc &operator=(const CSWConCalc &old) = delete;
+    CSWConCalc (CSWConCalc &&old) = delete;
+    const CSWConCalc &operator=(CSWConCalc &&old) = delete;
 
     void SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};
     void SetGrdArithPtr (CSWGrdArith *p) {grd_arith_ptr = p;};

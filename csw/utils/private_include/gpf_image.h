@@ -80,6 +80,17 @@ class GPFImage
   public:
 
     GPFImage () {};
+    ~GPFImage () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    GPFImage (const GPFImage &old) = delete;
+    const GPFImage &operator=(const GPFImage &old) = delete;
+    GPFImage (GPFImage &&old) = delete;
+    const GPFImage &operator=(GPFImage &&old) = delete;
 
   private:
 

@@ -80,6 +80,17 @@ class CSWGrdConstraint
   public:
 
     CSWGrdConstraint () {};
+    ~CSWGrdConstraint () {};
+
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWGrdConstraint (const CSWGrdConstraint &old) = delete;
+    const CSWGrdConstraint &operator=(const CSWGrdConstraint &old) = delete;
+    CSWGrdConstraint (CSWGrdConstraint &&old) = delete;
+    const CSWGrdConstraint &operator=(CSWGrdConstraint &&old) = delete;
 
     void SetGrdFaultPtr (CSWGrdFault *p) {grd_fault_ptr = p;};
     void SetGrdFileioPtr (CSWGrdFileio *p) {grd_fileio_ptr = p;};

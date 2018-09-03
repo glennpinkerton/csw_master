@@ -36,32 +36,14 @@
 
 #  include "csw/utils/include/csw_.h"
 
-/*
-    csw_portP.h is needed for the PC386IX define
-*/
-
-#  include "csw/utils/private_include/csw_portP.h"
-
 #  define GRIDSIZE          5000
 #  define MOATSIZE          0.5
 
-#  ifdef PC386IX
-
-#    define PFILLCHUNK        50
-#    define SHAPECHUNK        50
-#    define LINECHUNK         200
-#    define SYMBCHUNK         200
-#    define TEXTCHUNK         200
-
-#  else
-
-#    define PFILLCHUNK        100
-#    define SHAPECHUNK        100
-#    define LINECHUNK         300
-#    define SYMBCHUNK         400
-#    define TEXTCHUNK         300
-
-#  endif
+#  define PFILLCHUNK        100
+#  define SHAPECHUNK        100
+#  define LINECHUNK         300
+#  define SYMBCHUNK         400
+#  define TEXTCHUNK         300
 
 #endif
 

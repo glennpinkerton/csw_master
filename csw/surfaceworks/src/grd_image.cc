@@ -98,12 +98,12 @@ void CSWGrdImage::grd_setup_image_color_bands (CSW_F *cmin, CSW_F *cmax,
     dz = (z2 - z1) /100.0;
     z1 -= dz;
     z2 += dz;
-    dz = (z2 - z1) / 10000.0;
+    dz = (z2 - z1) / (CSW_F)MAX_IMAGE_COLOR_BANDS;;
 
     Zmin = z1;
     Zinc = dz;
 
-    for (i=0; i<10000; i++) {
+    for (i=0; i<MAX_IMAGE_COLOR_BANDS; i++) {
         ColorTable[i] = COLOR_UNDEFINED;
     }
 
@@ -113,7 +113,7 @@ void CSWGrdImage::grd_setup_image_color_bands (CSW_F *cmin, CSW_F *cmax,
         i1--;
         i2++;
         if (i1 < 0) i1 = 0;
-        if (i2 > 9999) i2 = 9999;
+        if (i2 > MAX_IMAGE_COLOR_BANDS - 1) i2 = MAX_IMAGE_COLOR_BANDS - 1;
         for (j=i1; j<= i2; j++) {
             ColorTable[j] = colors[i];
         }
@@ -1287,7 +1287,7 @@ int CSWGrdImage::LookupColor (CSW_F val)
     if (val > ClipGridMax) val = ClipGridMax;
 
     i = (int)((val - Zmin) / Zinc + 0.5f);
-    if (i < 0  ||  i >= 10000) {
+    if (i < 0  ||  i >= MAX_IMAGE_COLOR_BANDS) {
         return (int)BadColor;
     }
 

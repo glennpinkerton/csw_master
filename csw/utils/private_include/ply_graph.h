@@ -161,7 +161,15 @@ class CSWPolyGraph
     CSWPolyGraph () {InitAllMem ();};
     ~CSWPolyGraph () {FreeAllMem ();};
 
-bool  _bbr_ = false;
+// It makes no sense to copy construct, move construct,
+// assign or move assign an object of this class.  The
+// various copy methods are flagged "delete" to prevent
+// their use.
+
+    CSWPolyGraph (const CSWPolyGraph &old) = delete;
+    const CSWPolyGraph &operator=(const CSWPolyGraph &old) = delete;
+    CSWPolyGraph (CSWPolyGraph &&old) = delete;
+    const CSWPolyGraph &operator=(CSWPolyGraph &&old) = delete;
 
   private:
 

@@ -864,13 +864,16 @@ int CSWGrdArith::IntersectGeometry (CSW_F x11, CSW_F y11, CSW_F x12, CSW_F y12,
   ******************************************************************
 
     Create a new grid by interpolating the old grid at the new grid's
-  node locations.
+    node locations.
 
 */
 
-int CSWGrdArith::ResampleGrid (CSW_F *grid, char *mask, CSW_F x1, CSW_F y1,
-                         CSW_F x2, CSW_F y2, int ncol, int nrow,
-                         CSW_F *gout, char *maskout, CSW_F x1out, CSW_F y1out,
+int CSWGrdArith::ResampleGrid (CSW_F *grid, char *mask,
+                         CSW_F x1, CSW_F y1,
+                         CSW_F x2, CSW_F y2,
+                         int ncol, int nrow,
+                         CSW_F *gout, char *maskout,
+                         CSW_F x1out, CSW_F y1out,
                          CSW_F x2out, CSW_F y2out,
                          int ncout, int nrout, int flag)
 {
@@ -879,8 +882,12 @@ int CSWGrdArith::ResampleGrid (CSW_F *grid, char *mask, CSW_F x1, CSW_F y1,
     CSW_F      *zw = NULL, y0, ysp, xsp, ymsp, xmsp, tiny, eps;
     CSW_F      *xw = NULL, *yw = NULL;
 
-    xw = x_maxc;
-    yw = y_maxc;
+    if (ncout > MAX_COLUMNS) {
+        ncout = MAX_COLUMNS;
+    }
+
+    xw = x_maxc.get();
+    yw = y_maxc.get();
 
 /*
     Shift the input and output x and y limits of the grids
