@@ -5,12 +5,16 @@ export classpath=$CSW_PARENT
 echo
 cd $CSW_PARENT
 
+#export EZ_PAINT_PRINT_TIMING=1
+#export EZ_PRINT_TIMING=1
 #export SW_PRINT_TIMING=1
 #export PB_PRINT_TIMING=1
 
 java -Xmx1500m -Djava.library.path=$CSW_PARENT/csw/lib  csw.jtest.$@
 #java -Xmx500m -Djava.library.path=$CSW_PARENT/csw/lib  csw.jtest.$@
 
+#unset EZ_PAINT_PRINT_TIMING
+#unset EZ_PRINT_TIMING
 #unset SW_PRINT_TIMING
 #unset PB_PRINT_TIMING
 

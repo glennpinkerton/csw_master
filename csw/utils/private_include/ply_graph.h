@@ -89,6 +89,7 @@ typedef struct {
     void           **tag2 = NULL;
     int            *bbid = NULL;
     int            *compid = NULL;
+    int            *notused = NULL;
     int            nvec;
     int            xmin,
                    ymin,
@@ -175,6 +176,8 @@ class CSWPolyGraph
 
 void testForLongLine (int cidx, double dt);
 void initIntListForDebug (int *lp, int n);
+
+void check_node (PLY_NOdeStruct *node, int num);
 
 // Static variables from the old C file are now private class variables.
 
@@ -293,6 +296,17 @@ void initIntListForDebug (int *lp, int n);
 
 // Static functions from the old C file are now private class methods
 
+    void  print_nodes (int n1, int n2);
+    void  print_nodes (int n1, int n2, int n3, int n4);
+
+    inline
+    bool between (int vt, int v1, int v2) {
+        if ((vt - v1) * (vt - v2) < 0) {
+            return true;
+        }
+        return false;
+    }
+
     int SamePoint (double x1, double y1, double x2, double y2);
     int WriteLines (double *x,
                    double *y,
@@ -317,6 +331,8 @@ void initIntListForDebug (int *lp, int n);
     int SetBugLocation (int ix, int iy);
     int SetupRawVectors (double*, double*, void**, int, int*, int*,
                             double*, double*, void**, int, int*, int*);
+    int CleanupRawVectors ();
+    int CleanupRawOverlap (RAwEdgeStruct &raw, int i, int j);
     int ResetRawVectors (void);
     int SetupEdgeGrids (void);
     int SetHorizontalCrossingsForVector (int, int, int, int, int*,
@@ -339,12 +355,15 @@ void initIntListForDebug (int *lp, int n);
     int XorGraphs (void);
     int FragmentGraphs (void);
     int RemoveTemporaryNodes (void);
+    int RemoveSetidTemporaryNodes (int setid);
     int CalculateSegmentIntersections (void);
+    int CalculateSetidSegmentIntersections (int setid);
     int SplitSegments (int index_seg1, int index_seg2, int, int, int);
     int BuildPolygonComponents (void);
     int BuildPolygonComponentsForFragments (void);
     int BuildXorComponents (void);
     int RemoveDuplicateSegments (void);
+    int RemoveSetidDuplicateSegments (int setid);
     int RemoveProblemSegments (void);
     int DiscardInteriorSegment (int);
     int NestHoles (void);

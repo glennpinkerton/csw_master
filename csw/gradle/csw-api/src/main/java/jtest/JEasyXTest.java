@@ -57,7 +57,7 @@ import csw.jutils.src.CSWLogger;
 
 // imports flagged as unused by eclipse
 
-//import java.util.Date;
+import java.util.Date;
 //import org.apache.logging.log4j.LogManager;
 
 
@@ -176,52 +176,8 @@ public class JEasyXTest {
 
         frame.setVisible (true);
 
-//        timerTest ();
-
     }
 
-    /*
-    static private void timerTest ()
-    {
-        double[] d1, d2;
-        int      i, j, k, itot, jtot;
-
-        Date     date;
-        long     t1, t2;
-
-        date = new Date ();
-        t1 = date.getTime ();
-
-        itot = 2000;
-        jtot = 2000;
-
-        for (i=0; i<itot; i++) {
-            d1 = new double[jtot];
-            for (j=0; j<jtot; j++) {
-                d1[j] = j + i;
-            }
-
-            d2 = new double[jtot+ 2 * i];
-            for (j=0; j<jtot + 2 * i; j++) {
-                k = j % 100;
-                d2[j] = j + i + k;
-            }
-         }
-
-         date = new Date ();
-         t2 = date.getTime ();
-
-         System.out.print ("Elapsed time for itot = ");
-         System.out.print (itot);
-         System.out.print (" and jtot = ");
-         System.out.print (jtot);
-         System.out.print (" is ");
-         System.out.print (t2 - t1);
-         System.out.println (" milliseconds");
-
-         return;
-    }
-    */
 
 
     static void showMem (String  msg)
@@ -1945,10 +1901,16 @@ catch (Exception e) {
 }
 */
 
+        Date     date;
+        long     t1, t2;
+
+        date = new Date ();
+        t1 = date.getTime ();
+
         DLSelectable dls = null;
 
-        xline = new double[100];
-        yline = new double[100];
+        xline = new double[1000];
+        yline = new double[1000];
         icomp = new int[10];
 
         if (nhint <= 0) {
@@ -2204,6 +2166,23 @@ catch (Exception e) {
         dl.unsetFrame ();
 
         logger.info ("    Huge Random Frame Test Finished");
+
+        date = new Date ();
+        t2 = date.getTime ();
+
+        String stev = System.getenv ("EZ_PRINT_TIMING");
+        if (stev != null) {
+            double dtt = (t2 - t1);
+            dtt /= 1000.0;
+            System.out.println ();
+            System.out.println ("For initial population of display list");
+            System.out.print ("Elapsed time for ndo = ");
+            System.out.print (ndo);
+            System.out.print (" is ");
+            System.out.print (dtt);
+            System.out.println (" seconds");
+            System.out.println ();
+        }
 
     }
 

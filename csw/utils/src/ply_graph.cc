@@ -353,6 +353,14 @@ int CSWPolyGraph::_ply_boolean_
         return -1;
     }
 
+/*
+    istat = CleanupRawVectors ();
+    if (istat == -1) {
+        FreeAllMem ();
+        return -1;
+    }
+*/
+
     istat = SetupEdgeGrids ();
     if (istat == -1) {
         FreeAllMem ();
@@ -453,7 +461,7 @@ int CSWPolyGraph::_ply_boolean_
 
   ****************************************************************************
 
-    Given the two sets of input polygons, create arrays of endpoints of all
+  Given the two sets of input polygons, create arrays of endpoints of all
   the edges.  The endpoint arrays are scaled to integers.  All integers in
   the arrays are evenly divisible by INTEGER_MULTIPLIER.  This is critical
   for several grazing avoidance solutions throughout the algorithm.
@@ -465,9 +473,9 @@ int CSWPolyGraph::SetupRawVectors (double *xp1, double *yp1, void **tag1,
                             double *xp2, double *yp2, void **tag2,
 			    int np2, int *nc2, int *nv2)
 {
-    int              i, j, k, n, n2, n3, nbase, ii, *iptr;
+    int              i, j, k, n, n2, n3, nbase, ii, *iptr = NULL;
     int              ix1, iy1, ix2, iy2, ix0, iy0, nbb;
-    void             *it1, *it2, *it0;
+    void             *it1 = NULL, *it2 = NULL, *it0 = NULL;
     int              bbx1, bby1, bbx2, bby2;
     double           scale, tiny, dx1, dy1, dx2, dy2;
     double           p1x1, p1y1, p1x2, p1y2;
@@ -599,7 +607,7 @@ int CSWPolyGraph::SetupRawVectors (double *xp1, double *yp1, void **tag1,
     }
     n += 2;
 
-    iptr = (int *)csw_Malloc (6 * n * sizeof(int));
+    iptr = (int *)csw_Malloc (7 * n * sizeof(int));
     if (!iptr) {
         return -1;
     }
@@ -610,6 +618,7 @@ int CSWPolyGraph::SetupRawVectors (double *xp1, double *yp1, void **tag1,
     Raw1.y2 = iptr + n * 3;
     Raw1.bbid = iptr + n * 4;
     Raw1.compid = iptr + n * 5;
+    Raw1.notused = iptr + n * 6;
 
     Raw1.bblist = (BOxStruct *)csw_Calloc (np1 * sizeof(BOxStruct));
     if (!Raw1.bblist) {
@@ -762,7 +771,7 @@ int CSWPolyGraph::SetupRawVectors (double *xp1, double *yp1, void **tag1,
     }
     n += 2;
 
-    iptr = (int *)csw_Malloc (6 * n * sizeof(int));
+    iptr = (int *)csw_Malloc (7 * n * sizeof(int));
     if (!iptr) {
         csw_Free (Raw1.x1);
         csw_Free (Raw1.bblist);
@@ -777,6 +786,7 @@ int CSWPolyGraph::SetupRawVectors (double *xp1, double *yp1, void **tag1,
     Raw2.y2 = iptr + n * 3;
     Raw2.bbid = iptr + n * 4;
     Raw2.compid = iptr + n * 5;
+    Raw2.notused = iptr + n * 6;
 
     Raw2.bblist = (BOxStruct *)csw_Calloc (np2 * sizeof(BOxStruct));
     if (!Raw2.bblist) {
@@ -915,6 +925,437 @@ int CSWPolyGraph::SetupRawVectors (double *xp1, double *yp1, void **tag1,
     return 1;
 
 }  /*  end of private function SetupRawVectors  */
+
+
+/*
+  ****************************************************************************
+
+                    C l e a n u p R a w V e c t o r s
+
+  ****************************************************************************
+
+  The Raw1 and Raw2 structures have been populated and before continuing 
+  with the boolean algorithm, some special cases need to be addressed.
+
+  The first case is overlapping vectors in each individual set of polygons.
+  
+
+*/
+
+#if 0
+int CSWPolyGraph::CleanupRawVectors ()
+{
+
+  // cleanup overlaps within same polygon set
+
+
+// !! TODO !!   replace these double loops with index stuff
+
+    for (int i=0; i<Raw1.nvec; i++) {
+        for (int j=i+1; j<Raw1.nvec; j++) {
+//            CleanupRawOverlap (Raw1, i, j);
+        }
+    }
+        
+    for (int i=0; i<Raw2.nvec; i++) {
+        for (int j=i+1; j<Raw2.nvec; j++) {
+//            CleanupRawOverlap (Raw2, i, j);
+        }
+    }
+        
+    return 1;
+}
+#endif
+
+
+
+/*
+ * Check if the two vectors from the single referenced raw edge struct
+ * overlap each other.  If no overlap is found, do not change any raw
+ * vectors and return 1.  If an overlap is found, change the raw vectors
+ * to make the overlapping vectors either abut each other or to remove
+ * one of the overlap vectors, depending upon the nature of the overlap.
+ *
+ * This is a private method and should never be made public.
+ */
+int CSWPolyGraph::CleanupRawOverlap (RAwEdgeStruct &raw, int i, int j)
+{
+    static const double  MAX_SLOPE_RATIO = 1.00001;
+    static const double  MIN_SLOPE_RATIO = 0.99999;
+
+    int  x1, y1, x2, y2, x3, y3, x4, y4;
+    int  ix12, iy12;
+    int  ix34, iy34;
+    double  dx12, dy12, dx34, dy34, s12, s34, sratio;
+
+    x1 = raw.x1[i] / INTEGER_MULTIPLIER;
+    x2 = raw.x2[i] / INTEGER_MULTIPLIER;
+    y1 = raw.y1[i] / INTEGER_MULTIPLIER;
+    y2 = raw.y2[i] / INTEGER_MULTIPLIER;
+    x3 = raw.x1[j] / INTEGER_MULTIPLIER;
+    x4 = raw.x2[j] / INTEGER_MULTIPLIER;
+    y3 = raw.y1[j] / INTEGER_MULTIPLIER;
+    y4 = raw.y2[j] / INTEGER_MULTIPLIER;
+
+    int  xmin_i, ymin_i, xmax_i, ymax_i;
+    int  xmin_j, ymin_j, xmax_j, ymax_j;
+
+// return if there is no bounding box intersection
+
+    xmin_i = x1;
+    xmax_i = x2;
+    if (x1 > x2) {
+        xmin_i = x2;
+        xmax_i = x1;
+    }
+    ymin_i = y1;
+    ymax_i = y2;
+    if (y1 > y2) {
+        ymin_i = y2;
+        ymax_i = y1;
+    }
+
+    xmin_j = x3;
+    xmax_j = x4;
+    if (x3 > x4) {
+        xmin_j = x4;
+        xmax_j = x3;
+    }
+    ymin_j = y3;
+    ymax_j = y4;
+    if (y3 > y4) {
+        ymin_j = y4;
+        ymax_j = y3;
+    }
+
+    if (xmin_i >= xmax_j  ||
+        xmax_i <= xmin_j  ||
+        ymin_i >= ymax_j  ||
+        ymax_i <= ymin_j) {
+        return 1;
+    }
+
+
+
+// vertical i line segment
+
+    if (x1 == x2) {
+        y1 = ymin_i;
+        y2 = ymax_i;
+        y3 = ymin_j;
+        y4 = ymax_j;
+        if (x3 != x1  ||  x4 != x1) {
+            return 1;
+        }
+        iy12 = y2 - y1;
+        iy34 = y4 - y3;
+        if (iy12 > iy34) {
+            if (between (y3, y1, y2)  &&
+                between (y4, y1, y2)) {
+                raw.y1[i] = y1;
+                raw.y2[i] = y3;
+                raw.y1[j] = y3;
+                raw.y2[j] = y2;
+            }
+            else if (between (y3, y1, y2)) {
+                raw.y1[i] = y1;
+                raw.y2[i] = y3;
+                raw.y1[j] = y3;
+                raw.y2[j] = y4;
+            }
+            else if (between (y4, y1, y2)) {
+                raw.y1[i] = y3;
+                raw.y2[i] = y4;
+                raw.y1[j] = y4;
+                raw.y2[j] = y2;
+            }
+        }
+        else {
+            if (between (y1, y3, y4)  &&
+                between (y2, y3, y4)) {
+                raw.y1[i] = y3;
+                raw.y2[i] = y1;
+                raw.y1[j] = y1;
+                raw.y2[j] = y4;
+            }
+            else if (between (y1, y3, y4)) {
+                raw.y1[i] = y3;
+                raw.y2[i] = y1;
+                raw.y1[j] = y1;
+                raw.y2[j] = y2;
+            }
+            else if (between (y2, y3, y4)) {
+                raw.y1[i] = y1;
+                raw.y2[i] = y2;
+                raw.y1[j] = y2;
+                raw.y2[j] = y4;
+            }
+        }
+        return 1;
+    }
+
+// horizontal i line segment
+
+    if (y1 == y2) {
+
+        x1 = xmin_i;
+        x2 = xmax_i;
+        x3 = xmin_j;
+        x4 = xmax_j;
+        if (y3 != y1  ||  y4 != y1) {
+            return 1;
+        }
+
+        ix12 = x2 - x1;
+        ix34 = x4 - x3;
+        if (ix12 > ix34) {
+            if (between (x3, x1, x2)  &&
+                between (x4, x1, x2)) {
+                raw.x1[i] = x1;
+                raw.x2[i] = x3;
+                raw.x1[j] = x3;
+                raw.x2[j] = x2;
+            }
+            else if (between (x3, x1, x2)) {
+                raw.x1[i] = x1;
+                raw.x2[i] = x3;
+                raw.x1[j] = x3;
+                raw.x2[j] = x4;
+            }
+            else if (between (x4, x1, x2)) {
+                raw.x1[i] = x3;
+                raw.x2[i] = x4;
+                raw.x1[j] = x4;
+                raw.x2[j] = x2;
+            }
+        }
+        else {
+            if (between (x1, x3, x4)  &&
+                between (x2, x3, x4)) {
+                raw.x1[i] = x3;
+                raw.x2[i] = x1;
+                raw.x1[j] = x1;
+                raw.x2[j] = x4;
+            }
+            else if (between (x1, x3, x4)) {
+                raw.x1[i] = x3;
+                raw.x2[i] = x1;
+                raw.x1[j] = x1;
+                raw.x2[j] = x2;
+            }
+            else if (between (x2, x3, x4)) {
+                raw.x1[i] = x1;
+                raw.x2[i] = x2;
+                raw.x1[j] = x2;
+                raw.x2[j] = x4;
+            }
+        }
+        return 1;
+    }
+
+// neither vertical or horizontal
+
+    double s12_intercept, s34_intercept;
+
+// if slopes of the segments are not very near the same
+// in absolute value, no overlap is possible.
+    dx12 = (double) (x2 - x1);
+    dy12 = (double) (y2 - y1);
+    s12 = dy12 / dx12;
+    s12_intercept = (double)y1 - (double)x1 * s12;
+    if (s12 < 0.0) s12 = -s12;
+
+    dx34 = (double) (x4 - x3);
+    dy34 = (double) (y4 - y3);
+    s34 = dy34 / dx34;
+    s34_intercept = (double)y3 - (double)x3 * s12;
+    if (s34 < 0.0) s34 = -s34;
+
+    sratio = s12 / s34;
+    if (sratio > MAX_SLOPE_RATIO  ||
+        sratio < MIN_SLOPE_RATIO) {
+        return 1;
+    }
+
+// Equal slope segments also need equal y intercepts
+
+    int  intercept_i, intercept_j;
+
+    intercept_i = (int) (s12_intercept + .5);
+    intercept_j = (int) (s34_intercept + .5);
+    if (intercept_i != intercept_j) {
+        return 1;
+    }
+
+// If the code gets this far, the segments either overlap or
+// possibly share an end point.
+
+    int  itmp;
+
+// more horizontal segment
+    if (s12 < 1.0) {    
+        if (x1 > x2) {
+            itmp = x1;
+            x1 = x2;
+            x2 = itmp;
+            itmp = y1;
+            y1 = y2;
+            y2 = itmp;
+        }
+        ix12 = x2 - x1;
+        ix34 = x4 - x3;
+        if (ix12 > ix34) {
+            if (between (x3, x1, x2)  &&
+                between (x4, x1, x2)) {
+                raw.x1[i] = x1;
+                raw.x2[i] = x3;
+                raw.x1[j] = x3;
+                raw.x2[j] = x2;
+                raw.y1[i] = y1;
+                raw.y2[i] = y3;
+                raw.y1[j] = y3;
+                raw.y2[j] = y2;
+            }
+            else if (between (x3, x1, x2)) {
+                raw.x1[i] = x1;
+                raw.x2[i] = x3;
+                raw.x1[j] = x3;
+                raw.x2[j] = x4;
+                raw.y1[i] = y1;
+                raw.y2[i] = y3;
+                raw.y1[j] = y3;
+                raw.y2[j] = y4;
+            }
+            else if (between (x4, x1, x2)) {
+                raw.x1[i] = x3;
+                raw.x2[i] = x4;
+                raw.x1[j] = x4;
+                raw.x2[j] = x2;
+                raw.y1[i] = y3;
+                raw.y2[i] = y4;
+                raw.y1[j] = y4;
+                raw.y2[j] = y2;
+            }
+        }
+        else {
+            if (between (x1, x3, x4)  &&
+                between (x2, x3, x4)) {
+                raw.x1[i] = x3;
+                raw.x2[i] = x1;
+                raw.x1[j] = x1;
+                raw.x2[j] = x4;
+                raw.y1[i] = y3;
+                raw.y2[i] = y1;
+                raw.y1[j] = y1;
+                raw.y2[j] = y4;
+            }
+            else if (between (x1, x3, x4)) {
+                raw.x1[i] = x3;
+                raw.x2[i] = x1;
+                raw.x1[j] = x1;
+                raw.x2[j] = x2;
+                raw.y1[i] = y3;
+                raw.y2[i] = y1;
+                raw.y1[j] = y1;
+                raw.y2[j] = y2;
+            }
+            else if (between (x2, x3, x4)) {
+                raw.x1[i] = x1;
+                raw.x2[i] = x2;
+                raw.x1[j] = x2;
+                raw.x2[j] = x4;
+                raw.y1[i] = y1;
+                raw.y2[i] = y2;
+                raw.y1[j] = y2;
+                raw.y2[j] = y4;
+            }
+        }
+        return 1;
+    }
+
+// more vertical segment
+    else {
+        if (y1 > y2) {
+            itmp = y1;
+            y1 = y2;
+            y2 = itmp;
+            itmp = y1;
+            y1 = y2;
+            y2 = itmp;
+        }
+        iy12 = y2 - y1;
+        iy34 = y4 - y3;
+        if (iy12 > iy34) {
+            if (between (y3, y1, y2)  &&
+                between (y4, y1, y2)) {
+                raw.y1[i] = y1;
+                raw.y2[i] = y3;
+                raw.y1[j] = y3;
+                raw.y2[j] = y2;
+                raw.x1[i] = x1;
+                raw.x2[i] = x3;
+                raw.x1[j] = x3;
+                raw.x2[j] = x2;
+            }
+            else if (between (y3, y1, y2)) {
+                raw.y1[i] = y1;
+                raw.y2[i] = y3;
+                raw.y1[j] = y3;
+                raw.y2[j] = y4;
+                raw.x1[i] = x1;
+                raw.x2[i] = x3;
+                raw.x1[j] = x3;
+                raw.x2[j] = x4;
+            }
+            else if (between (y4, y1, y2)) {
+                raw.y1[i] = y3;
+                raw.y2[i] = y4;
+                raw.y1[j] = y4;
+                raw.y2[j] = y2;
+                raw.x1[i] = x3;
+                raw.x2[i] = x4;
+                raw.x1[j] = x4;
+                raw.x2[j] = x2;
+            }
+        }
+        else {
+            if (between (y1, y3, y4)  &&
+                between (y2, y3, y4)) {
+                raw.y1[i] = y3;
+                raw.y2[i] = y1;
+                raw.y1[j] = y1;
+                raw.y2[j] = y4;
+                raw.x1[i] = x3;
+                raw.x2[i] = x1;
+                raw.x1[j] = x1;
+                raw.x2[j] = x4;
+            }
+            else if (between (y1, y3, y4)) {
+                raw.y1[i] = y3;
+                raw.y2[i] = y1;
+                raw.y1[j] = y1;
+                raw.y2[j] = y2;
+                raw.x1[i] = x3;
+                raw.x2[i] = x1;
+                raw.x1[j] = x1;
+                raw.x2[j] = x2;
+            }
+            else if (between (y2, y3, y4)) {
+                raw.y1[i] = y1;
+                raw.y2[i] = y2;
+                raw.y1[j] = y2;
+                raw.y2[j] = y4;
+                raw.x1[i] = x1;
+                raw.x2[i] = x2;
+                raw.x1[j] = x2;
+                raw.x2[j] = x4;
+            }
+        }
+        return 1;
+    }
+
+    return 1;
+}
 
 
 
@@ -1392,12 +1833,12 @@ int  CSWPolyGraph::PointInteger (int *x1a, int *y1a, int *x2a, int *y2a,
 
   ****************************************************************
 
-    Set up grids for locations of polygon edges for clip and
+  Set up grids for locations of polygon edges for clip and
   source polygons.  The calling function has already set up
   the segment endpoint arrays in the Raw1 and Raw2 structures
   prior to calling this function.
 
-    The edges for each polygon set are indexed by a
+  The edges for each polygon set are indexed by a
   grid specifying if each cell is all inside, all
   outside, or part inside and outside.  The grid
   geometry for each edge set is determined separately.
@@ -2108,7 +2549,7 @@ int CSWPolyGraph::InsideOutside (int ix, int iy, int numpoly)
 
   ****************************************************************************
 
-    Build the initial segment and node lists (prior to intersecting segments).
+  Build the initial segment and node lists (prior to intersecting segments).
   The Raw1 and Raw2 vectors must have been populated before calling this
   function.
 
@@ -2952,6 +3393,9 @@ int CSWPolyGraph::InsertPiece (int x1in, int y1in, int x2in, int y2in,
     node->y = y1;
     node->xorig = (x1 + IntegerRange) * TestScale + TestXmin;
     node->yorig = (y1 + IntegerRange) * TestScale + TestYmin;
+
+//check_node (node, n1);
+
     if (node1flag >= 0  &&  new1 != -1) {
         if (node1flag == 0) {
             node->tempflag = 1;
@@ -2987,6 +3431,7 @@ int CSWPolyGraph::InsertPiece (int x1in, int y1in, int x2in, int y2in,
 
 
     static const int list_chunk_size = 100;
+
 /*
     Index the segment.
 */
@@ -2996,7 +3441,7 @@ int CSWPolyGraph::InsertPiece (int x1in, int y1in, int x2in, int y2in,
         if (!list) {
             return -1;
         }
-initIntListForDebug (list+2, list_chunk_size);
+//initIntListForDebug (list+2, list_chunk_size);
         list[0] = list_chunk_size;
     }
 
@@ -3095,7 +3540,7 @@ initIntListForDebug (list+2, list_chunk_size);
 
   ****************************************************************************
 
-    Check the specified x,y coordinate for the presence of another node.  This
+  Check the specified x,y coordinate for the presence of another node.  This
   should only be called from the InsertPiece function.
 
 */
@@ -3179,7 +3624,7 @@ int CSWPolyGraph::CheckExistingNode (int x, int y)
 
   ****************************************************************************
 
-    Calculate intersections between all segments in the segment list.  When
+  Calculate intersections between all segments in the segment list.  When
   an intersection is found, a new node is created and each intersecting
   segment is split into two shorter segments.
 
@@ -3201,6 +3646,23 @@ int CSWPolyGraph::CalculateSegmentIntersections (void)
     {
     };
     CSWScopeGuard  func_scope_guard (fscope);
+
+    int is2 = CalculateSetidSegmentIntersections (1);
+    if (is2 != 1) return is2;
+/*
+    is2 = RemoveSetidTemporaryNodes (1);
+    if (is2 != 1) return is2;
+*/
+    is2 = RemoveSetidDuplicateSegments (1);
+    if (is2 != 1) return is2;
+    is2 = CalculateSetidSegmentIntersections (2);
+    if (is2 != 1) return is2;
+/*
+    is2 = RemoveSetidTemporaryNodes (2);
+    if (is2 != 1) return is2;
+*/
+    is2 = RemoveSetidDuplicateSegments (2);
+    if (is2 != 1) return is2;
 
 /*
     Loop through the entire segment list to check intersections.
@@ -3278,6 +3740,7 @@ int CSWPolyGraph::CalculateSegmentIntersections (void)
             seg2 = SegList + list[j+2];
             index_seg2 = list[j+2];
             if (seg2->discarded) continue;
+            if (seg2->setid == seg1->setid) continue;
             node = NodeList + seg2->node1;
             x21 = node->x;
             y21 = node->y;
@@ -3665,7 +4128,7 @@ int CSWPolyGraph::RemoveSegmentFromNode (int segnum, PLY_NOdeStruct *node)
 
   ****************************************************************************
 
-    Remove segments that are exactly on top of other segments by setting
+  Remove segments that are exactly on top of other segments by setting
   their discard flags to 1.  Also, any segments that have one or both end
   nodes temporary are discarded.
 
@@ -3730,9 +4193,27 @@ int CSWPolyGraph::RemoveDuplicateSegments (void)
                 n4 = seg2->node2;
                 if (n1 == n3  &&  n2 == n4) {
                     seg2->discarded = (char)DiscardFlag;
+                    if (seg1->setid == seg2->setid) {
+/*
+printf ("discarding both duplicate segments\n");
+printf ("n1 = %d  n2 = %d    n3 = %d  n4 = %d\n", n1, n2, n3, n4);
+print_nodes (n1, n2, n3, n4);
+fflush (stdout);
+*/
+                        seg1->discarded = (char)DiscardFlag;
+                    }
                 }
                 else if (n1 == n4  &&  n2 == n3) {
                     seg2->discarded = (char)DiscardFlag;
+                    if (seg1->setid == seg2->setid) {
+/*
+printf ("discarding both duplicate segments\n");
+printf ("n1 = %d  n2 = %d    n3 = %d  n4 = %d\n", n1, n2, n3, n4);
+print_nodes (n1, n2, n3, n4);
+fflush (stdout);
+*/
+                        seg1->discarded = (char)DiscardFlag;
+                    }
                 }
             }
         }
@@ -3820,6 +4301,22 @@ int CSWPolyGraph::RemoveDuplicateSegments (void)
 
 }  /*  end of private RemoveDuplicateSegments function  */
 
+
+void CSWPolyGraph::print_nodes (int n1, int n2) {
+    printf ("  %.2f   %.2f     %.2f  %.2f\n",
+        NodeList[n1].xorig, NodeList[n1].yorig,
+        NodeList[n2].xorig, NodeList[n2].yorig);
+}
+
+
+void CSWPolyGraph::print_nodes (int n1, int n2, int n3, int n4) {
+    printf ("  %.2f   %.2f     %.2f  %.2f\n",
+        NodeList[n1].xorig, NodeList[n1].yorig,
+        NodeList[n2].xorig, NodeList[n2].yorig);
+    printf ("  %.2f   %.2f     %.2f  %.2f\n",
+        NodeList[n3].xorig, NodeList[n3].yorig,
+        NodeList[n4].xorig, NodeList[n4].yorig);
+}
 
 
 
@@ -4835,8 +5332,11 @@ int CSWPolyGraph::BuildOutputPolygons (void)
     nv = 0;
     nc = 0;
 
-//printf ("\nNcomp in BuildOutput = %d\n\n", Ncomp);
-//fflush (stdout);
+
+/*
+printf ("\nNcomp in BuildOutput = %d\n\n", Ncomp);
+fflush (stdout);
+*/
 
     for (;;) {
 
@@ -6836,6 +7336,17 @@ int CSWPolyGraph::ResetRawVectors (void)
     n1 += 10;
     n2 += 10;
 
+    int  nn11 = 0;
+    for (i=0; i<Raw1.nbblist; i++) {
+        nn11 += Raw1.bblist[i].nseg;
+    }
+    if (n1 < nn11) n1 = nn11;
+    nn11 = 0;
+    for (i=0; i<Raw2.nbblist; i++) {
+        nn11 += Raw1.bblist[i].nseg;
+    }
+    if (n2 < nn11) n2 = nn11;
+
 /*
     Repopulate the Raw1 segments.  This has to be done in bounding
     box id order so that the InsideOutside polygon stuff will work.
@@ -7019,7 +7530,7 @@ int CSWPolyGraph::FreeBBLists (void)
 
   ****************************************************************************
 
-    If a segment from a node contains the end point of another segment from
+  If a segment from a node contains the end point of another segment from
   the node, discard the longer segment.  This is called just after duplicates
   have been discarded.
 
@@ -9733,3 +10244,421 @@ int CSWPolyGraph::InitAllMem (void)
 
 }  /*  end of private InitAllMem function  */
 
+
+int CSWPolyGraph::CalculateSetidSegmentIntersections (int setid)
+{
+    int             istat, i, j, k, i0, j0,
+                    x1, y1, x2, y2, x21, y21, x22, y22, xt, yt,
+                    xint, yint, *list, ndo;
+    PLY_NOdeStruct      *node;
+    SEgmentStruct   *seg1, *seg2, *ovseg;
+
+// lambda expression captures all local variables by reference.
+// Any cleanup needed upon this function going out of scope
+// should be done in the body (between curly braces) of the
+// expression.
+    auto fscope = [&]()
+    {
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
+
+/*
+    Loop through the entire segment list to check intersections.
+    Note that when a segment is split, the new segments are appended
+    to the SegList array, and NumSegs is incremented.  These new
+    segments will be checked for intersections also since the loop
+    does not stop until the NumSegs variable is exceeded.  This
+    insures that all segment intersections are found when one segment
+    is intersected by more than one other segment.
+*/
+    int  index_seg1 = 0;
+    int  index_seg2 = 0;
+    i = 0;
+    while (i < NumSegs) {
+
+        index_seg1 = i;
+
+    /*
+        Get the endpoints for the first segment.
+    */
+        seg1 = SegList + i;
+        if (seg1->discarded) {
+            i++;
+            continue;
+        }
+        if (seg1->setid != setid) {
+            i++;
+            continue;
+        }
+        node = NodeList + seg1->node1;
+        x1 = node->x;
+        y1 = node->y;
+        node = NodeList + seg1->node2;
+        x2 = node->x;
+        y2 = node->y;
+
+    /*
+        Get the index cell of the first segment.
+    */
+        xt = (x1 + x2) / 2;
+        yt = (y1 + y2) / 2;
+        i0 = (yt - IndexYmin) / SegIndexSpace;
+        j0 = (xt - IndexXmin) / SegIndexSpace;
+        k = i0 * SegIndexNcol + j0;
+        if (SegIndex[k] == NULL) {
+            i++;
+            continue;
+        }
+
+    /*
+        The second element in the index cell's list is the number
+        of segments crossing the cell.  The actual segment numbers
+        start with list[2].
+    */
+        list = SegIndex[k];
+        if (list[1] < 2) {
+            i++;
+            continue;
+        }
+
+    /*
+        Check for an intersection with each segment that crosses the same index cell.
+    */
+        ndo = list[1];
+        for (j=0; j<ndo; j++) {
+
+        /*
+            If the segment in the list has already been the base segment
+            in a set of intersection calculations (i.e. it has already
+            been or is now the ith segment in the outer loop) then all
+            of the intersections with the current segment have already
+            been calculated.
+        */
+            list = SegIndex[k];
+            if (list[j+2] <= i) {
+                continue;
+            }
+
+            seg2 = SegList + list[j+2];
+            index_seg2 = list[j+2];
+            if (seg2->discarded) continue;
+            if (seg2->setid != setid) continue;
+            node = NodeList + seg2->node1;
+            x21 = node->x;
+            y21 = node->y;
+            node = NodeList + seg2->node2;
+            x22 = node->x;
+            y22 = node->y;
+
+            istat = SegintInteger (x1, y1, x2, y2, x21, y21, x22, y22,
+                                   &xint, &yint);
+        /*
+            If the two segments overlap each other and they are in the
+            same polygon set, then an intersection needs to be found.
+            This is the endpoint that is completely inside the other
+            segment.  The split of the overlapping segments may produce
+            duplicate results.  If this happens, the longer of the two
+            overlapping segments needs to be discarded.
+        */
+            ovseg = NULL;
+            if (istat == 3 || istat == 2) {
+                istat = 0;
+                if (IntInside (x1, x21, x22)  &&  IntInside (y1, y21, y22)) {
+                    xint = x1;
+                    yint = y1;
+                    ovseg = seg2;
+                }
+                else if (IntInside (x2, x21, x22)  &&  IntInside (y2, y21, y22)) {
+                    xint = x2;
+                    yint = y2;
+                    ovseg = seg2;
+                }
+                else if (IntInside (x21, x1, x2)  &&  IntInside (y21, y1, y2)) {
+                    xint = x21;
+                    yint = y21;
+                    ovseg = seg1;
+                }
+                else if (IntInside (x22, x1, x2)  &&  IntInside (y22, y1, y2)) {
+                    xint = x22;
+                    yint = y22;
+                    ovseg = seg1;
+                }
+                else {
+                    istat = 2;
+                }
+            }
+
+        /*
+            Attempt to split the segments using this intersection point.
+        */
+            if (istat == 0) {
+
+                istat = SplitSegments (index_seg1, index_seg2,
+                                       xint, yint, k);
+                seg2 = SegList + index_seg2;
+                if (istat == -1) {
+                    return -1;
+                }
+                if (istat == 0) {
+                    if (ovseg) {
+                        ovseg->discarded = (char)DiscardFlag;
+                    }
+                    continue;
+                }
+            /*
+                Update the endpoints for the first segment.
+            */
+                seg1 = SegList + index_seg1;
+                node = NodeList + seg1->node1;
+                x1 = node->x;
+                y1 = node->y;
+                node = NodeList + seg1->node2;
+                x2 = node->x;
+                y2 = node->y;
+            }
+        }
+
+        i++;
+
+    }  /*  end of while i < NumSegs loop  */
+
+    return 1;
+
+}  /*  end of private CalculateSetidSegmentIntersections function  */
+
+
+
+
+int CSWPolyGraph::RemoveSetidDuplicateSegments (int setid)
+{
+    int              i, j, k, n1, n2, n3, n4, nlist, *list;
+    PLY_NOdeStruct   *node;
+    SEgmentStruct    *seg1, *seg2;
+
+// lambda expression captures all local variables by reference.
+// Any cleanup needed upon this function going out of scope
+// should be done in the body (between curly braces) of the
+// expression.
+    auto fscope = [&]()
+    {
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
+
+/*
+    Duplicated segments must be attached to the same node, so look
+    through each node's segment list for duplicates.  Temporary nodes
+    initially introduced in spliting up the segments for indexing
+    are no longer needed, so skip them.
+*/
+    for (i=0; i<NumNodes; i++) {
+
+        node = NodeList + i;
+        if (node->tempflag == 1  ||  node->nseg < 3) {
+            continue;
+        }
+
+        nlist = node->nseg;
+        list = node->seglist;
+
+    /*
+        There are more than 2 segments attached to the node,
+        so check if any segments in the list of attached
+        segments are identical with each other.  If identical
+        segments are found, arbitrarily flag the last one in
+        the list as discarded.
+    */
+        for (j=0; j<nlist; j++) {
+            seg1 = SegList + list[j];
+            if (seg1->discarded) {
+                continue;
+            }
+            if (seg1->setid != setid) continue;
+            n1 = seg1->node1;
+            n2 = seg1->node2;
+            if (!(n1 == i  ||  n2 == i)) {
+                continue;
+            }
+
+            for (k=j+1; k<nlist; k++) {
+                seg2 = SegList + list[k];
+                if (seg2->discarded  ||  list[k] == list[j]) {
+                    continue;
+                }
+                if (seg2->setid != setid) continue;
+                n3 = seg2->node1;
+                n4 = seg2->node2;
+                if (n1 == n3  &&  n2 == n4) {
+                    seg2->discarded = (char)DiscardFlag;
+                    seg1->discarded = (char)DiscardFlag;
+/*
+printf ("In setid version discarding both duplicate segments\n");
+printf ("n1 = %d  n2 = %d    n3 = %d  n4 = %d\n", n1, n2, n3, n4);
+print_nodes (n1, n2, n3, n4);
+fflush (stdout);
+*/
+                }
+                else if (n1 == n4  &&  n2 == n3) {
+                    seg2->discarded = (char)DiscardFlag;
+                    seg1->discarded = (char)DiscardFlag;
+/*
+printf ("In setid version discarding both duplicate segments\n");
+printf ("n1 = %d  n2 = %d    n3 = %d  n4 = %d\n", n1, n2, n3, n4);
+print_nodes (n1, n2, n3, n4);
+fflush (stdout);
+*/
+                }
+            }
+        }
+    }
+
+    return 1;
+
+}  /*  end of private RemoveSetidDuplicateSegments function  */
+
+
+
+int CSWPolyGraph::RemoveSetidTemporaryNodes (int setid)
+{
+
+    int                 i, j, k, ntemp, n3, jlast, s1, s2;
+    int                 sid;
+    PLY_NOdeStruct          *node1, *node2;
+    SEgmentStruct       *seg1, *seg2, *stmp;
+
+    int                 sav_discard_flag = DiscardFlag;
+    DiscardFlag = 1;
+
+// lambda expression captures all local variables by reference.
+// Any cleanup needed upon this function going out of scope
+// should be done in the body (between curly braces) of the
+// expression.
+    auto fscope = [&]()
+    {
+        DiscardFlag = sav_discard_flag;
+    };
+    CSWScopeGuard  func_scope_guard (fscope);
+
+    i = 0;
+    while (i < NumSegs) {
+
+        seg1 = SegList + i;
+        if (seg1->discarded  ||  seg1->setid != setid) {
+            i++;
+            continue;
+        }
+
+        sid = seg1->setid;
+
+        node1 = NodeList + seg1->node1;
+        node2 = NodeList + seg1->node2;
+        n3 = seg1->node2;
+
+        if (node1->tempflag == 0  &&  node2->tempflag == 1) {
+
+            ntemp = seg1->node2;
+            jlast = i;
+
+            for (;;) {
+
+            /*
+                Find two segments with the same set id as the starting segment.
+                The two segments must both have their discarded flags still
+                set to zero or -1.
+            */
+                s1 = -1;
+                s2 = -1;
+                for (k=0; k<node2->nseg; k++) {
+                    j = node2->seglist[k];
+                    stmp = SegList + j;
+                    if (stmp->setid == sid  &&  stmp->discarded < 1) {
+                        if (s1 < 0) {
+                            s1 = j;
+                        }
+                        else {
+                            s2 = j;
+                            break;
+                        }
+                    }
+                }
+
+                if (s1 == -1  &&  s2 == -1) {
+                    seg1->discarded = (char)DiscardFlag;
+                    break;
+                }
+
+                j = s1;
+                if (j == jlast) {
+                    if (s2 == -1) {
+                        seg1->discarded = (char)DiscardFlag;
+                        break;
+                    }
+                    j = s2;
+                }
+                jlast = j;
+
+                seg2 = SegList + j;
+                n3 = seg2->node2;
+                if (n3 == ntemp) {
+                    n3 = seg2->node1;
+                }
+
+                ntemp = n3;
+                seg2->discarded = (char)DiscardFlag;
+                node2 = NodeList + n3;
+                if (node2->tempflag == 0) {
+                    if (node2->nseg >= MAXSEG) {
+                        return -1;
+                    }
+                    node2->seglist[node2->nseg] = i;
+                    node2->nseg++;
+                    break;
+                }
+            }
+
+            if (seg1->discarded == 1) {
+                continue;
+            }
+
+            seg1->node2 = n3;
+            seg1->discarded = 99;
+            i++;
+
+        }
+
+        else {
+            i++;
+        }
+
+    }
+
+    for (i=0; i<NumSegs; i++) {
+        if (SegList[i].discarded == 99) {
+            SegList[i].discarded = 0;
+        }
+    }
+
+    return 1;
+
+}  /*  end of private RemoveSetidTemporaryNodes function  */
+
+
+
+void CSWPolyGraph::check_node (PLY_NOdeStruct *node, int num)
+{
+    double  xn = node->xorig;
+    double  yn = node->yorig;
+
+    double  x1 = 10.0 - .01;
+    double  x2 = 30.0 + .01;
+    double  y1 = 70.0;
+    //double  y2 = 70.0;
+
+    double  dy = yn - y1;
+    if (dy < 0.0) dy = -dy;
+
+    if (dy < 0.01  &&  xn >= x1  &&  xn <= x2) {
+        printf ("node number %d   is at %.2lf  %.2lf\n", num, xn, yn);
+        fflush (stdout);
+    }
+
+}

@@ -206,6 +206,7 @@ class DigitizeFrame extends JDLFrame implements DLEditListener
     private JButton        clipButton = null;
     private JButton        randomButton = null;
     private JButton        random4Button = null;
+    private JButton        gridButton = null;
     private JButton        intersectButton = null;
     private JButton        unionButton = null;
     private JButton        xorButton = null;
@@ -224,6 +225,8 @@ class DigitizeFrame extends JDLFrame implements DLEditListener
     public DigitizeFrame ()
     {
         super (FRAME_WITH_TOOLBAR, true);
+
+        setSize (800, 800);
 
         dl = super.getDL ();
         dlpanel = dl.getPanel ();
@@ -283,6 +286,19 @@ catch (Exception e) {
                public void actionPerformed(ActionEvent ae){
                  DigitizeFrame.this.clearPolys ();
                  DigitizeFrame.this.generateRandom4 ();
+               }
+             },
+             null
+        );
+
+        gridButton =
+        addAdditionalTextButton (
+             "Grid",
+             "Generate Sealed Grid of Polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 //DigitizeFrame.this.clearPolys ();
+                 DigitizeFrame.this.generateGrid ();
                }
              },
              null
@@ -1019,5 +1035,126 @@ System.out.flush ();
         dl.setFillColor (-1, -1, -1);
         dl.setBorderColor (0, 0, 255);
     }
+
+
+
+    private void generateGrid () {
+
+        Random  ran = new Random ();
+
+        DLSelectable _dls = new DLSelectable ();
+        sourceSel.add (_dls);
+        dl.setSelectable (_dls);
+        setSourceAttributes ();
+        dl.setLineThickness(.002);
+
+        double[] xgr = new double[5];
+        double[] ygr = new double[5];
+        int[] npgr = new int[1];
+
+        npgr[0] = 5;
+        xgr[0] = 10.0;
+        ygr[0] = 10.0;
+        xgr[1] = 90.0;
+        ygr[1] = 10.0;
+        xgr[2] = 90.0;
+        ygr[2] = 30.0;
+        xgr[3] = 10.0;
+        ygr[3] = 30.0;
+        xgr[4] = xgr[0];
+        ygr[4] = ygr[0];
+
+        DLFill  dlf = new DLFill ();
+        dlf.setNumComponents (2);
+        dlf.setNumPoints (npgr);
+        dlf.setXPoints (xgr);
+        dlf.setYPoints (ygr);
+
+        sourcePolyList.add (dlf);
+        dl.addFill (xgr, ygr, npgr, 1, 1);
+
+        xgr = new double[5];
+        ygr = new double[5];
+        npgr = new int[1];
+
+        npgr[0] = 5;
+        xgr[0] = 10.0;
+        ygr[0] = 90.0;
+        xgr[1] = 90.0;
+        ygr[1] = 90.0;
+        xgr[2] = 90.0;
+        ygr[2] = 70.0;
+        xgr[3] = 10.0;
+        ygr[3] = 70.0;
+        xgr[4] = xgr[0];
+        ygr[4] = ygr[0];
+
+        dlf = new DLFill ();
+        dlf.setNumComponents (2);
+        dlf.setNumPoints (npgr);
+        dlf.setXPoints (xgr);
+        dlf.setYPoints (ygr);
+
+        sourcePolyList.add (dlf);
+        dl.addFill (xgr, ygr, npgr, 1, 1);
+
+        xgr = new double[5];
+        ygr = new double[5];
+        npgr = new int[1];
+
+        npgr[0] = 5;
+        xgr[0] = 10.0;
+        ygr[0] = 70.0;
+        xgr[1] = 30.0;
+        ygr[1] = 70.0;
+        xgr[2] = 30.0;
+        ygr[2] = 30.0;
+        xgr[3] = 10.0;
+        ygr[3] = 30.0;
+        xgr[4] = xgr[0];
+        ygr[4] = ygr[0];
+
+        dlf = new DLFill ();
+        dlf.setNumComponents (2);
+        dlf.setNumPoints (npgr);
+        dlf.setXPoints (xgr);
+        dlf.setYPoints (ygr);
+
+        sourcePolyList.add (dlf);
+        dl.addFill (xgr, ygr, npgr, 1, 1);
+
+        xgr = new double[5];
+        ygr = new double[5];
+        npgr = new int[1];
+
+        npgr[0] = 5;
+        xgr[0] = 70.0;
+        ygr[0] = 70.0;
+        xgr[1] = 90.0;
+        ygr[1] = 70.0;
+        xgr[2] = 90.0;
+        ygr[2] = 30.0;
+        xgr[3] = 70.0;
+        ygr[3] = 30.0;
+        xgr[4] = xgr[0];
+        ygr[4] = ygr[0];
+
+        dlf = new DLFill ();
+        dlf.setNumComponents (2);
+        dlf.setNumPoints (npgr);
+        dlf.setXPoints (xgr);
+        dlf.setYPoints (ygr);
+
+        sourcePolyList.add (dlf);
+        dl.addFill (xgr, ygr, npgr, 1, 1);
+
+
+        dl.setSelectable (null);
+
+        repaintPanel ();
+
+    }
+
+
 
 };

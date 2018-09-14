@@ -18,6 +18,7 @@ import java.awt.Toolkit;
 import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 import java.util.Date;
 
@@ -3000,6 +3001,47 @@ of Font.BOLD|Font.ITALIC.
     }
 
 /*-------------------------------------------------------------*/
+    
+    public void genRandomLine (int npts, double xc, double yc, double rad)
+    {
+
+        Random  ran = new Random ();
+
+        double  dang = Math.PI * 2.0 / (npts - 1);
+
+        for (int i=0; i<1; i++) {
+
+            double rad11 = rad * 1.1;
+            if (xc < rad11) xc = rad11;
+            if (yc < rad11) yc = rad11;
+
+            double[] xgr = new double[npts+1];
+            double[] ygr = new double[npts+1];
+
+            int  nxy = 0;
+            double  ang = 0.0;
+
+            for (int j=0; j<npts-1; j++) {
+                double rt = ran.nextDouble () * rad * .05 + rad * .5;
+                double xt = xc + rt * Math.cos(ang);
+                double yt = yc + rt * Math.sin(ang);
+                xgr[nxy] = xt;
+                ygr[nxy] = yt;
+                nxy++;
+                ang += dang;
+            }
+            xgr[nxy] = xgr[0];
+            ygr[nxy] = ygr[0];
+            nxy++;
+
+            addLine (xgr, ygr, nxy);
+
+        }
+
+    }
+
+
+/*-------------------------------------------------------------*/
 
   /**
   Specify if arrows are to be drawn at the last point of
@@ -5396,48 +5438,43 @@ of Font.BOLD|Font.ITALIC.
 
 /*---------------------------------------------------------------------*/
 
-    public int polyBoolean
-        (double[] xsrc,
-         double[] ysrc,
-         int[] npts_src,
-         int ncomp_src,
-         double[] xclip,
-         double[] yclip,
-         int[] npts_clip,
-         int ncomp_clip,
-         int boolean_type,
-         double[] xout,
-         double[] yout,
-         int[] npts_out,
-         Integer ncomp_out)
-    {
-        return 1;
+    private boolean IdentBooleanInputPoly (DLFill dlf1, DLFill dlf2) {
+
+      if (dlf1 == null  ||  dlf2 == null) {
+        return false;
+      }
+      if (dlf1.numComponents != dlf2.numComponents) {
+        return false;
+      }
+
+      int nplen = dlf1.numPoints.length;
+      if (dlf2.numPoints.length != nplen) {
+        return false;
+      }
+
+      int  npt1 = 0;
+      int  npt2 = 0;
+      for (int i=0; i<nplen; i++) {
+        if (dlf1.numPoints[i] != dlf2.numPoints[i]) {
+          return false;
+        }
+        npt1 += dlf1.numPoints[i];
+        npt2 += dlf2.numPoints[i];
+      }
+
+      for (int i=0; i<npt1; i++) {
+        if (dlf1.xPoints[i] != dlf2.xPoints[i]  ||
+            dlf1.yPoints[i] != dlf2.yPoints[i]) {
+          return false;
+        }
+      }
+
+      return true;
+
     }
 
 
-/*---------------------------------------------------------------------*/
 
-
-    public int polyBoolean
-        (ArrayList<Double> xsrc,
-         ArrayList<Double> ysrc,
-         ArrayList<Integer> npts_src,
-         int ncomp_src,
-         ArrayList<Double> xclip,
-         ArrayList<Double> yclip,
-         ArrayList<Integer> npts_clip,
-         int ncomp_clip,
-         int boolean_type,
-         ArrayList<Double> xout,
-         ArrayList<Double> yout,
-         ArrayList<Integer> npts_out,
-         Integer ncomp_out)
-    {
-        return 1;
-    }
-
-
-/*---------------------------------------------------------------------*/
 
     public int polyIntersect
         (ArrayList<DLFill> sourcePolyList,
@@ -5541,9 +5578,66 @@ of Font.BOLD|Font.ITALIC.
         return -1;
       }
 
+
+// Remove all but one of identical components from source poly list.
+
+      int  ic = 0;
+      DLFill dlf2 = null;
+      for (DLFill dlf : sourcePolyList) {
+        if (dlf == null) {
+          ic++;
+          continue;
+        }
+        for (int j=ic+1; j<siz1; j++) {
+          dlf2 = sourcePolyList.get(j);
+          if (dlf2 == null) continue;
+          if (IdentBooleanInputPoly (dlf, dlf2)) {
+            sourcePolyList.set (j, null);
+          }
+        }       
+        ic++;
+      }
+      ic = 0;
+      while (sourcePolyList.remove(null)) {
+        ic++;
+        if (ic >= siz1) break;
+      }
+
+// Remove all but one of identical components from clip poly list.
+
+      ic = 0;
+      dlf2 = null;
+      for (DLFill dlf : clipPolyList) {
+        if (dlf == null) {
+          ic++;
+          continue;
+        }
+        for (int j=ic+1; j<siz2; j++) {
+          dlf2 = clipPolyList.get(j);
+          if (dlf2 == null) continue;
+          if (IdentBooleanInputPoly (dlf, dlf2)) {
+            clipPolyList.set (j, null);
+          }
+        }       
+        ic++;
+      }
+      ic = 0;
+      while (clipPolyList.remove(null)) {
+        ic++;
+        if (ic >= siz2) break;
+      }
+
+      siz1 = sourcePolyList.size();
+      siz2 = clipPolyList.size();
+      if (siz1 < 1  ||  siz2 < 1) {
+        return -1;
+      }
+
+
       int n1 = 0;
       int nn1 = 0;
       for (DLFill dlf : sourcePolyList) {
+        if (dlf == null) continue;
         for (int i=0; i<dlf.numPoints.length; i++) {
           n1 += dlf.numPoints[i];
           nn1++;
@@ -5553,6 +5647,7 @@ of Font.BOLD|Font.ITALIC.
       int n2 = 0;
       int nn2 = 0;
       for (DLFill dlf : clipPolyList) {
+        if (dlf == null) continue;
         for (int i=0; i<dlf.numPoints.length; i++) {
           n2 += dlf.numPoints[i];
           nn2++;
