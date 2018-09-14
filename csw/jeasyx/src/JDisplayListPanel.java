@@ -43,7 +43,7 @@ import org.apache.logging.log4j.Logger;
 
 import csw.jutils.src.CSWLogger;
 
-//import java.util.Date;
+import java.util.Date;
 //import org.apache.logging.log4j.LogManager;
 
 
@@ -308,8 +308,26 @@ public class JDisplayListPanel extends JPanel
         width = getWidth ();
         height = getHeight ();
 
+        Date   date = new Date ();
+        long   t1, t2;
+
+        t1 = date.getTime ();
+
         dlist.drawToDevice (g2d, x, y, width, height);
 
+        String stev = System.getenv ("EZ_PAINT_PRINT_TIMING");
+        if (stev != null) {
+            date = new Date ();
+            t2 = date.getTime ();
+            double dtt = (double) (t2 - t1);
+            dtt /= 1000.0;
+            if (dtt > .1) {
+                System.out.println ("Time for painting component = " + dtt);
+                System.out.println ();
+                System.out.flush ();
+            }
+        }
+        
     }
 
 /*---------------------------------------------------------------------------*/

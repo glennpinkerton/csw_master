@@ -43,9 +43,6 @@ public class DLFill implements Serializable {
                     linePattern,
                     nativeIndex;
 
-    public void outlineComponents (JDisplayList  dl) {
-    }
-
     public void printForDebug () {
       int k=0;
       System.out.println ();
