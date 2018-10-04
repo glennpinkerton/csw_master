@@ -5443,23 +5443,23 @@ of Font.BOLD|Font.ITALIC.
       if (dlf1 == null  ||  dlf2 == null) {
         return false;
       }
+
       if (dlf1.numComponents != dlf2.numComponents) {
         return false;
       }
 
       int nplen = dlf1.numPoints.length;
+
       if (dlf2.numPoints.length != nplen) {
         return false;
       }
 
       int  npt1 = 0;
-      int  npt2 = 0;
       for (int i=0; i<nplen; i++) {
         if (dlf1.numPoints[i] != dlf2.numPoints[i]) {
           return false;
         }
         npt1 += dlf1.numPoints[i];
-        npt2 += dlf2.numPoints[i];
       }
 
       for (int i=0; i<npt1; i++) {
@@ -5548,6 +5548,7 @@ of Font.BOLD|Font.ITALIC.
         }
         catch (Throwable th) {
             System.out.println ();
+            th.printStackTrace ();
             System.out.println ();
             System.out.println
               ("Exception from polygon boolean calculations.");
@@ -5565,7 +5566,7 @@ of Font.BOLD|Font.ITALIC.
         (ArrayList<DLFill> sourcePolyList,
          ArrayList<DLFill> clipPolyList,
          ArrayList<DLFill> outPolyList,
-         int op_type)
+         int op_type)   throws Throwable
     {
       double[] xpout, ypout;
       int[] np1, np2, npout;
@@ -5580,10 +5581,19 @@ of Font.BOLD|Font.ITALIC.
 
 
 // Remove all but one of identical components from source poly list.
+// Also remove any obviously erroneous component.
 
       int  ic = 0;
       DLFill dlf2 = null;
       for (DLFill dlf : sourcePolyList) {
+        if (dlf == null) {
+          ic++;
+          continue;
+        }
+        if (BadPolygonComponent (dlf)) {
+          sourcePolyList.set (ic, null);
+          dlf = null;
+        }
         if (dlf == null) {
           ic++;
           continue;
@@ -5608,12 +5618,20 @@ of Font.BOLD|Font.ITALIC.
       ic = 0;
       dlf2 = null;
       for (DLFill dlf : clipPolyList) {
+        if (BadPolygonComponent (dlf)) {
+          clipPolyList.set (ic, null);
+          dlf = null;
+        }
         if (dlf == null) {
           ic++;
           continue;
         }
+        
         for (int j=ic+1; j<siz2; j++) {
           dlf2 = clipPolyList.get(j);
+          if (BadPolygonComponent (dlf2)) {
+            dlf2 = null;
+          }
           if (dlf2 == null) continue;
           if (IdentBooleanInputPoly (dlf, dlf2)) {
             clipPolyList.set (j, null);
@@ -5630,9 +5648,10 @@ of Font.BOLD|Font.ITALIC.
       siz1 = sourcePolyList.size();
       siz2 = clipPolyList.size();
       if (siz1 < 1  ||  siz2 < 1) {
-        return -1;
+        Throwable thr = new Throwable
+          ("No valid polygons specified for boolean operation");
+        throw (thr);
       }
-
 
       int n1 = 0;
       int nn1 = 0;
@@ -5801,6 +5820,9 @@ System.out.print ("Elapsed time for native boolean operation = ");
 System.out.print (t2 - t1);
 System.out.println (" milliseconds");
 System.out.println ();
+System.out.println ("npolyout = " + Ilist[3]);
+System.out.println ();
+System.out.flush ();
 }
 
 
@@ -5886,6 +5908,36 @@ System.out.println ();
 
       return 1;
     }
+
+
+/*---------------------------------------------------------------------*/
+
+
+/*
+ * Check a polygon component that is being used for polygon boolean
+ * operations for obvious errors.
+ */
+
+    private boolean BadPolygonComponent (DLFill dlf)
+    {
+      int i = 0;
+
+      if (dlf == null) {
+        return true;
+      }
+
+  // If any numPoints values are too small to support a polygon 
+  // component, this is an error in the input.
+
+      for (i=0; i<dlf.numPoints.length; i++) {
+        if (dlf.numPoints[i] < 3) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
 
 /*---------------------------------------------------------------------*/
 
