@@ -2376,7 +2376,7 @@ int ezx_process_command (
                 }
                 for (int i = 0; i<nddata; i++) {
                     sprintf (LogFileLine,
-                             "%lf\n",
+                             "%.10lf\n",
                              ddata[i]);
                     DLF
                 }

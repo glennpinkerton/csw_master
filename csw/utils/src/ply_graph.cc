@@ -39,7 +39,8 @@
 #include "csw/utils/private_include/csw_scope.h"
 
 
-int CSWPolyGraph::_test_inside_outside (double *xp, double *yp, int np, int *nv,
+int CSWPolyGraph::_test_inside_outside (double *xp, double *yp,
+                          int np, int *nv,
                           double x, double y)
 {
     int             ix, iy, istat;
@@ -254,6 +255,13 @@ int CSWPolyGraph::_ply_boolean_
 {
     int             istat, i;
 
+/*
+printf ("\nIn c++ code, source polygon dump:\n\n");
+DumpPolySet (xp1, yp1, np1, nc1, nv1);
+printf ("\nIn c++ code, clip polygon dump:\n\n");
+DumpPolySet (xp2, yp2, np2, nc2, nv2);
+*/
+
 // lambda expression captures all local variables by reference.
 // Any cleanup needed upon this function going out of scope
 // should be done in the body (between curly braces) of the
@@ -411,6 +419,8 @@ int CSWPolyGraph::_ply_boolean_
 
     RemoveOverlaps ();
 
+//DumpSurvivingSegments ();
+
     if (operation == PLY_INTERSECT) {
         IntersectGraphs ();
     }
@@ -450,6 +460,37 @@ int CSWPolyGraph::_ply_boolean_
 
 }  /*  end of ply_boolean function  */
 
+
+
+void CSWPolyGraph::DumpSurvivingSegments () {
+
+    int    i = 0;
+
+    PLY_NOdeStruct   *np1, *np2;
+    SEgmentStruct    *seg1;
+
+    printf ("\nSurviving segments\n");
+
+    for (i=0; i<NumSegs; i++) {
+        seg1 = SegList + i;
+        if (seg1->discarded == 1) {
+            continue;
+        }
+        printf ("  %d %d %d %d    %d\n",
+            i, seg1->node1, seg1->node2, seg1->discarded, seg1->setid);
+        np1 = NodeList + seg1->node1;
+        np2 = NodeList + seg1->node2;
+if (seg1->node1 == 3920  ||  seg1->node2 == 3920) {
+        printf ("    %.10f  %.10f   %.10f  %.10f\n",
+            np1->xorig, np1->yorig, np2->xorig, np2->yorig);
+        printf ("    %d  %d   %d  %d\n",
+            np1->x, np1->y, np2->x, np2->y);
+}
+    }
+    printf ("\n");
+    fflush (stdout);
+    
+}
 
 
 
@@ -3580,6 +3621,7 @@ int CSWPolyGraph::CheckExistingNode (int x, int y)
         }
     }
 
+/*
     range = INTEGER_MULTIPLIER / 2;
     for (i=0; i<n; i++) {
         j = list[i+2];
@@ -3594,8 +3636,10 @@ int CSWPolyGraph::CheckExistingNode (int x, int y)
             return j;
         }
     }
+*/
 
-    range = INTEGER_MULTIPLIER * 2;
+    //range = INTEGER_MULTIPLIER * 2;
+    range = INTEGER_MULTIPLIER * 10;
     for (i=0; i<n; i++) {
         j = list[i+2];
         node = NodeList + j;
@@ -3835,9 +3879,9 @@ int CSWPolyGraph::CalculateSegmentIntersections (void)
 
   ****************************************************************************
 
-    Split the specified segments at the specified intersection point.  A new
+  Split the specified segments at the specified intersection point.  A new
   node is created along with two new segments.  The current segment endpoints
-  are adjusted to agree with the spliting.
+  are adjusted to agree with the splitting.
 
 */
 
@@ -3846,7 +3890,7 @@ int CSWPolyGraph::SplitSegments (int index_seg1, int index_seg2,
 {
     int                  istat, nodenum, *list, nlist, i, n1, n2;
     int                  nstat1, nstat2, nstat3, nstat4;
-    PLY_NOdeStruct           *node, *node1, *node2;
+    PLY_NOdeStruct       *node, *node1, *node2;
     SEgmentStruct        *seg;
 
 // lambda expression captures all local variables by reference.
@@ -4463,7 +4507,7 @@ int CSWPolyGraph::RemoveTemporaryNodes (void)
 
   ****************************************************************************
 
-    Move node locations to the nearest multiple of INTEGER_MULTIPLIER in
+  Move node locations to the nearest multiple of INTEGER_MULTIPLIER in
   x and y.
 
 */
@@ -4866,6 +4910,14 @@ int CSWPolyGraph::BuildPolygonComponents (void)
                     nd++;
                 }
             }
+
+if (i == 168) {
+printf ("i = 168  nd = %d  ns = %d\n", nd, ns);
+if (ns >= 6) {
+printf ("should break here\n");
+}
+fflush (stdout);
+}
 
             if (nd > 1) {
                 istat = ChooseExitSegment (node, senter,
@@ -10661,4 +10713,27 @@ void CSWPolyGraph::check_node (PLY_NOdeStruct *node, int num)
         fflush (stdout);
     }
 
+}
+
+
+
+void CSWPolyGraph::DumpPolySet (double *xp, double *yp, int np, int *nc, int *nv)
+{
+    printf ("np = %d\n", np);
+    int k1 = 0;
+    int k2 = 0;
+    for (int i=0; i<np; i++) {
+        printf ("  poly #%d   nc = %d\n", i, nc[i]);
+        for (int j=0; j<nc[i]; j++) {
+            printf ("    comp #%d   nv = %d\n", j, nv[k1]);
+            for (int k=0; k<nv[k1]; k++) {
+                printf ("      %.2lf   %.2lf\n", xp[k2], yp[k2]);
+                k2++;
+            }
+            k1++;
+        }
+    }
+
+    printf ("\n\n");
+    fflush (stdout);
 }

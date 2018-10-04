@@ -207,6 +207,7 @@ class DigitizeFrame extends JDLFrame implements DLEditListener
     private JButton        randomButton = null;
     private JButton        random4Button = null;
     private JButton        gridButton = null;
+    private JButton        grid2Button = null;
     private JButton        intersectButton = null;
     private JButton        unionButton = null;
     private JButton        xorButton = null;
@@ -297,8 +298,19 @@ catch (Exception e) {
              "Generate Sealed Grid of Polygons",
              new ActionListener() {
                public void actionPerformed(ActionEvent ae){
-                 //DigitizeFrame.this.clearPolys ();
                  DigitizeFrame.this.generateGrid ();
+               }
+             },
+             null
+        );
+
+        grid2Button =
+        addAdditionalTextButton (
+             "Grid 2",
+             "Generate Sealed Grid of Many Polygons",
+             new ActionListener() {
+               public void actionPerformed(ActionEvent ae){
+                 DigitizeFrame.this.generateGrid2 ();
                }
              },
              null
@@ -1156,5 +1168,161 @@ System.out.flush ();
     }
 
 
+    private void generateGrid2 ()
+    {
+        int  ncol = 3, nrow = 3;
+        String stm = System.getenv ("PBOOL_GRID2_MAX");
+        try {
+            Integer iob = Integer.parseInt (stm);
+            nrow = iob.intValue();
+            ncol = nrow;
+        }
+        catch (Throwable ex) {
+        }
+        if (nrow > 100) nrow = 100;
+        if (nrow < 3) nrow = 3;
+        ncol = nrow;
+
+        double  xspace = 80.0 / (double)(ncol - 1);
+        double  yspace = 80.0 / (double)(nrow - 1);
+        double  xsp5 = xspace / 5.0;
+        double  ysp5 = yspace / 5.0;
+
+        double[] xoff = new double[nrow * ncol];
+        double[] yoff = new double[nrow * ncol];
+
+        Random rand = new Random (12357);
+
+        for (int i=0; i<nrow*ncol; i++) {
+            xoff[i] = rand.nextDouble () * xsp5;
+            xoff[i] -= .5 * xoff[i];
+            yoff[i] = rand.nextDouble () * ysp5;
+            yoff[i] -= .5 * yoff[i];
+        }
+
+        double[] xp = null;
+        double[] yp = null;
+
+        int[] npa = null;
+
+        DLFill dlf = null;
+
+        DLSelectable _dls = new DLSelectable ();
+        sourceSel.add (_dls);
+        dl.setSelectable (_dls);
+
+        setSourceAttributes ();
+        dl.setLineThickness(.002);
+
+        int  k = 0;
+
+System.out.println ();
+System.out.println ("start grid2 source   " + nrow + "    " + ncol);
+System.out.flush ();
+
+
+
+        for (int i=0; i<nrow-1; i++) {
+          double y1 = i * yspace + 10.0;
+          double y2 = (i + 1) * yspace + 10.0;
+          int ianc = i * ncol;
+          for (int j=0; j<ncol - 1; j++) {
+            npa = new int[1];
+            npa[0] = 5;
+            k = ianc + j;
+            double x1 = j * xspace + 10.0;
+            double x2 = (j + 1) * xspace + 10.0;
+            xp = new double[5];
+            xp[0] = x1 + xoff[k];
+            xp[1] = x1 + xoff[k+ncol];
+            xp[2] = x2 + xoff[k+1+ncol];
+            xp[3] = x2 + xoff[k+1];
+            xp[4] = x1 + xoff[k];
+            yp = new double[5];
+            yp[0] = y1 + yoff[k];
+            yp[1] = y2 + yoff[k+ncol];
+            yp[2] = y2 + yoff[k+1+ncol];
+            yp[3] = y1 + yoff[k+1];
+            yp[4] = y1 + yoff[k];
+            dlf = new DLFill ();
+            dlf.setNumComponents (1);
+            dlf.setNumPoints (npa);
+            dlf.setXPoints (xp);
+            dlf.setYPoints (yp);
+
+if (k % 100 == 0) {
+System.out.println ("    source k = " + k);
+System.out.flush ();
+}
+
+            sourcePolyList.add (dlf);
+            dl.addFill (xp, yp, npa, 1, 1);
+          }
+        }
+
+System.out.println ("finished grid2 source");
+System.out.flush ();
+
+        setClipAttributes ();
+        dl.setLineThickness(.002);
+
+        DLSelectable clip_dls = new DLSelectable ();
+        clipSel.add (clip_dls);
+        dl.setSelectable (clip_dls);
+
+        for (int i=0; i<nrow-1; i++) {
+          double y1 = i * yspace + 12.0;
+          double y2 = (i + 1) * yspace + 12.0;
+          yp = new double[5];
+          yp[0] = y1;
+          yp[1] = y2;
+          yp[2] = y2;
+          yp[3] = y1;
+          yp[4] = y1;
+          for (int j=0; j<ncol - 1; j++) {
+            npa = new int[1];
+            npa[0] = 5;
+            double x1 = j * xspace + 12.0;
+            double x2 = (j + 1) * xspace + 12.0;
+            xp = new double[5];
+            xp[0] = x1;
+            xp[1] = x1;
+            xp[2] = x2;
+            xp[3] = x2;
+            xp[4] = x1;
+            dlf = new DLFill ();
+            dlf.setNumComponents (1);
+            dlf.setNumPoints (npa);
+            dlf.setXPoints (xp);
+            dlf.setYPoints (yp);
+
+k = i * ncol + j;
+if (k % 100 == 0) {
+System.out.println ("    clip k = " + k);
+System.out.flush ();
+}
+
+            clipPolyList.add (dlf);
+            dl.addFill (xp, yp, npa, 1, 1);
+          }
+        }
+
+        dl.setSelectable (null);
+
+System.out.println ("finished grid2 clip");
+System.out.flush ();
+
+        intersectButton.setEnabled (true);
+        unionButton.setEnabled (true);
+        xorButton.setEnabled (true);
+
+        repaintPanel ();
+
+System.out.println ("after grid2 repaint");
+System.out.flush ();
+
+
+
+    }
 
 };

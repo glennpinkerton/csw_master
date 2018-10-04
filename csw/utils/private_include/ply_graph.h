@@ -178,6 +178,9 @@ void testForLongLine (int cidx, double dt);
 void initIntListForDebug (int *lp, int n);
 
 void check_node (PLY_NOdeStruct *node, int num);
+void DumpPolySet (double *xp, double *yp, int np,
+                  int *nc, int *mv);
+void DumpSurvivingSegments (void);
 
 // Static variables from the old C file are now private class variables.
 
