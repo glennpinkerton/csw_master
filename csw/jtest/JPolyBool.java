@@ -14,6 +14,8 @@ import java.lang.Exception;
 import java.lang.Runtime;
 import java.lang.Math;
 
+import java.util.Date;
+
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.FileInputStream;
@@ -216,8 +218,6 @@ class DigitizeFrame extends JDLFrame implements DLEditListener
     private JButton        saveButton = null;
     private JButton        restoreButton = null;
 
-    private ArrayList<DLSelectable>   sourceSel = new ArrayList<DLSelectable> ();
-    private ArrayList<DLSelectable>   clipSel = new ArrayList<DLSelectable> ();
     private DLSelectable   resultSel = null;
 
     private ArrayList<DLFill>  sourcePolyList = new ArrayList<DLFill> ();
@@ -405,7 +405,12 @@ catch (Exception e) {
              null
         );
 
+        drawFrame ();
 
+    }
+
+    private void drawFrame ()
+    {
 
         setTitle ("Polygon Boolean Testing");
 
@@ -449,9 +454,6 @@ catch (Exception e) {
     private void dumpSourcePolys () {
 
         for (DLFill dlf : sourcePolyList) {
-            DLSelectable _dls = new DLSelectable ();
-            sourceSel.add (_dls);
-            dl.setSelectable (_dls);
             setSourceAttributes ();
             int ncomp = dlf.getNumComponents ();
             if (ncomp < 1) continue;
@@ -466,9 +468,6 @@ catch (Exception e) {
         dl.setLineThickness(.002);
 
         for (DLFill dlf : sourcePolyList) {
-            DLSelectable _dls = new DLSelectable ();
-            sourceSel.add (_dls);
-            dl.setSelectable (_dls);
             setSourceAttributes ();
             int ncomp = dlf.getNumComponents ();
             if (ncomp < 1) continue;
@@ -479,9 +478,6 @@ catch (Exception e) {
         }
 
         for (DLFill dlf : clipPolyList) {
-            DLSelectable _dls = new DLSelectable ();
-            clipSel.add (_dls);
-            dl.setSelectable (_dls);
             setClipAttributes ();
             int ncomp = dlf.getNumComponents ();
             if (ncomp < 1) continue;
@@ -673,22 +669,20 @@ System.out.flush ();
 
 
     private void clearPolys () {
-        for (DLSelectable dlsel : sourceSel) {
-            dl.eraseSelectable (dlsel);
-        }
-        for (DLSelectable dlsel : clipSel) {
-            dl.eraseSelectable (dlsel);
-        }
-        dl.eraseSelectable (resultSel); 
-        repaintPanel ();
-        sourceSel.clear();
-        clipSel.clear();
+
         resultSel = null;
         sourcePolyList.clear();
         clipPolyList.clear();
+
+        dl.eraseAll ();
+        drawFrame ();
+        repaintPanel ();
+
         intersectButton.setEnabled (false);
         unionButton.setEnabled (false);
         xorButton.setEnabled (false);
+
+        System.gc ();
     }
 
 
@@ -801,15 +795,9 @@ System.out.flush ();
         }
 
         if (dig_type == DIG_TYPE_SOURCE) {
-            DLSelectable _dls = new DLSelectable ();
-            sourceSel.add (_dls);
-            dl.setSelectable (_dls);
             setSourceAttributes ();
         }
         else {
-            DLSelectable _dls = new DLSelectable ();
-            clipSel.add (_dls);
-            dl.setSelectable (_dls);
             setClipAttributes ();
         }
         int  n = 0;
@@ -866,9 +854,6 @@ System.out.flush ();
 
         double  dang = Math.PI * 2.0 / (maxpts - 1);
 
-        DLSelectable _dls = new DLSelectable ();
-        sourceSel.add (_dls);
-        dl.setSelectable (_dls);
         setSourceAttributes ();
         dl.setLineThickness(.002);
 
@@ -965,9 +950,6 @@ System.out.flush ();
 
         double  dang = Math.PI * 2.0 / (maxpts - 1);
 
-        DLSelectable _dls = new DLSelectable ();
-        sourceSel.add (_dls);
-        dl.setSelectable (_dls);
         setSourceAttributes ();
         dl.setLineThickness(.002);
 
@@ -1054,9 +1036,6 @@ System.out.flush ();
 
         Random  ran = new Random ();
 
-        DLSelectable _dls = new DLSelectable ();
-        sourceSel.add (_dls);
-        dl.setSelectable (_dls);
         setSourceAttributes ();
         dl.setLineThickness(.002);
 
@@ -1179,7 +1158,7 @@ System.out.flush ();
         }
         catch (Throwable ex) {
         }
-        if (nrow > 100) nrow = 100;
+        if (nrow > 400) nrow = 400;
         if (nrow < 3) nrow = 3;
         ncol = nrow;
 
@@ -1207,20 +1186,10 @@ System.out.flush ();
 
         DLFill dlf = null;
 
-        DLSelectable _dls = new DLSelectable ();
-        sourceSel.add (_dls);
-        dl.setSelectable (_dls);
-
         setSourceAttributes ();
         dl.setLineThickness(.002);
 
         int  k = 0;
-
-System.out.println ();
-System.out.println ("start grid2 source   " + nrow + "    " + ncol);
-System.out.flush ();
-
-
 
         for (int i=0; i<nrow-1; i++) {
           double y1 = i * yspace + 10.0;
@@ -1250,25 +1219,13 @@ System.out.flush ();
             dlf.setXPoints (xp);
             dlf.setYPoints (yp);
 
-if (k % 100 == 0) {
-System.out.println ("    source k = " + k);
-System.out.flush ();
-}
-
             sourcePolyList.add (dlf);
             dl.addFill (xp, yp, npa, 1, 1);
           }
         }
 
-System.out.println ("finished grid2 source");
-System.out.flush ();
-
         setClipAttributes ();
         dl.setLineThickness(.002);
-
-        DLSelectable clip_dls = new DLSelectable ();
-        clipSel.add (clip_dls);
-        dl.setSelectable (clip_dls);
 
         for (int i=0; i<nrow-1; i++) {
           double y1 = i * yspace + 12.0;
@@ -1295,13 +1252,6 @@ System.out.flush ();
             dlf.setNumPoints (npa);
             dlf.setXPoints (xp);
             dlf.setYPoints (yp);
-
-k = i * ncol + j;
-if (k % 100 == 0) {
-System.out.println ("    clip k = " + k);
-System.out.flush ();
-}
-
             clipPolyList.add (dlf);
             dl.addFill (xp, yp, npa, 1, 1);
           }
@@ -1309,19 +1259,11 @@ System.out.flush ();
 
         dl.setSelectable (null);
 
-System.out.println ("finished grid2 clip");
-System.out.flush ();
-
         intersectButton.setEnabled (true);
         unionButton.setEnabled (true);
         xorButton.setEnabled (true);
 
         repaintPanel ();
-
-System.out.println ("after grid2 repaint");
-System.out.flush ();
-
-
 
     }
 

@@ -761,6 +761,10 @@ System.out.flush ();
 //            dlp.setShowNodes (true);
 //        }
         //dlp.setShowColorFills (false);
+        int  nodetot = grid.getNCols() * grid.getNRows();
+        if (np > 2000000  ||  nodetot > 3000000) {
+            dlp.setShowContours (false);
+        }
         ColorPalette cpal = new ColorPalette();
         double zmin = grid.getZMin ();
         double zmax = grid.getZMax ();

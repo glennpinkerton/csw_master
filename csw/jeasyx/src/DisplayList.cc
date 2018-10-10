@@ -65,7 +65,6 @@ void CDisplayList::ZeroInit (T p, int n) {
  */
 CDisplayList::CDisplayList(int index, int ifile)
 {
-    int          i;
 
 // Open the playback log file if needed.  This log is meant to stay
 // open for the lifetime of the CDisplayList, so it is not manually
@@ -102,6 +101,15 @@ CDisplayList::CDisplayList(int index, int ifile)
     gtx_drawprim_obj.SetDlistIndex (dlist_index);
     gpf_graph_obj.SetDlistIndex (dlist_index);
 
+    InitState ();
+
+}
+
+
+void CDisplayList::InitState ()
+{
+
+    int          i;
 /*
  * Initialize graphic attribute states to defaults.
  */
@@ -489,12 +497,32 @@ CDisplayList::~CDisplayList()
     csw_Free (xywork2);
     csw_Free (iwork);
 
+    xywork = NULL;
+    xywork2 = NULL;
+    iwork = NULL;
+
     clean_frame_list ();
 
     csw_Free (frame_list);
     csw_Free (graph_list);
     csw_Free (layer_list);
     csw_Free (item_list);
+
+    frame_list = NULL;
+    num_frame_list = 0;
+    max_frame_list = 0;
+
+    graph_list = NULL;
+    num_graph_list = 0;
+    max_graph_list = 0;
+
+    layer_list = NULL;
+    num_layer_list = 0;
+    max_layer_list = 0;
+
+    item_list = NULL;
+    num_item_list = 0;
+    max_item_list = 0;
 
     free_lines ();
     free_fills ();
@@ -2102,26 +2130,6 @@ int CDisplayList::CalcLineBounds (int line_prim_num,
 
 
 
-/*
- * private methods for managing the available primitive lists.
- */
-void CDisplayList::free_available_lists (void)
-{
-    contour_available_list.clear();
-    contour_line_available_list.clear();
-    line_available_list.clear();
-    text_available_list.clear();
-    fill_available_list.clear();
-    symb_available_list.clear();
-    image_available_list.clear();
-    shape_available_list.clear();
-    axis_available_list.clear();
-
-    return;
-
-}
-
-
 int CDisplayList::get_available_contour (void) {
 
     int        cv_size = contour_available_list.size();
@@ -2991,7 +2999,15 @@ int CDisplayList::AddFill (double *xptsin, double *yptsin,
         csw_Free (y_cut);
         csw_Free (npts_cut);
         if (bsuccess == false) {
+printf ("bsuccess false in AddFill\n");
+fflush (stdout);
             csw_Free (x_orig);
+            csw_Free (npts_orig);
+            if (fptr != NULL) {
+                fptr->npts_orig = NULL;
+                fptr->x_orig = NULL;
+                fptr->y_orig = NULL;
+            }
         }
     };
     CSWScopeGuard func_scope_guard (fscope);
@@ -7455,6 +7471,13 @@ void CDisplayList::SetSelectableNum (int ival)
     }
 }
 
+
+void CDisplayList::EraseAll ()
+{
+    DoCleanup ();
+}
+
+
 void CDisplayList::EraseSelectableNum (int index)
 {
     DLSelectable        *dls;
@@ -10320,6 +10343,11 @@ void CDisplayList::delete_frame_border_fills (int fnum)
         fptr->npts = 0;
         fptr->maxpts = 0;
         fptr->deleted_flag = 1;
+        csw_Free (fptr->npts_orig);
+        csw_Free (fptr->x_orig);
+        fptr->npts_orig = NULL;
+        fptr->x_orig = NULL;
+        fptr->y_orig = NULL;
         add_available_fill (i);
 
     }
@@ -18563,6 +18591,11 @@ void CDisplayList::delete_frame_axis_fills (int fnum)
         fptr->npts = 0;
         fptr->maxpts = 0;
         fptr->deleted_flag = 1;
+        csw_Free (fptr->npts_orig);
+        csw_Free (fptr->x_orig);
+        fptr->npts_orig = NULL;
+        fptr->x_orig = NULL;
+        fptr->y_orig = NULL;
         add_available_fill (i);
 
     }
@@ -20069,6 +20102,11 @@ void CDisplayList::erase_selected_fills (DLSelectable *dls)
             fptr->npts = 0;
             fptr->maxpts = 0;
             fptr->deleted_flag = 1;
+            csw_Free (fptr->npts_orig);
+            csw_Free (fptr->x_orig);
+            fptr->npts_orig = NULL;
+            fptr->x_orig = NULL;
+            fptr->y_orig = NULL;
             add_available_fill (i);
         }
         else {
@@ -21727,3 +21765,142 @@ int CDisplayList::PerformPolyBoolean (int *ilist, int *idata, double *ddata)
     return istat;
 
 }
+
+
+void CDisplayList::DoCleanup ()
+
+{
+
+    clean_frame_list ();
+
+    num_frame_list = 0;
+    num_graph_list = 0;
+    num_layer_list = 0;
+    num_item_list = 0;
+
+    free_lines ();
+    free_fills ();
+    free_texts ();
+    free_symbs ();
+    free_shapes ();
+    free_images ();
+    free_axes ();
+
+    grdapi_ptr->grd_FreeFaultLineStructs (tmp_contour_faults,
+                              num_tmp_contour_faults);
+    tmp_contour_faults = NULL;
+    num_tmp_contour_faults = 0;
+
+    int i;
+
+    if (selectable_object_list != NULL) {
+        for (i=0; i<num_selectable_object_list; i++) {
+            if (selectable_object_list[i] != NULL) {
+                delete (selectable_object_list[i]);
+            }
+            selectable_object_list[i] = NULL;
+        }
+        num_selectable_object_list = 0;
+    }
+
+    int        sf_size = surf_list.size();
+    DLSurf     **sf_data = surf_list.data();
+
+    if (sf_data != NULL  &&  sf_size > 0) {
+        for (i=0; i<sf_size; i++) {
+            if (sf_data[i] != NULL) {
+                delete (sf_data[i]);
+            }
+            sf_data[i] = NULL;
+        }
+    }
+    surf_list.clear();
+
+    int        cl_size = (int)contour_list.size();
+    DLContour  **cl_data = contour_list.data();
+    
+    if (cl_data != NULL  &&  cl_size > 0) {
+        DLContour     *dlc;
+        for (i=0; i<cl_size; i++) {
+            dlc = cl_data[i];
+            if (dlc != NULL) {
+                delete (dlc);
+            }
+        }
+    }
+    contour_list.clear();
+
+    csw_Free (ImageXFault);
+    csw_Free (ImageNFaultPoints);
+    ImageXFault = NULL;
+    ImageYFault = NULL;
+    ImageNFaultPoints = NULL;
+    ImageNFaults = 0;
+    ImageNFaultTotal= 0;
+
+    ClearAllVectors ();
+
+}
+
+
+
+void CDisplayList::ClearAllVectors () {
+
+    free_lines ();
+    free_fills ();
+    free_texts ();
+    free_symbs ();
+    free_shapes ();
+    free_images ();
+    free_axes ();
+
+    contour_list.clear ();
+    surf_list.clear ();
+
+    contour_line_prim_list.clear ();
+    line_prim_list.clear ();
+    fill_prim_list.clear ();
+    symb_prim_list.clear ();
+    text_prim_list.clear ();
+    num_selectable_text = 0;
+    shape_prim_list.clear ();
+    image_prim_list.clear ();
+    axis_prim_list.clear ();
+
+    line_available_list.clear ();
+    contour_available_list.clear ();
+    contour_line_available_list.clear ();
+    fill_available_list.clear ();
+    text_available_list.clear ();
+    symb_available_list.clear ();
+    shape_available_list.clear ();
+    axis_available_list.clear ();
+    image_available_list.clear ();
+
+    line_hidden_list.clear ();
+    fill_hidden_list.clear ();
+    symb_hidden_list.clear ();
+    text_hidden_list.clear ();
+    shape_hidden_list.clear ();
+    axis_hidden_list.clear ();
+    contour_hidden_list.clear ();
+
+    contour_line_patch_list.clear ();
+    line_patch_list.clear ();
+    fill_patch_list.clear ();
+    symb_patch_list.clear ();
+    text_patch_list.clear ();
+    shape_patch_list.clear ();
+
+    patch_draw_flag = 0;
+
+    contour_line_pick_list.clear ();
+    line_pick_list.clear ();
+    fill_pick_list.clear ();
+    symb_pick_list.clear ();
+    text_pick_list.clear ();
+    shape_pick_list.clear ();
+
+    patch_pick_flag = 0;
+
+};

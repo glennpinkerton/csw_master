@@ -492,6 +492,7 @@ public class DLConst {
     final static int GTX_CONVERT_TO_FRAME  = 82;
     final static int GTX_SET_SELECT_STATE  = 83;
     final static int GTX_GET_PRIM_NUM      = 84;
+    final static int GTX_ERASE_ALL         = 85;
 
     final static int GTX_SET_ASYNC_FLAG    = 90;
     final static int GTX_POLL_ASYNC_PICK   = 91;
