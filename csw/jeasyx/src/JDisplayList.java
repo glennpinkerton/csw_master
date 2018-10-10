@@ -51,7 +51,6 @@ public class JDisplayList extends JDisplayListBase {
 
     private static Logger logger = CSWLogger.getMyLogger ();
 
-
  /**
    Make the default constructor not accessible other than by the
    package.  That way the application cannot get a display list
@@ -149,9 +148,13 @@ public class JDisplayList extends JDisplayListBase {
     int          DdataMax = 10000;
 
 
+
 // Set the arrays to null in case it helps speed up garbage collection.
-// May not help, but it should not hurt either.
-    public void clearArrays ()
+// May not help, but it should not hurt either.  This is package scope
+// to keep the whole world from calling it at the wrong time.  It should
+// only be called from the JDLFrame class when the window is closed.
+
+    void clearArrays ()
     {
         Ilist = null;
         Llist = null;
@@ -167,8 +170,8 @@ public class JDisplayList extends JDisplayListBase {
     {
         int     istat = 0;
         size += 100;
-        while (size > BdataMax) {
-            BdataMax +=  HUGE_CHUNK;
+        if (size > BdataMax) {
+            BdataMax = size;
             istat = 1;
         }
         if (istat == 1) {
@@ -180,8 +183,8 @@ public class JDisplayList extends JDisplayListBase {
     {
         int     istat = 0;
         size += 100;
-        while (size > SdataMax) {
-            SdataMax +=  HUGE_CHUNK;
+        if (size > SdataMax) {
+            SdataMax = size;
             istat = 1;
         }
         if (istat == 1) {
@@ -193,8 +196,8 @@ public class JDisplayList extends JDisplayListBase {
     {
         int     istat = 0;
         size += 100;
-        while (size > IdataMax) {
-            IdataMax +=  HUGE_CHUNK;
+        if (size > IdataMax) {
+            IdataMax = size;
             istat = 1;
         }
         if (istat == 1) {
@@ -206,8 +209,8 @@ public class JDisplayList extends JDisplayListBase {
     {
         int     istat = 0;
         size += 100;
-        while (size > FdataMax) {
-            FdataMax +=  HUGE_CHUNK;
+        if (size > FdataMax) {
+            FdataMax = size;
             istat = 1;
         }
         if (istat == 1) {
@@ -219,8 +222,8 @@ public class JDisplayList extends JDisplayListBase {
     {
         int     istat = 0;
         size += 100;
-        while (size > DdataMax) {
-            DdataMax +=  HUGE_CHUNK;
+        if (size > DdataMax) {
+            DdataMax = size;
             istat = 1;
         }
         if (istat == 1) {
@@ -4715,6 +4718,15 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
+    public void eraseAll () {
+
+        Ilist[0] = 0;
+        sendNativeCommand (GTX_ERASE_ALL,
+                           Ilist);
+        return;
+    }
+
+
   /**
   Retrieve the current selectable object.  A null return value means that there
   is no selectable group at this time.
@@ -5474,6 +5486,63 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
+    static private final int IdentPolyIndexSize = 1000000;
+
+
+    private void RemoveIdentPolysUsingIndex (ArrayList<DLFill> spl)
+    {
+    }
+
+
+
+
+    private void RemoveIdentPolys (ArrayList<DLFill> spl)
+    {
+
+      if (spl == null) return;
+
+      int  siz1 = spl.size();
+      if (siz1 < 2) return;
+
+      if (siz1 > IdentPolyIndexSize) {
+        RemoveIdentPolysUsingIndex (spl);
+        return;
+      }
+
+      int  ic = 0;
+      DLFill dlf2 = null;
+      for (DLFill dlf : spl) {
+        if (dlf == null) {
+          ic++;
+          continue;
+        }
+        if (BadPolygonComponent (dlf)) {
+          spl.set (ic, null);
+          dlf = null;
+        }
+        if (dlf == null) {
+          ic++;
+          continue;
+        }
+        for (int j=ic+1; j<siz1; j++) {
+          dlf2 = spl.get(j);
+          if (dlf2 == null) continue;
+          if (IdentBooleanInputPoly (dlf, dlf2)) {
+            spl.set (j, null);
+          }
+        }       
+        ic++;
+      }
+      ic = 0;
+      while (spl.remove(null)) {
+        ic++;
+        if (ic >= siz1) break;
+      }
+
+      return;
+
+    }
+
 
 
     public int polyIntersect
@@ -5568,8 +5637,6 @@ of Font.BOLD|Font.ITALIC.
          ArrayList<DLFill> outPolyList,
          int op_type)   throws Throwable
     {
-      double[] xpout, ypout;
-      int[] np1, np2, npout;
       int nc1, nc2;
 
       int siz1, siz2;
@@ -5579,71 +5646,23 @@ of Font.BOLD|Font.ITALIC.
         return -1;
       }
 
-
 // Remove all but one of identical components from source poly list.
 // Also remove any obviously erroneous component.
 
-      int  ic = 0;
-      DLFill dlf2 = null;
-      for (DLFill dlf : sourcePolyList) {
-        if (dlf == null) {
-          ic++;
-          continue;
-        }
-        if (BadPolygonComponent (dlf)) {
-          sourcePolyList.set (ic, null);
-          dlf = null;
-        }
-        if (dlf == null) {
-          ic++;
-          continue;
-        }
-        for (int j=ic+1; j<siz1; j++) {
-          dlf2 = sourcePolyList.get(j);
-          if (dlf2 == null) continue;
-          if (IdentBooleanInputPoly (dlf, dlf2)) {
-            sourcePolyList.set (j, null);
-          }
-        }       
-        ic++;
-      }
-      ic = 0;
-      while (sourcePolyList.remove(null)) {
-        ic++;
-        if (ic >= siz1) break;
-      }
+Date date = new Date ();
+long t11, t22;
+
+t11 = date.getTime ();
+
+      RemoveIdentPolys (sourcePolyList);
 
 // Remove all but one of identical components from clip poly list.
 
-      ic = 0;
-      dlf2 = null;
-      for (DLFill dlf : clipPolyList) {
-        if (BadPolygonComponent (dlf)) {
-          clipPolyList.set (ic, null);
-          dlf = null;
-        }
-        if (dlf == null) {
-          ic++;
-          continue;
-        }
-        
-        for (int j=ic+1; j<siz2; j++) {
-          dlf2 = clipPolyList.get(j);
-          if (BadPolygonComponent (dlf2)) {
-            dlf2 = null;
-          }
-          if (dlf2 == null) continue;
-          if (IdentBooleanInputPoly (dlf, dlf2)) {
-            clipPolyList.set (j, null);
-          }
-        }       
-        ic++;
-      }
-      ic = 0;
-      while (clipPolyList.remove(null)) {
-        ic++;
-        if (ic >= siz2) break;
-      }
+      RemoveIdentPolys (clipPolyList);
+
+date = new Date ();
+
+t22 = date.getTime ();
 
       siz1 = sourcePolyList.size();
       siz2 = clipPolyList.size();
@@ -5684,10 +5703,6 @@ of Font.BOLD|Font.ITALIC.
       
       if (maxptsout < 1000000) maxptsout = 1000000;
 
-      npout = new int[maxout];
-      xpout = new double[maxptsout];
-      ypout = new double[maxptsout];
-
       Ilist[0] = siz1;
       Ilist[1] = siz2;
       Ilist[2] = op_type;
@@ -5706,8 +5721,12 @@ of Font.BOLD|Font.ITALIC.
       int max_ddata =  n1 * 2 + n2 * 2 + maxptsout;
       int max_idata =  siz1 + siz2 + maxout;
  
+// good here   if (true) return 1;
+
       new_ddata (max_ddata);  
       new_idata (max_idata);  
+
+// bad here   if (true) return 1;
 
       int nn = 0;
       for (DLFill dlf : sourcePolyList) {
@@ -5761,7 +5780,6 @@ nnsxy++ ;
         }
       }
       
-
 int nncp = 0;
 int nncc = 0;
 int nncxy = 0;
@@ -5785,8 +5803,7 @@ nncxy++;
 
       Ilist[9] = nn * 2;
 
-
-Date date = new Date ();
+date = new Date ();
 long t1, t2;
 
 t1 = date.getTime ();
@@ -5814,8 +5831,13 @@ System.out.println ("nnsp = " + nnsp + "  nnsc = " + nnsc +
     "  nnsxy = " + nnsxy);
 System.out.println ("nncp = " + nncp + "  nncc = " + nncc +
     "  nncxy = " + nncxy);
+System.out.println ();
 
 System.out.println ();
+System.out.print ("Elapsed time for identical polygon removal = ");
+System.out.print (t22 - t11);
+System.out.println (" milliseconds");
+
 System.out.print ("Elapsed time for native boolean operation = ");
 System.out.print (t2 - t1);
 System.out.println (" milliseconds");
@@ -5905,6 +5927,22 @@ System.out.flush ();
         outPolyList.add (dlff);
 
       }
+
+
+//  The Ddata and Idata arrays are likely very large from the
+//  polygon boolean operation.  If these remain this large,
+//  it can seriously slow down subsequent simpler graphics
+//  calls (addFill, addLine, etc).  I set these back to the
+//  original size of 10000, with a garbage collection call
+//  (that may be ignored right now by the system) just in case.
+
+      Ddata = null;
+      Idata = null;
+      System.gc ();
+      Ddata = new double[10000];
+      Idata = new int[10000];
+      DdataMax = 10000;
+      IdataMax = 10000;
 
       return 1;
     }

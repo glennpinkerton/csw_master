@@ -2308,6 +2308,16 @@ int ezx_process_command (
             break;
 
     /*--------------------------------------------------------------
+     * Erase everything in the display list.  The state will revert to
+     * the state when the display list was constructed.
+     */
+        case GTX_ERASE_ALL:
+
+            dlist->EraseAll ();
+
+            break;
+
+    /*--------------------------------------------------------------
      * Erase the primitives for the specified selectable object index.
      *
      * ilist[0] has the selectable object index

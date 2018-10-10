@@ -109,6 +109,7 @@ public class JDisplayListPanel extends JPanel
     }
 
 
+
 /**
  This method is called when the top level frame is about to
  become inactive.  This can happen when another frame is made

@@ -1714,7 +1714,27 @@ int main (int argc, char *argv[])
 
                 break;
 
+           case GTX_ERASE_ALL:
+
+               ezx_process_command (
+                   dlist_index,
+                   command_id,
+                   threadid,
+                   longlist,
+                   ilist,
+                   cdata,
+                   bdata,
+                   sdata,
+                   idata,
+                   fdata,
+                   ddata,
+                   dfile
+               );
+
+               break;
+
            case GTX_SET_SELECTABLE:
+           case GTX_ERASE_SELECTABLE:
 
                ctmp = csw_fileio_obj.csw_fgets (inbuff, 1000, fptr);
                if (ctmp == NULL) {

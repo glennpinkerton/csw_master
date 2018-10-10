@@ -287,6 +287,7 @@ private:
     int CreateSelectable (int number, char *name);
     void SetSelectableNum (int ival);
     void EraseSelectableNum (int ival);
+    void EraseAll ();
 
     void SetXaxisNum (int ival);
     void SetYaxisNum (int ival);
@@ -639,6 +640,10 @@ private:
     template<typename T>
     void ZeroInit (T p, int n);
 
+    void DoCleanup ();
+    void InitState ();
+    void ClearAllVectors ();
+
     int AddLine (CSW_F *x, CSW_F *y, int npts, bool from_graph);
     int AddText (double x, double y, double size,
                  double angle, char *text, bool from_graph);
@@ -762,8 +767,6 @@ private:
     int add_text_patch_prim (int prim_num);
     int add_symb_patch_prim (int prim_num);
     int add_shape_patch_prim (int prim_num);
-
-    void free_available_lists (void);
 
     int add_available_line (int prim_num);
     int get_available_line (void);
@@ -1111,7 +1114,7 @@ private:
    */
     std::vector<DLContour*>   contour_list;
 
-    std::vector<DLSurf *>      surf_list;
+    std::vector<DLSurf *>     surf_list;
 
     DLContourProperties   tmp_contour_props;
     void            default_contour_properties (void);

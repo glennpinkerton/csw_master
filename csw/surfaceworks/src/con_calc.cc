@@ -259,7 +259,7 @@ int CSWConCalc::con_default_calc_options (COntourCalcOptions *options)
 
   ****************************************************************
 
-    Specify contour interval, major spacing, minimum contour,
+  Specify contour interval, major spacing, minimum contour,
   maximum contour, and a list of specific contours if desired.
   If the contour interval is greater than zero, then the lists
   of major and minor contours are ignored.  If the contour
@@ -1338,6 +1338,15 @@ int CSWConCalc::BuildContourArrays (void)
     DefaultNumberOfContours = 20.0f;
     if (FaultedFlag != 0) {
         DefaultNumberOfContours = 30.0f;
+    }
+    if (Ncol * Nrow > 2000000) {
+        DefaultNumberOfContours /= 4;
+    }
+    else if (Ncol * Nrow > 1000000) {
+        DefaultNumberOfContours /= 3;
+    }
+    else if (Ncol * Nrow > 500000) {
+        DefaultNumberOfContours /= 2;
     }
     if (ContourInterval <= 0.0f  &&  NumMinor + NumMajor < 1) {
         zt = (LastContour - FirstContour) / DefaultNumberOfContours;

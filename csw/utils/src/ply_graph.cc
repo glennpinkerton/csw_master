@@ -275,6 +275,9 @@ DumpPolySet (xp2, yp2, np2, nc2, nv2);
         return -1;
     }
 
+//printf ("\nstart of c++ ply_boolean\n\n");
+//fflush (stdout);
+
     FragmentFlag = 0;
     if (operation == PLY_FRAGMENT) {
         FragmentFlag = 1;
@@ -294,6 +297,8 @@ DumpPolySet (xp2, yp2, np2, nc2, nv2);
         }
     }
 
+//printf ("after IdenticalInput finish\n");
+//fflush (stdout);
 
     Xp1 = xp1;
     Yp1 = yp1;
@@ -351,6 +356,9 @@ DumpPolySet (xp2, yp2, np2, nc2, nv2);
         return -1;
     }
 
+//printf ("just before SetupRawVectors\n");
+//fflush (stdout);
+
     Nwork = 0;
     Ncomp = 0;
 
@@ -360,6 +368,9 @@ DumpPolySet (xp2, yp2, np2, nc2, nv2);
         FreeAllMem ();
         return -1;
     }
+
+//printf ("finished SetupRawVectors\n");
+//fflush (stdout);
 
 /*
     istat = CleanupRawVectors ();
@@ -375,13 +386,22 @@ DumpPolySet (xp2, yp2, np2, nc2, nv2);
         return -1;
     }
 
+//printf ("finished SetupEdgeGrids\n");
+//fflush (stdout);
+
     istat = BuildInitialLists ();
     if (istat == -1) {
         FreeAllMem ();
         return -1;
     }
 
+//printf ("finished BuildInitialLists\n");
+//fflush (stdout);
+
     SnapNodes ();
+
+//printf ("finished SnapNodes\n");
+//fflush (stdout);
 
 
     DiscardFlag = -1;
@@ -391,6 +411,9 @@ DumpPolySet (xp2, yp2, np2, nc2, nv2);
         return -1;
     }
 
+//printf ("finished CalculateSegmentIntersections\n");
+//fflush (stdout);
+
     DiscardFlag = 1;
 
     istat = RemoveTemporaryNodes ();
@@ -399,11 +422,17 @@ DumpPolySet (xp2, yp2, np2, nc2, nv2);
         return -1;
     }
 
+//printf ("finished RemoveTemporaryNodes\n");
+//fflush (stdout);
+
     istat = ResetRawVectors ();
     if (istat == -1) {
         FreeAllMem ();
         return -1;
     }
+
+//printf ("finished ResetRawVectors\n");
+//fflush (stdout);
 
     istat = SetupEdgeGrids ();
     if (istat == -1) {
@@ -411,13 +440,22 @@ DumpPolySet (xp2, yp2, np2, nc2, nv2);
         return -1;
     }
 
+//printf ("finished second SetupEdgeGrids\n");
+//fflush (stdout);
+
     istat = RemoveDuplicateSegments ();
     if (istat == -1) {
         FreeAllMem ();
         return -1;
     }
 
+//printf ("finished RemoveDuplicateSegments\n");
+//fflush (stdout);
+
     RemoveOverlaps ();
+
+//printf ("finished RemoveOverlaps\n");
+//fflush (stdout);
 
 //DumpSurvivingSegments ();
 
@@ -433,6 +471,9 @@ DumpPolySet (xp2, yp2, np2, nc2, nv2);
     else if (operation == PLY_FRAGMENT) {
         FragmentGraphs ();
     }
+
+//printf ("finished boolean operation \n");
+//fflush (stdout);
 
     if (operation == PLY_FRAGMENT) {
         for (i=0; i<Ncomp; i++) {
@@ -454,11 +495,14 @@ DumpPolySet (xp2, yp2, np2, nc2, nv2);
         return -1;
     }
 
+//printf ("finished BuildOutputPolygons\n");
+//fflush (stdout);
+
     FreeAllMem ();
 
     return 1;
 
-}  /*  end of ply_boolean function  */
+}  /*  end of _ply_boolean_ function  */
 
 
 
@@ -4910,14 +4954,6 @@ int CSWPolyGraph::BuildPolygonComponents (void)
                     nd++;
                 }
             }
-
-if (i == 168) {
-printf ("i = 168  nd = %d  ns = %d\n", nd, ns);
-if (ns >= 6) {
-printf ("should break here\n");
-}
-fflush (stdout);
-}
 
             if (nd > 1) {
                 istat = ChooseExitSegment (node, senter,
