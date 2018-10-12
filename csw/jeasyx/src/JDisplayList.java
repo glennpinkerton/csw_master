@@ -5486,13 +5486,320 @@ of Font.BOLD|Font.ITALIC.
     }
 
 
-    static private final int IdentPolyIndexSize = 1000000;
+    static private final int IdentPolyIndexSize = 100;
+
+    private class PolyBB {
+      double   xc;
+      double   yc;
+      double   w;
+      double   h;
+      int      idx;
 
 
-    private void RemoveIdentPolysUsingIndex (ArrayList<DLFill> spl)
-    {
+
+    // If the two polygon centers and dimensions are not the
+    // same, the polygons cannot be "identical"
+      boolean notSame (PolyBB pb2, double tiny) {
+
+        double dx;
+
+        dx = xc - pb2.xc;
+        if (Math.abs (dx) > tiny) return true;
+        dx = yc - pb2.yc;
+        if (Math.abs (dx) > tiny) return true;
+        dx = w - pb2.w;
+        if (Math.abs (dx) > tiny) return true;
+        dx = h - pb2.h;
+        if (Math.abs (dx) > tiny) return true;
+
+        return false;
+
+      }
+
     }
 
+
+
+  // Calculate the bounding box and the center point of the 
+  // bounding box.  Put these data into a PolyBB object and
+  // return that object.  Obvious errors have a null object
+  // returned.
+    private PolyBB CalcPolyBB (DLFill dlf) {
+
+      if (dlf == null) return null;
+      if (dlf.numComponents < 1  ||
+          dlf.numPoints == null  ||
+          dlf.xPoints == null  ||
+          dlf.yPoints == null) {
+        return null;
+      }
+
+      PolyBB pbb = new PolyBB ();
+      int  npts = 0;
+      for (int i=0; i<dlf.numComponents; i++) {
+        npts += dlf.numPoints[i];
+      }
+
+      if (npts < 3) return null;
+
+      double  xmin = 1.e30;
+      double  ymin = 1.e30;
+      double  xmax = -1.e30;
+      double  ymax = -1.e30;
+
+      double  xt, yt;
+     
+      for (int i=0; i<npts; i++) {
+        xt = dlf.xPoints[i];
+        yt = dlf.yPoints[i];
+        if (xt < xmin) xmin = xt;
+        if (yt < ymin) ymin = yt;
+        if (xt > xmax) xmax = xt;
+        if (yt > ymax) ymax = yt;
+      } 
+
+      pbb.xc = (xmin + xmax) / 2.0;
+      pbb.yc = (ymin + ymax) / 2.0;
+      pbb.w = xmax - xmin;
+      pbb.h = ymax - ymin;
+      
+      return pbb;
+      
+    }
+
+
+  // Attempt to speed up the identical polygon stuff by using a spatial
+  // index.  Each polygon has its bounding box and the center of the
+  // bounding box stored in an internal PolyBB object.  A matrix of
+  // lists of PolyBB objects is created, with each cell populated 
+  // according to center points lying within the cell.  Since polygons
+  // with differing center points cannot be "identical", only the list
+  // for each individual cell needs to be exhautively tested for
+  // identity.
+    private void RemoveIdentPolysUsingIndex (ArrayList<DLFill> spl)
+    {
+      try {
+        _RemoveIdentPolysUsingIndex_ (spl);
+      }
+      catch (Throwable th) {
+        System.out.println ();
+        System.out.println ("Exception from identical polygon removal");
+        System.out.flush ();
+        throw (th);
+      }
+    }
+
+
+    private void _RemoveIdentPolysUsingIndex_ (ArrayList<DLFill> spl)
+    {
+
+      if (spl == null) return;
+
+      ArrayList<PolyBB> bbl = new ArrayList<PolyBB> (256);
+
+    // Calculate the bounding box for all polygons and expand it 
+    // slightly.  The matrix of cells used for the indexing is
+    // based on this bounding box and on the number of polygons
+    // in the spl input.
+      double   xmin, ymin, xmax, ymax;
+
+      xmin = 1.e30;
+      ymin = 1.e30;
+      xmax = -1.e30;
+      ymax = -1.e30;
+
+      int  idx = 0;
+      for (DLFill dlf : spl) {
+        idx++;
+        if (dlf == null) continue;
+        PolyBB pb = CalcPolyBB (dlf);
+        if (pb == null) continue;
+        pb.idx = idx - 1;
+        bbl.add (pb);
+        if (pb.xc < xmin) xmin = pb.xc;
+        if (pb.yc < ymin) ymin = pb.yc;
+        if (pb.xc > xmax) xmax = pb.xc;
+        if (pb.yc > ymax) ymax = pb.yc;
+      }
+
+      if (xmax <= xmin  ||  ymax <= ymin) return;
+
+      double  tiny = (xmax - xmin + ymax - ymin) / 200.0;
+      xmin -= tiny;
+      ymin -= tiny;
+      xmax += tiny;
+      ymax += tiny;
+
+//System.out.println ("xmin = " + xmin + "  ymin = " + ymin);
+//System.out.println ("xmax = " + xmax + "  ymax = " + ymax);
+//System.out.flush ();
+
+    // Calculate a reasonable number of rows and columns for the matrix.
+      int  siz = bbl.size();
+      int  ncol, nrow, ntot;
+      
+      ntot = bbl.size() / 10;
+      if (ntot < 100) ntot = 100;
+      if (ntot > 10000) ntot = 10000;
+
+      double xt = xmax - xmin;
+      double yt = ymax - ymin;
+      double xyrat = xt / yt;
+
+      int  nt = (int)(Math.sqrt ((double)ntot));
+      if (xyrat > 1.0) {
+          ncol = (int) ((double)nt * xyrat);
+          nrow = nt;
+      }
+      else {
+          nrow = (int) ((double)nt * xyrat);
+          ncol = nt;
+      }
+
+ncol *= 2;
+nrow *= 2;
+
+      if (nrow < 5) nrow = 5;
+      if (nrow > 500) nrow = 500;
+      if (ncol < 5) ncol = 5;
+      if (ncol > 500) ncol = 500;
+
+      ntot = ncol * nrow;
+
+//System.out.println ("ncol = " + ncol + "  nrow = " + nrow);
+//System.out.flush ();
+
+      int init_cell_size = bbl.size() / ntot;
+      if (init_cell_size < 4) {
+        init_cell_size = 4;
+      }
+      else if (init_cell_size > 16) {
+        init_cell_size = 16;
+      }
+      else {
+        init_cell_size = 8;
+      }
+
+    // create the matrix and assign each cell's list to null
+      ArrayList<ArrayList<PolyBB>> cells =
+          new ArrayList<ArrayList<PolyBB>> (ntot);
+      for (int kk=0; kk<ntot; kk++) {
+        cells.add (null);
+      }
+
+      double   xspace = (xmax - xmin) / (double)ncol;
+      double   yspace = (ymax - ymin) / (double)nrow;
+
+      int  irow, jcol, kcell;
+
+//System.out.println ("bbl size = " + bbl.size());
+//System.out.flush ();
+
+    // Use each xc. yc center in each PolyBB object to add
+    // to the list for the cell where the xc, yc is located.
+      for (PolyBB pb : bbl) {
+
+        jcol = (int) ((pb.xc - xmin) / xspace);
+        irow = (int) ((pb.yc - ymin) / yspace);
+        kcell = irow * ncol + jcol;
+
+        ArrayList<PolyBB> ap = cells.get (kcell);
+        if (ap == null) {
+          ap = new ArrayList<PolyBB> (init_cell_size);
+          cells.set (kcell, ap);
+        }
+        ap.add (pb);  
+      }
+
+    // Remove ident polys from each non null cell list.
+    // Identical polygons (all but one instance) are set to
+    // null in the spl list.  Tiny2 is used for determining
+    // if PolyBB center points and dimensions are "identical".
+      double  tiny2 = tiny / 100000.0;
+      for (ArrayList<PolyBB> ap : cells) {
+        if (ap == null) continue;
+        RemoveIdents (ap, tiny2, spl);
+      }
+       
+    }
+
+    private ArrayList<DLFill> cullPolyIdentNulls (ArrayList<DLFill> ap)
+    {
+      if (ap == null) return null;
+
+      ArrayList<DLFill>  ap2 = new ArrayList<DLFill> (256);
+      for (DLFill dlf : ap) {
+        if (dlf != null) ap2.add (dlf);
+      }
+
+      return ap2;
+
+    }
+
+
+    private void RemoveIdents (ArrayList<PolyBB> ap,
+                               double tiny,
+                               ArrayList<DLFill> spl)
+    {
+      if (ap == null  ||  spl == null  ||  tiny < 0.0) return;
+
+      int  ic = 0;
+      DLFill dlf = null;
+      DLFill dlf2 = null;
+      PolyBB pb2 = null;
+
+      int siz1 = ap.size();
+
+//System.out.println ("  In remove idents size = " + siz1);
+//System.out.flush ();
+
+      for (PolyBB pbb : ap) {
+
+        if (pbb == null) {
+          ic++;
+          continue;
+        }
+        if (pbb.idx < 0) {
+          ic++;
+          continue;
+        }
+
+        dlf = spl.get(pbb.idx);
+        if (dlf == null) {
+          ic++;
+          pbb.idx = -1;
+          continue;
+        }
+        if (BadPolygonComponent (dlf)) {
+          pbb.idx = -1;
+          spl.set (pbb.idx, null);
+          dlf = null;
+          ic++;
+          continue;
+        }
+        for (int j=ic+1; j<siz1; j++) {
+          pb2 = ap.get (j);
+          if (pb2 == null  ||  pb2.idx < 0) {
+            continue;
+          }
+          if (pbb.notSame (pb2, tiny)) {
+            continue;
+          }
+//System.out.println ("notSame returned false idx = " + pb2.idx);
+//System.out.flush ();
+          dlf2 = spl.get(pb2.idx);
+          if (dlf2 == null) {
+            pb2.idx = -1;
+            continue;
+          }
+          if (IdentBooleanInputPoly (dlf, dlf2)) {
+            spl.set (pb2.idx, null);
+            pb2.idx = -1;
+          }
+        }       
+        ic++;
+      }
+    }
 
 
 
@@ -5532,11 +5839,6 @@ of Font.BOLD|Font.ITALIC.
           }
         }       
         ic++;
-      }
-      ic = 0;
-      while (spl.remove(null)) {
-        ic++;
-        if (ic >= siz1) break;
       }
 
       return;
@@ -5654,11 +5956,16 @@ long t11, t22;
 
 t11 = date.getTime ();
 
+      ArrayList<DLFill> spout = null;
       RemoveIdentPolys (sourcePolyList);
+      spout = cullPolyIdentNulls (sourcePolyList);
+      sourcePolyList = spout;
 
 // Remove all but one of identical components from clip poly list.
 
       RemoveIdentPolys (clipPolyList);
+      spout = cullPolyIdentNulls (clipPolyList);
+      clipPolyList = spout;
 
 date = new Date ();
 
@@ -5808,7 +6115,6 @@ long t1, t2;
 
 t1 = date.getTime ();
 
-
       sendNativeCommand (
           GTX_POLYGON_BOOLEAN,
           Ilist,
@@ -5823,16 +6129,19 @@ t1 = date.getTime ();
 date = new Date ();
 t2 = date.getTime ();
 
+
+
+
 String stev = System.getenv ("PB_PRINT_TIMING");
 if (stev != null) {
 System.out.println ();
 System.out.println ();
+
 System.out.println ("nnsp = " + nnsp + "  nnsc = " + nnsc +
     "  nnsxy = " + nnsxy);
 System.out.println ("nncp = " + nncp + "  nncc = " + nncc +
     "  nncxy = " + nncxy);
 System.out.println ();
-
 System.out.println ();
 System.out.print ("Elapsed time for identical polygon removal = ");
 System.out.print (t22 - t11);

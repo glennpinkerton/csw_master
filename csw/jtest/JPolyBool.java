@@ -1158,7 +1158,7 @@ System.out.flush ();
         }
         catch (Throwable ex) {
         }
-        if (nrow > 400) nrow = 400;
+        if (nrow > 200) nrow = 200;
         if (nrow < 3) nrow = 3;
         ncol = nrow;
 
