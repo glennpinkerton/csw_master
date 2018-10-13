@@ -5520,6 +5520,87 @@ of Font.BOLD|Font.ITALIC.
 
 
 
+
+    private class IdentCell {
+
+      ArrayList<IdentCell>  subMatrix = null;
+      ArrayList<PolyBB> alist;
+      double  xmin = 1.e30, ymin = 1.e30,
+              xmax = -1.e30, ymax = -1.e30,
+              xsp = -1.0, ysp = -1.0;
+      int     ncol = -1, nrow = -1;
+
+      JDisplayList  parent = null;
+
+    
+      IdentCell (int isiz) {
+        alist = new ArrayList<PolyBB> (isiz);
+      }
+
+
+      void setSubMatrix (ArrayList<IdentCell> sub) {
+        subMatrix = sub;
+      }
+
+
+      void setBBList (ArrayList<PolyBB> al) {
+        alist = al;
+      }
+
+
+      void setParent (JDisplayList par) {
+        parent = par;
+      }
+
+
+      void setGeom (double x1, double y1,
+                    double x2, double y2,
+                    double xs, double ys,
+                    int nc, int nr) {
+        xmin = x1;
+        ymin = y1;
+        xmax = x2;
+        ymax = y2;
+        xsp = xs;
+        ysp = ys;
+        ncol = nc;
+        nrow = nr;
+      }
+
+
+      void splitCellToMatrix () {
+
+        int jcol, irow, kcell;
+
+      // Use each xc, yc center in each PolyBB object to add
+      // to the list for the cell where the xc, yc is located.
+        for (PolyBB pb : alist) {
+
+          jcol = (int) ((pb.xc - xmin) / xsp);
+          irow = (int) ((pb.yc - ymin) / ysp);
+          kcell = irow * ncol + jcol;
+
+          ArrayList<PolyBB> ap = null;
+          IdentCell  idc = subMatrix.get (kcell);
+          if (idc != null) {
+            ap = idc.alist;
+          }
+          else {
+            idc = new IdentCell (4);
+            subMatrix.set (kcell, idc);
+            ap = idc.alist;
+          }
+          ap.add (pb);  
+        }
+      }
+
+ 
+    }  // end of private IdentCell class
+
+
+
+
+
   // Calculate the bounding box and the center point of the 
   // bounding box.  Put these data into a PolyBB object and
   // return that object.  Obvious errors have a null object
@@ -5656,8 +5737,11 @@ of Font.BOLD|Font.ITALIC.
           ncol = nt;
       }
 
-ncol *= 2;
-nrow *= 2;
+    // empirical evidence shows that more columns and rows speed up things
+    // in many cases.  Doubling works well for evenly distributed polygons.
+
+      ncol *= 2;
+      nrow *= 2;
 
       if (nrow < 5) nrow = 5;
       if (nrow > 500) nrow = 500;
@@ -5666,23 +5750,9 @@ nrow *= 2;
 
       ntot = ncol * nrow;
 
-//System.out.println ("ncol = " + ncol + "  nrow = " + nrow);
-//System.out.flush ();
-
-      int init_cell_size = bbl.size() / ntot;
-      if (init_cell_size < 4) {
-        init_cell_size = 4;
-      }
-      else if (init_cell_size > 16) {
-        init_cell_size = 16;
-      }
-      else {
-        init_cell_size = 8;
-      }
-
     // create the matrix and assign each cell's list to null
-      ArrayList<ArrayList<PolyBB>> cells =
-          new ArrayList<ArrayList<PolyBB>> (ntot);
+      ArrayList<IdentCell> cells =
+          new ArrayList<IdentCell> (ntot);
       for (int kk=0; kk<ntot; kk++) {
         cells.add (null);
       }
@@ -5690,35 +5760,28 @@ nrow *= 2;
       double   xspace = (xmax - xmin) / (double)ncol;
       double   yspace = (ymax - ymin) / (double)nrow;
 
+      IdentCell topCell = new IdentCell (4);
+      topCell.setSubMatrix (cells);
+      topCell.setParent (this);
+      topCell.setBBList (bbl);
+      topCell.setGeom (xmin, ymin, xmax, ymax,
+                       xspace, yspace, ncol, nrow);
+
       int  irow, jcol, kcell;
 
-//System.out.println ("bbl size = " + bbl.size());
-//System.out.flush ();
-
-    // Use each xc. yc center in each PolyBB object to add
+    // Use each xc, yc center in each PolyBB object to add
     // to the list for the cell where the xc, yc is located.
-      for (PolyBB pb : bbl) {
 
-        jcol = (int) ((pb.xc - xmin) / xspace);
-        irow = (int) ((pb.yc - ymin) / yspace);
-        kcell = irow * ncol + jcol;
-
-        ArrayList<PolyBB> ap = cells.get (kcell);
-        if (ap == null) {
-          ap = new ArrayList<PolyBB> (init_cell_size);
-          cells.set (kcell, ap);
-        }
-        ap.add (pb);  
-      }
+      topCell.splitCellToMatrix ();
 
     // Remove ident polys from each non null cell list.
     // Identical polygons (all but one instance) are set to
     // null in the spl list.  Tiny2 is used for determining
     // if PolyBB center points and dimensions are "identical".
       double  tiny2 = tiny / 100000.0;
-      for (ArrayList<PolyBB> ap : cells) {
-        if (ap == null) continue;
-        RemoveIdents (ap, tiny2, spl);
+      for (IdentCell id : topCell.subMatrix) {
+        if (id == null) continue;
+        RemoveIdents (id, tiny2, spl);
       }
        
     }
@@ -5737,16 +5800,19 @@ nrow *= 2;
     }
 
 
-    private void RemoveIdents (ArrayList<PolyBB> ap,
+    private void RemoveIdents (IdentCell id,
                                double tiny,
                                ArrayList<DLFill> spl)
     {
-      if (ap == null  ||  spl == null  ||  tiny < 0.0) return;
+      if (id == null  ||  spl == null  ||  tiny < 0.0) return;
 
       int  ic = 0;
       DLFill dlf = null;
       DLFill dlf2 = null;
       PolyBB pb2 = null;
+
+      ArrayList<PolyBB> ap = id.alist;
+      if (ap == null) return;
 
       int siz1 = ap.size();
 
