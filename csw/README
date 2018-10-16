@@ -99,3 +99,11 @@ mysql  (Added 1/7/2018)
   data base.  There is no real data.  I just generated random data for
   use in learning some mysql skills.  The random data is not stored in
   git.
+
+
+gradle
+
+  Simple gradle build for the JEasyXTest application.  I just did this to
+  learn a little about gradle.
+
+

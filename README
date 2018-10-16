@@ -4,12 +4,14 @@ contour mapping stuff.  The code was originally written by Glenn Pinkerton
 is a refactor trying to use more modern software technology.
 
 My (Glenn's) reason for doing this is primarily to learn new technology.
-The code is currently (11/21/2017) not really "ready for use".  I have put
-it here on github to learn how to use github and to have everything under
-a version control system
+
+As of 10/15/2018, quite a bit of the code is useful, in my opinion.  It is
+not particularly well documented, but the test programs in csw/jtest give
+a good starting point if anyone wants to use this stuff.
 
 I have made two branches:  glenns_branch and testing_branch.   You should make
-your own branch if you want to explore the code.
+your own branch if you want to explore the code.  Or, clone the whole master and 
+do what you want from there.
 
 I will update/replace this README with information about relatively big changes
 that I make in the code.
@@ -19,14 +21,19 @@ Any constructive comments are appreciated.
 
 The three directories here are:
 
-    build     Scripts to build using make.  I do not have any other build
-              mechanism other than the makefiles.
+    build     Scripts to build using make.  The only mechanism for building
+              everything is makefiles.  I have a simple use of gradle for
+              building the JEasyXTest application as well.  The gradle build
+              is in the csw/gradle directory.
 
     csw       This has all the code, makefiles, some data, etc.
 
     jutest    This has files for building and running junit tests.  There
               are very few tests.  I made these few as a start to learning
-              the junit framework.
+              the junit framework.  As of 10/15/2018, I doubt if I will do
+              much with the jutest directory.  I'm not real impressed with
+              junit.  It seems to me that it is quite a bit of tedious work
+              for not much reward.
 
 
 There are README files in these directories with more information.
