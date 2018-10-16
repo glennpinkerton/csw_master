@@ -5450,7 +5450,7 @@ of Font.BOLD|Font.ITALIC.
 
 /*---------------------------------------------------------------------*/
 
-    private boolean IdentBooleanInputPoly (DLFill dlf1, DLFill dlf2) {
+    private static boolean IdentBooleanInputPoly (DLFill dlf1, DLFill dlf2) {
 
       if (dlf1 == null  ||  dlf2 == null) {
         return false;
@@ -5529,8 +5529,7 @@ of Font.BOLD|Font.ITALIC.
               xmax = -1.e30, ymax = -1.e30,
               xsp = -1.0, ysp = -1.0;
       int     ncol = -1, nrow = -1;
-
-      JDisplayList  parent = null;
+      int     level = 0;
 
     
       IdentCell (int isiz) {
@@ -5545,11 +5544,6 @@ of Font.BOLD|Font.ITALIC.
 
       void setBBList (ArrayList<PolyBB> al) {
         alist = al;
-      }
-
-
-      void setParent (JDisplayList par) {
-        parent = par;
       }
 
 
@@ -5568,16 +5562,45 @@ of Font.BOLD|Font.ITALIC.
       }
 
 
+      void setLevel (int ival) {
+        level = ival;
+      }
+
+
+  /*
+   * Split the cell into 4 by 4 matrices until no cell in the matrix has more 
+   * than 16 polygons.  This is done recursively.
+   */
       void splitCellToMatrix () {
+
+/*
+if (level > 0) {
+System.out.println ("splitting cell for level = " + level);
+System.out.println ("  min = " + xmin + " " + ymin +
+                    "  max = " + xmax + " " + ymax);
+System.out.flush ();
+}
+
+if (level > 10) {
+System.out.println ("** stopping for level too large.");
+System.out.flush ();
+  return;
+}
+*/
 
         int jcol, irow, kcell;
 
       // Use each xc, yc center in each PolyBB object to add
       // to the list for the cell where the xc, yc is located.
+
         for (PolyBB pb : alist) {
 
           jcol = (int) ((pb.xc - xmin) / xsp);
           irow = (int) ((pb.yc - ymin) / ysp);
+          if (jcol < 0) jcol = 0;
+          if (jcol > ncol-1) jcol = ncol-1;
+          if (irow < 0) irow = 0;
+          if (irow > nrow-1) irow = nrow-1;
           kcell = irow * ncol + jcol;
 
           ArrayList<PolyBB> ap = null;
@@ -5592,9 +5615,131 @@ of Font.BOLD|Font.ITALIC.
           }
           ap.add (pb);  
         }
-      }
 
+        int nt = 16;  // adjust for efficiency
+        int nc2 = 4;
+        int nr2 = 4;
+        int ntot2 = 16;
+
+        int n2 = 0;
+        for (IdentCell idd : subMatrix) {
+          if (idd == null) continue;
+          if (idd.alist.size() > nt) n2++;
+        }
+
+        if (n2 < 1) {
+//System.out.println ("**** Stopping recursion for no crowded cells. ****");
+//System.out.flush ();
+          return;
+        }
+
+        double  x1, y1, x2, y2, xs, ys;
+
+        xs = (xmax - xmin) / (double)ncol;
+        ys = (ymax - ymin) / (double)nrow;
+
+        for (irow=0; irow<nrow; irow++) {
+          int ianc = irow * ncol;
+          for (jcol=0; jcol<ncol; jcol++) {
+            kcell = ianc + jcol;
+            IdentCell idd = subMatrix.get (kcell);
+            if (idd == null) continue;
+            if (idd.alist.size() <= nt) continue;
+            x1 = xmin + jcol * xs; 
+            x2 = x1 + xs;
+            y1 = ymin + irow * ys;
+            y2 = y1 + ys;
+            idd.setLevel (level + 1);
+            idd.setGeom (x1, y1, x2, y2,
+                         xs / (double)nc2, ys / (double)nr2, nc2, nr2);
+            ArrayList<IdentCell> idd_sub = new ArrayList<IdentCell> (ntot2);
+            for (int i=0; i<ntot2; i++) {
+              idd_sub.add (null);
+            }
+            idd.setSubMatrix (idd_sub);
+            idd.splitCellToMatrix ();
+          }
+        }
+      }
  
+
+
+      void removeIdents (double tiny,
+                         ArrayList<DLFill> spl)
+      {
+
+//if (level > 0) {
+//System.out.println ("removing idents for level = " + level);
+//System.out.flush ();
+//}
+
+        if (spl == null  ||  tiny < 0.0) return;
+
+        int  ic = 0;
+        DLFill dlf = null;
+        DLFill dlf2 = null;
+        PolyBB pb2 = null;
+
+        if (subMatrix != null) {
+          for (IdentCell id : subMatrix) {
+            if (id == null) continue;
+            id.removeIdents (tiny, spl);
+          }
+        }
+        else {
+          if (alist == null) return;
+
+          int siz1 = alist.size();
+
+          for (PolyBB pbb : alist) {
+
+            if (pbb == null) {
+              ic++;
+              continue;
+            }
+            if (pbb.idx < 0) {
+              ic++;
+              continue;
+            }
+
+            dlf = spl.get(pbb.idx);
+            if (dlf == null) {
+              ic++;
+              pbb.idx = -1;
+              continue;
+            }
+            if (JDisplayList.BadPolygonComponent (dlf)) {
+              pbb.idx = -1;
+              spl.set (pbb.idx, null);
+              dlf = null;
+              ic++;
+              continue;
+            }
+            for (int j=ic+1; j<siz1; j++) {
+              pb2 = alist.get (j);
+              if (pb2 == null  ||  pb2.idx < 0) {
+                continue;
+              }
+              if (pbb.notSame (pb2, tiny)) {
+                continue;
+              }
+              dlf2 = spl.get(pb2.idx);
+              if (dlf2 == null) {
+                pb2.idx = -1;
+                continue;
+              }
+              if (JDisplayList.IdentBooleanInputPoly (dlf, dlf2)) {
+                spl.set (pb2.idx, null);
+                pb2.idx = -1;
+              }
+            }       
+            ic++;
+          }
+
+        }
+
+      }  // end of removeIdents method
+
     }  // end of private IdentCell class
 
 
@@ -5711,10 +5856,6 @@ of Font.BOLD|Font.ITALIC.
       xmax += tiny;
       ymax += tiny;
 
-//System.out.println ("xmin = " + xmin + "  ymin = " + ymin);
-//System.out.println ("xmax = " + xmax + "  ymax = " + ymax);
-//System.out.flush ();
-
     // Calculate a reasonable number of rows and columns for the matrix.
       int  siz = bbl.size();
       int  ncol, nrow, ntot;
@@ -5750,7 +5891,8 @@ of Font.BOLD|Font.ITALIC.
 
       ntot = ncol * nrow;
 
-    // create the matrix and assign each cell's list to null
+    // create the top level matrix and set each cell's list to null
+
       ArrayList<IdentCell> cells =
           new ArrayList<IdentCell> (ntot);
       for (int kk=0; kk<ntot; kk++) {
@@ -5762,10 +5904,10 @@ of Font.BOLD|Font.ITALIC.
 
       IdentCell topCell = new IdentCell (4);
       topCell.setSubMatrix (cells);
-      topCell.setParent (this);
       topCell.setBBList (bbl);
       topCell.setGeom (xmin, ymin, xmax, ymax,
                        xspace, yspace, ncol, nrow);
+      topCell.setLevel (0);
 
       int  irow, jcol, kcell;
 
@@ -5778,11 +5920,9 @@ of Font.BOLD|Font.ITALIC.
     // Identical polygons (all but one instance) are set to
     // null in the spl list.  Tiny2 is used for determining
     // if PolyBB center points and dimensions are "identical".
+
       double  tiny2 = tiny / 100000.0;
-      for (IdentCell id : topCell.subMatrix) {
-        if (id == null) continue;
-        RemoveIdents (id, tiny2, spl);
-      }
+      topCell.removeIdents (tiny2, spl);
        
     }
 
@@ -5798,75 +5938,6 @@ of Font.BOLD|Font.ITALIC.
       return ap2;
 
     }
-
-
-    private void RemoveIdents (IdentCell id,
-                               double tiny,
-                               ArrayList<DLFill> spl)
-    {
-      if (id == null  ||  spl == null  ||  tiny < 0.0) return;
-
-      int  ic = 0;
-      DLFill dlf = null;
-      DLFill dlf2 = null;
-      PolyBB pb2 = null;
-
-      ArrayList<PolyBB> ap = id.alist;
-      if (ap == null) return;
-
-      int siz1 = ap.size();
-
-//System.out.println ("  In remove idents size = " + siz1);
-//System.out.flush ();
-
-      for (PolyBB pbb : ap) {
-
-        if (pbb == null) {
-          ic++;
-          continue;
-        }
-        if (pbb.idx < 0) {
-          ic++;
-          continue;
-        }
-
-        dlf = spl.get(pbb.idx);
-        if (dlf == null) {
-          ic++;
-          pbb.idx = -1;
-          continue;
-        }
-        if (BadPolygonComponent (dlf)) {
-          pbb.idx = -1;
-          spl.set (pbb.idx, null);
-          dlf = null;
-          ic++;
-          continue;
-        }
-        for (int j=ic+1; j<siz1; j++) {
-          pb2 = ap.get (j);
-          if (pb2 == null  ||  pb2.idx < 0) {
-            continue;
-          }
-          if (pbb.notSame (pb2, tiny)) {
-            continue;
-          }
-//System.out.println ("notSame returned false idx = " + pb2.idx);
-//System.out.flush ();
-          dlf2 = spl.get(pb2.idx);
-          if (dlf2 == null) {
-            pb2.idx = -1;
-            continue;
-          }
-          if (IdentBooleanInputPoly (dlf, dlf2)) {
-            spl.set (pb2.idx, null);
-            pb2.idx = -1;
-          }
-        }       
-        ic++;
-      }
-    }
-
 
 
     private void RemoveIdentPolys (ArrayList<DLFill> spl)
@@ -5889,7 +5960,7 @@ of Font.BOLD|Font.ITALIC.
           ic++;
           continue;
         }
-        if (BadPolygonComponent (dlf)) {
+        if (JDisplayList.BadPolygonComponent (dlf)) {
           spl.set (ic, null);
           dlf = null;
         }
@@ -5900,7 +5971,7 @@ of Font.BOLD|Font.ITALIC.
         for (int j=ic+1; j<siz1; j++) {
           dlf2 = spl.get(j);
           if (dlf2 == null) continue;
-          if (IdentBooleanInputPoly (dlf, dlf2)) {
+          if (JDisplayList.IdentBooleanInputPoly (dlf, dlf2)) {
             spl.set (j, null);
           }
         }       
@@ -6331,7 +6402,7 @@ System.out.flush ();
  * operations for obvious errors.
  */
 
-    private boolean BadPolygonComponent (DLFill dlf)
+    private static boolean BadPolygonComponent (DLFill dlf)
     {
       int i = 0;
 
@@ -6355,4 +6426,3 @@ System.out.flush ();
 /*---------------------------------------------------------------------*/
 
 }  // end of JDisplayList class definition
-
