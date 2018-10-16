@@ -1149,23 +1149,63 @@ System.out.flush ();
 
     private void generateGrid2 ()
     {
-        int  ncol = 3, nrow = 3;
+        int  eval = 21;
         String stm = System.getenv ("PBOOL_GRID2_MAX");
         try {
             Integer iob = Integer.parseInt (stm);
-            nrow = iob.intValue();
-            ncol = nrow;
+            eval = iob.intValue();
         }
         catch (Throwable ex) {
         }
-        if (nrow > 300) nrow = 300;
-        if (nrow < 3) nrow = 3;
-        ncol = nrow;
 
-        double  xspace = 80.0 / (double)(ncol - 1);
-        double  yspace = 80.0 / (double)(nrow - 1);
+        boolean  bcluster = false;
+
+        if (eval < 0) {
+            bcluster = true;
+            eval = -eval;
+        }
+
+        if (eval > 300) eval = 300;
+        if (eval < 3) eval = 3;
+
+        if (bcluster == false) {
+            _generateGrid2_ (eval, 10.0, 10.0, 90.0, 90.0);
+        }
+        else {
+            _generateGrid2_ (eval, 10.0, 10.0, 40.0, 40.0);
+            _generateGrid2_ (eval, 20.0, 70.0, 30.0, 80.0);
+            _generateGrid2_ (eval, 70.0, 70.0, 75.0, 75.0);
+            _generateGrid2_ (eval, 80.0, 20.0, 82.0, 22.0);
+            _generateGrid2_ (eval, 70.0, 15.0, 70.1, 15.1);
+            _generateGrid2_ (eval, 65.0, 10.0, 65.01, 10.01);
+            _generateGrid2_ (eval, 60.0, 12.0, 60.001, 12.001);
+        }
+
+        intersectButton.setEnabled (true);
+        unionButton.setEnabled (true);
+        xorButton.setEnabled (true);
+
+        repaintPanel ();
+
+    }
+
+
+    private void _generateGrid2_ (int eval, 
+                                  double _x1, double _y1,
+                                  double _x2, double _y2) {
+
+        int  ncol = eval, nrow = eval;
+        
+        double width = _x2 - _x1;
+        double height = _y2 - _y1;
+
+        double  xspace = width / (double)(ncol - 1);
+        double  yspace = height / (double)(nrow - 1);
         double  xsp5 = xspace / 5.0;
         double  ysp5 = yspace / 5.0;
+
+        double xcorig = _x1 + width / 40.0;
+        double ycorig = _y1 + height / 40.0;
 
         double[] xoff = new double[nrow * ncol];
         double[] yoff = new double[nrow * ncol];
@@ -1192,15 +1232,15 @@ System.out.flush ();
         int  k = 0;
 
         for (int i=0; i<nrow-1; i++) {
-          double y1 = i * yspace + 10.0;
-          double y2 = (i + 1) * yspace + 10.0;
+          double y1 = i * yspace + _y1;
+          double y2 = (i + 1) * yspace + _y1;
           int ianc = i * ncol;
           for (int j=0; j<ncol - 1; j++) {
             npa = new int[1];
             npa[0] = 5;
             k = ianc + j;
-            double x1 = j * xspace + 10.0;
-            double x2 = (j + 1) * xspace + 10.0;
+            double x1 = j * xspace + _x1;
+            double x2 = (j + 1) * xspace + _x1;
             xp = new double[5];
             xp[0] = x1 + xoff[k];
             xp[1] = x1 + xoff[k+ncol];
@@ -1228,8 +1268,8 @@ System.out.flush ();
         dl.setLineThickness(.002);
 
         for (int i=0; i<nrow-1; i++) {
-          double y1 = i * yspace + 12.0;
-          double y2 = (i + 1) * yspace + 12.0;
+          double y1 = i * yspace + ycorig;
+          double y2 = (i + 1) * yspace + ycorig;
           yp = new double[5];
           yp[0] = y1;
           yp[1] = y2;
@@ -1239,8 +1279,8 @@ System.out.flush ();
           for (int j=0; j<ncol - 1; j++) {
             npa = new int[1];
             npa[0] = 5;
-            double x1 = j * xspace + 12.0;
-            double x2 = (j + 1) * xspace + 12.0;
+            double x1 = j * xspace + xcorig;
+            double x2 = (j + 1) * xspace + xcorig;
             xp = new double[5];
             xp[0] = x1;
             xp[1] = x1;
@@ -1259,12 +1299,6 @@ System.out.flush ();
 
         dl.setSelectable (null);
 
-        intersectButton.setEnabled (true);
-        unionButton.setEnabled (true);
-        xorButton.setEnabled (true);
-
-        repaintPanel ();
-
-    }
+    }  // end of _generateGrid2_ method
 
 };

@@ -50,8 +50,8 @@
 #define EDGE_CHECK_LENGTH          100
 
 #define LOCAL_MAX_GRID_SIZE        20000
-#define MAX_SEG_INDEX              4000
-#define MAX_NODE_INDEX             4000
+#define MAX_SEG_INDEX              64000
+#define MAX_NODE_INDEX             64000
 #define LIST_CHUNK                 1000
 
 #define NCOMP_INDEXED              20
